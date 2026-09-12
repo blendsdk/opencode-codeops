@@ -1,0 +1,56 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/blendsdk/codex-codeops/schemas/codeops-config.schema.json",
+  "title": "CodeOps project configuration",
+  "type": "object",
+  "required": ["schema", "mode", "artifacts"],
+  "additionalProperties": false,
+  "properties": {
+    "schema": {"const": 1},
+    "mode": {"enum": ["strict", "adaptive"]},
+    "artifacts": {
+      "type": "object",
+      "required": ["layout", "root"],
+      "additionalProperties": false,
+      "properties": {
+        "layout": {"enum": ["nested", "flat"]},
+        "root": {"type": "string", "minLength": 1}
+      }
+    },
+    "quality": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "independentReview": {"type": "boolean"},
+        "minimumReviewers": {"type": "integer", "minimum": 1},
+        "stopOnMajorFinding": {"type": "boolean"}
+      }
+    },
+    "routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "maxConcurrentAgents": {"type": "integer", "minimum": 1},
+        "roles": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "model": {"type": "string", "minLength": 1},
+              "effort": {"type": "string", "minLength": 1},
+              "sandbox": {"enum": ["read-only", "workspace-write", "danger-full-access"]}
+            }
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {"type": "boolean"}
+      }
+    }
+  }
+}
