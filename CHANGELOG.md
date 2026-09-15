@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 1.3.1 — 2026-09-15
+
+- Refuse to install or uninstall through a symlinked skills directory unless `--force` is passed,
+  so a symlinked target cannot silently rewrite the tree it points at. `status` stays read-only.
+- Ignore the local install marker and development skill link under `skills/`.
+
 ## 1.3.0 — 2026-09-15
 
 - Add a one-line curl installer (`install.sh`) that downloads the repository tarball and runs the
