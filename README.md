@@ -44,19 +44,37 @@ OpenCode installs the plugin automatically via Bun on next startup. A global con
 ### Install the skills
 
 OpenCode discovers skills only from the filesystem (`.opencode/skills/` or
-`~/.config/opencode/skills/`); it never reads them from a plugin package. Install all 16 CodeOps
+`~/.config/opencode/skills/`); it never reads them from a plugin package. Install all CodeOps
 skills with one command:
 
 ```bash
 # Global (recommended) — available in every OpenCode project
-npx opencode-codeops install-skills
+curl -fsSL https://raw.githubusercontent.com/blendsdk/opencode-codeops/main/install.sh | bash
 
 # Project-only — skills live in ./.opencode/skills and are committed with the repo
-npx opencode-codeops install-skills --project
+curl -fsSL https://raw.githubusercontent.com/blendsdk/opencode-codeops/main/install.sh | bash -s -- --project
 ```
 
-Use `--dry-run` to preview and `--force` to overwrite files that differ. Without `--force`,
-existing files that differ from the packaged version are skipped, so hand-edited skills are safe.
+Pin a version with `CODEOPS_REF` (defaults to `main`):
+
+```bash
+CODEOPS_REF=<tag-or-commit> curl -fsSL https://raw.githubusercontent.com/blendsdk/opencode-codeops/main/install.sh | bash
+```
+
+Re-running the installer upgrades an existing install in place. It replaces only the skills this
+package owns, recorded in `<skills-dir>/.opencode-codeops.json`. Skills you author yourself, or
+install with another tool, are left untouched. If you installed earlier with `npm`, run
+`npx opencode-codeops install-skills` instead — it is the same installer.
+
+Check or remove an install:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/blendsdk/opencode-codeops/main/install.sh | bash -s -- status
+curl -fsSL https://raw.githubusercontent.com/blendsdk/opencode-codeops/main/install.sh | bash -s -- uninstall
+```
+
+Use `--dry-run` to preview an install. A same-named directory this package does not own is skipped
+with a warning; pass `--force` to replace it.
 
 ### Local development
 

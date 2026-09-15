@@ -2,6 +2,15 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+- Add a one-line curl installer (`install.sh`) that downloads the repository tarball and runs the
+  skills installer. Pin a version with `CODEOPS_REF`.
+- Add `status` and `uninstall` subcommands to `bin/install-skills.mjs`.
+- Record owned skills and the installed version in `<skills-dir>/.opencode-codeops.json`, and
+  replace managed skills atomically on upgrade. Skills not owned by this package are never touched.
+- Add specification tests for the installer, run with `node --test`.
+
 ## 1.2.0 — OpenCode port — 2026-09-12
 
 Port from `codex-codeops` (Codex plugin) to `opencode-codeops` (OpenCode plugin).

@@ -7,7 +7,7 @@ CodeOps plugin for OpenCode — specification-first engineering for complex syst
 - This is an OpenCode plugin. The plugin entry point is `plugin/index.ts`.
 - Use `CODEOPS_PLUGIN_ROOT` (not `PLUGIN_ROOT`) in all skill and shared-document script references.
 - Agent files live in `agents/` (source) and are installed into `.opencode/agents/` in user projects by the `setup-codeops` skill. Do not hand-edit files in `agents/` — regenerate them with `scripts/install_agents.py`.
-- Skill files live in `skills/` (source) and are installed into a discoverable skills directory (`.opencode/skills/` or `~/.config/opencode/skills/`) by `bin/install-skills.mjs`.
+- Skill files live in `skills/` (source) and are installed into a discoverable skills directory (`.opencode/skills/` or `~/.config/opencode/skills/`) by `bin/install-skills.mjs`. The curl bootstrap is `install.sh`; it downloads the repo tarball and runs the same installer.
 - `codeops/codeops.json` is the project-level config. `codeops/.codeops.yml` is the layout marker owned solely by `setup-codeops`.
 - All CodeOps artifacts are plain Markdown files in the user's repo — host-agnostic and git-commitable.
 
@@ -52,6 +52,7 @@ node bin/install-skills.mjs install-skills --dry-run
 ## Verification commands
 
 - Type-check: `npx tsc --noEmit`
+- Installer tests: `node --test`
 - Skill frontmatter: `python3 -c "import sys,re; [print(f) for f in __import__('glob').glob('skills/*/SKILL.md') if not re.search(r'^name:', open(f).read(), re.M)]"`
 - No `${PLUGIN_ROOT}` leaks: `grep -r '\${PLUGIN_ROOT}' skills/ _shared/ standards/` (must be empty)
 - No `.codex/` leaks: `grep -r '\.codex/' skills/ _shared/ standards/` (must be empty)

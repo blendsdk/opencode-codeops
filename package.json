@@ -10,6 +10,9 @@
   "bin": {
     "opencode-codeops": "./bin/install-skills.mjs"
   },
+  "scripts": {
+    "test": "node --test"
+  },
   "files": [
     "plugin/",
     "skills/",
@@ -21,6 +24,7 @@
     "bin/",
     "references/",
     "schemas/",
+    "install.sh",
     "README.md",
     "CHANGELOG.md",
     "LICENSE"
