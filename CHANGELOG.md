@@ -2,7 +2,7 @@
 
 All notable changes to CodeOps are recorded here.
 
-## Unreleased
+## 1.3.0 — 2026-09-15
 
 - Add a one-line curl installer (`install.sh`) that downloads the repository tarball and runs the
   skills installer. Pin a version with `CODEOPS_REF`.
