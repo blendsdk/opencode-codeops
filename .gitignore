@@ -10,3 +10,8 @@ __pycache__/
 
 # OS files
 .DS_Store
+
+# Installer state and local skill links. These appear in skills/ when the
+# global OpenCode skills directory is symlinked to this checkout.
+skills/.opencode-codeops.json
+skills/blendsdk

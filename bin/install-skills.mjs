@@ -108,6 +108,20 @@ function entryExists(targetPath) {
 }
 
 /**
+ * Tests whether a path is a symbolic link, without following it.
+ *
+ * @param targetPath - Path to test
+ * @returns True when the path itself is a symlink
+ */
+function isSymlink(targetPath) {
+  try {
+    return lstatSync(targetPath).isSymbolicLink()
+  } catch {
+    return false
+  }
+}
+
+/**
  * Lists the skill names shipped in a skills directory.
  *
  * A directory counts as a skill when it contains `SKILL.md`. Symbolic links are
@@ -432,6 +446,17 @@ export function main(argv, io = {}) {
 
   console.log(`Source: ${sourceDir}`)
   console.log(`Target: ${targetDir}`)
+
+  // Writing through a symlinked target would mutate whatever the link points
+  // at, which is often the package's own source tree. Refuse unless the user
+  // explicitly overrides with --force. Status is read-only and always allowed.
+  if (command !== "status" && !options.force && isSymlink(targetDir)) {
+    console.error(
+      `error: target skills directory is a symlink to ${realpathSync(targetDir)}; ` +
+        "install/uninstall would write through it. Pass --force to proceed."
+    )
+    return 2
+  }
 
   if (command === "status") {
     printStatus({ targetDir, sourceDir })

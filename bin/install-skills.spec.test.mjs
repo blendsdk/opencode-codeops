@@ -67,12 +67,15 @@ function makeSource(names = ["make-plan", "exec-plan"]) {
 
 /** Runs a function while suppressing console output. */
 function silence(fn) {
-  const original = console.log
+  const log = console.log
+  const error = console.error
   console.log = () => {}
+  console.error = () => {}
   try {
     return fn()
   } finally {
-    console.log = original
+    console.log = log
+    console.error = error
   }
 }
 
@@ -214,5 +217,52 @@ describe("main", () => {
 
     assert.equal(code, 0)
     assert.equal(readMarker(target).version, "1.2.3")
+  })
+})
+
+describe("symlinked target guard", () => {
+  /** Builds a source tree plus a real target and a symlink pointing at it. */
+  function makeLinkedTarget() {
+    const source = makeSource(["make-plan"])
+    const real = tempDir("codeops-real-")
+    const link = join(tempDir("codeops-link-"), "skills")
+    symlinkSync(real, link, "dir")
+    return { source, real, link }
+  }
+
+  it("refuses install through a symlinked target unless forced", () => {
+    const { source, real, link } = makeLinkedTarget()
+
+    const refused = silence(() =>
+      main(["install", "--target", link], { source, version: "1.0.0" })
+    )
+    assert.equal(refused, 2)
+    assert.ok(!existsSync(join(real, MARKER_FILE)))
+
+    const forced = silence(() =>
+      main(["install", "--target", link, "--force"], { source, version: "1.0.0" })
+    )
+    assert.equal(forced, 0)
+    assert.ok(existsSync(join(real, MARKER_FILE)))
+  })
+
+  it("refuses uninstall through a symlinked target unless forced", () => {
+    const { source, real, link } = makeLinkedTarget()
+    silence(() => main(["install", "--target", link, "--force"], { source, version: "1.0.0" }))
+
+    const refused = silence(() => main(["uninstall", "--target", link]))
+    assert.equal(refused, 2)
+    assert.ok(existsSync(join(real, "make-plan")))
+
+    const forced = silence(() => main(["uninstall", "--target", link, "--force"]))
+    assert.equal(forced, 0)
+    assert.ok(!existsSync(join(real, "make-plan")))
+  })
+
+  it("allows status on a symlinked target", () => {
+    const { source, link } = makeLinkedTarget()
+    silence(() => main(["install", "--target", link, "--force"], { source, version: "1.0.0" }))
+
+    assert.equal(silence(() => main(["status", "--target", link], { source })), 0)
   })
 })
