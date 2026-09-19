@@ -81,20 +81,17 @@ export function readPackageVersion() {
 /**
  * Resolves the directory that holds the shipped skills.
  *
- * The `CODEOPS_PLUGIN_ROOT` environment variable overrides the default. That
- * lets a checkout run the installer before the package is published.
+ * The package's own `skills/` directory is always the source, so the installed
+ * skills match the package that was invoked. The `CODEOPS_PLUGIN_ROOT`
+ * environment variable is deliberately ignored: the plugin exports it into
+ * every shell, and honouring it would install a different checkout's skills.
+ * Pass `--source` to override for development.
  *
  * @param override - Optional explicit skills directory
  * @returns Absolute path to the skills directory
  */
 export function resolveSourceDir(override) {
   if (override) return resolve(override)
-
-  const envRoot = process.env.CODEOPS_PLUGIN_ROOT
-  if (envRoot && existsSync(join(envRoot, "skills"))) {
-    return join(envRoot, "skills")
-  }
-
   return join(PACKAGE_ROOT, "skills")
 }
 
@@ -385,7 +382,7 @@ export function main(argv, io = {}) {
   const cwd = io.cwd ?? process.cwd()
   const version = io.version ?? readPackageVersion()
   const sourceDir = io.source ?? resolveSourceDir(options.source)
-  const targetDir = resolveTarget(options, cwd, "skills")
+  const targetDir = resolveTarget(options, cwd, "skills", io.home)
 
   if (!existsSync(sourceDir)) {
     console.error(`error: skills directory not found: ${sourceDir}`)
@@ -414,8 +411,8 @@ export function main(argv, io = {}) {
   if (command === "uninstall") {
     const result = uninstallSkills({ targetDir, dryRun: options.dryRun })
     if (result.error) {
-      console.error(`error: ${result.error} at ${targetDir}`)
-      return 1
+      console.log(`nothing to remove at ${targetDir} (${result.error})`)
+      return 0
     }
     console.log(
       `${options.dryRun ? "would remove" : "removed"} ${result.removed.length} skill(s); ` +

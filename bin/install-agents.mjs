@@ -81,20 +81,17 @@ export function readPackageVersion() {
 /**
  * Resolves the directory that holds the packaged agent definitions.
  *
- * The `CODEOPS_PLUGIN_ROOT` environment variable overrides the default, which
- * lets a checkout run the installer before the package is published.
+ * The package's own `agents/` directory is always the source, so the installed
+ * agents match the package that was invoked. The `CODEOPS_PLUGIN_ROOT`
+ * environment variable is deliberately ignored: the plugin exports it into
+ * every shell, and honouring it would install a different checkout's agents.
+ * Pass `--source` to override for development.
  *
  * @param override - Optional explicit agents directory
  * @returns Absolute path to the agents directory
  */
 export function resolveSourceDir(override) {
   if (override) return resolve(override)
-
-  const envRoot = process.env.CODEOPS_PLUGIN_ROOT
-  if (envRoot && existsSync(join(envRoot, "agents"))) {
-    return join(envRoot, "agents")
-  }
-
   return join(PACKAGE_ROOT, "agents")
 }
 
@@ -375,7 +372,7 @@ export function main(argv, io = {}) {
   const cwd = io.cwd ?? process.cwd()
   const version = io.version ?? readPackageVersion()
   const sourceDir = io.source ?? resolveSourceDir(options.source)
-  const targetDir = resolveTarget(options, cwd, "agents")
+  const targetDir = resolveTarget(options, cwd, "agents", io.home)
 
   if (!existsSync(sourceDir)) {
     console.error(`error: agents directory not found: ${sourceDir}`)
@@ -404,8 +401,8 @@ export function main(argv, io = {}) {
   if (command === "uninstall") {
     const result = uninstallAgents({ targetDir, dryRun: options.dryRun })
     if (result.error) {
-      console.error(`error: ${result.error} at ${targetDir}`)
-      return 1
+      console.log(`nothing to remove at ${targetDir} (${result.error})`)
+      return 0
     }
     console.log(
       `${options.dryRun ? "would remove" : "removed"} ${result.removed.length} agent(s); ` +

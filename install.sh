@@ -17,11 +17,11 @@
 # defaults to "latest").
 #
 # Subcommands (see `npx opencode-codeops help` for the full option list):
-#   install-skills   Install or upgrade the skills      (default)
-#   install-agents   Install or upgrade the subagents
-#   status           Show the installed skills and agents version
-#   uninstall        Remove the managed skills
-#   help             Show installer help
+#   install     Install or upgrade skills and subagents   (default)
+#   update      Alias of install
+#   status      Show the installed versions
+#   uninstall   Remove the managed files
+#   help        Show installer help
 
 set -euo pipefail
 
@@ -40,12 +40,12 @@ if ! command -v npx >/dev/null 2>&1; then
   exit 1
 fi
 
-# The subcommand is optional and defaults to install-skills. Any remaining
-# arguments are passed through to the installer unchanged.
-subcommand="install-skills"
+# The subcommand is optional and defaults to install. Any remaining arguments
+# are passed through to the installer unchanged.
+subcommand="install"
 if (( $# > 0 )); then
   case "$1" in
-    install | install-skills | install-agents | status | uninstall | help)
+    install | update | status | uninstall | help)
       subcommand="$1"
       shift
       ;;

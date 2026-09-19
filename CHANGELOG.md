@@ -2,6 +2,13 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+### Changed
+- The CLI has one installation path. `install` (and its alias `update`) installs the skills and the subagents together; `status` reports both and `uninstall` removes both. The per-component `install-skills`, `install-agents`, `agents-status`, and `agents-uninstall` subcommands are gone.
+- The install scope is auto-detected: inside a CodeOps project the files go to `.opencode/`, otherwise to `~/.config/opencode/`. `--project` and `--global` override the detection.
+- The installers use the package's own `skills/` and `agents/` directories and ignore `CODEOPS_PLUGIN_ROOT`, so an install always matches the package that was invoked instead of a running plugin checkout.
+
 ## 1.4.0 — 2026-09-19
 
 ### Features

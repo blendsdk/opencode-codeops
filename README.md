@@ -45,41 +45,46 @@ Add to your `opencode.json`:
 OpenCode installs the plugin automatically via Bun on next startup. A global config
 (`~/.config/opencode/opencode.json`) is recommended so CodeOps is active in every project.
 
-### 2. Install the skills
+### 2. Install the skills and subagents
 
-OpenCode discovers skills only from the filesystem (`.opencode/skills/` or
-`~/.config/opencode/skills/`); it never reads them from a plugin package. The installer is a thin
-`npx` wrapper around this package, so the skills always match the published version:
+OpenCode discovers skills and subagents only from the filesystem; it never reads them from a plugin
+package. One command installs both. The installer is a thin `npx` wrapper around this package, so
+the installed files always match the published version:
 
 ```bash
 # Global (recommended) — available in every OpenCode project
 curl -fsSL https://cdn.jsdelivr.net/npm/opencode-codeops@latest/install.sh | bash
 
-# Project-only — skills live in ./.opencode/skills and are committed with the repo
+# Project-only — files live in ./.opencode and are committed with the repo
 curl -fsSL https://cdn.jsdelivr.net/npm/opencode-codeops@latest/install.sh | bash -s -- --project
 ```
 
 The same installer runs directly through npm:
 
 ```bash
-npx -y opencode-codeops@latest install-skills
+npx -y opencode-codeops@latest install
+npx -y opencode-codeops@latest update    # alias of install
 ```
+
+The scope is auto-detected: inside a CodeOps project (a git repo with `.opencode/` or
+`codeops/.codeops.yml`) it installs into `./.opencode/skills` and `./.opencode/agents`; anywhere
+else it installs globally into `~/.config/opencode/`. Pass `--project` or `--global` to force one.
 
 Pin a version with `CODEOPS_VERSION` (an npm dist-tag or exact version; defaults to `latest`):
 
 ```bash
-CODEOPS_VERSION=1.4.0 curl -fsSL https://cdn.jsdelivr.net/npm/opencode-codeops@latest/install.sh | bash
+CODEOPS_VERSION=1.5.0 curl -fsSL https://cdn.jsdelivr.net/npm/opencode-codeops@latest/install.sh | bash
 ```
 
 Pin the plugin to the same version so the two cannot drift apart:
 
 ```json
-{ "plugin": ["opencode-codeops@1.4.0"] }
+{ "plugin": ["opencode-codeops@1.5.0"] }
 ```
 
 Re-running the installer upgrades an existing install in place. It replaces only the files this
-package owns, recorded in `<skills-dir>/.opencode-codeops.json`. Skills you author yourself, or
-install with another tool, are left untouched.
+package owns, recorded in `.opencode-codeops.json`. Files you author yourself, or install with
+another tool, are left untouched.
 
 Check or remove an install:
 
@@ -88,47 +93,37 @@ npx -y opencode-codeops@latest status
 npx -y opencode-codeops@latest uninstall
 ```
 
-`status` reports the installed version next to the current package version, so a plugin/skills
-mismatch is visible. Use `--dry-run` to preview an install; a same-named directory the package
-does not own is skipped with a warning, and `--force` replaces it.
-
-### 3. Install the subagents
-
-The 12 CodeOps subagents install into `.opencode/agents/` (project) or `~/.config/opencode/agents/`
-(global). The `/setup-codeops` skill does this for a project; do it manually with:
-
-```bash
-npx -y opencode-codeops@latest install-agents --project
-```
+`status` reports the installed version next to the current package version, so a plugin/files
+mismatch is visible. Use `--dry-run` to preview an install; a same-named file the package does not
+own is skipped with a warning, and `--force` replaces it.
 
 ### Local development
 
-Symlink the plugin into your OpenCode plugin directory and link the skills to a checkout, so edits
-are picked up without reinstalling:
+Symlink the plugin into your OpenCode plugin directory and link the installed files to a checkout,
+so edits are picked up without reinstalling:
 
 ```bash
 # Plugin (project or global plugin directory)
 ln -s /path/to/opencode-codeops/plugin/index.ts ~/.config/opencode/plugins/codeops.ts
 
 # Skills and agents — link instead of copy
-node /path/to/opencode-codeops/bin/index.mjs install-skills --link --global
-node /path/to/opencode-codeops/bin/index.mjs install-agents --link --global
+node /path/to/opencode-codeops/bin/index.mjs install --link --global
 ```
 
 ## Setup
 
-After installing the plugin and the skills, initialize CodeOps in your project:
+After installing the plugin and the files, initialize CodeOps in your project:
 
 ```
 /setup-codeops
 ```
 
-This creates the `codeops/` layout, scaffolds `codeops/codeops.json` and `codeops/.codeops.yml`, installs the 12 CodeOps subagent files into `.opencode/agents/`, and adds a managed section to `AGENTS.md`.
+This creates the `codeops/` layout, scaffolds `codeops/codeops.json` and `codeops/.codeops.yml`, installs the skills and the 12 CodeOps subagent files into `.opencode/`, and adds a managed section to `AGENTS.md`.
 
 Commit the result:
 
 ```bash
-git add codeops/ .opencode/agents/ AGENTS.md
+git add codeops/ .opencode/ AGENTS.md
 git commit -m "chore: initialize CodeOps"
 ```
 
@@ -140,7 +135,7 @@ On every OpenCode session start and after every compaction, the plugin injects:
 
 These standards are active without any user action. They do not need to be copied into `AGENTS.md`.
 
-The plugin also warns (non-blocking) if any tool attempts to edit `codeops/.codeops.yml` directly — that file is managed exclusively by the `setup-codeops` skill.
+The plugin also warns (non-blocking) if any tool attempts to edit `codeops/.codeops.yml` directly — that file is managed exclusively by the `setup-codeops` skill — and if the installed skills version differs from the plugin version, so a stale install is visible.
 
 ## Agent model configuration
 

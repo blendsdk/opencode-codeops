@@ -79,9 +79,9 @@ function installedSkillsVersion(skillsDir: string): string | undefined {
 
 // ---------------------------------------------------------------------------
 // Helper — warn (non-blocking) when the installed skills were written by a
-// different CodeOps version than this plugin. The plugin and the skills are
+// different CodeOps version than this plugin. The plugin and the files are
 // installed by separate commands, so their versions can drift; a mismatch
-// usually means the skills need `npx opencode-codeops install-skills` again.
+// usually means the skills need `npx opencode-codeops update` again.
 // ---------------------------------------------------------------------------
 async function warnOnVersionSkew(
   client: Parameters<Plugin>[0]["client"],
@@ -103,7 +103,7 @@ async function warnOnVersionSkew(
         message:
           `CodeOps skills at ${skillsDir} are version ${installed}, ` +
           `but the plugin is version ${packageVersion}. ` +
-          `Run \`npx opencode-codeops@${packageVersion} install-skills\` to match them.`,
+          `Run \`npx opencode-codeops@${packageVersion} update\` to match them.`,
       },
     })
   }

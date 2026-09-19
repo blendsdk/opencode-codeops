@@ -76,24 +76,24 @@ default when it is absent — so this line is a convenience/pin, not a requireme
 - Scaffolding is intentionally simple, so it lives in skill prose; only the *migration* path
   needs the deterministic engine. For migration, see [migration.md](migration.md).
 
-## Agent file installation
+## Project file installation
 
-After scaffolding, install the CodeOps OpenCode agent definitions into the project. Prefer the
-installer bundled with the running plugin, so the agent version always matches the plugin version:
+After scaffolding, install the CodeOps skills and subagents into the project. Prefer the installer
+bundled with the running plugin, so the installed files always match the plugin version:
 
 ```bash
-node "${CODEOPS_PLUGIN_ROOT}/bin/install-agents.mjs" --project
+node "${CODEOPS_PLUGIN_ROOT}/bin/index.mjs" install --project
 ```
 
 When the plugin is not active, the published installer does the same thing:
 
 ```bash
-npx -y opencode-codeops@latest install-agents --project
+npx -y opencode-codeops@latest install --project
 ```
 
-This installs the 12 CodeOps subagent definitions (`executor`, `explorer`, `correctness-reviewer`,
-etc.) into `.opencode/agents/` where OpenCode will discover and load them automatically. These files
-are safe to commit to git. Files the installer owns are replaced on upgrade; same-named files it
-does not own are left untouched (pass `--force` to replace them). Users can override individual
-agent models in `opencode.json` under the `agent` key.
+This installs the skills into `.opencode/skills/` and the 12 subagent definitions (`executor`,
+`explorer`, `correctness-reviewer`, etc.) into `.opencode/agents/`, where OpenCode discovers and
+loads them automatically. These files are safe to commit to git. Files the installer owns are
+replaced on upgrade; same-named files it does not own are left untouched (pass `--force` to replace
+them). Users can override individual agent models in `opencode.json` under the `agent` key.
 

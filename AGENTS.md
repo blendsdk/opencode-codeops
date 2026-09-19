@@ -6,8 +6,8 @@ CodeOps plugin for OpenCode — specification-first engineering for complex syst
 
 - This is an OpenCode plugin. The plugin entry point is `plugin/index.ts`.
 - Use `CODEOPS_PLUGIN_ROOT` (not `PLUGIN_ROOT`) in all skill and shared-document script references.
-- Agent files live in `agents/` (source) and are installed into `.opencode/agents/` in user projects by `bin/install-agents.mjs`. Do not hand-edit files in `agents/` — regenerate them with `scripts/install_agents.py`.
-- Skill files live in `skills/` (source) and are installed into a discoverable skills directory (`.opencode/skills/` or `~/.config/opencode/skills/`) by `bin/install-skills.mjs`. `bin/index.mjs` is the package binary and dispatches to both installers. The curl bootstrap is `install.sh`; it is a thin wrapper that runs `npx opencode-codeops`.
+- Agent files live in `agents/` (source) and ship inside the package. Do not hand-edit files in `agents/` — regenerate them with `scripts/install_agents.py`.
+- Skill files live in `skills/` (source). `bin/index.mjs` is the package binary: `install`/`update` install the skills and the subagents together, auto-detecting the project or global scope. `bin/install-skills.mjs` and `bin/install-agents.mjs` are the internal installers it orchestrates. The curl bootstrap is `install.sh`; it is a thin wrapper that runs `npx opencode-codeops`.
 - `package.json` holds the one product version. It is written only by `scripts/release.mjs`, which derives the bump from conventional commits; `scripts/check-version.mjs` guards against drift. Do not hand-edit the version.
 - `codeops/codeops.json` is the project-level config. `codeops/.codeops.yml` is the layout marker owned solely by `setup-codeops`.
 - All CodeOps artifacts are plain Markdown files in the user's repo — host-agnostic and git-commitable.
@@ -45,11 +45,11 @@ pip install -r requirements-dev.txt
 python3 scripts/install_agents.py --project /path/to/test-project --dry-run
 ```
 
-### Test install-skills.mjs
+### Test the installer
 
 ```bash
-node bin/index.mjs install-skills --dry-run
-node bin/index.mjs install-agents --dry-run
+node bin/index.mjs install --dry-run --project
+node bin/index.mjs status --project
 ```
 
 ### Release dry run

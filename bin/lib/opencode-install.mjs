@@ -167,12 +167,13 @@ export function linkEntry({ from, dest, type = "dir" }) {
  * @param options.project - Use a project-relative directory instead of global
  * @param cwd - Project root used for `--project`
  * @param kind - Subdirectory name under `.opencode` (for example `skills`)
+ * @param home - Home directory used for the global default (injectable for tests)
  * @returns Absolute path to the target directory
  */
-export function resolveTarget(options, cwd, kind) {
+export function resolveTarget(options, cwd, kind, home = homedir()) {
   if (options.target) return resolve(options.target)
   if (options.project) return resolve(cwd, ".opencode", kind)
-  return join(homedir(), ".config", "opencode", kind)
+  return join(home, ".config", "opencode", kind)
 }
 
 /**
