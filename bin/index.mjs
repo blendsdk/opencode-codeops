@@ -27,6 +27,8 @@ import { existsSync, realpathSync } from "node:fs"
 import { join } from "node:path"
 import { fileURLToPath } from "node:url"
 
+import { PLUGIN_NAME, readConfiguredPlugin, registerPlugin } from "./lib/opencode-plugin.mjs"
+
 /** Commands this CLI understands. */
 const COMMANDS = new Set(["install", "update", "status", "uninstall", "help"])
 
@@ -47,10 +49,15 @@ Options:
   --dry-run          Show what would happen without writing files
   --force            Replace same-named files this package does not own
   --link             Symlink to the source instead of copying (development)
+  --no-plugin        Do not register the plugin in the OpenCode config
   -h, --help         Show this help
 
 Scope is auto-detected: inside a CodeOps project (a git repo with .opencode/ or
-codeops/.codeops.yml) the files go to .opencode/; otherwise to ~/.config/opencode/.`)
+codeops/.codeops.yml) the files go to .opencode/; otherwise to ~/.config/opencode/.
+
+install/update also register the CodeOps plugin in the OpenCode config (unless
+--no-plugin), so standards injection and CODEOPS_PLUGIN_ROOT are enabled. Restart
+OpenCode after installing for the plugin to load.`)
 }
 
 /**
@@ -108,16 +115,46 @@ async function runCombined(command, rest, io) {
   const agents = await import("./install-agents.mjs")
 
   const cwd = io.cwd ?? process.cwd()
+  const noPlugin = rest.includes("--no-plugin")
+  const dryRun = rest.includes("--dry-run")
   const scope = resolveScope(
     { project: rest.includes("--project"), global: rest.includes("--global") },
     cwd
   )
-  const passed = rest.filter((arg) => arg !== "--project" && arg !== "--global")
+  const passed = rest.filter(
+    (arg) => arg !== "--project" && arg !== "--global" && arg !== "--no-plugin"
+  )
   const scoped = [scope === "project" ? "--project" : "--global", ...passed]
 
   const skillsCode = skills.main([command, ...scoped], io)
   const agentsCode = agents.main([command, ...scoped], io)
-  return skillsCode || agentsCode
+  const code = skillsCode || agentsCode
+
+  if (command === "install" && code === 0 && !noPlugin && !dryRun) {
+    const version = io.version ?? skills.readPackageVersion()
+    const result = registerPlugin({ scope, version, cwd, run: io.run })
+    if (result.ok) {
+      console.log(`Plugin: registered ${result.spec} in the ${scope} OpenCode config.`)
+      console.log("Restart OpenCode to load the plugin.")
+    } else {
+      console.log(
+        `Plugin: not registered (${result.reason}). ` +
+          `Add "${PLUGIN_NAME}" to the "plugin" array in your opencode.json.`
+      )
+    }
+  }
+
+  if (command === "status") {
+    const plugins = readConfiguredPlugin({ cwd, run: io.run })
+    if (plugins === undefined) {
+      console.log("plugin: opencode CLI unavailable; cannot read the config")
+    } else {
+      const entry = plugins.find((item) => String(item).startsWith(PLUGIN_NAME))
+      console.log(entry ? `plugin: configured (${entry})` : "plugin: not configured")
+    }
+  }
+
+  return code
 }
 
 /**

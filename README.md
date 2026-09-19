@@ -27,29 +27,8 @@ Turn an idea or existing system into ambiguity-free requirements, grounded speci
 
 ## Installation
 
-CodeOps has two parts that OpenCode loads differently: the **plugin** (standards and hooks) is
-installed by OpenCode from npm, and the **skills** and **subagents** must be copied onto the
-filesystem because OpenCode only discovers those from disk.
-
-### 1. Add the plugin
-
-Add to your `opencode.json`:
-
-```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-codeops"]
-}
-```
-
-OpenCode installs the plugin automatically via Bun on next startup. A global config
-(`~/.config/opencode/opencode.json`) is recommended so CodeOps is active in every project.
-
-### 2. Install the skills and subagents
-
-OpenCode discovers skills and subagents only from the filesystem; it never reads them from a plugin
-package. One command installs both. The installer is a thin `npx` wrapper around this package, so
-the installed files always match the published version:
+One command installs everything CodeOps owns: the skills, the subagents, and the OpenCode plugin
+entry in your config.
 
 ```bash
 # Global (recommended) — available in every OpenCode project
@@ -66,21 +45,33 @@ npx -y opencode-codeops@latest install
 npx -y opencode-codeops@latest update    # alias of install
 ```
 
+`install`/`update` writes the skills and subagents onto the filesystem (OpenCode discovers those
+only from disk), then registers the plugin in the OpenCode config by calling OpenCode's own
+`opencode plugin` command, so standards injection and `CODEOPS_PLUGIN_ROOT` are enabled. Restart
+OpenCode after installing for the plugin to load. Pass `--no-plugin` to manage the config yourself.
+
 The scope is auto-detected: inside a CodeOps project (a git repo with `.opencode/` or
-`codeops/.codeops.yml`) it installs into `./.opencode/skills` and `./.opencode/agents`; anywhere
-else it installs globally into `~/.config/opencode/`. Pass `--project` or `--global` to force one.
+`codeops/.codeops.yml`) it installs into `./.opencode`, and registers the plugin in the project
+config; anywhere else it installs globally into `~/.config/opencode` and the global config. Pass
+`--project` or `--global` to force one.
+
+If you prefer to register the plugin manually instead, add it to your `opencode.json`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": ["opencode-codeops"]
+}
+```
 
 Pin a version with `CODEOPS_VERSION` (an npm dist-tag or exact version; defaults to `latest`):
 
 ```bash
-CODEOPS_VERSION=1.5.0 curl -fsSL https://cdn.jsdelivr.net/npm/opencode-codeops@latest/install.sh | bash
+CODEOPS_VERSION=1.6.0 curl -fsSL https://cdn.jsdelivr.net/npm/opencode-codeops@latest/install.sh | bash
 ```
 
-Pin the plugin to the same version so the two cannot drift apart:
-
-```json
-{ "plugin": ["opencode-codeops@1.5.0"] }
-```
+`install`/`update` pins the plugin in the OpenCode config to the installer's own version, so the
+plugin and the installed files cannot drift apart; run `update` to move both to a new version.
 
 Re-running the installer upgrades an existing install in place. It replaces only the files this
 package owns, recorded in `.opencode-codeops.json`. Files you author yourself, or install with
@@ -93,21 +84,24 @@ npx -y opencode-codeops@latest status
 npx -y opencode-codeops@latest uninstall
 ```
 
-`status` reports the installed version next to the current package version, so a plugin/files
+`status` reports the installed skills and agents versions and the configured plugin entry, so a
 mismatch is visible. Use `--dry-run` to preview an install; a same-named file the package does not
-own is skipped with a warning, and `--force` replaces it.
+own is skipped with a warning, and `--force` replaces it. `uninstall` removes the skills and
+subagents but leaves the plugin entry in your config; remove `opencode-codeops` from the `plugin`
+array by hand to fully disable it.
 
 ### Local development
 
 Symlink the plugin into your OpenCode plugin directory and link the installed files to a checkout,
-so edits are picked up without reinstalling:
+so edits are picked up without reinstalling. Pass `--no-plugin` so the checkout is not overwritten
+by a registered npm plugin:
 
 ```bash
 # Plugin (project or global plugin directory)
 ln -s /path/to/opencode-codeops/plugin/index.ts ~/.config/opencode/plugins/codeops.ts
 
 # Skills and agents — link instead of copy
-node /path/to/opencode-codeops/bin/index.mjs install --link --global
+node /path/to/opencode-codeops/bin/index.mjs install --link --global --no-plugin
 ```
 
 ## Setup

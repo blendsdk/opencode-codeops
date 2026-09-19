@@ -4,7 +4,9 @@
  * There is one installation path: `install` (and its alias `update`) installs
  * the skills and the subagents together, `status` reports both, and `uninstall`
  * removes both. The scope is auto-detected or forced with `--project`/
- * `--global`. All filesystem work happens in throwaway temporary directories.
+ * `--global`. Plugin registration is delegated to the `opencode` CLI, so every
+ * test injects a fake command runner and never starts a real process or touches
+ * a real config. All filesystem work happens in throwaway temporary directories.
  *
  * @module index.spec.test
  */
@@ -33,6 +35,25 @@ afterEach(() => {
   }
   delete process.env.CODEOPS_PLUGIN_ROOT
 })
+
+/**
+ * Fake command runner: succeeds for `--version` and `plugin`, returns an empty
+ * plugin array for `debug config`. Records every call.
+ *
+ * @param calls - Array the joined arguments are appended to
+ * @returns A runner function
+ */
+function stubRun(calls = []) {
+  return (_command, args) => {
+    const key = args.join(" ")
+    calls.push(key)
+    if (key === "debug config") {
+      return { status: 0, stdout: JSON.stringify({ plugin: ["opencode-codeops@1.0.0"] }) }
+    }
+    if (key === "--version" || key.startsWith("plugin ")) return { status: 0 }
+    return { status: 1 }
+  }
+}
 
 /** Runs a function while capturing console output and the returned exit code. */
 async function capture(fn) {
@@ -80,7 +101,7 @@ describe("dispatch install", () => {
     const cwd = tempDir("codeops-project-")
     mkdirSync(join(cwd, ".opencode"))
 
-    const { code } = await capture(() => dispatch(["install"], { cwd }))
+    const { code } = await capture(() => dispatch(["install"], { cwd, run: stubRun() }))
 
     assert.equal(code, 0)
     assert.ok(existsSync(join(cwd, ".opencode", "skills", "make-plan", "SKILL.md")))
@@ -93,7 +114,9 @@ describe("dispatch install", () => {
     const cwd = tempDir("codeops-cwd-")
     const home = tempDir("codeops-home-")
 
-    const { code } = await capture(() => dispatch(["install", "--global"], { cwd, home }))
+    const { code } = await capture(() =>
+      dispatch(["install", "--global"], { cwd, home, run: stubRun() })
+    )
 
     assert.equal(code, 0)
     assert.ok(existsSync(join(home, ".config", "opencode", "skills", "make-plan", "SKILL.md")))
@@ -104,8 +127,10 @@ describe("dispatch install", () => {
     const cwd = tempDir("codeops-project-")
     mkdirSync(join(cwd, ".opencode"))
 
-    await capture(() => dispatch(["install"], { cwd }))
-    const { code, output } = await capture(() => dispatch(["update"], { cwd }))
+    await capture(() => dispatch(["install"], { cwd, run: stubRun() }))
+    const { code, output } = await capture(() =>
+      dispatch(["update"], { cwd, run: stubRun() })
+    )
 
     assert.equal(code, 0)
     assert.match(output, /replace/)
@@ -122,11 +147,32 @@ describe("dispatch install", () => {
     writeFileSync(join(decoy, "agents", "decoy.md"), "# decoy\n", "utf-8")
     process.env.CODEOPS_PLUGIN_ROOT = decoy
 
-    await capture(() => dispatch(["install"], { cwd }))
+    await capture(() => dispatch(["install"], { cwd, run: stubRun() }))
 
     assert.ok(existsSync(join(cwd, ".opencode", "skills", "make-plan", "SKILL.md")))
     assert.ok(!existsSync(join(cwd, ".opencode", "skills", "decoy-skill")))
     assert.ok(!existsSync(join(cwd, ".opencode", "agents", "decoy.md")))
+  })
+
+  it("registers the plugin on install", async () => {
+    const cwd = tempDir("codeops-project-")
+    mkdirSync(join(cwd, ".opencode"))
+    const calls = []
+
+    await capture(() => dispatch(["install"], { cwd, run: stubRun(calls) }))
+
+    assert.ok(calls.includes("--version"))
+    assert.ok(calls.some((call) => call.startsWith("plugin opencode-codeops")))
+  })
+
+  it("skips plugin registration with --no-plugin", async () => {
+    const cwd = tempDir("codeops-project-")
+    mkdirSync(join(cwd, ".opencode"))
+    const calls = []
+
+    await capture(() => dispatch(["install", "--no-plugin"], { cwd, run: stubRun(calls) }))
+
+    assert.deepEqual(calls, [])
   })
 })
 
@@ -134,13 +180,14 @@ describe("dispatch lifecycle", () => {
   it("reports status and then removes both installs", async () => {
     const cwd = tempDir("codeops-project-")
     mkdirSync(join(cwd, ".opencode"))
-    await capture(() => dispatch(["install"], { cwd }))
+    await capture(() => dispatch(["install"], { cwd, run: stubRun() }))
 
-    const status = await capture(() => dispatch(["status"], { cwd }))
+    const status = await capture(() => dispatch(["status"], { cwd, run: stubRun() }))
     assert.equal(status.code, 0)
     assert.match(status.output, /installed/)
+    assert.match(status.output, /plugin:/)
 
-    const removed = await capture(() => dispatch(["uninstall"], { cwd }))
+    const removed = await capture(() => dispatch(["uninstall"], { cwd, run: stubRun() }))
     assert.equal(removed.code, 0)
     assert.ok(!existsSync(join(cwd, ".opencode", "skills", "make-plan")))
     assert.ok(!existsSync(join(cwd, ".opencode", "agents", "executor.md")))

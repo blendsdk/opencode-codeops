@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+### Added
+- `install`/`update` now register the CodeOps plugin in the OpenCode config by calling OpenCode's own `opencode plugin` command, pinned to the installed version, so standards injection and `CODEOPS_PLUGIN_ROOT` work without a manual config edit. Pass `--no-plugin` to opt out.
+- `status` reports the configured plugin entry alongside the installed skills and agents versions.
+
 ## 1.5.0 — 2026-09-19
 
 ### Features
