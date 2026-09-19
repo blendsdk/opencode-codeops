@@ -1,5 +1,6 @@
 import type { Plugin } from "@opencode-ai/plugin"
 import { readFileSync } from "node:fs"
+import { homedir } from "node:os"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -11,6 +12,23 @@ import { fileURLToPath } from "node:url"
 // ---------------------------------------------------------------------------
 const PLUGIN_DIR = dirname(fileURLToPath(import.meta.url))
 const PACKAGE_ROOT = dirname(PLUGIN_DIR)
+
+// ---------------------------------------------------------------------------
+// The plugin's own version, read from the package it shipped in. There is no
+// separate hardcoded version: the running plugin always reports the version of
+// the npm package that was installed, so it cannot drift from the package.
+// ---------------------------------------------------------------------------
+const packageVersion = readPackageVersion()
+
+/** Reads the `version` field of this package's package.json. */
+function readPackageVersion(): string {
+  try {
+    const manifest = JSON.parse(readFileSync(join(PACKAGE_ROOT, "package.json"), "utf8"))
+    return typeof manifest.version === "string" ? manifest.version : "0.0.0"
+  } catch {
+    return "0.0.0"
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Load standards at startup (once). Both files are injected into every session.
@@ -43,10 +61,59 @@ async function injectStandards(
 }
 
 // ---------------------------------------------------------------------------
+// Helper — read the version recorded in an installed skills marker, if any.
+// The marker (`.opencode-codeops.json`) is written by the skills installer.
+// Its absence means the skills are not managed — for example a development
+// symlink — so there is no version to compare against.
+// ---------------------------------------------------------------------------
+function installedSkillsVersion(skillsDir: string): string | undefined {
+  try {
+    const marker = JSON.parse(
+      readFileSync(join(skillsDir, ".opencode-codeops.json"), "utf8")
+    )
+    return typeof marker.version === "string" ? marker.version : undefined
+  } catch {
+    return undefined
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Helper — warn (non-blocking) when the installed skills were written by a
+// different CodeOps version than this plugin. The plugin and the skills are
+// installed by separate commands, so their versions can drift; a mismatch
+// usually means the skills need `npx opencode-codeops install-skills` again.
+// ---------------------------------------------------------------------------
+async function warnOnVersionSkew(
+  client: Parameters<Plugin>[0]["client"],
+  directory: string
+): Promise<void> {
+  const skillsDirs = [
+    join(homedir(), ".config", "opencode", "skills"),
+    join(directory, ".opencode", "skills"),
+  ]
+
+  for (const skillsDir of skillsDirs) {
+    const installed = installedSkillsVersion(skillsDir)
+    if (!installed || installed === packageVersion) continue
+
+    await client.app.log({
+      body: {
+        service: "codeops",
+        level: "warn",
+        message:
+          `CodeOps skills at ${skillsDir} are version ${installed}, ` +
+          `but the plugin is version ${packageVersion}. ` +
+          `Run \`npx opencode-codeops@${packageVersion} install-skills\` to match them.`,
+      },
+    })
+  }
+}
+
+// ---------------------------------------------------------------------------
 // CodeOps plugin for OpenCode
 // Replaces: hooks/hooks.json + hook_session_context.sh + hook_marker_guard.sh
 // ---------------------------------------------------------------------------
-export const CodeOpsPlugin: Plugin = async ({ client }) => {
+export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
   return {
     // -----------------------------------------------------------------------
     // Hook 1 & 2: inject standards on session.created and session.compacted.
@@ -58,6 +125,7 @@ export const CodeOpsPlugin: Plugin = async ({ client }) => {
       if (event.type === "session.created") {
         const sessionId: string = (event.properties as { info: { id: string } }).info.id
         await injectStandards(client, sessionId)
+        await warnOnVersionSkew(client, directory)
       } else if (event.type === "session.compacted") {
         const sessionId: string = (event.properties as { sessionID: string }).sessionID
         await injectStandards(client, sessionId)

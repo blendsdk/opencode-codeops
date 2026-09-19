@@ -78,12 +78,22 @@ default when it is absent — so this line is a convenience/pin, not a requireme
 
 ## Agent file installation
 
-After scaffolding, copy the CodeOps OpenCode agent definitions into the project:
+After scaffolding, install the CodeOps OpenCode agent definitions into the project. Prefer the
+installer bundled with the running plugin, so the agent version always matches the plugin version:
 
 ```bash
-mkdir -p .opencode/agents
-cp "${CODEOPS_PLUGIN_ROOT}/agents/"*.md .opencode/agents/
+node "${CODEOPS_PLUGIN_ROOT}/bin/install-agents.mjs" --project
 ```
 
-This installs the 12 CodeOps subagent definitions (`executor`, `explorer`, `correctness-reviewer`, etc.) into `.opencode/agents/` where OpenCode will discover and load them automatically. These files are safe to commit to git. Users can override individual agent models in `opencode.json` under the `agent` key.
+When the plugin is not active, the published installer does the same thing:
+
+```bash
+npx -y opencode-codeops@latest install-agents --project
+```
+
+This installs the 12 CodeOps subagent definitions (`executor`, `explorer`, `correctness-reviewer`,
+etc.) into `.opencode/agents/` where OpenCode will discover and load them automatically. These files
+are safe to commit to git. Files the installer owns are replaced on upgrade; same-named files it
+does not own are left untouched (pass `--force` to replace them). Users can override individual
+agent models in `opencode.json` under the `agent` key.
 

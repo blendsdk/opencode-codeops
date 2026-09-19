@@ -2,6 +2,18 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+### Added
+- npm-first installation: the published package ships the skills and subagents, and `install.sh` is a thin `npx opencode-codeops` wrapper served from jsDelivr.
+- `bin/index.mjs` dispatcher with an `install-agents` command; `--link` and `--source` options for the skills installer.
+- `scripts/release.mjs` derives the next version from conventional commits and writes it to `package.json`, `package-lock.json`, and `CHANGELOG.md`; `scripts/check-version.mjs` guards against version drift.
+- CI and release GitHub Actions workflows using npm trusted publishing.
+- The plugin warns when the installed skills version differs from the plugin version.
+
+### Changed
+- `setup-codeops` installs subagents through `bin/install-agents.mjs` instead of copying files directly.
+
 ## 1.3.1 — 2026-09-15
 
 - Refuse to install or uninstall through a symlinked skills directory unless `--force` is passed,

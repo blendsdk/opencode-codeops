@@ -3,15 +3,22 @@
   "version": "1.3.1",
   "description": "Specification-first engineering for complex systems — CodeOps plugin for OpenCode",
   "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
   "main": "./plugin/index.ts",
   "exports": {
     ".": "./plugin/index.ts"
   },
   "bin": {
-    "opencode-codeops": "./bin/install-skills.mjs"
+    "opencode-codeops": "bin/index.mjs"
   },
   "scripts": {
-    "test": "node --test"
+    "test": "node --test",
+    "typecheck": "tsc --noEmit",
+    "check:version": "node scripts/check-version.mjs",
+    "verify": "npm run typecheck && npm run test && npm run check:version",
+    "prepublishOnly": "npm run verify"
   },
   "files": [
     "plugin/",
@@ -21,7 +28,11 @@
     "agents/",
     "agent-templates/",
     "scripts/",
+    "!scripts/*.test.mjs",
+    "!scripts/*.spec.test.mjs",
     "bin/",
+    "!bin/*.test.mjs",
+    "!bin/*.spec.test.mjs",
     "references/",
     "schemas/",
     "install.sh",
@@ -39,6 +50,10 @@
   ],
   "license": "MIT",
   "author": "blendsdk",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/blendsdk/opencode-codeops.git"
