@@ -46,6 +46,18 @@ import {
 // package root that contains skills/ and package.json.
 const PACKAGE_ROOT = dirname(dirname(fileURLToPath(import.meta.url)))
 
+/**
+ * Package-root sibling directories that the installed skills reference with
+ * `../../<name>/...` links.
+ *
+ * The skills live in `skills/<skill>/`, so `../../_shared/...` and
+ * `../../references/...` only resolve when these directories sit beside the
+ * installed `skills` directory. The installer copies them from the parent of
+ * the source skills directory into the parent of the install target, and
+ * records them in the marker so `uninstall` can remove them.
+ */
+export const SHARED_DIRS = ["_shared", "references"]
+
 export { MARKER_FILE, readMarker }
 
 /**
@@ -120,14 +132,17 @@ export function listSkills(sourceDir) {
  * @param details - Marker contents
  * @param details.version - Installed package version
  * @param details.skills - Skill directory names the package owns
+ * @param details.shared - Shared directory names the package owns, installed
+ *   beside the skills directory; defaults to an empty list for older callers
  */
-export function writeMarker(targetDir, { version, skills }) {
+export function writeMarker(targetDir, { version, skills, shared = [] }) {
   writeMarkerFile(targetDir, {
     schema: 1,
     source: "opencode-codeops",
     version,
     installedAt: new Date().toISOString(),
     skills,
+    shared,
   })
 }
 
@@ -160,11 +175,96 @@ function installOneSkill({ sourceDir, targetDir, name, dryRun, link }) {
 }
 
 /**
+ * Installs the package-root sibling directories the skills link to.
+ *
+ * Both the source and the destination are the parents of the skills
+ * directories, so `../../_shared/...` and `../../references/...` links resolve
+ * from every installed skill. A sibling the marker does not own is left
+ * untouched unless `force` is set. A sibling missing from the source is skipped
+ * with a warning, which is normal when a custom `--source` points at a bare
+ * skills directory.
+ *
+ * @param details - Shared-directory install inputs
+ * @param details.sourceDir - Skills source directory (siblings live beside it)
+ * @param details.targetDir - Skills install directory (siblings install beside it)
+ * @param details.ownedShared - Shared directory names the marker already owns
+ * @param details.force - Replace unowned same-named directories
+ * @param details.dryRun - Report only, write nothing
+ * @param details.link - Symlink to the source instead of copying
+ * @returns The installed shared directory names and the skipped count
+ */
+function installSharedDirs({ sourceDir, targetDir, ownedShared, force, dryRun, link }) {
+  const sourceRoot = dirname(sourceDir)
+  const installRoot = dirname(targetDir)
+  const shared = []
+  let skipped = 0
+
+  for (const name of SHARED_DIRS) {
+    const from = join(sourceRoot, name)
+    const dest = join(installRoot, name)
+
+    if (!existsSync(from)) {
+      // The marker may already own this directory from an earlier install even
+      // though the current source no longer ships it. Keep the recorded
+      // ownership so `uninstall` can still remove it, and leave the copy alone.
+      if (ownedShared.has(name) && entryExists(dest)) {
+        console.log(`shared directory not found in source; keeping managed copy: ${dest}`)
+        shared.push(name)
+      } else {
+        console.log(`shared directory not found in source, skipped: ${from}`)
+      }
+      continue
+    }
+
+    if (entryExists(dest) && !ownedShared.has(name) && !force) {
+      console.log(`conflict, skipped (not managed by opencode-codeops; use --force): ${dest}`)
+      skipped += 1
+      continue
+    }
+
+    const existed = entryExists(dest)
+    if (!dryRun) {
+      if (link) linkEntry({ from, dest, type: "dir" })
+      else atomicReplace({ from, targetDir: installRoot, name, recursive: true })
+    }
+    shared.push(name)
+    console.log(`${dryRun ? "[dry-run] would " : ""}${existed ? "replace" : "install"}: ${dest}`)
+  }
+
+  return { shared, skipped }
+}
+
+/**
+ * Reports that shared directories are skipped when the target is a symlink.
+ *
+ * The skills are written through a symlinked target into the real directory,
+ * but the shared directories would land beside the link. Their `../../` links
+ * then resolve beside the real skills directory, so installing beside the link
+ * puts them in the wrong place; copying into the link target could overwrite
+ * the package checkout the link often points at. Skipping leaves the escape
+ * hatch safe and lets the user place the shared directories beside the real
+ * skills directory if the link target does not already contain them.
+ *
+ * @param targetDir - Symlinked skills install directory
+ * @returns Empty install result
+ */
+function skipSharedDirs(targetDir) {
+  console.log(
+    `warning: ${targetDir} is a symlink; skipping shared directories. ` +
+      "_shared/ and references/ must exist beside the real skills directory " +
+      "for the skills' relative links to resolve."
+  )
+  return { shared: [], skipped: 0 }
+}
+
+/**
  * Installs or upgrades every packaged skill into a target directory.
  *
  * Skills named by an existing marker, plus every packaged skill on a first run,
  * are replaced. A same-named directory that the marker does not own is skipped
  * unless `force` is set, so an unrelated skill is never overwritten by accident.
+ * The shared directories the skills link to are installed beside the target
+ * through {@link installSharedDirs}.
  *
  * @param details - Install inputs
  * @param details.sourceDir - Skills directory holding the packaged skills
@@ -173,7 +273,7 @@ function installOneSkill({ sourceDir, targetDir, name, dryRun, link }) {
  * @param details.force - Replace same-named directories the marker does not own
  * @param details.dryRun - Report only, write nothing
  * @param details.link - Symlink to the source instead of copying
- * @returns Counts plus the skill names recorded in the marker
+ * @returns Counts plus the skill and shared names recorded in the marker
  */
 export function installSkills({
   sourceDir,
@@ -186,13 +286,15 @@ export function installSkills({
   const names = listSkills(sourceDir)
   const marker = readSkillsMarker(targetDir)
   const managed = marker ? new Set(marker.skills ?? []) : null
-  const counts = { skills: names.length, installed: 0, replaced: 0, skipped: 0 }
+  const ownedShared = new Set(marker?.shared ?? [])
+  const counts = { skills: names.length, installed: 0, replaced: 0, skipped: 0, shared: 0 }
   const owned = []
   const prefix = dryRun ? "[dry-run] would " : ""
 
   if (!dryRun) {
     ensureDir(targetDir)
     cleanStaleArtifacts(targetDir)
+    cleanStaleArtifacts(dirname(targetDir))
   }
 
   for (const name of names) {
@@ -211,9 +313,15 @@ export function installSkills({
     console.log(`${prefix}${existed ? "replace" : "install"}: ${dest}`)
   }
 
-  if (!dryRun) writeMarker(targetDir, { version, skills: owned })
+  const installedShared = isSymlink(targetDir)
+    ? skipSharedDirs(targetDir)
+    : installSharedDirs({ sourceDir, targetDir, ownedShared, force, dryRun, link })
+  counts.shared = installedShared.shared.length
+  counts.skipped += installedShared.skipped
 
-  return { ...counts, owned }
+  if (!dryRun) writeMarker(targetDir, { version, skills: owned, shared: installedShared.shared })
+
+  return { ...counts, owned, shared: installedShared.shared }
 }
 
 /**
@@ -222,16 +330,19 @@ export function installSkills({
  * The marker is the ownership record, so an unmanaged install is left intact.
  * Without a marker the function reports an error instead of guessing.
  *
+ * Removes both the owned skills and the shared directories the installer placed
+ * beside them, so an uninstall leaves no package-owned files behind.
+ *
  * @param details - Uninstall inputs
  * @param details.targetDir - Skills directory to clean
  * @param details.dryRun - Report only, write nothing
- * @returns Removed skill names plus the marker outcome, or a reason it refused
+ * @returns Removed skill and shared names plus the marker outcome, or a reason it refused
  */
 export function uninstallSkills({ targetDir, dryRun = false }) {
   const marker = readSkillsMarker(targetDir)
 
   if (!marker) {
-    return { removed: [], markerRemoved: false, error: "no opencode-codeops marker found" }
+    return { removed: [], shared: [], markerRemoved: false, error: "no opencode-codeops marker found" }
   }
 
   const removed = []
@@ -245,9 +356,21 @@ export function uninstallSkills({ targetDir, dryRun = false }) {
     console.log(`${dryRun ? "would remove" : "removed"}: ${dest}`)
   }
 
+  const shared = []
+  const installRoot = dirname(targetDir)
+
+  for (const name of marker.shared ?? []) {
+    const dest = join(installRoot, name)
+    if (!entryExists(dest)) continue
+
+    if (!dryRun) rmSync(dest, { recursive: true, force: true })
+    shared.push(name)
+    console.log(`${dryRun ? "would remove" : "removed"}: ${dest}`)
+  }
+
   if (!dryRun) rmSync(join(targetDir, MARKER_FILE), { force: true })
 
-  return { removed, markerRemoved: true }
+  return { removed, shared, markerRemoved: true }
 }
 
 /** Prints command usage. */
@@ -341,6 +464,11 @@ function printStatus({ targetDir, sourceDir, sourceVersion }) {
     if (missing.length > 0) {
       console.log(`warning: missing managed skills: ${missing.join(", ")}`)
     }
+    const installRoot = dirname(targetDir)
+    const missingShared = (marker.shared ?? []).filter((name) => !entryExists(join(installRoot, name)))
+    if (missingShared.length > 0) {
+      console.log(`warning: missing managed shared directories: ${missingShared.join(", ")}`)
+    }
     return
   }
 
@@ -415,8 +543,8 @@ export function main(argv, io = {}) {
       return 0
     }
     console.log(
-      `${options.dryRun ? "would remove" : "removed"} ${result.removed.length} skill(s); ` +
-        `marker ${options.dryRun ? "would be removed" : "removed"}`
+      `${options.dryRun ? "would remove" : "removed"} ${result.removed.length} skill(s) and ` +
+        `${result.shared.length} shared dir(s); marker ${options.dryRun ? "would be removed" : "removed"}`
     )
     return 0
   }
@@ -432,7 +560,8 @@ export function main(argv, io = {}) {
   const mode = options.dryRun ? " (dry-run, nothing written)" : ""
   console.log(
     `Done${mode}: ${counts.skills} skills | ` +
-      `installed ${counts.installed}, replaced ${counts.replaced}, ${counts.skipped} skipped`
+      `installed ${counts.installed}, replaced ${counts.replaced}, ${counts.skipped} skipped | ` +
+      `shared ${counts.shared}/${SHARED_DIRS.length}`
   )
   if (counts.skipped > 0) {
     console.log("Re-run with --force to replace skipped directories.")

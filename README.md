@@ -50,6 +50,11 @@ only from disk), then registers the plugin in the OpenCode config by calling Ope
 `opencode plugin` command, so standards injection and `CODEOPS_PLUGIN_ROOT` are enabled. Restart
 OpenCode after installing for the plugin to load. Pass `--no-plugin` to manage the config yourself.
 
+The installer also places the shared `_shared/` and `references/` documents beside the installed
+`skills/` directory (for example `~/.config/opencode/_shared`), so the skills' relative links to
+them resolve at their installed location. An existing directory with either name is only replaced
+with `--force`.
+
 The scope is auto-detected: inside a CodeOps project (a git repo with `.opencode/` or
 `codeops/.codeops.yml`) it installs into `./.opencode`, and registers the plugin in the project
 config; anywhere else it installs globally into `~/.config/opencode` and the global config. Pass

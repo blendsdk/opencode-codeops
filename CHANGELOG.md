@@ -2,6 +2,15 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+### Fixes
+
+- installer: place the shared `_shared/` and `references/` documents beside the installed
+  `skills/` directory and record them in the install marker, so the `../../_shared/...` and
+  `../../references/...` links the layout-aware skills rely on resolve after install. `uninstall`
+  removes the shared directories it owns, and an unowned directory is skipped unless `--force`.
+
 ## 1.6.0 — 2026-09-19
 
 ### Features
