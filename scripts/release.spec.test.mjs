@@ -20,6 +20,7 @@ import {
   parseCli,
   parseCommit,
   semverBump,
+  tagArgs,
 } from "./release.mjs"
 
 describe("semverBump", () => {
@@ -159,5 +160,17 @@ describe("parseCli", () => {
     assert.match(parseCli(["frobnicate"]).error, /unknown command/)
     assert.match(parseCli(["version", "--nope"]).error, /unknown argument/)
     assert.match(parseCli(["version", "--type", "banana"]).error, /--type must be/)
+  })
+})
+
+describe("tagArgs", () => {
+  it("builds an annotated tag so git push --follow-tags publishes it", () => {
+    assert.deepEqual(tagArgs("1.2.3"), [
+      "tag",
+      "-a",
+      "v1.2.3",
+      "-m",
+      "opencode-codeops v1.2.3",
+    ])
   })
 })

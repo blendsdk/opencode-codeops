@@ -328,6 +328,23 @@ function updateChangelog(version, commits) {
 }
 
 /**
+ * Builds the `git tag` arguments for a release.
+ *
+ * The tag is annotated (`-a` with a message) because the release publishes tags
+ * with `git push --follow-tags`, which pushes only annotated tags. A lightweight
+ * tag would be created locally but never reach the remote, and the next release
+ * would then derive its version from a stale tag.
+ *
+ * @param version - Plain `x.y.z` version being tagged
+ * @returns Arguments for `git tag`
+ * @example
+ * tagArgs("1.2.3") // ["tag", "-a", "v1.2.3", "-m", "opencode-codeops v1.2.3"]
+ */
+export function tagArgs(version) {
+  return ["tag", "-a", `v${version}`, "-m", `opencode-codeops v${version}`]
+}
+
+/**
  * Commits the version bump and creates the release tag.
  *
  * @param version - Version being released
@@ -340,7 +357,7 @@ function commitAndTag(version, { ci, noGitCommit }) {
 
   run("git", ["add", "package.json", "package-lock.json", "CHANGELOG.md"])
   run("git", ["commit", "-m", `chore(release): v${version}${ci ? " [skip ci]" : ""}`])
-  run("git", ["tag", `v${version}`])
+  run("git", tagArgs(version))
 }
 
 /**
