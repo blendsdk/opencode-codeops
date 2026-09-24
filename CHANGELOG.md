@@ -2,14 +2,17 @@
 
 All notable changes to CodeOps are recorded here.
 
-## Unreleased
+## 1.7.0 — 2026-09-24
 
 ### Fixes
 
-- installer: place the shared `_shared/` and `references/` documents beside the installed
-  `skills/` directory and record them in the install marker, so the `../../_shared/...` and
-  `../../references/...` links the layout-aware skills rely on resolve after install. `uninstall`
-  removes the shared directories it owns, and an unowned directory is skipped unless `--force`.
+- installer: install _shared and references beside the skills
+
+### Features
+
+- installer: register the plugin automatically on install/update
+- installer: unify install/update into one command
+- installer: add npm-first install, agents installer, and release tooling
 
 ## 1.6.0 — 2026-09-19
 
