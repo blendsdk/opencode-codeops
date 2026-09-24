@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 1.7.1 — 2026-09-24
+
+### Fixes
+
+- release: create annotated tags so --follow-tags pushes them
+
 ## 1.7.0 — 2026-09-24
 
 ### Fixes
