@@ -1,7 +1,7 @@
 # Ambiguity Register: Specialist Agents
 
-> **Status**: ✅ GATE PASSED — all 25 items resolved (AR #25 added and resolved at execution time)
-> **Last Updated**: 2026-10-04 00:57
+> **Status**: ✅ GATE PASSED — all 26 items resolved (AR #25 and #26 added and resolved at execution time)
+> **Last Updated**: 2026-10-04 01:12
 
 | # | Category | Ambiguity / Gap | Options Presented | User Decision | Status |
 |---|----------|-----------------|-------------------|---------------|--------|
@@ -30,6 +30,7 @@
 | 23 | Scope | Invocation carried `--auto-commit`, which is not a `make-plan` flag | Record as execution intent / drop | Record `exec-plan --auto-commit` as the intended execution mode; `make-plan` itself writes no commits | ✅ Resolved — User chose "Record it for execution" |
 | 24 | Scope | Detection budget: at most two specialist candidates per requirements set or plan | Record as a resolved decision / remove the budget | At most two candidates per requirements set or plan, proposed in one batch; recorded during preflight (PF-012) | ✅ Resolved — User accepted recommendation (preflight PF-012) |
 | 25 | Technical (runtime) | ST-42's oracle requires the refactored generator's catalog output to be byte-identical to `agents/executor.md`, but the pre-refactor generator never reproduced that file: `agent-templates/plan-task-executor.md` has no YAML frontmatter description (fallback text) and carries a provenance comment absent from `agents/executor.md` (`git log`: both landed in the v1.2.0 port). Satisfying the literal oracle would change catalog generation, which R5 and AC #6 forbid. | A: capture the pre-refactor catalog output as a committed golden fixture and compare against it (recommended) · B: fix the generator to reproduce `agents/*.md` (changes catalog behavior; violates R5/AC #6) · C: drop the ST-42 regression guard | Option A — golden fixture `scripts/fixtures/catalog-executor.golden.md` captured from the pre-refactor generator; ST-42 amended to compare against it | ✅ Resolved — User chose golden fixture |
+| 26 | Technical (runtime) | Phase 2 review RV-1: the sanitizer's spec wording in `03-02` ("collapse once, then remove markers") did not actually reach a fixed point when marker removal leaves double spaces; the implementation was corrected and the spec wording needed the matching correction during the phase | Keep the stale wording / correct the spec wording to the true fixed-point pass | The wording was corrected as a necessary correction belonging to the sanitizer fix; the path is added to the Phase 2 expected modification set | ✅ Resolved — necessary correction, recorded after the fact |
 
 ### Resolution Notes
 

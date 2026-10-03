@@ -96,7 +96,8 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 > **Expected modification set** (strict scope): `scripts/install_agents.spec.test.mjs`,
 > `scripts/install_agents.impl.test.mjs`, `scripts/install_agents.py`,
 > `agent-templates/domain-specialist-reviewer.md`, `agent-templates/domain-specialist-executor.md`,
-> `schemas/codeops-config.schema.json`, `scripts/fixtures/catalog-executor.golden.md` (AR #25), and
+> `schemas/codeops-config.schema.json`, `scripts/fixtures/catalog-executor.golden.md` (AR #25),
+> `plans/specialist-agents/03-02-installer-and-templates.md` (spec wording correction, AR #26), and
 > this plan's progress marks.
 
 ### Step 2.1: Specification tests (generation and validation)
@@ -244,6 +245,7 @@ Review evidence lives here; severities follow the preflight scale.
 | Phase | Reviewer(s) | Findings | Rulings | Evidence |
 | ----- | ----------- | -------- | ------- | -------- |
 | 1 | correctness-reviewer (strict defaults) | RV-1…RV-3 🟡 minor, RV-4…RV-5 🔵 observation | RV-1…RV-4 fixed as a follow-up commit; RV-5 is a forward reference landed by ST-32 in Phase 4 | phase diff vs `187e0be`; `npm run verify` 92 tests |
+| 2 | correctness-reviewer + security-auditor (strict defaults; security selected) | SA-001…SA-002 🟠 major, SA-003…SA-007 🟡 minor, RV-1…RV-7 🟡/🔵 | User ruled 2026-10-04: SA-001 full containment fix, SA-002 validate+escape. Fixes applied for SA-001/002/004/005/006/007 and RV-2…RV-7; SA-003 declined (body markers are inert; stripping would destroy legitimate Markdown HTML comments) with rationale recorded; RV-1 recorded as AR #26. One scoped re-review dispatched | phase diff vs `f44ee8f`; `npm run verify` 121 tests |
 
 ## Dependencies
 

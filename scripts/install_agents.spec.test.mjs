@@ -254,6 +254,20 @@ describe("custom agent generation (ST-1, ST-2)", () => {
       "executor contract text must be present",
     )
   })
+
+  it("maps brief effort, reasoning, and hidden values into the frontmatter", () => {
+    const project = makeProject()
+    const role = "pg-migration-reviewer"
+    writeBrief(project, role, reviewerBrief({ effort: "low", reasoning: "high", hidden: "true" }))
+
+    const result = runInstaller(project, "--custom", role)
+
+    assert.equal(result.status, 0, `installer failed: ${result.stderr || result.stdout}`)
+    const frontmatter = frontmatterBlock(readFixtureFile(project, join(".opencode", "agents", `${role}.md`)))
+    assert.match(frontmatter, /^temperature: 0\.3$/m)
+    assert.match(frontmatter, /^reasoningEffort: high$/m)
+    assert.match(frontmatter, /^hidden: true$/m)
+  })
 })
 
 describe("brief validation (ST-3, ST-4, ST-12, ST-13)", () => {
@@ -266,6 +280,32 @@ describe("brief validation (ST-3, ST-4, ST-12, ST-13)", () => {
 
     assert.notEqual(result.status, 0)
     assert.match(result.stderr + result.stdout, /description/)
+    assert.equal(existsSync(join(project, ".opencode", "agents", `${role}.md`)), false)
+  })
+
+  it("rejects a brief missing role or kind and a description that sanitizes to empty", () => {
+    const cases = [
+      { brief: reviewerBrief({ role: null }), role: "pg-migration-reviewer" },
+      { brief: reviewerBrief({ kind: null }), role: "pg-migration-reviewer" },
+      { brief: reviewerBrief({ description: "<!-- -->" }), role: "pg-migration-reviewer" },
+    ]
+    for (const { brief: content, role } of cases) {
+      const project = makeProject()
+      writeBrief(project, role, content)
+      const result = runInstaller(project, "--custom", role)
+      assert.notEqual(result.status, 0, `brief must be rejected: ${content.split("\n")[3]}`)
+      assert.equal(existsSync(join(project, ".opencode", "agents", `${role}.md`)), false)
+    }
+  })
+
+  it("rejects combining --check with --custom", () => {
+    const project = makeProject()
+    const role = "pg-migration-reviewer"
+    writeBrief(project, role, reviewerBrief())
+
+    const result = runInstaller(project, "--check", "--custom", role)
+
+    assert.notEqual(result.status, 0)
     assert.equal(existsSync(join(project, ".opencode", "agents", `${role}.md`)), false)
   })
 
@@ -374,6 +414,25 @@ describe("role-name allowlist (ST-5, ST-6, ST-7, ST-8)", () => {
     const linkedAgents = runInstaller(agentsProject, "--custom", role)
     assert.notEqual(linkedAgents.status, 0, "symlinked agents directory must be refused")
     assert.equal(existsSync(join(realAgents, `${role}.md`)), false, "link target must stay empty")
+
+    const parentProject = makeProject()
+    writeBrief(parentProject, role, reviewerBrief())
+    const realOpenCode = join(outside, "opencode-parent")
+    mkdirSync(join(realOpenCode, "agents"), { recursive: true })
+    symlinkSync(realOpenCode, join(parentProject, ".opencode"))
+    const linkedParent = runInstaller(parentProject, "--custom", role)
+    assert.notEqual(linkedParent.status, 0, "symlinked .opencode parent must be refused")
+    assert.equal(existsSync(join(realOpenCode, "agents", `${role}.md`)), false)
+
+    const targetProject = makeProject()
+    writeBrief(targetProject, role, reviewerBrief())
+    mkdirSync(join(targetProject, ".opencode", "agents"), { recursive: true })
+    const sentinel = join(outside, "target-sentinel.md")
+    writeFileSync(sentinel, "# sentinel\n", "utf8")
+    symlinkSync(sentinel, join(targetProject, ".opencode", "agents", `${role}.md`))
+    const linkedTarget = runInstaller(targetProject, "--custom", role)
+    assert.notEqual(linkedTarget.status, 0, "symlinked target agent file must be refused")
+    assert.equal(readFileSync(sentinel, "utf8"), "# sentinel\n")
   })
 
   it("rejects catalog, built-in, and hidden system role names without touching their files", () => {
@@ -467,7 +526,7 @@ describe("routing overrides (ST-9, ST-10, ST-11)", () => {
     assert.equal(pinned.status, 0, `installer failed: ${pinned.stderr || pinned.stdout}`)
     assert.match(
       frontmatterBlock(readFixtureFile(pinnedProject, join(".opencode", "agents", `${role}.md`))),
-      /^model: provider\/model-x$/m,
+      /^model: "provider\/model-x"$/m,
     )
 
     const unpinnedProject = makeProject()
@@ -478,6 +537,47 @@ describe("routing overrides (ST-9, ST-10, ST-11)", () => {
       frontmatterBlock(readFixtureFile(unpinnedProject, join(".opencode", "agents", `${role}.md`))),
       /^model:/m,
     )
+  })
+
+  it("rejects routing reasoning or effort values outside their enums", () => {
+    const role = "pg-migration-reviewer"
+    for (const [key, value] of [
+      ["reasoning", "max\ninjected: true"],
+      ["effort", "high\ninjected: true"],
+    ]) {
+      const project = makeProject()
+      writeBrief(project, role, reviewerBrief())
+      writeFixtureFile(
+        project,
+        join("codeops", "codeops.json"),
+        JSON.stringify({ routing: { roles: { [role]: { [key]: value } } } }),
+      )
+      const result = runInstaller(project, "--custom", role)
+      assert.notEqual(result.status, 0, `invalid routing ${key} must be rejected`)
+      assert.equal(existsSync(join(project, ".opencode", "agents", `${role}.md`)), false)
+    }
+  })
+
+  it("escapes routing model values so they cannot inject frontmatter keys", () => {
+    const project = makeProject()
+    const role = "pg-migration-reviewer"
+    const payload = 'p/m"\n---\nINJECTED: true'
+    writeBrief(project, role, reviewerBrief())
+    writeFixtureFile(
+      project,
+      join("codeops", "codeops.json"),
+      JSON.stringify({ routing: { roles: { [role]: { model: payload } } } }),
+    )
+
+    const result = runInstaller(project, "--custom", role)
+
+    assert.equal(result.status, 0, `installer failed: ${result.stderr || result.stdout}`)
+    const lines = readFixtureFile(project, join(".opencode", "agents", `${role}.md`)).split("\n")
+    assert.equal(lines.filter((line) => line === "---").length, 3, "delimiter lines must stay intact")
+    const modelLine = lines.find((line) => line.startsWith("model: "))
+    assert.ok(modelLine, "model line must exist")
+    assert.equal(JSON.parse(modelLine.slice("model: ".length)), payload)
+    assert.equal(lines.some((line) => line.startsWith("INJECTED")), false)
   })
 })
 

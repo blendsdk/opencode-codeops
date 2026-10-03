@@ -55,6 +55,15 @@ print(json.dumps([
     assert.deepEqual(results, ["a b", "ab", "padded", 200])
   })
 
+  it("strips C1 control and Unicode format characters", () => {
+    const results = runPython(`
+print(json.dumps([
+    ia.sanitize_prompt_text("a\\u009bb\\u202ec", 200),
+    ia.sanitize_brief_body("a\\u009bb\\n\\u200bc"),
+]))`)
+    assert.deepEqual(results, ["abc", "ab\nc"])
+  })
+
   it("removes marker sequences to a fixed point with none remaining", () => {
     const results = runPython(`
 payloads = ["x --> y", "<!--<!--x-->-->", "<!<!---- STITCH ---->>", "<!--<-->-->--><!--"]
@@ -131,6 +140,38 @@ except ia.BriefError as exc:
       const result = runPython(parseScript(`${JSON.stringify(content)}.encode("utf-8")`))
       assert.equal(result.ok, false, `brief must be rejected: ${content}`)
     }
+  })
+
+  it("reports invalid UTF-8 as a clean brief error", () => {
+    const result = runPython(`
+import tempfile, pathlib
+root = pathlib.Path(tempfile.mkdtemp())
+path = root / "my-role.md"
+path.write_bytes(b"---\\nrole: my-role\\nkind: reviewer\\ndescription: \\xff\\n---\\n\\nBody\\n")
+try:
+    ia.parse_brief(path, "my-role")
+    print(json.dumps({"ok": True}))
+except ia.BriefError as exc:
+    print(json.dumps({"ok": False, "error": str(exc)}))
+`)
+    assert.equal(result.ok, false)
+    assert.match(result.error, /brief/i)
+  })
+
+  it("rejects an oversized brief file before reading it fully", () => {
+    const result = runPython(`
+import tempfile, pathlib
+root = pathlib.Path(tempfile.mkdtemp())
+path = root / "my-role.md"
+path.write_bytes(b"---\\n" + b"x" * (2 * 1024 * 1024))
+try:
+    ia.parse_brief(path, "my-role")
+    print(json.dumps({"ok": True}))
+except ia.BriefError as exc:
+    print(json.dumps({"ok": False, "error": str(exc)}))
+`)
+    assert.equal(result.ok, false)
+    assert.match(result.error, /too large/i)
   })
 
   it("rejects unsupported schema, hidden, effort, and reasoning values", () => {
