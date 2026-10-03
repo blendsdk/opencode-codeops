@@ -32,18 +32,18 @@ function read(relativePath) {
 }
 
 /**
- * Recursively collect Markdown files under a repository directory.
+ * Recursively collect every regular file under a repository directory.
  * @param {string} relativeDir - Directory relative to the repository root.
- * @returns {string[]} Absolute paths of the Markdown files found.
+ * @returns {string[]} Absolute paths of the files found.
  */
-function markdownFiles(relativeDir) {
+function filesUnder(relativeDir) {
   const base = join(ROOT, relativeDir)
   const found = []
   for (const entry of readdirSync(base, { withFileTypes: true })) {
     const path = join(base, entry.name)
     if (entry.isDirectory()) {
-      found.push(...markdownFiles(join(relativeDir, entry.name)))
-    } else if (entry.name.endsWith(".md")) {
+      found.push(...filesUnder(join(relativeDir, entry.name)))
+    } else if (entry.isFile()) {
       found.push(path)
     }
   }
@@ -68,7 +68,21 @@ describe("ST-30 specialist protocol document", () => {
   it("defines the candidate packet that is presented before approval", () => {
     const content = read(protocolPath)
     assert.match(content, /candidate packet/i)
-    for (const field of ["Capability", "Evidence", "Independent verdict", "Direct user decision"]) {
+    const fields = [
+      "Role",
+      "Kind",
+      "Capability",
+      "Evidence",
+      "Why existing options fail",
+      "Smallest alternative",
+      "Use map",
+      "Permissions",
+      "Effort",
+      "Maintenance cost",
+      "Independent verdict",
+      "Direct user decision",
+    ]
+    for (const field of fields) {
       assert.match(content, new RegExp(field.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")), `candidate packet field "${field}"`)
     }
   })
@@ -76,8 +90,12 @@ describe("ST-30 specialist protocol document", () => {
   it("carries the reserved-authority and two-candidate budget clauses", () => {
     const content = read(protocolPath)
     assert.match(content, /--auto-design/)
-    assert.match(content, /may never approve/)
-    assert.match(content, /at most \*\*two\*\* candidates/i)
+    assert.match(content, /(?:may never|can never|cannot|must not)\s+approve/i)
+    assert.match(content, /at most\s+\*{0,2}two\*{0,2}\s+candidates/i)
+  })
+
+  it("states that a rejected candidate may not reappear without new evidence", () => {
+    assert.match(read(protocolPath), /may not reappear/i)
   })
 
   it("requires recording the detection outcome, including a negative outcome", () => {
@@ -105,7 +123,7 @@ describe("ST-31 layout and content hygiene", () => {
     const leak = /\$\{PLUGIN_ROOT\}/
     const offenders = []
     for (const dir of ["skills", "_shared", "standards"]) {
-      for (const file of markdownFiles(dir)) {
+      for (const file of filesUnder(dir)) {
         if (leak.test(readFileSync(file, "utf8"))) {
           offenders.push(file.slice(ROOT.length + 1))
         }

@@ -230,6 +230,14 @@ results are owned by the user and block Phase 5 completion until recorded.
 
 ---
 
+## Phase Review Log
+
+Review evidence lives here; severities follow the preflight scale.
+
+| Phase | Reviewer(s) | Findings | Rulings | Evidence |
+| ----- | ----------- | -------- | ------- | -------- |
+| 1 | correctness-reviewer (strict defaults) | RV-1…RV-3 🟡 minor, RV-4…RV-5 🔵 observation | RV-1…RV-4 fixed as a follow-up commit; RV-5 is a forward reference landed by ST-32 in Phase 4 | phase diff vs `187e0be`; `npm run verify` 92 tests |
+
 ## Dependencies
 
 ```
