@@ -188,6 +188,64 @@ except ia.BriefError as exc:
   })
 })
 
+describe("AGENTS.md block internals", () => {
+  it("classifies absent, present, and malformed marker layouts", () => {
+    const result = runPython(`
+start = ia.AGENTS_START
+end = ia.AGENTS_END
+present = "text\\n" + start + "\\nbody\\n" + end + "\\n"
+out = {}
+for name, value in [("absent", "text\\n"), ("present", present), ("one", start), ("dup", start + start + end), ("reversed", end + start)]:
+    try:
+        out[name] = list(ia.classify_agents_block(value)[0:1]) + [ia.classify_agents_block(value)[1] > -1]
+    except ia.BriefError:
+        out[name] = "error"
+print(json.dumps(out))
+`)
+    assert.deepEqual(result, {
+      absent: ["absent", false],
+      present: ["present", true],
+      one: "error",
+      dup: "error",
+      reversed: "error",
+    })
+  })
+
+  it("renders an overflow pointer beyond the entry budget", () => {
+    const result = runPython(`
+briefs = {f"role-{i:02d}": {"description": f"d{i}", "required-for": None} for i in range(16)}
+block = ia.render_agents_block(briefs, "\\n")
+print(json.dumps({"entries": block.count("- \`role-"), "overflow": "…and 1 more" in block}))
+`)
+    assert.deepEqual(result, { entries: 15, overflow: true })
+  })
+})
+
+describe("removal internals", () => {
+  it("unlinks a symlinked agent without touching its target", () => {
+    const result = runPython(`
+import os, tempfile, pathlib, contextlib, io
+root = pathlib.Path(tempfile.mkdtemp())
+(root / "codeops" / "specialists").mkdir(parents=True)
+(root / ".opencode" / "agents").mkdir(parents=True)
+brief = root / "codeops" / "specialists" / "my-role.md"
+brief.write_text("---\\nrole: my-role\\nkind: reviewer\\ndescription: Hi\\n---\\n\\nBody\\n", encoding="utf-8")
+target = root / "target.md"
+target.write_text("original", encoding="utf-8")
+os.symlink(target, root / ".opencode" / "agents" / "my-role.md")
+with contextlib.redirect_stdout(io.StringIO()):
+    code = ia.run_remove_custom(root, "my-role", True, False)
+print(json.dumps({
+    "code": code,
+    "target": target.read_text(encoding="utf-8"),
+    "link_gone": not (root / ".opencode" / "agents" / "my-role.md").is_symlink(),
+    "brief_gone": not brief.exists(),
+}))
+`)
+    assert.deepEqual(result, { code: 0, target: "original", link_gone: true, brief_gone: true })
+  })
+})
+
 describe("generate_custom_agent YAML quoting", () => {
   it("quotes and escapes hostile description values exactly", () => {
     const hostile = 'He said "hi" \\ on [unterminated *alias # tag'

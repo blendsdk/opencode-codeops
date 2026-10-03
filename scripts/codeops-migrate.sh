@@ -14,6 +14,10 @@
 # means "already migrated"), and applies via `git mv` (history preserved), writing the marker and
 # the seeded portfolio roadmap LAST so an interrupted run never leaves a false "migrated" marker.
 #
+# Existing config: an existing codeops/codeops.json is never overwritten — a valid file is
+# preserved byte-for-byte (the preview prints PRESERVE) and a malformed one refuses the run
+# before any move.
+#
 # Security: never executes repo data; the feature slug is sanitized so it can never escape
 # codeops/features/. All mutation requires an explicit --yes; absent that, it only previews.
 #
@@ -106,6 +110,32 @@ if [[ -e codeops && ! -d codeops ]]; then
 fi
 
 # -----------------------------------------------------------------------------
+# Existing structured config: never overwrite it.
+#
+# `codeops/specialists/` is project-level and survives migration; a specialist
+# brief's routing policy may already live in codeops/codeops.json. A valid file
+# is preserved byte-for-byte (the preview says PRESERVE instead of CREATE) and
+# a malformed one refuses the run before anything moves, so a broken config can
+# never be silently replaced by the seeded defaults.
+# -----------------------------------------------------------------------------
+PRESERVE_CONFIG=0
+if [[ -f codeops/codeops.json ]]; then
+  if [[ "$HAVE_PY3" -eq 1 ]]; then
+    if python3 -c 'import json, sys; json.load(open(sys.argv[1], encoding="utf-8"))' codeops/codeops.json 2>/dev/null; then
+      PRESERVE_CONFIG=1
+    else
+      printf 'ERROR: codeops/codeops.json exists but is not valid JSON — refusing to migrate.\n' >&2
+      printf '       Fix or remove it, then re-run. It was not modified.\n' >&2
+      exit 1
+    fi
+  else
+    # Without python3 the file cannot be validated; preserving it is the only
+    # safe choice (the migration never overwrites an existing config).
+    PRESERVE_CONFIG=1
+  fi
+fi
+
+# -----------------------------------------------------------------------------
 # Derive the feature slug (roadmap header → else repo dir name), then sanitize.
 # -----------------------------------------------------------------------------
 slug=""
@@ -155,6 +185,9 @@ fi
 # Hazard scan → warnings (never block; the user resolves these by hand after the move).
 # -----------------------------------------------------------------------------
 warnings=()
+if [[ "$PRESERVE_CONFIG" -eq 1 ]]; then
+  warnings+=("config-preserved: codeops/codeops.json already exists and is kept byte-for-byte — review it against the seeded defaults")
+fi
 # (a) plan folders on disk but not referenced in the roadmap.
 if [[ -f plans/00-roadmap.md ]]; then
   for d in plans/*/; do
@@ -230,7 +263,11 @@ for m in "${moves[@]}"; do
   printf 'MOVE %s -> %s\n' "${m%%|*}" "${m##*|}"
 done
 printf 'CREATE codeops/.codeops.yml\n'
-printf 'CREATE codeops/codeops.json\n'
+if [[ "$PRESERVE_CONFIG" -eq 1 ]]; then
+  printf 'PRESERVE codeops/codeops.json (existing file kept byte-for-byte)\n'
+else
+  printf 'CREATE codeops/codeops.json\n'
+fi
 printf 'CREATE codeops/00-roadmap.md\n'
 for w in "${warnings[@]:-}"; do
   [[ -n "$w" ]] && printf 'WARN %s\n' "$w"
@@ -294,7 +331,8 @@ find plans requirements -type d -empty -delete 2>/dev/null || true
 integration_branch="$(git symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's#^origin/##')"
 [[ -n "$integration_branch" ]] || integration_branch="$(git symbolic-ref --quiet --short HEAD 2>/dev/null)"
 [[ -n "$integration_branch" ]] || integration_branch="main"
-cat > codeops/codeops.json <<'JSON' || fail_apply "write codeops/codeops.json"
+if [[ "$PRESERVE_CONFIG" -ne 1 ]]; then
+  cat > codeops/codeops.json <<'JSON' || fail_apply "write codeops/codeops.json"
 {
   "schema": 1,
   "mode": "strict",
@@ -307,6 +345,7 @@ cat > codeops/codeops.json <<'JSON' || fail_apply "write codeops/codeops.json"
   "metrics": {"enabled": false}
 }
 JSON
+fi
 # Seeded portfolio roadmap — one row for the migrated feature. The roadmap skill refines the
 # stage/progress on the next /update_roadmap; this is a valid starting point.
 today="$(date '+%Y-%m-%d')"

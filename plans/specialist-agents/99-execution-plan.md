@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-04 00:52
-> **Progress**: 20/40 tasks (50%)
+> **Progress**: 26/40 tasks (65%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -167,12 +167,12 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 **Reference**: [03-02](03-02-installer-and-templates.md) §Testing requirements · AR #17, PF-013, PF-017, PF-023
 **Objective**: Harden lifecycle internals, protect migration, and prove the end-to-end lifecycle.
 
-- [ ] 3.3.1 Extend implementation tests for check/removal/sync internals — `scripts/install_agents.impl.test.mjs`
-- [ ] 3.3.2 Write the migration spec test ST-33 (dry-run **and** apply-mode preservation fixture) — `scripts/specialists-migration.spec.test.mjs`
-- [ ] 3.3.3 Implement the approved guard in `scripts/codeops-migrate.sh`: preserve a valid existing `codeops/codeops.json` byte-for-byte with a preview warning, and refuse before any move when it is malformed; never overwrite (PF-013, user-approved scope expansion)
-- [ ] 3.3.4 Run the migration spec test and verify it PASSES (green phase)
-- [ ] 3.3.5 Write the end-to-end lifecycle integration test — `scripts/specialists-lifecycle.spec.test.mjs`
-- [ ] 3.3.6 Full verification
+- [x] 3.3.1 Extend implementation tests for check/removal/sync internals — `scripts/install_agents.impl.test.mjs` ✅ (completed: 2026-10-04 01:31)
+- [x] 3.3.2 Write the migration spec test ST-33 (dry-run **and** apply-mode preservation fixture) — `scripts/specialists-migration.spec.test.mjs` ✅ (completed: 2026-10-04 01:33)
+- [x] 3.3.3 Implement the approved guard in `scripts/codeops-migrate.sh`: preserve a valid existing `codeops/codeops.json` byte-for-byte with a preview warning, and refuse before any move when it is malformed; never overwrite (PF-013, user-approved scope expansion) ✅ (completed: 2026-10-04 01:33)
+- [x] 3.3.4 Run the migration spec test and verify it PASSES (green phase) ✅ (completed: 2026-10-04 01:33)
+- [x] 3.3.5 Write the end-to-end lifecycle integration test — `scripts/specialists-lifecycle.spec.test.mjs` ✅ (completed: 2026-10-04 01:34)
+- [x] 3.3.6 Full verification ✅ (completed: 2026-10-04 01:34)
 
 **Deliverables**:
 - ST-17 … ST-41 and ST-33 pass
