@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-04 00:52
-> **Progress**: 12/40 tasks (30%)
+> **Progress**: 14/40 tasks (35%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -123,8 +123,8 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 **Reference**: [03-02](03-02-installer-and-templates.md) §Error handling, §Security · AR #17, #18
 **Objective**: Cover parser, sanitization, and quoting boundaries.
 
-- [ ] 2.3.1 Write implementation tests for fixed-point sanitization, YAML quoting, parser edge cases (colons, CRLF, BOM), and idempotent writes — `scripts/install_agents.impl.test.mjs`
-- [ ] 2.3.2 Full verification
+- [x] 2.3.1 Write implementation tests for fixed-point sanitization, YAML quoting, parser edge cases (colons, CRLF, BOM), and idempotent writes — `scripts/install_agents.impl.test.mjs` ✅ (completed: 2026-10-04 01:07)
+- [x] 2.3.2 Full verification ✅ (completed: 2026-10-04 01:07)
 
 **Deliverables**:
 - ST-1 … ST-16 and ST-42 pass; `--custom` generates valid reviewer and executor agents

@@ -153,10 +153,11 @@ def sanitize_prompt_text(value: str, limit: int) -> str:
     """Sanitize one single-line brief value before it reaches a prompt.
 
     The result is stable under repeated sanitization (a fixed point): control
-    characters are removed, whitespace is collapsed, HTML comment marker
-    sequences are removed until none remain, and the value is trimmed and
-    length-capped. Removing markers can stitch a new marker together, which is
-    why the removal repeats until the value stops changing.
+    characters are removed, then the whitespace-collapse and HTML comment
+    marker removal pass repeats until the value stops changing, and finally the
+    value is trimmed and length-capped. Removing markers can stitch a new
+    marker together (and can leave double spaces behind), which is why the
+    whole pass repeats until nothing changes.
 
     Args:
         value: Raw field value from the brief.
@@ -170,10 +171,10 @@ def sanitize_prompt_text(value: str, limit: int) -> str:
             point is reached (defensive; a correct loop cannot leave one).
     """
     cleaned = "".join(character for character in value if character >= " " and character != "\x7f")
-    cleaned = re.sub(r"\s+", " ", cleaned)
     previous = None
     while previous != cleaned:
         previous = cleaned
+        cleaned = re.sub(r"\s+", " ", cleaned)
         cleaned = cleaned.replace("<!--", "").replace("-->", "")
     if "<!--" in cleaned or "-->" in cleaned:
         raise BriefError("value still contains a comment marker after sanitization")

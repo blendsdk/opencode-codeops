@@ -61,9 +61,10 @@ structure (newlines and spacing) is preserved. The body is never whitespace-coll
 byte-verbatim re-emitted without the control-character pass (PF-027).
 
 Sanitization applies to every value that can reach a prompt or AGENTS.md, and runs to a
-**fixed point**: strip control characters; collapse whitespace to single spaces; repeatedly remove
-`<!--` and `-->` until the value stops changing; then reject if any marker sequence remains;
-finally trim and length-cap. This makes marker injection impossible (PF-007, PF-027).
+**fixed point**: strip control characters; then repeat the whitespace-collapse and `<!--`/`-->`
+removal pass until the value stops changing (removal can stitch a new marker and can leave double
+spaces, so the whole pass repeats); reject if any marker sequence remains; finally trim and
+length-cap. This makes marker injection impossible (PF-007, PF-027).
 
 ## Generated agent
 
