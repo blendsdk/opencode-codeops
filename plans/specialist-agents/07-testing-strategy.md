@@ -86,7 +86,7 @@
 | ST-39 | `--dry-run --sync-agents-md` | Prints the delta; AGENTS.md bytes unchanged | Req R11, PF-014 |
 | ST-40 | `--dry-run --remove-custom <role> --yes` | Prints intended deletions; both files remain; dry-run wins over `--yes` | Req R11, PF-014 |
 | ST-41 | `--sync-agents-md` with an invalid brief present | Exit 1; reports `INVALID: <role>`; AGENTS.md unchanged | Req R6, PF-021 |
-| ST-42 | Regenerate a catalog role (e.g. `executor`) with the refactored generator | Output is byte-identical to the packaged `agents/executor.md` | Req R5, AC #6, PF-023 |
+| ST-42 | Regenerate a catalog role (e.g. `executor`) with the refactored generator | Output is byte-identical to the pre-refactor golden fixture `scripts/fixtures/catalog-executor.golden.md` (captured before any generator edit; AR #25) | Req R5, AC #6, PF-023, AR #25 |
 
 ### Protocol and skill content
 
@@ -150,6 +150,8 @@ record the manual scenario procedure and results.
   attributable to custom states (PF-003).
 - A flat migration fixture with `requirements/`, a plan folder, `codeops/specialists/`, and a
   committed `codeops/codeops.json` (PF-013).
+- The pre-refactor catalog golden file `scripts/fixtures/catalog-executor.golden.md` for the ST-42
+  regression comparison (AR #25).
 
 ### Mock Requirements
 

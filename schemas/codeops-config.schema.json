@@ -39,7 +39,8 @@
             "properties": {
               "model": {"type": "string", "minLength": 1},
               "effort": {"type": "string", "minLength": 1},
-              "sandbox": {"enum": ["read-only", "workspace-write", "danger-full-access"]}
+              "sandbox": {"enum": ["read-only", "workspace-write", "danger-full-access"]},
+              "reasoning": {"enum": ["none", "minimal", "low", "medium", "high", "xhigh", "max"]}
             }
           }
         }

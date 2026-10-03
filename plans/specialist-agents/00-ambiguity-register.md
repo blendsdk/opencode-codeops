@@ -1,7 +1,7 @@
 # Ambiguity Register: Specialist Agents
 
-> **Status**: ✅ GATE PASSED — all 24 items resolved
-> **Last Updated**: 2026-10-04 00:40
+> **Status**: ✅ GATE PASSED — all 25 items resolved (AR #25 added and resolved at execution time)
+> **Last Updated**: 2026-10-04 00:57
 
 | # | Category | Ambiguity / Gap | Options Presented | User Decision | Status |
 |---|----------|-----------------|-------------------|---------------|--------|
@@ -29,6 +29,7 @@
 | 22 | Naming & terminology | Parseable `> **Implements**:` target for a standalone full plan (no RD exists; the plan parser requires at least one target and accepts only `RD-*`, `T-\d+`, `REQ-*`) | `REQ-SPECIALIST-AGENTS` (recommended) / create an RD first / other tracker id | User chose `REQ-SPECIALIST-AGENTS` | ✅ Resolved — User decision |
 | 23 | Scope | Invocation carried `--auto-commit`, which is not a `make-plan` flag | Record as execution intent / drop | Record `exec-plan --auto-commit` as the intended execution mode; `make-plan` itself writes no commits | ✅ Resolved — User chose "Record it for execution" |
 | 24 | Scope | Detection budget: at most two specialist candidates per requirements set or plan | Record as a resolved decision / remove the budget | At most two candidates per requirements set or plan, proposed in one batch; recorded during preflight (PF-012) | ✅ Resolved — User accepted recommendation (preflight PF-012) |
+| 25 | Technical (runtime) | ST-42's oracle requires the refactored generator's catalog output to be byte-identical to `agents/executor.md`, but the pre-refactor generator never reproduced that file: `agent-templates/plan-task-executor.md` has no YAML frontmatter description (fallback text) and carries a provenance comment absent from `agents/executor.md` (`git log`: both landed in the v1.2.0 port). Satisfying the literal oracle would change catalog generation, which R5 and AC #6 forbid. | A: capture the pre-refactor catalog output as a committed golden fixture and compare against it (recommended) · B: fix the generator to reproduce `agents/*.md` (changes catalog behavior; violates R5/AC #6) · C: drop the ST-42 regression guard | Option A — golden fixture `scripts/fixtures/catalog-executor.golden.md` captured from the pre-refactor generator; ST-42 amended to compare against it | ✅ Resolved — User chose golden fixture |
 
 ### Resolution Notes
 
@@ -84,6 +85,13 @@ Direct user decision: approved larger — with two challenger-derived trims: (1)
 - AR-21's options were A (catalog-only), B (novel subsystem), and C (OpenCode-generated). The
   challenger's middle alternative was a trimmed catalog-only variant; there is no "option D".
 - AR #24 was added by preflight decision PF-012.
+
+**AR-25 (runtime):** Discovered during Phase 2, task 2.1.1. ST-42 conflates "the refactor leaves
+catalog output unchanged" (the requirement) with "the generator reproduces `agents/executor.md`"
+(a property the repository never had). The user approved resolution A: the pre-refactor output of
+`python3 scripts/install_agents.py --roles executor` was captured before any generator edit as
+`scripts/fixtures/catalog-executor.golden.md`; ST-42 compares the refactored generator's output
+against that golden file byte-for-byte. This keeps the regression guard and R5/AC #6 intact.
 
 **AR-22:** Added during authoring per the surface-during-authoring rule. The plan parser
 (`scripts/codeops_plan.py:62-67`, `:141-143`) requires a parseable target and the grammar accepts

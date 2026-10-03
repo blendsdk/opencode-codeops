@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-04 00:52
-> **Progress**: 5/40 tasks (12%)
+> **Progress**: 12/40 tasks (30%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -92,24 +92,31 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 
 ## Phase 2: Generation core
 
+> **Phase baseline tree**: f44ee8ffdabc1d01291469f3e64ee3a6a36c1175
+> **Expected modification set** (strict scope): `scripts/install_agents.spec.test.mjs`,
+> `scripts/install_agents.impl.test.mjs`, `scripts/install_agents.py`,
+> `agent-templates/domain-specialist-reviewer.md`, `agent-templates/domain-specialist-executor.md`,
+> `schemas/codeops-config.schema.json`, `scripts/fixtures/catalog-executor.golden.md` (AR #25), and
+> this plan's progress marks.
+
 ### Step 2.1: Specification tests (generation and validation)
 
 **Reference**: [03-02](03-02-installer-and-templates.md) §Project brief, §Generated agent · AR #9, #10, #12, #13, #15, #19, PF-002, PF-009, PF-025
 **Objective**: Define the observable behavior of `--custom` generation before implementing it.
 
-- [ ] 2.1.1 Write installer spec tests ST-1 … ST-16 and the catalog regression ST-42 (spawning `python3` with an overridden `CODEOPS_PLUGIN_ROOT`) — `scripts/install_agents.spec.test.mjs`
-- [ ] 2.1.2 Run the spec tests and verify they FAIL (red phase)
+- [x] 2.1.1 Write installer spec tests ST-1 … ST-16 and the catalog regression ST-42 (spawning `python3` with an overridden `CODEOPS_PLUGIN_ROOT`; ST-42 compares against the pre-refactor golden fixture per AR #25) — `scripts/install_agents.spec.test.mjs` ✅ (completed: 2026-10-04 01:00)
+- [x] 2.1.2 Run the spec tests and verify they FAIL (red phase) ✅ (completed: 2026-10-04 01:00)
 
 ### Step 2.2: Implementation
 
 **Reference**: [03-02](03-02-installer-and-templates.md) §Frontmatter rules, §Generated agent, §CLI surface · AR #12, #15, PF-006, PF-008, PF-010, PF-019, PF-024, PF-026
 **Objective**: Parse and validate briefs, add the two templates and schema enum, and generate specialist agents deterministically with the existing plain-write pattern.
 
-- [ ] 2.2.1 Add the brief parser and validation to `scripts/install_agents.py` (fullmatch slug, reserved/built-in/DOS names, `schema`, `kind`, required fields, unknown keys, fixed-point sanitization, 16384-byte body cap, canonical paths, `from __future__ import annotations`)
-- [ ] 2.2.2 Add `agent-templates/domain-specialist-reviewer.md` and `agent-templates/domain-specialist-executor.md` with their contracts
-- [ ] 2.2.3 Add the `reasoning` enum to `routing.roles.<role>` in `schemas/codeops-config.schema.json` (before generation consumes it)
-- [ ] 2.2.4 Implement `--custom` generation: template by `kind`, quoted/escaped frontmatter, reasoning/effort/sandbox/model resolution, reviewer write clamp, marker, hand-authored refusal, no comma lists
-- [ ] 2.2.5 Run the spec tests and verify they PASS (green phase)
+- [x] 2.2.1 Add the brief parser and validation to `scripts/install_agents.py` (fullmatch slug, reserved/built-in/DOS names, `schema`, `kind`, required fields, unknown keys, fixed-point sanitization, 16384-byte body cap, canonical paths, `from __future__ import annotations`) ✅ (completed: 2026-10-04 01:02)
+- [x] 2.2.2 Add `agent-templates/domain-specialist-reviewer.md` and `agent-templates/domain-specialist-executor.md` with their contracts ✅ (completed: 2026-10-04 01:02)
+- [x] 2.2.3 Add the `reasoning` enum to `routing.roles.<role>` in `schemas/codeops-config.schema.json` (before generation consumes it) ✅ (completed: 2026-10-04 01:02)
+- [x] 2.2.4 Implement `--custom` generation: template by `kind`, quoted/escaped frontmatter, reasoning/effort/sandbox/model resolution, reviewer write clamp, marker, hand-authored refusal, no comma lists ✅ (completed: 2026-10-04 01:04)
+- [x] 2.2.5 Run the spec tests and verify they PASS (green phase) ✅ (completed: 2026-10-04 01:04)
 
 ### Step 2.3: Implementation tests and hardening
 
