@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-04 00:52
-> **Progress**: 3/40 tasks (8%)
+> **Progress**: 5/40 tasks (12%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -78,8 +78,8 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 **Objective**: Author the canonical detection/routing/lifecycle protocol and register the specialists path.
 
 - [x] 1.2.1 Write `_shared/specialist-agents.md` (criteria, disqualifiers, candidate packet, authority/budget per AR #24, routing layers, lifecycle, test hooks) ✅ (completed: 2026-10-04 00:53)
-- [~] 1.2.2 Add `codeops/specialists/` to `_shared/layout-convention.md` (project-level, both layouts) ⏳ (implemented: 2026-10-04 00:53)
-- [ ] 1.2.3 Run the content spec tests and verify they PASS (green phase)
+- [x] 1.2.2 Add `codeops/specialists/` to `_shared/layout-convention.md` (project-level, both layouts) ✅ (completed: 2026-10-04 00:53)
+- [x] 1.2.3 Run the content spec tests and verify they PASS (green phase) ✅ (completed: 2026-10-04 00:54)
 
 **Deliverables**:
 - `_shared/specialist-agents.md` exists with the schema stamp and all required sections

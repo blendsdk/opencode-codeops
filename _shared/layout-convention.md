@@ -49,6 +49,7 @@ fi
 | Feature roadmap | `plans/00-roadmap.md` | `codeops/features/<f>/00-roadmap.md` |
 | Portfolio roadmap | *(n/a)* | `codeops/00-roadmap.md` |
 | Staged AGENTS.md notes | *(n/a)* | `codeops/features/<f>/AGENTS.notes.md` |
+| Specialist briefs | `codeops/specialists/<role>.md` (project-level) | `codeops/specialists/<role>.md` (project-level) |
 | Ambiguity register | `requirements/00-ambiguity-register.md` or `plans/<plan>/00-ambiguity-register.md` | the same file, under the feature |
 | Scope-expansion register | See the target-qualified rules below | the same target-qualified filename, under the feature |
 | Task mini-plan | `plans/<task-slug>/99-execution-plan.md` | `codeops/features/<f>/plans/<task-slug>/99-execution-plan.md` |
@@ -57,6 +58,10 @@ fi
 In nested layout, a feature's inner directories are created **lazily** — only when that
 feature's first RD, plan, or task is written. The marker and the (possibly empty) portfolio
 roadmap are the only things `setup-codeops` creates up front.
+
+Specialist briefs are **project-level in both layouts**: a specialist describes a project-wide
+domain or capability, so it is never scoped to one feature. The flat-to-nested migration leaves
+`codeops/specialists/` in place.
 
 ### Scope-expansion register paths
 
