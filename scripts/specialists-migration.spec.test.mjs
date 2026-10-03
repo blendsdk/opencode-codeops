@@ -15,7 +15,7 @@
 
 import assert from "node:assert/strict"
 import { spawnSync } from "node:child_process"
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { dirname, join, resolve } from "node:path"
 import { after, describe, it } from "node:test"
@@ -145,6 +145,28 @@ describe("ST-33 migration preserves project-level specialists and existing confi
     assert.match(dryRun.stderr + dryRun.stdout, /codeops\.json/)
 
     const apply = migrate(fixture, "--yes")
+    assert.equal(apply.status, 1)
+    assert.match(apply.stderr + apply.stdout, /codeops\.json/)
+    assert.equal(existsSync(join(fixture, "codeops", ".codeops.yml")), false)
+    assert.equal(existsSync(join(fixture, "requirements", "RD-01.md")), true, "nothing moved")
+  })
+
+  it("refuses a symlinked existing config before any move", () => {
+    const fixture = makeFixture('{"schema": 1}\n')
+    rmSync(join(fixture, "codeops", "codeops.json"))
+    symlinkSync(
+      "/tmp/opencode/does-not-exist-config.json",
+      join(fixture, "codeops", "codeops.json"),
+    )
+    run("git", ["add", "-A"], fixture)
+    run(
+      "git",
+      ["-c", "user.email=codeops@example.invalid", "-c", "user.name=CodeOps", "commit", "-qm", "symlink"],
+      fixture,
+    )
+
+    const apply = migrate(fixture, "--yes")
+
     assert.equal(apply.status, 1)
     assert.match(apply.stderr + apply.stdout, /codeops\.json/)
     assert.equal(existsSync(join(fixture, "codeops", ".codeops.yml")), false)

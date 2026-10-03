@@ -109,6 +109,16 @@ if [[ -e codeops && ! -d codeops ]]; then
   exit 1
 fi
 
+# Committed symlinks or special files at the written targets would make `cat >`
+# write through the link (or block forever); refuse up front, before any move.
+for target in codeops/codeops.json codeops/.codeops.yml codeops/00-roadmap.md; do
+  if [[ -L "$target" || ( -e "$target" && ! -f "$target" ) ]]; then
+    printf 'ERROR: %s is a symlink or not a regular file — refusing to migrate.\n' "$target" >&2
+    printf '       Replace it with a regular file (or remove it), then re-run. Nothing was modified.\n' >&2
+    exit 1
+  fi
+done
+
 # -----------------------------------------------------------------------------
 # Existing structured config: never overwrite it.
 #
