@@ -129,6 +129,20 @@ BRIEF_TEXT_LIMITS: dict[str, int] = {
 # The brief Markdown body may not exceed this many bytes.
 MAX_BRIEF_BODY_BYTES = 16384
 
+# Managed AGENTS.md index block. The markers are the whole contract: the sync
+# replaces only what sits between them and removes the block when no specialist
+# briefs remain.
+AGENTS_START = "<!-- CODEOPS-SPECIALISTS:START -->"
+AGENTS_END = "<!-- CODEOPS-SPECIALISTS:END -->"
+
+# Soft budget: beyond this many entries the block ends with an overflow
+# pointer instead of growing without bound.
+AGENTS_ENTRY_BUDGET = 15
+
+# Generated specialist agents carry this template-name prefix in their
+# ownership header; removal refuses anything else.
+CUSTOM_TEMPLATE_PREFIX = "domain-specialist-"
+
 # Every frontmatter key a brief may carry; anything else is an error.
 BRIEF_KNOWN_KEYS = (
     "schema",
@@ -578,6 +592,402 @@ def generate_custom_agent(plugin_root: Path, role: str, brief: dict, role_config
     return f"{frontmatter}\n{contract}\n\n---\n\n{body}\n"
 
 
+def write_generated_file(path: Path, content: str) -> None:
+    """Write generated content with a hardened open.
+
+    The target is opened with `O_NOFOLLOW` where the platform supports it, so a
+    symlink swapped in after the caller's checks cannot redirect the write.
+    This is a plain write (truncate and write), not an atomic replace.
+
+    Args:
+        path: Destination file.
+        content: Full file content.
+
+    Raises:
+        BriefError: If the file cannot be opened or written.
+    """
+    flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_NOFOLLOW", 0)
+    try:
+        descriptor = os.open(path, flags, 0o644)
+    except OSError as exc:
+        raise BriefError(f"cannot write {path}: {exc}") from exc
+    with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+        handle.write(content)
+
+
+def read_with_newlines(path: Path) -> str:
+    """Read a text file without newline translation.
+
+    Python's default text mode rewrites CRLF to LF on read; the AGENTS.md sync
+    must see the file exactly as it is so it can preserve the dominant line
+    ending. This reads with `newline=""` so no translation happens.
+
+    Args:
+        path: File to read.
+
+    Returns:
+        The file content with its original line endings.
+
+    Raises:
+        OSError: If the file cannot be read.
+        UnicodeDecodeError: If the file is not valid UTF-8.
+    """
+    with path.open("r", encoding="utf-8", newline="") as handle:
+        return handle.read()
+
+
+def collect_briefs(project: Path) -> tuple[dict, list]:
+    """Collect and validate every specialist brief in a project.
+
+    Args:
+        project: Resolved project root.
+
+    Returns:
+        A tuple `(briefs, errors)`. `briefs` maps role -> parsed brief; each
+        entry in `errors` is a ready-to-print `INVALID: <role> — <reason>`
+        line. A symlinked specialists directory is reported as one error and
+        yields no briefs.
+    """
+    brief_dir = project / "codeops" / "specialists"
+    briefs: dict[str, dict] = {}
+    errors: list[str] = []
+    if brief_dir.is_symlink():
+        return briefs, ["INVALID: specialists — refusing to read through a symlinked directory"]
+    if not brief_dir.is_dir():
+        return briefs, errors
+    for path in sorted(brief_dir.glob("*.md")):
+        role = path.stem
+        if path.is_symlink():
+            errors.append(f"INVALID: {role} — brief is a symlink")
+            continue
+        try:
+            briefs[role] = parse_brief(path, role)
+        except BriefError as exc:
+            errors.append(f"INVALID: {role} — {exc}")
+    return briefs, errors
+
+
+def generated_custom_template(path: Path) -> Optional[str]:
+    """Return the template name recorded in a generated agent's header.
+
+    Args:
+        path: Candidate generated agent file.
+
+    Returns:
+        The template name (for example `domain-specialist-reviewer`) when the
+        file carries the CodeOps ownership marker and role header, otherwise
+        `None`.
+    """
+    if not is_codeops_generated(path):
+        return None
+    try:
+        lines = path.read_text(encoding="utf-8").split("\n", 3)[:3]
+    except (OSError, UnicodeDecodeError):
+        return None
+    for line in lines:
+        match = re.fullmatch(r"# Role: .+ \| Template: (.+)", line)
+        if match:
+            return match.group(1)
+    return None
+
+
+def render_agents_block(briefs: dict, newline: str) -> str:
+    """Render the managed AGENTS.md block for a set of briefs.
+
+    Args:
+        briefs: Role -> parsed brief mapping.
+        newline: Line ending to use (`\\n` or `\\r\\n`).
+
+    Returns:
+        The block text without a trailing newline.
+    """
+    lines = [
+        AGENTS_START,
+        "Specialist agents (routing: `codeops/codeops.json`; briefs: `codeops/specialists/`):",
+    ]
+    roles = sorted(briefs)
+    for role in roles[:AGENTS_ENTRY_BUDGET]:
+        entry = f'- `{role}` — "{briefs[role]["description"]}"'
+        required_for = briefs[role].get("required-for")
+        if required_for:
+            entry += f" (Required for: {required_for})"
+        lines.append(entry)
+    if len(roles) > AGENTS_ENTRY_BUDGET:
+        lines.append(f"- …and {len(roles) - AGENTS_ENTRY_BUDGET} more; see codeops/specialists/")
+    lines.append(AGENTS_END)
+    return newline.join(lines)
+
+
+def classify_agents_block(content: str) -> tuple[str, int, int]:
+    """Classify the marker layout of an AGENTS.md file.
+
+    Args:
+        content: Current AGENTS.md content (empty string when absent).
+
+    Returns:
+        `("absent", -1, -1)` when no markers exist, or
+        `("present", start, end)` when exactly one ordered pair exists.
+
+    Raises:
+        BriefError: For one marker, duplicate markers, or reversed order.
+    """
+    starts = content.count(AGENTS_START)
+    ends = content.count(AGENTS_END)
+    if starts == 0 and ends == 0:
+        return "absent", -1, -1
+    if starts == 1 and ends == 1:
+        start = content.find(AGENTS_START)
+        end = content.find(AGENTS_END)
+        if start < end:
+            return "present", start, end
+    raise BriefError("AGENTS.md contains malformed specialist markers")
+
+
+def compute_agents_md(project: Path, briefs: dict) -> tuple:
+    """Compute the post-change AGENTS.md content for a set of briefs.
+
+    Args:
+        project: Resolved project root.
+        briefs: Briefs that should be listed after the operation.
+
+    Returns:
+        A tuple `(path, new_content, error)`. `new_content` is `None` when no
+        change is needed; `error` is a message when the current file cannot be
+        updated safely.
+
+    Raises:
+        BriefError: If the file is unreadable or not a regular file.
+    """
+    path = project / "AGENTS.md"
+    if path.is_symlink():
+        return path, None, "refusing to write through a symlinked AGENTS.md"
+    exists = path.exists()
+    if exists and not path.is_file():
+        return path, None, "AGENTS.md is not a regular file"
+    if not exists:
+        content = ""
+    else:
+        try:
+            content = read_with_newlines(path)
+        except UnicodeDecodeError:
+            return path, None, "AGENTS.md is not valid UTF-8"
+        except OSError as exc:
+            return path, None, f"cannot read AGENTS.md: {exc}"
+
+    newline = "\r\n" if "\r\n" in content else "\n"
+    try:
+        state, start, end = classify_agents_block(content)
+    except BriefError as exc:
+        return path, None, str(exc)
+    block = render_agents_block(briefs, newline)
+
+    if state == "present":
+        if not briefs:
+            remove_start = start
+            remove_end = end + len(AGENTS_END)
+            if content[:remove_start].endswith(newline + newline):
+                remove_start -= len(newline)
+            if content[remove_end:].startswith(newline):
+                remove_end += len(newline)
+            return path, content[:remove_start] + content[remove_end:], None
+        return path, content[:start] + block + content[end + len(AGENTS_END):], None
+
+    if not briefs:
+        return path, None, None
+    if not exists or content == "":
+        return path, block + newline, None
+    base = content
+    if not base.endswith(("\n", "\r")):
+        base += newline
+    return path, base + newline + block + newline, None
+
+
+def run_sync_agents_md(project: Path, dry_run: bool) -> int:
+    """Render and apply the managed specialist block in AGENTS.md.
+
+    Args:
+        project: Resolved project root.
+        dry_run: When True, report the intended change and write nothing.
+
+    Returns:
+        Process exit code (0 on success, 1 when a brief or the file is invalid).
+    """
+    try:
+        briefs, errors = collect_briefs(project)
+        if errors:
+            for error in errors:
+                print(error)
+            return 1
+        path, new_content, error = compute_agents_md(project, briefs)
+        if error:
+            raise BriefError(error)
+        if new_content is None:
+            print("AGENTS.md: no specialist block to change")
+            return 0
+        if dry_run:
+            print(f"  [dry-run] would update: {path} ({len(briefs)} specialist(s))")
+            return 0
+        if path.exists() and not os.access(path, os.W_OK):
+            raise BriefError(f"AGENTS.md is not writable: {path}")
+        write_generated_file(path, new_content)
+        print(f"  updated: {path.name} ({len(briefs)} specialist(s))")
+        return 0
+    except BriefError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
+
+
+def run_check(project: Path, plugin_root: Path, roles: list, routing_roles: dict) -> int:
+    """Report catalog, custom, orphan, and AGENTS.md states.
+
+    Args:
+        project: Resolved project root.
+        plugin_root: Package root containing `agent-templates/`.
+        roles: Catalog roles requested for the default check.
+        routing_roles: Parsed `routing.roles` policy from `codeops.json`.
+
+    Returns:
+        Process exit code: 1 when any issue is reported, otherwise 0 with a
+        `OK: N default, M custom` summary.
+    """
+    agents_dir = project / ".opencode" / "agents"
+    issues: list[str] = []
+    for role in roles:
+        out_path = agents_dir / f"{role}.md"
+        if not out_path.exists():
+            issues.append(f"MISSING: {out_path}")
+        elif not is_codeops_generated(out_path):
+            issues.append(f"HAND-AUTHORED (skip): {out_path}")
+
+    briefs, errors = collect_briefs(project)
+    issues.extend(errors)
+    for role, brief in sorted(briefs.items()):
+        out_path = agents_dir / f"{role}.md"
+        if out_path.is_symlink() or (out_path.exists() and not out_path.is_file()):
+            issues.append(f"HAND-AUTHORED: {role} (not managed)")
+            continue
+        if not out_path.exists():
+            issues.append(f"MISSING: {role}")
+            continue
+        if not is_codeops_generated(out_path):
+            issues.append(f"HAND-AUTHORED: {role} (not managed)")
+            continue
+        try:
+            expected = generate_custom_agent(plugin_root, role, brief, routing_roles.get(role, {}))
+        except BriefError as exc:
+            issues.append(f"INVALID: {role} — {exc}")
+            continue
+        try:
+            current = out_path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            issues.append(f"STALE: {role}")
+            continue
+        if current != expected:
+            issues.append(f"STALE: {role}")
+
+    if agents_dir.is_dir():
+        for file in sorted(agents_dir.glob("*.md")):
+            template = generated_custom_template(file)
+            if template and template.startswith(CUSTOM_TEMPLATE_PREFIX) and file.stem not in briefs:
+                issues.append(f"ORPHAN: {file.stem}")
+
+    if briefs:
+        agents_path = project / "AGENTS.md"
+        if not agents_path.exists():
+            issues.append("AGENTS.md MISSING (file)")
+        else:
+            try:
+                content = read_with_newlines(agents_path)
+                state, _, _ = classify_agents_block(content)
+            except (OSError, UnicodeDecodeError, BriefError):
+                issues.append("AGENTS.md STALE")
+            else:
+                newline = "\r\n" if "\r\n" in content else "\n"
+                if state == "absent":
+                    issues.append("AGENTS.md MISSING (block)")
+                elif render_agents_block(briefs, newline) not in content:
+                    issues.append("AGENTS.md STALE")
+
+    if issues:
+        print("Agent check found issues:")
+        for issue in issues:
+            print(f"  {issue}")
+        return 1
+    print(f"OK: {len(roles)} default, {len(briefs)} custom")
+    return 0
+
+
+def run_remove_custom(project: Path, role: str, yes: bool, dry_run: bool) -> int:
+    """Remove a generated specialist agent and its brief after confirmation.
+
+    Args:
+        project: Resolved project root.
+        role: Role requested with `--remove-custom`.
+        yes: Confirms the deletion.
+        dry_run: When True, report the intended deletions and change nothing.
+
+    Returns:
+        Process exit code (0 on success, 1 on any refusal).
+    """
+    try:
+        validate_role_name(role)
+        agents_dir = project / ".opencode" / "agents"
+        agent_path = agents_dir / f"{role}.md"
+        brief_path = project / "codeops" / "specialists" / f"{role}.md"
+        if brief_path.is_symlink():
+            raise BriefError(f"refusing to remove through a symlinked brief: {brief_path}")
+
+        agent_is_link = agent_path.is_symlink()
+        agent_exists = agent_path.exists() or agent_is_link
+        brief_exists = brief_path.is_file()
+        if agent_exists and not agent_is_link:
+            if not agent_path.is_file():
+                raise BriefError(f"refusing to remove a non-regular file: {agent_path}")
+            template = generated_custom_template(agent_path)
+            if not template or not template.startswith(CUSTOM_TEMPLATE_PREFIX):
+                raise BriefError(f"refusing to remove {role!r}: not a generated specialist agent")
+        if not agent_exists and not brief_exists:
+            raise BriefError(f"nothing to remove for role {role!r}")
+
+        briefs, errors = collect_briefs(project)
+        if errors:
+            for error in errors:
+                print(error)
+            return 1
+        remaining = {name: brief for name, brief in briefs.items() if name != role}
+        agents_path, new_content, error = compute_agents_md(project, remaining)
+        if error:
+            raise BriefError(error)
+        if agents_path.exists() and not os.access(agents_path, os.W_OK):
+            raise BriefError(f"AGENTS.md is not writable: {agents_path}")
+
+        if not yes or dry_run:
+            if agent_exists:
+                print(f"Would delete: {agent_path}")
+            else:
+                print(f"MISSING: {role} (no generated agent)")
+            if brief_exists:
+                print(f"Would delete: {brief_path}")
+            else:
+                print(f"ORPHAN: {role} (generated agent without a brief)")
+            print("Pass --yes to delete (dry-run always wins).")
+            return 0
+
+        if agent_is_link:
+            os.unlink(agent_path)
+        elif agent_exists:
+            agent_path.unlink()
+        if brief_exists:
+            brief_path.unlink()
+        if new_content is not None:
+            write_generated_file(agents_path, new_content)
+        print(f"Removed: {role}")
+        return 0
+    except BriefError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1
+
+
 def run_custom(
     project: Path,
     plugin_root: Path,
@@ -644,13 +1054,7 @@ def run_custom(
             print(f"    kind={brief['kind']}, reasoning={routing_roles.get(role, {}).get('reasoning', brief.get('reasoning') or 'max')}")
             return 0
         agents_dir.mkdir(parents=True, exist_ok=True)
-        flags = os.O_WRONLY | os.O_CREAT | os.O_TRUNC | getattr(os, "O_NOFOLLOW", 0)
-        try:
-            descriptor = os.open(out_path, flags, 0o644)
-        except OSError as exc:
-            raise BriefError(f"cannot write {out_path}: {exc}") from exc
-        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
-            handle.write(content)
+        write_generated_file(out_path, content)
         print(f"  wrote: {out_path.name}")
         return 0
     except BriefError as exc:
@@ -664,13 +1068,24 @@ def main() -> int:
     )
     parser.add_argument("--project", required=True, help="Path to the project root")
     parser.add_argument("--roles", help="Comma-separated list of roles to install (default: all)")
-    custom_or_check = parser.add_mutually_exclusive_group()
-    custom_or_check.add_argument(
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument(
         "--custom",
         metavar="ROLE",
         help="Generate one project specialist agent from codeops/specialists/ROLE.md",
     )
-    custom_or_check.add_argument("--check", action="store_true", help="Check for missing or stale agents without writing")
+    mode.add_argument(
+        "--remove-custom",
+        metavar="ROLE",
+        help="Delete a generated specialist agent and its brief (needs --yes)",
+    )
+    mode.add_argument(
+        "--sync-agents-md",
+        action="store_true",
+        help="Render or update the managed specialist block in AGENTS.md",
+    )
+    mode.add_argument("--check", action="store_true", help="Check for missing or stale agents without writing")
+    parser.add_argument("--yes", action="store_true", help="Confirm destructive --remove-custom deletions")
     parser.add_argument("--dry-run", action="store_true", help="Show what would be written without writing")
     args = parser.parse_args()
 
@@ -710,26 +1125,14 @@ def main() -> int:
 
     if args.custom:
         return run_custom(project, plugin_root, args.custom, routing_roles, args.dry_run)
+    if args.remove_custom:
+        return run_remove_custom(project, args.remove_custom, args.yes, args.dry_run)
+    if args.sync_agents_md:
+        return run_sync_agents_md(project, args.dry_run)
+    if args.check:
+        return run_check(project, plugin_root, roles, routing_roles)
 
     agents_dir = project / ".opencode" / "agents"
-
-    if args.check:
-        # Check mode: report missing or stale files
-        issues = []
-        for role in roles:
-            out_path = agents_dir / f"{role}.md"
-            if not out_path.exists():
-                issues.append(f"MISSING: {out_path}")
-            elif not is_codeops_generated(out_path):
-                issues.append(f"HAND-AUTHORED (skip): {out_path}")
-        if issues:
-            print("Agent check found issues:")
-            for i in issues:
-                print(f"  {i}")
-            return 1
-        else:
-            print(f"OK: all {len(roles)} CodeOps agent files present.")
-            return 0
 
     # Generate and write (or dry-run)
     if not args.dry_run:

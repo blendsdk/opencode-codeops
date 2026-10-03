@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-04 00:52
-> **Progress**: 14/40 tasks (35%)
+> **Progress**: 20/40 tasks (50%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -138,23 +138,29 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 
 ## Phase 3: Check, removal, sync, and migration
 
+> **Phase baseline tree**: 3014e72036693d1ccbf8dd880de5d2fe31b3430f
+> **Expected modification set** (strict scope): `scripts/install_agents.spec.test.mjs`,
+> `scripts/install_agents.impl.test.mjs`, `scripts/install_agents.py`,
+> `scripts/specialists-migration.spec.test.mjs` (new), `scripts/specialists-lifecycle.spec.test.mjs`
+> (new), `scripts/codeops-migrate.sh`, and this plan's progress marks.
+
 ### Step 3.1: Specification tests (lifecycle)
 
 **Reference**: [03-02](03-02-installer-and-templates.md) §`--check` semantics, §Removal, §AGENTS.md managed block · AR #11, #13, #14, PF-003, PF-004, PF-005, PF-014, PF-021
 **Objective**: Define check/removal/sync behavior, including the file-state edge cases, before implementing it.
 
-- [ ] 3.1.1 Write installer spec tests ST-17 … ST-29 and ST-36 … ST-41 — `scripts/install_agents.spec.test.mjs`
-- [ ] 3.1.2 Run the spec tests and verify they FAIL (red phase)
+- [x] 3.1.1 Write installer spec tests ST-17 … ST-29 and ST-36 … ST-41 (plus the ST-6 AGENTS.md symlink sub-case, placed here because it needs `--sync-agents-md`) — `scripts/install_agents.spec.test.mjs` ✅ (completed: 2026-10-04 01:24)
+- [x] 3.1.2 Run the spec tests and verify they FAIL (red phase) ✅ (completed: 2026-10-04 01:24)
 
 ### Step 3.2: Implementation
 
 **Reference**: [03-02](03-02-installer-and-templates.md) §`--check` semantics, §Removal, §AGENTS.md managed block · AR #11, #13, #14, PF-004, PF-005, PF-006, PF-007, PF-014, PF-021, PF-022
 **Objective**: Implement lifecycle modes with guardrails.
 
-- [ ] 3.2.1 Implement `--check` states: invalid brief, missing, stale, orphan, hand-authored collision, and AGENTS.md file/block/stale tokens
-- [ ] 3.2.2 Implement `--remove-custom`: create-path validation plus `domain-specialist-*` template guard, missing-agent/brief rules, index-first ordering, `--yes`, and automatic index sync
-- [ ] 3.2.3 Implement `--sync-agents-md`: absent-file creation, empty/no-newline/CRLF normalization, append/replace/remove, fixed-point sanitization, duplicate/reversed-marker refusal, overflow pointer, idempotence
-- [ ] 3.2.4 Run the spec tests and verify they PASS (green phase)
+- [x] 3.2.1 Implement `--check` states: invalid brief, missing, stale, orphan, hand-authored collision, and AGENTS.md file/block/stale tokens ✅ (completed: 2026-10-04 01:27)
+- [x] 3.2.2 Implement `--remove-custom`: create-path validation plus `domain-specialist-*` template guard, missing-agent/brief rules, index-first ordering, `--yes`, and automatic index sync ✅ (completed: 2026-10-04 01:27)
+- [x] 3.2.3 Implement `--sync-agents-md`: absent-file creation, empty/no-newline/CRLF normalization, append/replace/remove, fixed-point sanitization, duplicate/reversed-marker refusal, overflow pointer, idempotence ✅ (completed: 2026-10-04 01:27)
+- [x] 3.2.4 Run the spec tests and verify they PASS (green phase) ✅ (completed: 2026-10-04 01:27)
 
 ### Step 3.3: Implementation tests, migration, and lifecycle
 
