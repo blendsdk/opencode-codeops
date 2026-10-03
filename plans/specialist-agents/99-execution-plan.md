@@ -245,7 +245,7 @@ Review evidence lives here; severities follow the preflight scale.
 | Phase | Reviewer(s) | Findings | Rulings | Evidence |
 | ----- | ----------- | -------- | ------- | -------- |
 | 1 | correctness-reviewer (strict defaults) | RV-1…RV-3 🟡 minor, RV-4…RV-5 🔵 observation | RV-1…RV-4 fixed as a follow-up commit; RV-5 is a forward reference landed by ST-32 in Phase 4 | phase diff vs `187e0be`; `npm run verify` 92 tests |
-| 2 | correctness-reviewer + security-auditor (strict defaults; security selected) | SA-001…SA-002 🟠 major, SA-003…SA-007 🟡 minor, RV-1…RV-7 🟡/🔵 | User ruled 2026-10-04: SA-001 full containment fix, SA-002 validate+escape. Fixes applied for SA-001/002/004/005/006/007 and RV-2…RV-7; SA-003 declined (body markers are inert; stripping would destroy legitimate Markdown HTML comments) with rationale recorded; RV-1 recorded as AR #26. One scoped re-review dispatched | phase diff vs `f44ee8f`; `npm run verify` 121 tests |
+| 2 | correctness-reviewer + security-auditor (strict defaults; security selected) | SA-001…SA-002 🟠 major, SA-003…SA-007 🟡 minor, RV-1…RV-7 🟡/🔵 | User ruled 2026-10-04: SA-001 full containment fix, SA-002 validate+escape. Fixes applied for SA-001/002/004/005/006/007 and RV-2…RV-7; SA-003 declined (body markers are inert — confirmed by re-review; stripping would destroy legitimate Markdown HTML comments); RV-1 recorded as AR #26. One scoped re-review: all fixes verified, observation SA-R1-001 (sandbox enum test) added | phase diff vs `f44ee8f`; fix diff vs `8f5263e`; `npm run verify` 129 tests |
 
 ## Dependencies
 

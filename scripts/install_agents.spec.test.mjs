@@ -539,11 +539,12 @@ describe("routing overrides (ST-9, ST-10, ST-11)", () => {
     )
   })
 
-  it("rejects routing reasoning or effort values outside their enums", () => {
+  it("rejects routing reasoning, effort, or sandbox values outside their enums", () => {
     const role = "pg-migration-reviewer"
     for (const [key, value] of [
       ["reasoning", "max\ninjected: true"],
       ["effort", "high\ninjected: true"],
+      ["sandbox", "root\ninjected: true"],
     ]) {
       const project = makeProject()
       writeBrief(project, role, reviewerBrief())
