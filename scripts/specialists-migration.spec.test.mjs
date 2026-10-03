@@ -151,6 +151,34 @@ describe("ST-33 migration preserves project-level specialists and existing confi
     assert.equal(existsSync(join(fixture, "requirements", "RD-01.md")), true, "nothing moved")
   })
 
+  it("refuses a symlinked codeops parent before any move", () => {
+    const fixture = mkdtempSync(join(tmpdir(), "codeops-migration-spec-"))
+    fixtures.push(fixture)
+    const outside = mkdtempSync(join(tmpdir(), "codeops-migration-outside-"))
+    fixtures.push(outside)
+    writeFixtureFile(fixture, "requirements/RD-01.md", "# RD-01\n")
+    writeFixtureFile(fixture, "plans/00-roadmap.md", "# Roadmap: demo\n\n> **Feature-Set**: demo\n")
+    writeFixtureFile(fixture, "plans/demo-plan/99-execution-plan.md", "# Plan\n")
+    writeFixtureFile(outside, "specialists/pg-migration-reviewer.md", "---\nrole: pg-migration-reviewer\n---\n")
+    writeFixtureFile(outside, "codeops.json", '{"schema": 1}\n')
+    symlinkSync(outside, join(fixture, "codeops"))
+    run("git", ["init", "-q"], fixture)
+    run("git", ["add", "-A"], fixture)
+    run(
+      "git",
+      ["-c", "user.email=codeops@example.invalid", "-c", "user.name=CodeOps", "commit", "-qm", "init"],
+      fixture,
+    )
+
+    const apply = migrate(fixture, "--yes")
+
+    assert.equal(apply.status, 1)
+    assert.match(apply.stderr + apply.stdout, /symlink/)
+    assert.equal(existsSync(join(outside, ".codeops.yml")), false)
+    assert.equal(existsSync(join(outside, "00-roadmap.md")), false)
+    assert.equal(existsSync(join(fixture, "requirements", "RD-01.md")), true, "nothing moved")
+  })
+
   it("refuses a symlinked existing config before any move", () => {
     const fixture = makeFixture('{"schema": 1}\n')
     rmSync(join(fixture, "codeops", "codeops.json"))

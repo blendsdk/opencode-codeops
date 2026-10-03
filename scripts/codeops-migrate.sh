@@ -109,6 +109,14 @@ if [[ -e codeops && ! -d codeops ]]; then
   exit 1
 fi
 
+# A symlinked `codeops` would redirect every write and every `git mv` outside the repository.
+# Refuse it before anything moves; `-L` also catches a dangling symlink, which `-e` misses.
+if [[ -L codeops ]]; then
+  printf 'ERROR: `codeops` is a symlink — refusing to migrate through it.\n' >&2
+  printf '       Replace it with a real directory (or remove it), then re-run. Nothing was modified.\n' >&2
+  exit 1
+fi
+
 # Committed symlinks or special files at the written targets would make `cat >`
 # write through the link (or block forever); refuse up front, before any move.
 for target in codeops/codeops.json codeops/.codeops.yml codeops/00-roadmap.md; do
