@@ -67,9 +67,9 @@ Findings reuse the preflight severity scale **by reference** — 🔴 CRITICAL /
 
 ### Finding prefixes
 
-RV (phase-reviewer) · SA (security-auditor) · PA (preflight-auditor) · PE (perf-auditor), each
-numbered `XX-NNN`. Every finding-producing agent reports "no findings" explicitly rather than
-returning empty output.
+RV (phase-reviewer) · SA (security-auditor) · PA (preflight-auditor) · PE (perf-auditor) ·
+SR (domain-specialist-reviewer), each numbered `XX-NNN`. Every finding-producing agent reports
+"no findings" explicitly rather than returning empty output.
 
 ## Activation & supersession
 
@@ -102,8 +102,19 @@ or response content.
 | plan-task-executor, plan-task-executor-opus | Phase task + Deliverable + Verify lines, governing spec/ST/AR excerpts, original goal + smallest viable design, relevant approved complexity PF/RV excerpts, target paths, scope mode (`strict` or `explore`), confirmed scope baseline, verify command |
 | spec-test-author | Spec excerpts + test cases, planned interface signatures from the plan documents, test framework/conventions, the FORBIDDEN implementation-file list, verify command (expected RED) |
 | preflight-auditor | The artifact under audit + ONE assigned dimension cluster + original goal + smallest viable design + relevant approved complexity AR/PF/RV excerpts + scope mode (`strict` or `explore`) + confirmed scope baseline |
+| domain-specialist-reviewer | Line-1 dispatch header; phase diff; original goal + smallest viable design; phase task + Deliverable lines; active lenses plus the brief's domain checklist; scope mode + confirmed baseline; verify command + last result; the specialist brief excerpt |
+| domain-specialist-executor | Phase task + Deliverable + Verify lines; governing spec/ST/AR excerpts; original goal + smallest viable design; target paths; scope mode + confirmed baseline; verify command; the specialist brief excerpt |
 | design-challenger | Problem + candidate options, **without** the parent's preferred choice (per `_shared/recommendation-hardening.md`) |
 | codebase-scout | The factual questions, search hints, and the facts-only contract |
+
+## Project specialists
+
+A project may define specialist roles on top of the catalog (see `_shared/specialist-agents.md`).
+Specialists resolve like any project agent; routing policy may pin model, effort, sandbox, and
+reasoning, and a generated agent embeds `reasoningEffort` (default `max`). Dispatch only roles
+listed in the plan's `## Specialist Agents` table, as **additional** reviewers or executors — a
+specialist never replaces a required reviewer or gate, and an unavailable or invalid-brief
+specialist falls back to a complete dynamic packet with the fallback reported.
 
 ## Budget caps
 
@@ -117,6 +128,8 @@ or response content.
   diff — never a third pass.
 - **Scout:** ≤3 codebase-scout dispatches per skill run, enforced by the dispatching parent.
 - **Challenger:** caps live in `_shared/recommendation-hardening.md` and apply unchanged.
+- **Specialist dispatch:** limited to the roles listed in the plan's `## Specialist Agents` table;
+  no additional fan-out.
 
 ## Model, effort, and agent resolution
 
@@ -129,6 +142,6 @@ Resolution order is:
 3. project `[agents]` defaults in `opencode.json`;
 4. the parent session's model and effort.
 
-Use `python3 "${CODEOPS_PLUGIN_ROOT}/scripts/install_agents.py" --project . --roles ...` to create optional project agents. Generated agent files carry a CodeOps marker. The installer owns only marked files and preserves every hand-authored file. Use `--check` to detect missing or stale generated agents and `--dry-run` to preview changes.
+Use `python3 "${CODEOPS_PLUGIN_ROOT}/scripts/install_agents.py" --project . --roles ...` to create optional project agents. Generated agent files carry a CodeOps marker. The installer owns only marked files and preserves every hand-authored file. Use `--check` to detect missing or stale generated agents and `--dry-run` to preview changes. Project specialists are generated with `--custom <role>` from `codeops/specialists/<role>.md` and indexed into `AGENTS.md` with `--sync-agents-md`; their routing policy may also set `reasoning`.
 
 Dynamic packets are the correctness baseline. If a named agent is missing or a model pin is unavailable, spawn a generic subagent with the complete packet or run inline. Report the fallback and preserve required reviewer independence, sandbox intent, and every ambiguity/readiness/verification gate.

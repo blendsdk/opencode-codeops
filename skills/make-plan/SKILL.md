@@ -61,6 +61,8 @@ with active scope exploration.
 
 Re-run [../../references/domains/selection.md](../../references/domains/selection.md) before component decomposition. Requirements-stage lens selection is evidence, not a permanent assumption. Apply every selected lens to specifications, acceptance criteria, failure narratives, and test strategy.
 
+After lens selection and phase decomposition, run the specialist-gap check in [../../_shared/specialist-agents.md](../../_shared/specialist-agents.md). Record the outcome in `00-index.md` under `## Specialist Agents` — always, including `None` with its reason and evidence. Candidate creation is reserved authority: `--auto-design` may not approve it, and approved roles are created through `setup-routing`.
+
 A folder `plans/<feature-name>/` containing:
 
 ```

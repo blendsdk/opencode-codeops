@@ -217,7 +217,9 @@ links to them, never restates them.
 The flow: the protocol records a phase-start ref when the phase begins; after the phase's last
 task verifies, the correctness reviewer and any active auditors are dispatched **in parallel** on
 the phase diff, their findings are merged and presented in severity-grouped batches, and each
-ruling is recorded in the durable finding artifact.
+ruling is recorded in the durable finding artifact. Specialist roles listed in the plan's
+`## Specialist Agents` table dispatch per `_shared/quality-profile.md`; an unavailable specialist
+falls back to a generic packet and the fallback is reported.
 
 > **🚨 Finding gate (load-bearing).** In normal mode, 🔴 CRITICAL and 🟠 MAJOR findings PAUSE
 > execution for the user's ruling in ALL commit modes. With active auto-design, select and record

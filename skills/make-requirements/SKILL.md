@@ -45,6 +45,8 @@ than stored as a second mutable status.
 
 Before discovery, read [../../references/domains/selection.md](../../references/domains/selection.md), select every applicable system lens, and read those lens files completely. Record selected lenses and evidence in the requirements index. Re-evaluate selection when discovery reveals another domain; a financial web service, for example, requires financial, web, distributed/concurrent, and data/migration lenses.
 
+After lens selection and scope confirmation, run the specialist-gap check in [../../_shared/specialist-agents.md](../../_shared/specialist-agents.md). Propose at most two candidates in one batch, each through the Complexity Escalation Gate; creation is reserved authority (`--auto-design` may never approve it). Record the check outcome — including "none" — in the final summary.
+
 You are NOT a passive interviewer. You are a **domain-aware consultant** that:
 
 1. **Absorbs** — takes whatever the user provides (brain dump, bullets, vague idea) as seed material

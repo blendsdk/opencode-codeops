@@ -10,7 +10,7 @@ description: Analyze the current repository and create or refresh concise CodeOp
 ## Protocol
 
 1. Resolve the Git root, current/default branch, and nested `AGENTS.md` files.
-2. Inspect manifests, build files, CI, test configuration, formatter/linter settings, source layout, package boundaries, and recent commit conventions.
+2. Inspect manifests, build files, CI, test configuration, formatter/linter settings, source layout, package boundaries, and recent commit conventions; note specialization signals (a specialized framework, DSL, codegen, protocol, or domain invariants a generic agent would miss).
 3. Derive commands only from executable configuration or documented scripts. Never invent a plausible command.
 4. Prepare a concise managed section between:
 
@@ -24,5 +24,6 @@ description: Analyze the current repository and create or refresh concise CodeOp
 7. On a non-integration branch, preview changes to repository-wide guidance and ask before writing unless repository policy explicitly permits branch-local updates.
 8. In compact mode, remove duplication and stale generated detail from the managed section only. Flag suspected hand-authored bloat; never silently rewrite it.
 9. Validate every recorded command or mark it explicitly unverified.
+10. When a specialization signal is strong and no specialist covers it, report the candidate with evidence and recommend the `setup-routing` creation flow ([../../_shared/specialist-agents.md](../../_shared/specialist-agents.md)); never write agent files here. Preserve the `<!-- CODEOPS-SPECIALISTS:START -->` / `<!-- CODEOPS-SPECIALISTS:END -->` block byte-for-byte when refreshing the managed section.
 
 Keep `AGENTS.md` small. Operational routing belongs in `codeops/codeops.json` or `opencode.json`, not prose.

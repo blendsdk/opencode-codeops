@@ -27,6 +27,14 @@ CodeOps routing lives under the optional `routing` and `quality` fields in `code
 
 Allowed effort values follow the active OpenCode release. Prefer `medium` for bounded reconnaissance, `high` for correctness/security review, and higher supported levels only for genuinely demanding semantic or architectural work.
 
+An optional per-role `reasoning` field sets the provider reasoning-effort passthrough (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`). Generated project specialists default to `max` through their brief or the embedded `reasoningEffort`; a routing value wins over the brief. A model that rejects the option is overridden here — there is no automatic provider-capability detection.
+
+```json
+"roles": {
+  "pg-migration-reviewer": {"reasoning": "max"}
+}
+```
+
 Model pins are optional per role. When omitted, OpenCode resolves the model from the explicit spawn, project defaults, and parent session. A missing pin must never block the workflow.
 
 Reviewer selection is driven by risk tags:

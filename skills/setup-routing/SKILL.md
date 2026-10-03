@@ -59,7 +59,7 @@ Model names are implementation choices, not policy names. Default to the current
 
 ## Structured policy
 
-Store CodeOps policy in `codeops/codeops.json`, not in `AGENTS.md`. `AGENTS.md` receives only a concise instruction that CodeOps routing is configured and that material ambiguity and verification gates may not be bypassed.
+Store CodeOps policy in `codeops/codeops.json`, not in `AGENTS.md`. When project specialists exist, `AGENTS.md` additionally carries the managed `<!-- CODEOPS-SPECIALISTS:START -->` … `<!-- CODEOPS-SPECIALISTS:END -->` index rendered by `install_agents.py --sync-agents-md`; this skill is its only writer, and material ambiguity and verification gates may not be bypassed.
 
 Example policy fields are documented in [routing.md](routing.md).
 
@@ -79,6 +79,20 @@ The installer:
 - uses read-only sandboxing for auditors and challengers;
 - writes complete developer instructions; and
 - never modifies global OpenCode configuration.
+
+### Specialist creation and removal
+
+Project specialists follow the shared protocol in [../../_shared/specialist-agents.md](../../_shared/specialist-agents.md); creation is reserved authority and requires the user's direct approval of the gate packet.
+
+Creation, after approval:
+
+1. Draft the brief at `codeops/specialists/<role>.md` from the candidate packet and present it for a final review — the brief is the actual prompt.
+2. Write `routing.roles.<role>` policy first when a model/effort/sandbox/reasoning override is needed: routing wins over the brief, and a policy written later makes the generated agent immediately stale.
+3. Generate the agent: `python3 "${CODEOPS_PLUGIN_ROOT}/scripts/install_agents.py" --project . --custom <role>`.
+4. Sync the index: `... --sync-agents-md`.
+5. Verify last with `... --check`, then tell the user the agent is available from the next OpenCode session.
+
+Removal: confirm, run `--remove-custom <role> --yes` (it deletes the agent and brief and syncs the index), drop the routing entry, warn when an active plan references the role, and report that `exec-plan` will fall back to a dynamic packet.
 
 ## Runtime dispatch rule
 

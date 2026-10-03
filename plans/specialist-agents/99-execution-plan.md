@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-04 00:52
-> **Progress**: 26/40 tasks (65%)
+> **Progress**: 34/40 tasks (85%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -185,25 +185,32 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 
 ## Phase 4: Skill wiring and execution routing
 
+> **Phase baseline tree**: 2b92d44fe9ae695a96499a45a27e76545c338287
+> **Expected modification set** (strict scope): `scripts/specialist-content.spec.test.mjs`,
+> `skills/make-plan/SKILL.md`, `skills/make-plan/templates.md`, `skills/make-requirements/SKILL.md`,
+> `skills/analyze-project/SKILL.md`, `skills/setup-routing/SKILL.md`, `skills/setup-routing/routing.md`,
+> `_shared/quality-profile.md`, `skills/exec-plan/SKILL.md`,
+> `skills/exec-plan/execution-protocol.md`, and this plan's progress marks.
+
 ### Step 4.1: Specification test (content)
 
 **Reference**: [03-03](03-03-execution-routing.md) · AR #16, PF-001
 **Objective**: Pin the routing and dispatch documentation before editing the skills.
 
-- [ ] 4.1.1 Write content spec test ST-32 (links, template section, quality-profile rules, exec-plan pointer, schema enum) — extend `scripts/specialist-content.spec.test.mjs`
-- [ ] 4.1.2 Run the spec test and verify it FAILS (red phase)
+- [x] 4.1.1 Write content spec test ST-32 (links, template section, quality-profile rules, exec-plan pointer, schema enum) — extend `scripts/specialist-content.spec.test.mjs` ✅ (completed: 2026-10-04 01:49)
+- [x] 4.1.2 Run the spec test and verify it FAILS (red phase) ✅ (completed: 2026-10-04 01:49)
 
 ### Step 4.2: Implementation
 
 **Reference**: [03-01](03-01-specialist-protocol.md) §Detection integration · [03-03](03-03-execution-routing.md) · AR #6, #7, #8, #16, PF-016
 **Objective**: Wire detection into three skills, create the setup-routing flow, and connect exec-plan dispatch.
 
-- [ ] 4.2.1 Add the detection step to `skills/make-plan/SKILL.md` and the `## Specialist Agents` section to `skills/make-plan/templates.md`
-- [ ] 4.2.2 Add the detection step (including the AR #24 budget and recorded outcome) and register recording to `skills/make-requirements/SKILL.md`
-- [ ] 4.2.3 Add specialization signals and managed-block preservation to `skills/analyze-project/SKILL.md`
-- [ ] 4.2.4 Add the creation/removal flow to `skills/setup-routing/SKILL.md` (including the routing-policy-first order and an explicit update of the "AGENTS.md receives only a concise instruction" stance at line 62) and document `reasoning` in `skills/setup-routing/routing.md`
-- [ ] 4.2.5 Add specialist resolution, the `SR` prefix, and fallback rules to `_shared/quality-profile.md` (including the stale line lists at `:15-16`, `:132`); add pointers in `skills/exec-plan/SKILL.md` and `skills/exec-plan/execution-protocol.md` (including `SR` at `:180`)
-- [ ] 4.2.6 Run the content spec test and verify it PASSES (green phase)
+- [x] 4.2.1 Add the detection step to `skills/make-plan/SKILL.md` and the `## Specialist Agents` section to `skills/make-plan/templates.md` ✅ (completed: 2026-10-04 01:51)
+- [x] 4.2.2 Add the detection step (including the AR #24 budget and recorded outcome) and register recording to `skills/make-requirements/SKILL.md` ✅ (completed: 2026-10-04 01:51)
+- [x] 4.2.3 Add specialization signals and managed-block preservation to `skills/analyze-project/SKILL.md` ✅ (completed: 2026-10-04 01:51)
+- [x] 4.2.4 Add the creation/removal flow to `skills/setup-routing/SKILL.md` (including the routing-policy-first order and an explicit update of the "AGENTS.md receives only a concise instruction" stance at line 62) and document `reasoning` in `skills/setup-routing/routing.md` ✅ (completed: 2026-10-04 01:51)
+- [x] 4.2.5 Add specialist resolution, the `SR` prefix, and fallback rules to `_shared/quality-profile.md` (including the stale line lists at `:15-16`, `:132`); add pointers in `skills/exec-plan/SKILL.md` and `skills/exec-plan/execution-protocol.md` (including `SR` at `:180`) ✅ (completed: 2026-10-04 01:51)
+- [x] 4.2.6 Run the content spec test and verify it PASSES (green phase) ✅ (completed: 2026-10-04 01:51)
 
 ### Step 4.3: Manual scenarios (user-owned evidence)
 

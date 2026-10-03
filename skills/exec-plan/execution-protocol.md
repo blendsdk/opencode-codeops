@@ -165,9 +165,10 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
 1. **Determine activation.** Strict defaults review every non-trivial phase. Adaptive mode may
    explicitly disable independent review; announce that choice. Trivial tasks are never reviewed.
    A docs-only diff → phase-reviewer only, and the auditor skip is logged — never silent.
-2. **Dispatch in parallel:** the correctness reviewer plus every risk-selected auditor (security,
-   financial integrity, concurrency, performance, semantics, or migration), each with the
-   dispatch header on line 1 of its prompt and its packet
+2. **Dispatch in parallel:** the correctness reviewer, every risk-selected auditor (security,
+   financial integrity, concurrency, performance, semantics, or migration), and any specialist
+   reviewer listed in the plan's `## Specialist Agents` table, each with the dispatch header on
+   line 1 of its prompt and its packet (`_shared/quality-profile.md`)
    Create the review diff with:
 
    ```bash
@@ -177,7 +178,7 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
 
    This includes committed, staged, unstaged, and newly created files while excluding changes that
    existed at phase start.
-3. **Merge findings** (RV/SA/PE) and present them in severity-grouped batches (reuse the
+3. **Merge findings** (RV/SA/PE/SR) and present them in severity-grouped batches (reuse the
    preflight skill's batch pacing). In normal mode, 🔴 CRITICAL / 🟠 MAJOR findings PAUSE
    execution for the user's ruling in ALL commit modes. With active auto-design, an eligible
    technical fix may be selected and recorded, but risk may never be waived and a critical/major

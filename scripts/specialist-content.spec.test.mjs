@@ -112,6 +112,50 @@ describe("ST-30 specialist protocol document", () => {
   })
 })
 
+describe("ST-32 specialist wiring and routing content", () => {
+  it("links the protocol from every participating skill and the quality profile", () => {
+    for (const file of [
+      "skills/make-requirements/SKILL.md",
+      "skills/make-plan/SKILL.md",
+      "skills/analyze-project/SKILL.md",
+      "skills/setup-routing/SKILL.md",
+      "_shared/quality-profile.md",
+    ]) {
+      assert.match(read(file), /specialist-agents\.md/, `${file} must link the protocol`)
+    }
+  })
+
+  it("contains the make-plan Specialist Agents section", () => {
+    assert.match(read("skills/make-plan/templates.md"), /^## Specialist Agents$/m)
+  })
+
+  it("documents the SR prefix, specialist resolution, and fallback in the quality profile", () => {
+    const content = read("_shared/quality-profile.md")
+    assert.match(content, /SR \(domain-specialist/)
+    assert.match(content, /specialist/i)
+    assert.match(content, /fallback/i)
+  })
+
+  it("points exec-plan at the specialist routing rules", () => {
+    assert.match(read("skills/exec-plan/SKILL.md"), /[Ss]pecialist/)
+    assert.match(read("skills/exec-plan/execution-protocol.md"), /[Ss]pecialist/)
+    assert.match(read("skills/exec-plan/execution-protocol.md"), /SR/)
+  })
+
+  it("updates the setup-routing AGENTS.md stance and documents the managed block", () => {
+    const content = read("skills/setup-routing/SKILL.md")
+    assert.doesNotMatch(content, /AGENTS\.md receives only a concise instruction/)
+    assert.match(content, /CODEOPS-SPECIALISTS:START/)
+    assert.match(content, /--remove-custom/)
+  })
+
+  it("declares the reasoning enum in the config schema", () => {
+    const schema = JSON.parse(read("schemas/codeops-config.schema.json"))
+    const reasoning = schema.properties.routing.properties.roles.additionalProperties.properties.reasoning
+    assert.deepEqual(reasoning.enum, ["none", "minimal", "low", "medium", "high", "xhigh", "max"])
+  })
+})
+
 describe("ST-31 layout and content hygiene", () => {
   it("documents codeops/specialists/ as a project-level path", () => {
     const content = read("_shared/layout-convention.md")

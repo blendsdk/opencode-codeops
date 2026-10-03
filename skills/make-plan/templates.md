@@ -85,6 +85,16 @@ excerpt at dispatch time — excerpting for a handoff packet is not restatement)
 | ------------ | --------- |
 | [Decision 1] | [Outcome] |
 
+## Specialist Agents
+
+| Role | Kind | Use | AR Ref |
+| ---- | ---- | --- | ------ |
+| [role] | [reviewer/executor] | [phase or use] | [AR ref] |
+
+[Or: `**None**` — the capability-gap check found no gap a standing specialist would close.]
+
+_Detection evidence: [repository facts with `file:line`, or the negative-check evidence]_
+
 ## Related Files
 
 [List of key files that will be created or modified]
