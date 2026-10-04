@@ -196,9 +196,9 @@ function traceEffort(
 // ---------------------------------------------------------------------------
 export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
   // Reasoning-effort state lives for the lifetime of this plugin instance:
-  // one entry per user message that carried a dispatch marker, plus a
-  // deduplication set for unsupported-level warnings.
-  const effortMarkers = new Map<string, { sessionID: string; level: EffortLevel }>()
+  // the latest dispatch-marker level per session, plus a deduplication set
+  // for unsupported-level warnings.
+  const effortMarkers = new Map<string, EffortLevel>()
   const warnedEffortLevels = new Set<string>()
   const effortTraceEnabled = isEffortTraceEnabled(process.env.CODEOPS_EFFORT_TRACE)
 
@@ -221,9 +221,7 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
         const info = (event.properties as { info: { id: string } }).info
         removeSessionTmpDir(info.id)
         try {
-          for (const [messageID, entry] of effortMarkers) {
-            if (entry.sessionID === info.id) effortMarkers.delete(messageID)
-          }
+          effortMarkers.delete(info.id)
         } catch {
           await warnContentFree(client, "Could not clear captured reasoning-effort markers.")
         }
@@ -288,8 +286,9 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
 
     // -----------------------------------------------------------------------
     // Hook 6: capture a dispatch marker from an incoming user message. The
-    // marker travels in the dispatch packet text; storing it by message id
-    // lets the later chat.params hook apply it to the same request.
+    // marker travels in the dispatch packet text; it is remembered for the
+    // whole session, because the later chat.params hook receives the latest
+    // user message, which can differ from the message that carried it.
     // -----------------------------------------------------------------------
     "chat.message": async (input, output) => {
       try {
@@ -298,7 +297,7 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
         )
         const level = findEffortMarker(texts)
         if (level !== undefined) {
-          effortMarkers.set(output.message.id, { sessionID: input.sessionID, level })
+          effortMarkers.set(input.sessionID, level)
           traceEffort(effortTraceEnabled, input.sessionID, {
             event: "capture",
             messageID: output.message.id,
@@ -317,8 +316,7 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
     // -----------------------------------------------------------------------
     "chat.params": async (input, output) => {
       try {
-        const stored = effortMarkers.get(input.message.id)
-        const marker = stored && stored.sessionID === input.sessionID ? stored.level : undefined
+        const marker = effortMarkers.get(input.sessionID)
         const session = readSessionEffort(input.sessionID)
         const routing = readRoutingReasoning(readRoutingConfig(directory), input.agent)
         const level = resolveEffort({ marker, session, routing })

@@ -1,9 +1,9 @@
 # Task T-03: Opt-in reasoning-effort request trace
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 3/4 tasks (75%)
+> **Progress**: 4/5 tasks (80%)
 > **Reasoning**: medium — bounded helper addition following existing project patterns
-> **Last Updated**: 2026-10-04 13:44
+> **Last Updated**: 2026-10-04 13:52
 
 ## Objective
 
@@ -22,6 +22,7 @@ name, level, source, and applied flag — never prompt text.
 - [x] T-03.1 Write spec tests for the trace helper (enabled check, path, append, blocked write) ✅ (completed: 2026-10-04 13:44)
 - [x] T-03.2 Implement the helper, its type declarations, the plugin wiring, and the contract note ✅ (completed: 2026-10-04 13:44)
 - [x] T-03.3 Full verification (`npm run verify`) ✅ (completed: 2026-10-04 13:44)
-- [ ] T-03.4 Live trace smoke after the global update (capture + apply lines readable)
+- [x] T-03.4 Live trace smoke after the global update (capture + apply lines readable) ✅ (completed: 2026-10-04 13:50) — smoke exposed a marker-scoping defect, tracked as T-03.5
+- [~] T-03.5 Fix the marker-scoping defect found by the smoke: session-scoped markers (user decision) ⏳ (implemented: 2026-10-04 13:52)
 
 **Verify**: `npm run verify`

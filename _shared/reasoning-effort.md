@@ -43,6 +43,10 @@ A dispatch marker is one standalone line in a dispatch message:
 For quality-agent packets the marker follows the dispatch header; for packet kinds without a
 header it is the first line. `exec-plan` owns the composition rule.
 
+A captured marker is remembered for the whole session: every request in that session uses it
+until a newer marker replaces it or the session ends. This is what keeps the marker effective
+when the host passes a later user message to the request hook.
+
 ## Precedence
 
 The most specific source wins:
