@@ -24,6 +24,7 @@ import {
   modelSupportsReasoning,
   parseStateFile,
   readSessionEffort,
+  resolveEffort,
   sessionEffortPath,
 } from "./lib/reasoning-effort.mjs"
 
@@ -100,6 +101,14 @@ describe("deepMergePlain", () => {
 
   it("never pollutes Object.prototype through a __proto__ key", () => {
     const hostile = JSON.parse('{"__proto__":{"polluted":true}}')
+    const result = deepMergePlain({ safe: 1 }, hostile)
+    assert.equal({}.polluted, undefined, "the global prototype must stay clean")
+    assert.equal(Object.getPrototypeOf(result), Object.prototype)
+    assert.equal(result.safe, 1)
+  })
+
+  it("never pollutes prototypes through constructor-shaped keys", () => {
+    const hostile = JSON.parse('{"constructor":{"prototype":{"polluted":true}}}')
     const result = deepMergePlain({ safe: 1 }, hostile)
     assert.equal({}.polluted, undefined, "the global prototype must stay clean")
     assert.equal(Object.getPrototypeOf(result), Object.prototype)
@@ -205,6 +214,16 @@ describe("parseStateFile shape checks", () => {
     assert.equal(parseStateFile('{"schema":"1","reasoning":"high"}'), undefined)
     assert.equal(parseStateFile('{"schema":1,"reasoning":42}'), undefined)
     assert.equal(parseStateFile('{"schema":1,"reasoning":"max"}'), "max")
+  })
+})
+
+describe("resolveEffort input tolerance", () => {
+  it("returns undefined for null and non-object arguments instead of throwing", () => {
+    assert.equal(resolveEffort(null), undefined)
+    assert.equal(resolveEffort(42), undefined)
+    assert.equal(resolveEffort("marker"), undefined)
+    assert.equal(resolveEffort([]), undefined)
+    assert.equal(resolveEffort(), undefined)
   })
 })
 

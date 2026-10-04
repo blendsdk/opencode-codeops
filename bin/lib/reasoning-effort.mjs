@@ -124,7 +124,8 @@ export function findEffortMarker(texts) {
  *
  * Precedence is "most specific wins": a dispatch marker beats a session
  * flag, which beats a routing default. Each source is validated before it is
- * accepted, so an invalid value is ignored rather than propagated.
+ * accepted, so an invalid value is ignored rather than propagated. A
+ * non-object argument yields `undefined` instead of throwing.
  *
  * @param input - Candidate sources; all optional
  * @returns The first valid value, or `undefined` when no source applies
@@ -132,7 +133,9 @@ export function findEffortMarker(texts) {
  * @example
  * resolveEffort({ session: "high", routing: "low" }) // "high"
  */
-export function resolveEffort({ marker, session, routing } = {}) {
+export function resolveEffort(input) {
+  if (!isPlainObject(input)) return undefined
+  const { marker, session, routing } = input
   if (isEffortLevel(marker)) return marker
   if (isEffortLevel(session)) return session
   if (isRoutingReasoning(routing)) return routing

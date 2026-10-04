@@ -17,9 +17,11 @@ contract consumed by the plugin and the skills. It is advisory by design and nev
 | `max` | Adversarial or high-risk analysis where a missed detail is costly | Thorough preflight, complex or sensitive phases |
 
 The four levels are the complete suggestion vocabulary. A level is applied only when the
-runtime model exposes a matching variant; a level the model does not expose leaves the request
-unchanged and never raises a provider error. Routing policy is project configuration, not a
-suggestion: `routing.roles.<agent>.reasoning` may name any value from the provider enum
+runtime model exposes a matching variant, or when the model reports reasoning support but has no
+variant record (the level is then written directly as the provider reasoning option). A level
+the model does not expose leaves the request unchanged and never raises a provider error.
+Routing policy is project configuration, not a suggestion:
+`routing.roles.<agent>.reasoning` may name any value from the provider enum
 (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`).
 
 ## Marker grammar

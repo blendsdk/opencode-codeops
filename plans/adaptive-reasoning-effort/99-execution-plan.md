@@ -2,7 +2,7 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-04 12:48
+> **Last Updated**: 2026-10-04 12:52
 > **Progress**: 0/24 tasks (0%)
 > **CodeOps Artifact Schema**: 1
 
@@ -246,3 +246,16 @@ sequentially for simple progress tracking.
 8. ✅ Documentation updated (`README.md`, `_shared/reasoning-effort.md`,
    `skills/setup-routing/routing.md`, `_shared/quality-profile.md`)
 9. ✅ No dead code; no code comment or doc comment references planning artifacts
+
+---
+
+## Phase Quality Reviews
+
+### Phase 1 — Contract and pure logic (2026-10-04)
+
+| Item | Result |
+| ---- | ------ |
+| Dispatch | Fallback generic packets run in parallel: phase reviewer + security auditor (the catalog reviewer agents are manual-invocation-only in this session); fallback reported |
+| Diff basis | Phase baseline tree `9dfe6375…` → HEAD; product files verified against the tree blobs |
+| Findings | RV-001 (MINOR) `resolveEffort(null)` threw; RV-002 (MINOR) contract doc omitted the no-variants passthrough; RV-003 (MINOR) constructor-key test gap; SA-001 (MINOR) same totality issue as RV-001 |
+| Disposition | All fixed as necessary corrections: input guard in the helper, one contract sentence, two new tests; `npm run verify` 242/242 green; no re-review required (no critical/major findings) |
