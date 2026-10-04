@@ -2,13 +2,11 @@
 
 All notable changes to CodeOps are recorded here.
 
-## Unreleased
+## 1.9.0 — 2026-10-04
 
 ### Features
 
-- hygiene: non-negotiable cleanup directive in the injected standards, every skill, and every
-  subagent; `CODEOPS_TMPDIR` gives each session an owned temp directory, the plugin removes it
-  when the session is deleted, and abandoned directories are swept at session start.
+- hygiene: require cleanup after every task with a temp safety net
 
 ## 1.8.1 — 2026-10-04
 
