@@ -2,6 +2,21 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 1.8.1 — 2026-10-04
+
+### Documentation
+
+- agents: refresh project guidance with specialist facts
+- plan: record ST-43 and final verification evidence
+- plan: add ST-44 for the ask-and-create acceptance path
+- plan: record ST-34 dispatch acceptance evidence
+
+### Fixes
+
+- test: broaden availability regression guard per re-review
+- docs: complete AR #27 availability correction per phase-4 review
+- docs: correct specialist availability per ST-35 observation
+
 ## 1.8.0 — 2026-10-04
 
 ### Documentation
