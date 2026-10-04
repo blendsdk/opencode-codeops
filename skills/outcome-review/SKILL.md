@@ -32,3 +32,11 @@ Outcome evidence is opt-in, local, and content-free. Invocation counts are not q
 6. Present the smallest change likely to improve the measured outcome and define how to evaluate it.
 
 Never upload or quote project content from the outcome store.
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

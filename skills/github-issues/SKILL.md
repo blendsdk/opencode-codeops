@@ -36,3 +36,11 @@ For each issue:
 5. Continue past nonexistent individual issues but record every outcome.
 
 Return a per-issue summary. Never create, edit, label, close, reopen, or comment unless the user's request explicitly authorizes that mutation.
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

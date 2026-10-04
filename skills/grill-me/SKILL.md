@@ -340,3 +340,11 @@ grill-me → identify design tree → walk each branch → resolve decisions →
 
 **Output:** A shared understanding summary with all decisions, assumptions,
 constraints, and deferrals — ready to feed into any downstream skill.
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

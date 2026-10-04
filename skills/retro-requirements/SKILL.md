@@ -216,3 +216,11 @@ mapping is in **`phases.md`**.
 - the make-requirements skill — consumes `09-reconstruction-brief.md` to produce formal RDs (downstream; this brief is its input)
 - the make-plan skill — turns RDs into implementation plans (rebuild pipeline)
 - your project's coding/testing standards (AGENTS.md) — code-quality and test patterns to reference while analyzing
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

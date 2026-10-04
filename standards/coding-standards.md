@@ -42,6 +42,12 @@ Do not duplicate these standards in `~/.config/opencode/AGENTS.md` — the plugi
   artifacts get validation too — see the full standards' validation-command table.
 
 # Working style
+- **Cleanup after yourself (NON-NEGOTIABLE).** Put every temporary artifact you create — logs,
+  diffs, patches, commit-message files, scratch directories — under `$CODEOPS_TMPDIR` when it is
+  set (otherwise the OS temp directory), never inside the repository, and delete them all before
+  reporting a task complete. Never delete user files, versioned artifacts, worktrees, or another
+  session's temporary files. If something must outlive the task, name it and say why. Full rules:
+  `_shared/workspace-hygiene.md`.
 - **Ask before assuming**; **verify previous work** before building on it.
 - **Do not overengineer:** use the simplest implementation that fully satisfies the authorized
   requirements and existing project conventions. Do not add abstractions, layers, dependencies,

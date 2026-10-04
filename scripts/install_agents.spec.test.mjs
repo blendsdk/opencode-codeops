@@ -693,7 +693,7 @@ describe("prompt-text safety and determinism (ST-14, ST-15, ST-16)", () => {
 })
 
 describe("catalog regression guard (ST-42)", () => {
-  it("regenerates the executor catalog role byte-identically to the pre-refactor golden", () => {
+  it("regenerates the executor catalog role byte-identically to the committed golden", () => {
     const project = makeProject()
 
     const result = runInstaller(project, "--roles", "executor")

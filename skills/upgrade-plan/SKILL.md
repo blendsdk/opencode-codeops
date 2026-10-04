@@ -73,3 +73,11 @@ approved drift repair; and the Git diff contains only the approved migration.
 
 Report old formats, new schema, files changed, ambiguities resolved, RD-to-plan coverage, preserved
 progress, and residual risk. Do not auto-advance lifecycle stages.
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

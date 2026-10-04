@@ -225,7 +225,8 @@ red-phase, green-phase, session wrap-up — executes with output captured to a t
 <verify command> > "$VERIFY_LOG" 2>&1
 ```
 
-(`$VERIFY_LOG` = a file in the session temp/scratchpad dir, e.g. `verify-<task-id>.log`.)
+(`$VERIFY_LOG` = a file under `$CODEOPS_TMPDIR` — or the OS temp directory when it is unset —
+e.g. `verify-<task-id>.log`.)
 
 - **PASS** → surface ONE line: `VERIFY PASS (task N.N.N)`, plus the test count if it is
   extractable from the log tail at no extra cost.
@@ -234,10 +235,11 @@ red-phase, green-phase, session wrap-up — executes with output captured to a t
 - **Red-phase runs** (spec tests expected to fail) → surface only the failing spec-test
   names/count confirming the red state — never the full dump.
 
-The full log always remains on disk for the session. If the log location is unwritable, fall
-back to running verify plainly ONCE and note the fallback in the session summary. This rule is
-about CONTEXT, not rigor: the verify command itself, its scope, and pass/fail gating are
-unchanged — and the temp log is read-only evidence, never executed.
+The full log remains on disk until the session wrap-up cleanup deletes it (see
+`_shared/workspace-hygiene.md`); nothing in the transcript depends on it afterward. If the log
+location is unwritable, fall back to running verify plainly ONCE and note the fallback in the
+session summary. This rule is about CONTEXT, not rigor: the verify command itself, its scope, and
+pass/fail gating are unchanged — and the temp log is read-only evidence, never executed.
 
 ### Zero-Ambiguity During Execution
 
@@ -403,6 +405,9 @@ otherwise still `[~]` — with the progress counter and Last Updated stamp curre
 3. Run the verify command (output captured per the Verify-output capture rule).
 4. Handle the commit per the active commit mode (see [commit-modes.md](commit-modes.md)).
 5. Report the session summary (must include `Execution Plan Updated: ✅`).
+6. **Cleanup:** delete every temporary artifact this session created — verify logs under
+   `$CODEOPS_TMPDIR`, scratch directories, temporary diffs — per
+   `_shared/workspace-hygiene.md`, and report `Cleanup: done` or name what was kept and why.
 
 ### Session Summary Template
 

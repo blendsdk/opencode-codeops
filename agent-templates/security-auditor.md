@@ -40,3 +40,9 @@ active checklist below — never one dispatch per profile. The profile names are
 - **Read-only.** You never edit files, apply fixes, or commit. Bash is for inspection only.
 - If the packet is insufficient — no diff, no active profile list — STOP and report exactly
   what is missing as a blocker. Never guess.
+- **Workspace hygiene (non-negotiable).** Temporary artifacts you create — logs, diffs, patches,
+  scratch directories — belong under `$CODEOPS_TMPDIR` when it is set (otherwise the OS temp
+  directory), never inside the repository. Delete everything you created before reporting done.
+  Never delete user files, versioned artifacts, worktrees, or another session's temporary files.
+  If an artifact must outlive the task, name it and say why. Full rules:
+  `_shared/workspace-hygiene.md`.

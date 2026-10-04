@@ -4,6 +4,12 @@ import { homedir } from "node:os"
 import { join, dirname } from "node:path"
 import { fileURLToPath } from "node:url"
 
+import {
+  cleanStaleTmpDirs,
+  ensureSessionTmpDir,
+  removeSessionTmpDir,
+} from "../bin/lib/tmp-hygiene.mjs"
+
 // ---------------------------------------------------------------------------
 // Package root — resolved at module load time so it is always the plugin's
 // installed directory, regardless of the working directory at event time.
@@ -42,6 +48,28 @@ const outputStyle = readFileSync(
   "utf8"
 )
 const standardsText = `${codingStandards}\n\n${outputStyle}`
+
+// ---------------------------------------------------------------------------
+// Workspace hygiene — the plugin owns one temp directory per session (exported
+// as CODEOPS_TMPDIR) and sweeps directories abandoned by earlier interrupted
+// runs. The sweep runs at most once per plugin process, so spawning many child
+// sessions does not repeat the directory walk.
+// ---------------------------------------------------------------------------
+let sweptStaleTmpDirs = false
+
+/**
+ * Sweep temp directories abandoned by earlier interrupted runs, once per
+ * process. Cleanup is best effort: a failure must never block a session.
+ */
+function sweepStaleTmpDirsOnce(): void {
+  if (sweptStaleTmpDirs) return
+  sweptStaleTmpDirs = true
+  try {
+    cleanStaleTmpDirs()
+  } catch {
+    // Best effort only.
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Helper — inject standards into a session without triggering an AI reply.
@@ -120,12 +148,18 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
     // Both are dispatched via the generic event hook.
     // session.created  → new session    (Codex: startup)
     // session.compacted → after compact  (Codex: resume|compact)
+    // Also the hygiene lifecycle: a new top-level session sweeps abandoned
+    // temp directories once, and a deleted session's temp directory is removed.
     // -----------------------------------------------------------------------
     event: async ({ event }) => {
       if (event.type === "session.created") {
-        const sessionId: string = (event.properties as { info: { id: string } }).info.id
-        await injectStandards(client, sessionId)
+        const info = (event.properties as { info: { id: string; parentID?: string } }).info
+        await injectStandards(client, info.id)
         await warnOnVersionSkew(client, directory)
+        if (!info.parentID) sweepStaleTmpDirsOnce()
+      } else if (event.type === "session.deleted") {
+        const info = (event.properties as { info: { id: string } }).info
+        removeSessionTmpDir(info.id)
       } else if (event.type === "session.compacted") {
         const sessionId: string = (event.properties as { sessionID: string }).sessionID
         await injectStandards(client, sessionId)
@@ -148,9 +182,16 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
     // scripts as: python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_plan.py"
     // The value is the package root (parent of this plugin/ directory), which
     // is where skills/, scripts/, and the other shipped assets live.
+    // CODEOPS_TMPDIR is the session's directory under the CodeOps temp root;
+    // skills and agents put every scratch file there and delete it when done.
     // -----------------------------------------------------------------------
-    "shell.env": async (_input, output) => {
+    "shell.env": async (input, output) => {
       output.env.CODEOPS_PLUGIN_ROOT = PACKAGE_ROOT
+      try {
+        output.env.CODEOPS_TMPDIR = ensureSessionTmpDir(input.sessionID)
+      } catch {
+        // Best effort: a temp-directory failure must never block a shell.
+      }
     },
 
     // -----------------------------------------------------------------------

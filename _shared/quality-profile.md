@@ -107,6 +107,11 @@ or response content.
 | design-challenger | Problem + candidate options, **without** the parent's preferred choice (per `_shared/recommendation-hardening.md`) |
 | codebase-scout | The factual questions, search hints, and the facts-only contract |
 
+Every packet also carries the session temp root (`$CODEOPS_TMPDIR`) and the hygiene requirement:
+the agent creates temporary files only under that root and deletes its own before returning (see
+`_shared/workspace-hygiene.md`). A parent never deletes a subagent's artifacts while its dispatch
+is still in flight.
+
 ## Project specialists
 
 A project may define specialist roles on top of the catalog (see `_shared/specialist-agents.md`).

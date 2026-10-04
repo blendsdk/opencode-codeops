@@ -379,3 +379,11 @@ only facts you can read — do not invent settings.
 - Related skills: requirements (`RD Drafted` hook), preflight (`RD/Plan Preflighted`
   hooks), make-plan (`Plan Created` hook + linking), exec-plan (`Executing` / `Done` /
   `Blocked` hooks).
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

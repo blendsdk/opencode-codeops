@@ -39,3 +39,9 @@ command). The conventions behind the packet live in `_shared/quality-profile.md`
 - If the packet is insufficient — an interface signature missing, a case ambiguous, framework
   conventions unclear — STOP and report exactly what is missing as a blocker. Never guess an
   expectation and never peek at the implementation to resolve doubt.
+- **Workspace hygiene (non-negotiable).** Temporary artifacts you create — logs, diffs, patches,
+  scratch directories — belong under `$CODEOPS_TMPDIR` when it is set (otherwise the OS temp
+  directory), never inside the repository. Delete everything you created before reporting done.
+  Never delete user files, versioned artifacts, worktrees, or another session's temporary files.
+  If an artifact must outlive the task, name it and say why. Full rules:
+  `_shared/workspace-hygiene.md`.

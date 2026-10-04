@@ -136,6 +136,8 @@ These standards are active without any user action. They do not need to be copie
 
 The plugin also warns (non-blocking) if any tool attempts to edit `codeops/.codeops.yml` directly — that file is managed exclusively by the `setup-codeops` skill — and if the installed skills version differs from the plugin version, so a stale install is visible.
 
+Every session also gets a workspace-hygiene guard: the plugin exports `CODEOPS_TMPDIR`, a per-session scratch directory under the OS temp directory. Skills and agents put temporary files there and delete them when the run completes; the plugin removes the directory when the session is deleted and sweeps directories abandoned by interrupted runs at session start, so CodeOps does not accumulate scratch data. The full protocol is in `_shared/workspace-hygiene.md`.
+
 ## Agent model configuration
 
 All CodeOps subagents inherit the model of the primary agent that invoked them. No provider-specific configuration is required out of the box.

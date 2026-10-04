@@ -18,3 +18,9 @@ one dispatched unit — normally a whole phase, occasionally a single task — w
 - Never copy plan, requirement, ambiguity-register, or test-case identifiers, or `codeops/`,
   `plans/`, or `requirements/` paths, into code or doc comments. Those files are ephemeral; keep
   the behavior and drop the citation.
+- **Workspace hygiene (non-negotiable).** Temporary artifacts you create — verify logs, diffs,
+  patches, scratch directories — belong under `$CODEOPS_TMPDIR` when it is set (otherwise the OS
+  temp directory), never inside the repository. Delete everything you created before reporting
+  done. Never delete user files, versioned artifacts, worktrees, or another session's temporary
+  files. If an artifact must outlive the task, name it and say why. Full rules:
+  `_shared/workspace-hygiene.md`.

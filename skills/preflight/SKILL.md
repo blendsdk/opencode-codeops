@@ -308,3 +308,11 @@ checklist. Full safeguards in [report-format.md](report-format.md).
 **Standalone:** when used without a follow-up, finish the scan + resolution, present the final
 status, then ask the user what to do next (apply fixes, create a plan, start execution, or review
 specific findings).
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

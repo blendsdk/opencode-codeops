@@ -197,3 +197,11 @@ auto-compacts context — no manual threshold handling is needed.)
 - [templates.md](templates.md) — all VitePress file templates (index, architecture/*, ADR log + ADR template, guides/*, reference/*). Read when writing any document in Phase 4.
 - [vitepress-setup.md](vitepress-setup.md) — Phase 3 install, `config.ts`, npm scripts, `.gitignore`, and sidebar auto-update. Read when scaffolding VitePress or adding pages.
 - [authoring-and-update.md](authoring-and-update.md) — Phase 5 authoring guidelines + Mermaid types, Phase 6 incremental/comprehensive update protocol with the Design Intent Preservation rule, and the review_techdocs health check. Read before authoring, before any auto-update, and for review_techdocs.
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

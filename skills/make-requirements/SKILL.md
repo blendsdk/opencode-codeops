@@ -268,3 +268,11 @@ comparable systems → key discovery focus is in **`discovery-phases.md`**.
 - the upgrade-plan skill — upgrading outdated requirements (upgrade_requirements)
 - the roadmap skill — sync each newly drafted RD to stage `RD Drafted`
 - Read the project's AGENTS.md (or detected project conventions) for project-specific constraints
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

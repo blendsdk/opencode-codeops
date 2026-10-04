@@ -27,3 +27,11 @@ description: Analyze the current repository and create or refresh concise CodeOp
 10. When a specialization signal is strong and no specialist covers it, report the candidate with evidence and recommend the `setup-routing` creation flow ([../../_shared/specialist-agents.md](../../_shared/specialist-agents.md)); never write agent files here. Preserve the `<!-- CODEOPS-SPECIALISTS:START -->` / `<!-- CODEOPS-SPECIALISTS:END -->` block byte-for-byte when refreshing the managed section.
 
 Keep `AGENTS.md` small. Operational routing belongs in `codeops/codeops.json` or `opencode.json`, not prose.
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

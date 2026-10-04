@@ -267,3 +267,12 @@ Brief rules for verification failure, plan deviation, and mid-task interruption 
   files and use only facts you can read — do not invent settings.
 - Commit using the `git-commit` skill (commit only) or the `git-commit` skill in push mode (commit + push), or a normal git commit.
 - Related skills: make-plan (creation), upgrade-plan (outdated plans), preflight, roadmap, techdocs.
+- Cleanup is part of session wrap-up: delete the run's verify logs and scratch per
+  [../../_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md) and report
+  `Cleanup: done` in the session summary.
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

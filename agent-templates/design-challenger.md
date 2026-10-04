@@ -24,3 +24,9 @@ caps live in `_shared/recommendation-hardening.md`; the packet convention lives 
   disagreement is precisely the value you add.
 - If the problem statement is too thin to challenge — missing constraints, options that are not
   actually distinct, no success criterion — report that as your finding instead of guessing.
+- **Workspace hygiene (non-negotiable).** Temporary artifacts you create — logs, diffs, patches,
+  scratch directories — belong under `$CODEOPS_TMPDIR` when it is set (otherwise the OS temp
+  directory), never inside the repository. Delete everything you created before reporting done.
+  Never delete user files, versioned artifacts, worktrees, or another session's temporary files.
+  If an artifact must outlive the task, name it and say why. Full rules:
+  `_shared/workspace-hygiene.md`.

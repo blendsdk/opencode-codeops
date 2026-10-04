@@ -114,3 +114,11 @@ python3 "${CODEOPS_PLUGIN_ROOT}/scripts/install_agents.py" --project . --check
 ```
 
 Report configured roles, model pins if any, read-only roles, fallbacks, and unresolved capability gaps.
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

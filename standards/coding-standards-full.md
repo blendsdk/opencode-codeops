@@ -50,6 +50,25 @@ These apply to all code I write unless this project's `AGENTS.md` overrides a sp
 - **Prevent injection:** parameterized queries (never string-concatenate SQL/NoSQL), escape output / use framework auto-escaping (XSS), never pass unsanitized input to shells/`eval` (command injection), canonicalize and reject `..`/absolute paths (path traversal), anti-CSRF tokens + `SameSite` cookies, rate-limit auth endpoints.
 - **Protect data:** TLS in transit; encrypt sensitive data at rest; hash passwords with `bcrypt`/`argon2`/`scrypt`; never hardcode secrets (use env vars / secret managers); never log secrets or PII; return minimal errors in production; restrictive CORS; request-size limits; audit dependencies; run containers as non-root from minimal images.
 
+# Workspace hygiene (NON-NEGOTIABLE)
+
+- **Own your temporary artifacts.** Verification logs, diffs, patch files, commit-message files,
+  scratch directories, fixture trees, and downloaded artifacts are borrowed space. Put them under
+  `$CODEOPS_TMPDIR` when the CodeOps plugin exports it (one directory per session); otherwise use
+  the OS temp directory. Never write temporary files into the repository.
+- **Delete at completion.** Before reporting any task, phase, or session complete, delete every
+  temporary artifact the run created — including verification logs. If the user asked for an
+  artifact to be kept, name its exact path and keep that file only.
+- **Never delete what you do not own.** User files, repository content, versioned artifacts,
+  `codeops/` planning artifacts, and git worktrees are durable. Never touch another session's
+  temporary files, and never follow a symlink out of the temp root.
+- **No secrets in temp files.** Do not write secrets into a temporary file; if one already holds a
+  secret, delete it and say so without printing its contents.
+- **Report it.** The final summary states `Cleanup: done`, or names what was kept and why, or
+  reports a failed deletion with its path and reason.
+- The canonical protocol, including the plugin's automatic safety net, is
+  `_shared/workspace-hygiene.md`.
+
 # Testing standards
 
 - **Run the project's verify command (build + test) before completing any task or committing.** No code is "done" while any test fails.

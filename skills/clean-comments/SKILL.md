@@ -20,3 +20,11 @@ This is a comment-only workflow. Never alter executable tokens, declarations, ty
 7. Review the diff to prove only comments changed. Run the repository's normal formatter and verification command.
 
 Documentation explains the shipped system, not the temporary process that produced it.
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

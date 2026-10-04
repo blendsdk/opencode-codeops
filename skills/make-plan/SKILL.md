@@ -282,3 +282,11 @@ See the **roadmap skill** for the full Roadmap Keeper protocol.
 - **upgrade-plan skill** — upgrades outdated plans; the gate applies to new decisions only.
 - **techdocs skill** — architecture docs read during Phase 1.2 and updated during execution.
 - For coding, testing, and git standards, follow **your project's coding standards (AGENTS.md)** and use **git-commit skill** / **git-commit skill in push mode** for commits.
+
+---
+
+> **Workspace hygiene (non-negotiable):** put every temporary artifact this run creates in
+> `$CODEOPS_TMPDIR` (fallback: the OS temp directory), never in the repository, and delete them
+> all before reporting completion. Never delete user files, versioned artifacts, worktrees, or
+> another session's temporary files. Full rules:
+> [_shared/workspace-hygiene.md](../../_shared/workspace-hygiene.md).

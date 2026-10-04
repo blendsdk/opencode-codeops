@@ -57,3 +57,9 @@ original-goal or smallest-design context blocks execution; report it to the pare
   exactly what is missing or ambiguous as a blocker — never guess, and never edit the
   execution plan or roadmap (the parent session owns those and the user conversation).
 - Report per task, 3-4 lines each: what changed, test status, any blocker.
+- **Workspace hygiene (non-negotiable).** Temporary artifacts you create — verify logs, diffs,
+  patches, scratch directories — belong under `$CODEOPS_TMPDIR` when it is set (otherwise the OS
+  temp directory), never inside the repository. Delete everything you created before reporting
+  done. Never delete user files, versioned artifacts, worktrees, or another session's temporary
+  files. If an artifact must outlive the task, name it and say why. Full rules:
+  `_shared/workspace-hygiene.md`.
