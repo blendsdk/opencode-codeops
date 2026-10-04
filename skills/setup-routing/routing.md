@@ -27,7 +27,7 @@ CodeOps routing lives under the optional `routing` and `quality` fields in `code
 
 Allowed effort values follow the active OpenCode release. Prefer `medium` for bounded reconnaissance, `high` for correctness/security review, and higher supported levels only for genuinely demanding semantic or architectural work.
 
-An optional per-role `reasoning` field sets the provider reasoning-effort passthrough (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`). Generated project specialists default to `max` through their brief or the embedded `reasoningEffort`; a routing value wins over the brief. A model that rejects the option is overridden here — there is no automatic provider-capability detection.
+An optional per-role `reasoning` field sets the provider reasoning-effort passthrough (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`). Generated project specialists default to `max` through their brief or the embedded `reasoningEffort`; a routing value wins over the brief and is embedded without provider-capability detection. At runtime the plugin applies a level only when the active model exposes a matching variant; an unsupported value leaves the request unchanged (see the policy below).
 
 ```json
 "roles": {
