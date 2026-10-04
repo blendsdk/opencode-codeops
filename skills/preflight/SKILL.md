@@ -33,6 +33,16 @@ If `$ARGUMENTS` contains exactly one exact standalone `--explore-scope` token be
 do not report optional additions as findings or suggestions. Exploration records them
 as separate `SE-*` proposals; finding resolution never chooses `Keep`.
 
+## Auto-effort option
+
+If `$ARGUMENTS` contains exactly one exact standalone `--auto-effort` or `--auto-effort=<level>`
+token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero
+occurrences means this skill's recommended level (`high`, or `max` with `--thorough`) is printed
+as a suggestion only, more than one or an invalid level is an argument error; announce
+`Auto-effort active — reasoning <level> applied for this run`; then read and apply
+[../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. The
+run clears the level before its final summary.
+
 Run a rigorous quality audit of the artifact named in `$ARGUMENTS`, **grounded in the actual
 codebase**. Find every issue, ambiguity, contradiction, gap, and risk; verify every claim and
 assumption against the real code; present each finding with options + a recommendation; iterate

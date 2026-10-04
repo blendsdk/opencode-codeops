@@ -153,6 +153,22 @@ To pin specific models per role, use the `setup-routing` skill or add overrides 
 }
 ```
 
+### Adaptive reasoning effort
+
+CodeOps can pick a reasoning level per dispatch instead of always inheriting the parent session's
+variant. A dispatch packet may carry one standalone marker line:
+
+```text
+[codeops-effort: medium]
+```
+
+Reasoning-heavy skills also accept `--auto-effort` (use the skill's recommended level) or
+`--auto-effort=high` (explicit level), announce it, and clear it before the final run summary.
+Resolution order: dispatch marker, then session `--auto-effort`, then
+`routing.roles.<agent>.reasoning` in `codeops/codeops.json`, then the inherited parent variant.
+The levels are suggestions: no permission, verification step, or review gate ever reads them. The
+full contract is in `_shared/reasoning-effort.md`.
+
 ## Project specialists
 
 CodeOps can recommend project-specific specialist subagents when repository evidence shows a

@@ -21,6 +21,16 @@ implementation work begins.
 
 > **CodeOps Artifact Schema**: 1
 
+## Auto-effort option
+
+If `$ARGUMENTS` contains exactly one exact standalone `--auto-effort` or `--auto-effort=<level>`
+token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero
+occurrences means this skill's recommended level (`high`) is printed as a suggestion only, more
+than one or an invalid level is an argument error; announce
+`Auto-effort active — reasoning <level> applied for this run`; then read and apply
+[../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. The
+run clears the level before its final summary.
+
 ## Core Directive
 
 > **Interview the user relentlessly about every aspect of the topic until you reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one.**

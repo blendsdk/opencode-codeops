@@ -7,6 +7,16 @@ description: Upgrade an existing CodeOps requirements set, specification, plan, 
 
 The current CodeOps artifact schema is `1`. Historical Claude CodeOps `3.x` stamps describe the producing skill release, not this schema. Treat them as legacy input requiring assessment, not as numeric predecessors of schema 1.
 
+## Auto-effort option
+
+If `$ARGUMENTS` contains exactly one exact standalone `--auto-effort` or `--auto-effort=<level>`
+token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero
+occurrences means this skill's recommended level (`high`) is printed as a suggestion only, more
+than one or an invalid level is an argument error; announce
+`Auto-effort active — reasoning <level> applied for this run`; then read and apply
+[../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. The
+run clears the level before its final summary.
+
 ## Scope
 
 Upgrade content and structure in place. Layout moves belong to `setup-codeops`. Never combine a layout migration and semantic/schema upgrade into one irreversible operation.

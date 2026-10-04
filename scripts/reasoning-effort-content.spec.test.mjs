@@ -109,3 +109,41 @@ describe("exec-plan integration content", () => {
     assert.match(read("skills/exec-plan/SKILL.md"), /--auto-effort/)
   })
 })
+
+describe("skill flag content", () => {
+  it("should carry the flag section and the contract link in every supported skill", () => {
+    const skills = [
+      "make-requirements",
+      "make-plan",
+      "preflight",
+      "grill-me",
+      "exec-plan",
+      "retro-requirements",
+      "upgrade-plan",
+    ]
+    for (const skill of skills) {
+      const content = read(`skills/${skill}/SKILL.md`)
+      assert.match(content, /--auto-effort/, `${skill} must document --auto-effort`)
+      assert.match(
+        content,
+        /_shared\/reasoning-effort\.md/,
+        `${skill} must link the shared contract`
+      )
+    }
+    assert.match(
+      read("skills/preflight/SKILL.md"),
+      /`max`[^\n]*`--thorough`|`--thorough`[^\n]*`max`/,
+      "preflight must document max with --thorough"
+    )
+  })
+})
+
+describe("documentation content", () => {
+  it("should document the marker, the flag, the routing policy, and the contract link", () => {
+    const readme = read("README.md")
+    assert.match(readme, /\[codeops-effort:/)
+    assert.match(readme, /--auto-effort/)
+    assert.match(read("skills/setup-routing/routing.md"), /Reasoning effort/i)
+    assert.match(read("_shared/quality-profile.md"), /reasoning-effort\.md/)
+  })
+})

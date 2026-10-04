@@ -20,6 +20,16 @@ description: >-
 
 > **CodeOps Artifact Schema**: 1
 
+## Auto-effort option
+
+If `$ARGUMENTS` contains exactly one exact standalone `--auto-effort` or `--auto-effort=<level>`
+token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero
+occurrences means this skill's recommended level (`high`) is printed as a suggestion only, more
+than one or an invalid level is an argument error; announce
+`Auto-effort active — reasoning <level> applied for this run`; then read and apply
+[../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. The
+run clears the level before its final summary.
+
 Analyze an existing codebase — any language, any framework — and produce a
 structured **reconstruction brief** that can be fed to the make-requirements
 skill to generate formal requirement documents capable of rebuilding the entire

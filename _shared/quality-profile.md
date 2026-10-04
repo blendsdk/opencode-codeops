@@ -147,6 +147,10 @@ Resolution order is:
 3. project `[agents]` defaults in `opencode.json`;
 4. the parent session's model and effort.
 
+For the runtime reasoning-effort override (a dispatch marker, a session `--auto-effort` level, or
+a routing role default), see [reasoning-effort.md](reasoning-effort.md); the static resolution
+order above is unchanged.
+
 Use `python3 "${CODEOPS_PLUGIN_ROOT}/scripts/install_agents.py" --project . --roles ...` to create optional project agents. Generated agent files carry a CodeOps marker. The installer owns only marked files and preserves every hand-authored file. Use `--check` to detect missing or stale generated agents and `--dry-run` to preview changes. Project specialists are generated with `--custom <role>` from `codeops/specialists/<role>.md` and indexed into `AGENTS.md` with `--sync-agents-md`; their routing policy may also set `reasoning`.
 
 Dynamic packets are the correctness baseline. If a named agent is missing or a model pin is unavailable, spawn a generic subagent with the complete packet or run inline. Report the fallback and preserve required reviewer independence, sandbox intent, and every ambiguity/readiness/verification gate.

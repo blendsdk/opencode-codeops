@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-04 13:08
-> **Progress**: 18/24 tasks (75%)
+> **Last Updated**: 2026-10-04 13:10
+> **Progress**: 23/24 tasks (96%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -167,7 +167,7 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 
 ## Phase 4: Skill flags and documentation
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill)_
+> **Phase baseline tree**: `abd92ebeef730df2d1f04d1b8e1f66b24c7f9d61` (strict scope)
 > **Expected modification set** (strict scope):
 > `scripts/reasoning-effort-content.spec.test.mjs`, `skills/make-requirements/SKILL.md`,
 > `skills/preflight/SKILL.md`, `skills/grill-me/SKILL.md`,
@@ -180,17 +180,17 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 **Reference**: [03-01](03-01-reasoning-effort-contract.md) §Skill recommendation table · [03-03](03-03-plan-skill-integration.md) §Documentation · AR #5, #7, #8, #23
 **Objective**: Pin the required flag sections and documentation clauses before editing them.
 
-- [ ] 4.1.1 Append content tests ST-28 and ST-29 to `scripts/reasoning-effort-content.spec.test.mjs`
-- [ ] 4.1.2 Run the tests and verify they FAIL (red phase)
+- [x] 4.1.1 Append content tests ST-28 and ST-29 to `scripts/reasoning-effort-content.spec.test.mjs` ✅ (completed: 2026-10-04 13:09)
+- [x] 4.1.2 Run the tests and verify they FAIL (red phase) ✅ (completed: 2026-10-04 13:09)
 
 ### Step 4.2: Implementation
 
 **Reference**: [03-03](03-03-plan-skill-integration.md) §Skills that accept `--auto-effort`, §Documentation · AR #3, #5, #7, #8, #23
 **Objective**: Add the flag to the five remaining skills and publish the user-facing documentation.
 
-- [ ] 4.2.1 Add the `--auto-effort` option section (per 03-01 table) to `skills/make-requirements/SKILL.md`, `skills/preflight/SKILL.md`, `skills/grill-me/SKILL.md`, `skills/retro-requirements/SKILL.md`, and `skills/upgrade-plan/SKILL.md`
-- [ ] 4.2.2 Update `skills/setup-routing/routing.md` (Reasoning effort policy), `skills/setup-routing/SKILL.md`, `_shared/quality-profile.md` (link to the shared contract), and `README.md` (Adaptive reasoning effort subsection)
-- [ ] 4.2.3 Run the tests and verify they PASS (green phase)
+- [x] 4.2.1 Add the `--auto-effort` option section (per 03-01 table) to `skills/make-requirements/SKILL.md`, `skills/preflight/SKILL.md`, `skills/grill-me/SKILL.md`, `skills/retro-requirements/SKILL.md`, and `skills/upgrade-plan/SKILL.md` ✅ (completed: 2026-10-04 13:10)
+- [x] 4.2.2 Update `skills/setup-routing/routing.md` (Reasoning effort policy), `skills/setup-routing/SKILL.md`, `_shared/quality-profile.md` (link to the shared contract), and `README.md` (Adaptive reasoning effort subsection) ✅ (completed: 2026-10-04 13:11)
+- [x] 4.2.3 Run the tests and verify they PASS (green phase) ✅ (completed: 2026-10-04 13:10)
 
 **Deliverables**:
 - All seven skills parse `--auto-effort[=<level>]` per the shared contract

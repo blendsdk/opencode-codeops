@@ -50,6 +50,8 @@ Present:
 
 - detected domains and concrete evidence;
 - phase tag → capability/effort policy;
+- reasoning-effort defaults per role when risk signals justify them (see
+  [routing.md](routing.md) §Reasoning effort policy);
 - required specialist reviewers;
 - proposed concurrency limit;
 - whether custom TOML agents add value over dynamic packets; and
