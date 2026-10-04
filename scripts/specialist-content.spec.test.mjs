@@ -148,7 +148,7 @@ describe("ST-32 specialist wiring and routing content", () => {
     for (const file of ["skills/setup-routing/SKILL.md", "_shared/specialist-agents.md", "README.md"]) {
       assert.doesNotMatch(
         read(file),
-        /next\s+(OpenCode\s+)?session/i,
+        /next[\s-]*(OpenCode\s+)?session|loads?\s+at\s+startup|available in the next one/i,
         `${file} must not promise next-session availability`,
       )
     }
