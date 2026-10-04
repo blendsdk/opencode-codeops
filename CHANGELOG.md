@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 1.10.2 — 2026-10-04
+
+### Fixes
+
+- effort: remember dispatch markers per session
+
 ## 1.10.1 — 2026-10-04
 
 ### Features
