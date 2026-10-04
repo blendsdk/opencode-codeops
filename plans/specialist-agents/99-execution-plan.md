@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-04 00:52
-> **Progress**: 36/40 tasks (90%)
+> **Progress**: 37/40 tasks (93%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -218,7 +218,16 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 **Objective**: Verify dispatch, fallback, and detection behavior that CI cannot execute. These
 results are owned by the user and block Phase 5 completion until recorded.
 
-- [ ] 4.3.1 Execute manual scenario ST-34 (working-tree install in a scratch scope, restart, dispatch as an additional reviewer; record the active model's `reasoningEffort` result) and record the result in this plan
+- [x] 4.3.1 Execute manual scenario ST-34 (working-tree install in a scratch scope, restart, dispatch as an additional reviewer; record the active model's `reasoningEffort` result) and record the result in this plan ✅ (completed: 2026-10-04 02:20)
+
+> **ST-34 evidence (user session `ses_efbbbfc2affeyu13QFl464wFf8`, fixture `/tmp/opencode/specialist-acceptance`):**
+> Phase 1 executed and verified (both tasks `[x]`, `slugify.mjs` created). The post-phase step
+> dispatched `correctness-reviewer` **and** `pg-migration-reviewer`
+> (`[codeops-dispatch agent=pg-migration-reviewer feature=acceptance-check phase=1]`); the
+> specialist completed read-only with "Findings: **no findings**" and an independent verify
+> re-run, so no `SR-NNN` items were triggered. The generated agent carries
+> `reasoningEffort: max` and the active model accepted it (no override recorded). Standard gate
+> (correctness review + verify) ran unchanged.
 - [ ] 4.3.2 Execute manual scenario ST-35 (session started before creation; confirm fallback and reporting) and record the result in this plan
 - [ ] 4.3.3 Execute manual scenario ST-43 (negative detection outcome and the two-candidate cap) and record the result in this plan
 - [ ] 4.3.4 Full verification
