@@ -1,9 +1,9 @@
 # Task T-03: Opt-in reasoning-effort request trace
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 4/5 tasks (80%)
+> **Progress**: 4/6 tasks (67%)
 > **Reasoning**: medium — bounded helper addition following existing project patterns
-> **Last Updated**: 2026-10-04 13:52
+> **Last Updated**: 2026-10-04 13:57
 
 ## Objective
 
@@ -24,5 +24,6 @@ name, level, source, and applied flag — never prompt text.
 - [x] T-03.3 Full verification (`npm run verify`) ✅ (completed: 2026-10-04 13:44)
 - [x] T-03.4 Live trace smoke after the global update (capture + apply lines readable) ✅ (completed: 2026-10-04 13:50) — smoke exposed a marker-scoping defect, tracked as T-03.5
 - [~] T-03.5 Fix the marker-scoping defect found by the smoke: session-scoped markers (user decision) ⏳ (implemented: 2026-10-04 13:52)
+- [~] T-03.6 Fix the application gate: model variants must be checked before the reasoning-support flag (contract order) ⏳ (implemented: 2026-10-04 13:57) — live trace shows the marker resolves but `applied:false`
 
 **Verify**: `npm run verify`

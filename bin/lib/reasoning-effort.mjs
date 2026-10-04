@@ -309,9 +309,13 @@ export function modelSupportsReasoning(model) {
  * The runtime model carries a `variants` record whose entries are the exact
  * provider options for each level (for example `reasoningEffort`, or a nested
  * `reasoning.effort`). This function is the only place that mapping is
- * consumed, so the plugin never hardcodes a provider key. The function is
- * pure: it returns a new object when a change applies and the original object
- * reference otherwise.
+ * consumed, so the plugin never hardcodes a provider key. A matching variant
+ * is applied even when the model's reasoning capability flag is absent or
+ * false: the variant itself is the provider-known option set, and the host
+ * applies inherited variants the same way. Only when no variants record
+ * exists does the documented `reasoningEffort` passthrough require an
+ * explicit reasoning capability. The function is pure: it returns a new
+ * object when a change applies and the original object reference otherwise.
  *
  * @param options - Current provider options
  * @param level - Candidate level from {@link resolveEffort}
@@ -320,7 +324,6 @@ export function modelSupportsReasoning(model) {
  */
 export function applyEffort(options, level, model) {
   if (!isRoutingReasoning(level)) return options
-  if (!modelSupportsReasoning(model)) return options
 
   const variants = extractModelVariants(model)
   if (variants !== undefined) {
@@ -330,6 +333,7 @@ export function applyEffort(options, level, model) {
     return deepMergePlain(options, variantOptions)
   }
 
+  if (!modelSupportsReasoning(model)) return options
   return { ...options, reasoningEffort: level }
 }
 

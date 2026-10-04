@@ -163,6 +163,18 @@ describe("provider option application", () => {
     })
   })
 
+  it("should apply a matching variant even when the model does not flag reasoning support", () => {
+    const options = { topP: 0.4 }
+    const model = {
+      capabilities: { reasoning: false },
+      variants: { medium: { reasoningEffort: "medium" } },
+    }
+    assert.deepEqual(applyEffort(options, "medium", model), {
+      topP: 0.4,
+      reasoningEffort: "medium",
+    })
+  })
+
   it("should return the original options when the model lacks the requested variant", () => {
     const options = { topP: 0.8 }
     const model = {

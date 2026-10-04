@@ -12,10 +12,12 @@ import {
 import {
   appendEffortTrace,
   applyEffort,
+  extractModelVariants,
   findEffortMarker,
   isEffortLevel,
   isEffortTraceEnabled,
   isRoutingReasoning,
+  modelSupportsReasoning,
   readRoutingReasoning,
   readSessionEffort,
   resolveEffort,
@@ -348,6 +350,8 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
           level,
           source,
           applied: changed,
+          reasoningSupported: modelSupportsReasoning(input.model),
+          variantLevels: Object.keys(extractModelVariants(input.model) ?? {}),
         })
         if (!changed) {
           if (marker !== undefined) {
