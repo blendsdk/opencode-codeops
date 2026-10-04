@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-04 00:52
-> **Progress**: 37/40 tasks (93%)
+> **Progress**: 37/41 tasks (90%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -17,7 +17,7 @@ is `00-preflight-report.md`.
 
 **Commit mode (recorded intent, AR #23):** execute with `exec-plan specialist-agents
 --auto-commit` (commit + push after each verified task). The commit-mode flag is supplied at
-execution time; `make-plan` writes no commits. Manual scenarios (ST-34, ST-35, ST-43) are
+execution time; `make-plan` writes no commits. Manual scenarios (ST-34, ST-35, ST-43, ST-44) are
 user-owned acceptance evidence and are never self-certified by the executor (PF-018).
 
 **🚨 Update this document after EACH completed task!**
@@ -31,10 +31,10 @@ user-owned acceptance evidence and are never self-certified by the executor (PF-
 | 1 | Protocol and layout | 5 |
 | 2 | Generation core | 9 |
 | 3 | Check, removal, sync, and migration | 12 |
-| 4 | Skill wiring and execution routing | 12 |
+| 4 | Skill wiring and execution routing | 13 |
 | 5 | Documentation and final verification | 2 |
 
-**Total: 40 tasks across 5 phases** (no fabricated hour estimates — scope is bounded by the
+**Total: 41 tasks across 5 phases** (no fabricated hour estimates — scope is bounded by the
 task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-checklist.md))
 
 > **⚠️ EXECUTION RULE — APPLIES TO EVERY AGENT EXECUTING THIS PLAN:**
@@ -190,7 +190,8 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 > `skills/make-plan/SKILL.md`, `skills/make-plan/templates.md`, `skills/make-requirements/SKILL.md`,
 > `skills/analyze-project/SKILL.md`, `skills/setup-routing/SKILL.md`, `skills/setup-routing/routing.md`,
 > `_shared/quality-profile.md`, `skills/exec-plan/SKILL.md`,
-> `skills/exec-plan/execution-protocol.md`, and this plan's progress marks.
+> `skills/exec-plan/execution-protocol.md`, `plans/specialist-agents/07-testing-strategy.md`,
+> `plans/specialist-agents/03-01-specialist-protocol.md`, and this plan's progress marks.
 
 ### Step 4.1: Specification test (content)
 
@@ -230,11 +231,12 @@ results are owned by the user and block Phase 5 completion until recorded.
 > (correctness review + verify) ran unchanged.
 - [ ] 4.3.2 Execute manual scenario ST-35 (session started before creation; confirm fallback and reporting) and record the result in this plan
 - [ ] 4.3.3 Execute manual scenario ST-43 (negative detection outcome and the two-candidate cap) and record the result in this plan
-- [ ] 4.3.4 Full verification
+- [ ] 4.3.4 Execute manual scenario ST-44 (gap-bearing project: CodeOps asks for approval through the gate, then `setup-routing` creates the specialist; nothing is created before approval) and record the result in this plan
+- [ ] 4.3.5 Full verification
 
 **Deliverables**:
 - Participating skills link to `_shared/specialist-agents.md`; `make-plan` records a `Specialist Agents` outcome always
-- ST-32 passes; ST-34, ST-35, and ST-43 results recorded as user-owned acceptance evidence
+- ST-32 passes; ST-34, ST-35, ST-43, and ST-44 results recorded as user-owned acceptance evidence
 - No gate, reviewer count, or catalog-agent behavior changes
 
 **Verify**: `npm run verify`
@@ -304,4 +306,4 @@ Phase 5 (docs/final verify)
 3. ✅ No warnings/errors; no dead code
 4. ✅ Security hardened — validation, traversal/symlink prevention, fixed-point sanitization, escaped output, read-only reviewer clamp
 5. ✅ Documentation updated in the owning files
-6. ✅ ST-1 … ST-42 pass; ST-34, ST-35, and ST-43 recorded as user-owned results
+6. ✅ ST-1 … ST-42 pass; ST-34, ST-35, ST-43, and ST-44 recorded as user-owned results

@@ -109,6 +109,7 @@
 | ST-34 | Create a specialist in a scratch project from an installed working-tree plugin, restart OpenCode, run an `exec-plan` phase that lists it | Agent appears in the task list; dispatched as an additional reviewer; findings use `SR-NNN`; standard gate still runs; the active model accepts `reasoningEffort: max` (or the override is recorded) | Req R7, AR #16/#19, PF-018, PF-031 |
 | ST-35 | In a session started before the agent was created, run the same phase | Dispatch falls back to a generic subagent with the brief excerpt; the fallback is reported; the phase still completes review | Req R7, AR #16 |
 | ST-43 | Run detection on a plan/requirements set where no gap exists; attempt to propose more than two candidates | Outcome recorded as `None` with evidence; the third candidate is refused under the AR #24 budget | Req R1/R2, AR #24, PF-012 |
+| ST-44 | In a gap-bearing project, ask CodeOps to run the specialist-gap check and follow it through the gate; approve the candidate and the brief | The skill presents the candidate packet with an independent challenger verdict and waits for approval; on approval `setup-routing` writes routing policy first, creates the brief and generated agent, syncs AGENTS.md, and `--check` is clean; no creation happens before approval (`--auto-design` cannot approve) | Req R1/R2/R4/R6, AR #4/#21 |
 
 ## Test Categories
 
@@ -169,5 +170,5 @@ checkout root (PF-030).
 - [ ] All specification tests pass after implementation (green phase)
 - [ ] Implementation tests written for edge cases and internals
 - [ ] `npm run verify` passes with no regressions
-- [ ] ST-34, ST-35, and ST-43 manual scenarios executed and recorded as user-owned acceptance
+- [ ] ST-34, ST-35, ST-43, and ST-44 manual scenarios executed and recorded as user-owned acceptance
       evidence in `99-execution-plan.md`

@@ -142,4 +142,5 @@ Presented to the user and persisted in the Ambiguity Register as a
   no edited skill leaks `${PLUGIN_ROOT}` (ST-31), and that the authority, budget,
   outcome-recording, and `--auto-design` ban clauses are present (ST-30).
 - Detection behavior is validated by the content assertions plus manual scenarios ST-34/ST-35 and
-  the negative-detection scenario ST-43; it is not executable in CI.
+  the negative-detection scenario ST-43; the positive detection-to-creation flow (ask, approve,
+  create through `setup-routing`) is ST-44. None of these are executable in CI.
