@@ -340,7 +340,8 @@ gates a dispatch.
 3. With `--auto-effort`, set the session level for the phase through
    `python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_effort.py" set --dir "$CODEOPS_TMPDIR" --reasoning <level>`
    and update it when the next phase's suggestion differs; with `--auto-effort=<level>`, set that
-   level once and keep it for the whole run.
+   level once and keep it for the whole run. A phase without a `Reasoning:` line leaves the
+   session level unchanged.
 4. When `$CODEOPS_TMPDIR` is empty or the helper fails, print an advise-only note and continue.
 
 **Division of labor.** The PARENT — never the executor — updates `99-execution-plan.md`

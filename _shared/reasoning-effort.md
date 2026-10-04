@@ -108,7 +108,7 @@ invalid `=<level>` is an argument error.
 
 | Flag | Behavior |
 | ---- | -------- |
-| *(absent)* | Print `Suggested reasoning: <level> — <reason>` once at start; change nothing |
+| *(absent)* | Print `Suggested reasoning: <level> — <reason>` once at start (`exec-plan`: before each phase); change nothing |
 | `--auto-effort` | Use the skill's recommended level (`exec-plan`: the current phase level) |
 | `--auto-effort=<level>` | Use the named level; reject values outside the four-level set |
 

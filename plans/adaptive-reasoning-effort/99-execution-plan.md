@@ -2,7 +2,7 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-04 13:04
+> **Last Updated**: 2026-10-04 13:08
 > **Progress**: 18/24 tasks (75%)
 > **CodeOps Artifact Schema**: 1
 
@@ -268,3 +268,12 @@ sequentially for simple progress tracking.
 | Diff basis | Phase baseline tree `bebf78cb…` → HEAD; hook signatures re-checked against the installed plugin types |
 | Findings | RV-001 (MINOR) `session.deleted` cleanup catch did not log; RV-002 (MINOR) Progress header was stale; RV-003 (MINOR) phase-2 test names missed the should-when convention; RV-004 (MINOR) `clear`/`set` traced back on a directory at the state path; SA-001 (MINOR) a symlink loop escaped the path guard |
 | Disposition | All fixed as necessary corrections: warning added, Progress header corrected, tests renamed, controlled exit 2 plus widened exception handling; `npm run verify` 247/247 green; no re-review required (no critical/major findings) |
+
+### Phase 3 — Plan integration (2026-10-04)
+
+| Item | Result |
+| ---- | ------ |
+| Dispatch | Fallback generic phase reviewer only; the diff is documentation-only, so the security and performance auditor skips are logged |
+| Diff basis | Phase baseline tree `cfeb8d4f…` → HEAD |
+| Findings | RV-001 (MINOR) the shared contract's absent-flag row did not name the exec-plan per-phase print; RV-002 (MINOR) inline step 3 did not state that a phase without a reasoning line leaves the session level unchanged |
+| Disposition | Both fixed as necessary corrections (one contract row, one protocol sentence); `npm run verify` 249/249 green; no re-review required (no critical/major findings) |
