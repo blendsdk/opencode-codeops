@@ -24,6 +24,12 @@ Routing policy is project configuration, not a suggestion:
 `routing.roles.<agent>.reasoning` may name any value from the provider enum
 (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`).
 
+Not every model exposes every suggestion level. The deepseek flash model in this environment
+exposes `low`, `high`, and `max`, so a `medium` suggestion is skipped there. Confirm the active
+model's set by enabling `CODEOPS_EFFORT_TRACE=1` and reading `variantLevels` on an apply line.
+When writing plans or markers for a model with a reduced set, name an exposed level instead —
+for example `high` where the derivation table would say `medium`, and `low` for mechanical work.
+
 ## Marker grammar
 
 A dispatch marker is one standalone line in a dispatch message:
@@ -98,6 +104,9 @@ already records:
 | Phase carries a security, financial-integrity, concurrency, performance-critical, compiler-semantics, or migration lens/risk tag | `high` |
 | Docs/config/rename-only phase with deterministic verification | `low` |
 | Any other non-trivial phase | `medium` |
+
+Substitute an exposed level when the target model lacks the suggested one — for the deepseek
+flash set in this environment, `high` replaces `medium`.
 
 The line is written as `> **Reasoning**: <level> — <one-line reason>`. It is a suggestion: the
 user may edit or delete it, and `exec-plan` never blocks on it. A plan without the line keeps
