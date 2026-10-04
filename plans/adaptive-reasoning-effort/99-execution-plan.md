@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-04 12:52
-> **Progress**: 0/24 tasks (0%)
+> **Last Updated**: 2026-10-04 13:01
+> **Progress**: 13/24 tasks (54%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -259,3 +259,12 @@ sequentially for simple progress tracking.
 | Diff basis | Phase baseline tree `9dfe6375…` → HEAD; product files verified against the tree blobs |
 | Findings | RV-001 (MINOR) `resolveEffort(null)` threw; RV-002 (MINOR) contract doc omitted the no-variants passthrough; RV-003 (MINOR) constructor-key test gap; SA-001 (MINOR) same totality issue as RV-001 |
 | Disposition | All fixed as necessary corrections: input guard in the helper, one contract sentence, two new tests; `npm run verify` 242/242 green; no re-review required (no critical/major findings) |
+
+### Phase 2 — Session helper and plugin runtime (2026-10-04)
+
+| Item | Result |
+| ---- | ------ |
+| Dispatch | Fallback generic packets run in parallel: phase reviewer + security auditor (catalog reviewer agents manual-invocation-only); fallback reported |
+| Diff basis | Phase baseline tree `bebf78cb…` → HEAD; hook signatures re-checked against the installed plugin types |
+| Findings | RV-001 (MINOR) `session.deleted` cleanup catch did not log; RV-002 (MINOR) Progress header was stale; RV-003 (MINOR) phase-2 test names missed the should-when convention; RV-004 (MINOR) `clear`/`set` traced back on a directory at the state path; SA-001 (MINOR) a symlink loop escaped the path guard |
+| Disposition | All fixed as necessary corrections: warning added, Progress header corrected, tests renamed, controlled exit 2 plus widened exception handling; `npm run verify` 247/247 green; no re-review required (no critical/major findings) |

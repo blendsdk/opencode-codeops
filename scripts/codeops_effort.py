@@ -53,7 +53,9 @@ def resolve_session_dir(raw_dir: str) -> Path | None:
     """
     try:
         resolved = Path(raw_dir).resolve(strict=True)
-    except OSError:
+    except (OSError, RuntimeError):
+        # RuntimeError covers a symlink loop on Python 3.12, which the
+        # filesystem reports as ELOOP rather than a plain OSError.
         return None
     root = codeops_tmp_root()
     if resolved == root or root not in resolved.parents:
@@ -108,7 +110,8 @@ def set_level(session_dir: Path, level: str) -> int:
             os.unlink(temporary_name)
         except OSError:
             pass
-        raise
+        print("Error: could not write the reasoning-effort state file.", file=sys.stderr)
+        return 2
     print(f"Reasoning effort set: {level} for this session run.")
     return 0
 
@@ -126,6 +129,9 @@ def clear_level(session_dir: Path) -> int:
         state_path(session_dir).unlink()
     except FileNotFoundError:
         pass
+    except OSError:
+        print("Error: could not remove the reasoning-effort state file.", file=sys.stderr)
+        return 2
     print("Reasoning effort cleared.")
     return 0
 

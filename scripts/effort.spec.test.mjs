@@ -74,7 +74,7 @@ function runCli(base, args) {
 }
 
 describe("codeops_effort.py set", () => {
-  it("writes a schema-1 state file with the level and leaves no temp file", () => {
+  it("should write a schema-1 state file and leave no temp file when the level is valid", () => {
     const base = makeBase()
     const dir = makeSessionDir(base, "ses_set")
 
@@ -90,7 +90,7 @@ describe("codeops_effort.py set", () => {
 })
 
 describe("codeops_effort.py status and clear", () => {
-  it("reports the stored level, clears it, and reports the empty state", () => {
+  it("should report, clear, and then report the empty state when a level was set", () => {
     const base = makeBase()
     const dir = makeSessionDir(base, "ses_status")
     const statePath = join(dir, "reasoning-effort.json")
@@ -112,7 +112,7 @@ describe("codeops_effort.py status and clear", () => {
 })
 
 describe("codeops_effort.py validation", () => {
-  it("rejects an unknown level with exit 2 and names the allowed levels", () => {
+  it("should reject an unknown level with exit 2 and name the allowed levels", () => {
     const base = makeBase()
     const dir = makeSessionDir(base, "ses_bad_level")
 
@@ -125,7 +125,7 @@ describe("codeops_effort.py validation", () => {
     assert.equal(existsSync(join(dir, "reasoning-effort.json")), false)
   })
 
-  it("rejects a directory outside the CodeOps temp root with exit 2 and no write", () => {
+  it("should reject a directory outside the CodeOps temp root with exit 2 and no write", () => {
     const base = makeBase()
     const outside = join(base, "outside-the-root")
     mkdirSync(outside, { recursive: true })

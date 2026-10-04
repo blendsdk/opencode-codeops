@@ -84,7 +84,7 @@ describe("reasoning-effort contract document", () => {
 })
 
 describe("plugin wiring content", () => {
-  it("registers the chat hooks and imports the reasoning-effort helper", () => {
+  it("should register the chat hooks and import the reasoning-effort helper", () => {
     const content = read("plugin/index.ts")
     assert.match(content, /"chat\.message"/)
     assert.match(content, /"chat\.params"/)

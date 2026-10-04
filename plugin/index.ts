@@ -206,7 +206,7 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
             if (entry.sessionID === info.id) effortMarkers.delete(messageID)
           }
         } catch {
-          // Best effort: cleanup must never break session deletion.
+          await warnContentFree(client, "Could not clear captured reasoning-effort markers.")
         }
       } else if (event.type === "session.compacted") {
         const sessionId: string = (event.properties as { sessionID: string }).sessionID
