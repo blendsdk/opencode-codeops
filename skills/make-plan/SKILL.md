@@ -24,6 +24,16 @@ If `$ARGUMENTS` contains exactly one exact standalone `--explore-scope` token be
 do not report or plan optional additions. Exploration may propose `SE-*` items but
 never accepts them; only the user may choose `Keep`.
 
+## Auto-effort option
+
+If `$ARGUMENTS` contains exactly one exact standalone `--auto-effort` or `--auto-effort=<level>`
+token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero
+occurrences means this skill's recommended level (`high`) is printed as a suggestion only, more
+than one or an invalid level is an argument error; announce
+`Auto-effort active — reasoning <level> applied for this run`; then read and apply
+[../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. The
+run clears the level before its final summary.
+
 ## Plan readiness proof
 
 A plan is not ready merely because its documents exist. Before presenting it as executable,
@@ -106,6 +116,7 @@ Mini-plan shape:
 
 > **Type**: Task (lightweight) · **Feature**: search · **CodeOps Artifact Schema**: 1
 > **Progress**: 0/3 tasks (0%)
+> **Reasoning**: medium — bounded UI change reusing existing patterns
 
 ## Objective
 Debounce the search box to 300ms to cut redundant queries.
@@ -120,6 +131,12 @@ shared debounce subsystem.
 
 **Verify**: [project verify command]
 ```
+
+Every phase and every task mini-plan carries the same advisory
+`> **Reasoning**: <level> — <reason>` line. Derive the level from the signals the plan already
+records, using [../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Plan
+suggestion derivation, and keep the reason a short plain-language phrase. The line is a
+suggestion: no gate reads it, deleting it is valid, and its absence means "inherit".
 
 Everything below is the **full feature** pipeline; skip it for tasks.
 

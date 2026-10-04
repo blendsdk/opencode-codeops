@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-04 13:01
-> **Progress**: 13/24 tasks (54%)
+> **Last Updated**: 2026-10-04 13:04
+> **Progress**: 18/24 tasks (75%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -133,7 +133,7 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 
 ## Phase 3: Plan integration
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill)_
+> **Phase baseline tree**: `cfeb8d4f39d50aabca6dad08f698df8910029264` (strict scope)
 > **Expected modification set** (strict scope): `scripts/reasoning-effort-content.spec.test.mjs`,
 > `skills/make-plan/templates.md`, `skills/make-plan/SKILL.md`,
 > `skills/exec-plan/execution-protocol.md`, `skills/exec-plan/SKILL.md`, and this plan's progress
@@ -144,17 +144,17 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 **Reference**: [03-03](03-03-plan-skill-integration.md) §make-plan, §exec-plan · AR #2, #3, #6, #12
 **Objective**: Pin the phase suggestion line, the dispatch marker rule, the inline suggestion, and the flag section before editing the skills.
 
-- [ ] 3.1.1 Append content tests ST-26 and ST-27 to `scripts/reasoning-effort-content.spec.test.mjs`
-- [ ] 3.1.2 Run the tests and verify they FAIL (red phase)
+- [x] 3.1.1 Append content tests ST-26 and ST-27 to `scripts/reasoning-effort-content.spec.test.mjs` ✅ (completed: 2026-10-04 13:03)
+- [x] 3.1.2 Run the tests and verify they FAIL (red phase) ✅ (completed: 2026-10-04 13:03)
 
 ### Step 3.2: Implementation
 
 **Reference**: [03-03](03-03-plan-skill-integration.md) §make-plan, §exec-plan · [03-01](03-01-reasoning-effort-contract.md) §Plan suggestion derivation, §Auto-effort option
 **Objective**: Make plans carry advisory effort, and make exec-plan resolve and report it.
 
-- [ ] 3.2.1 Update `skills/make-plan/templates.md` (phase header `> **Reasoning**:` line) and `skills/make-plan/SKILL.md` (mini-plan shape, derivation reference, `--auto-effort` section)
-- [ ] 3.2.2 Update `skills/exec-plan/execution-protocol.md` (marker in every packet, applied-level reporting, inline suggestion and session behavior) and `skills/exec-plan/SKILL.md` (`--auto-effort` option section)
-- [ ] 3.2.3 Run the tests and verify they PASS (green phase)
+- [x] 3.2.1 Update `skills/make-plan/templates.md` (phase header `> **Reasoning**:` line) and `skills/make-plan/SKILL.md` (mini-plan shape, derivation reference, `--auto-effort` section) ✅ (completed: 2026-10-04 13:04)
+- [x] 3.2.2 Update `skills/exec-plan/execution-protocol.md` (marker in every packet, applied-level reporting, inline suggestion and session behavior) and `skills/exec-plan/SKILL.md` (`--auto-effort` option section) ✅ (completed: 2026-10-04 13:04)
+- [x] 3.2.3 Run the tests and verify they PASS (green phase) ✅ (completed: 2026-10-04 13:04)
 
 **Deliverables**:
 - Phase template and mini-plan shape carry the `> **Reasoning**:` line

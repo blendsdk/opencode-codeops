@@ -36,6 +36,18 @@ do not report or implement optional additions raised during execution or review.
 Exploration may create `SE-*` proposals, but only the user may choose `Keep` and authorize a plan
 update.
 
+## Auto-effort option
+
+If `$ARGUMENTS` contains exactly one exact standalone `--auto-effort` or `--auto-effort=<level>`
+token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero
+occurrences means each phase's `Reasoning:` level is printed as a suggestion only, more than one
+or an invalid level is an argument error; announce
+`Auto-effort active — reasoning <level> applied for this run`; then read and apply
+[../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. A bare
+flag follows each phase's suggestion; `--auto-effort=<level>` forces that level for the whole run,
+including every dispatch marker composed during it. The run clears the level before its final
+summary.
+
 Execute the implementation plan at `plans/$ARGUMENTS/99-execution-plan.md`. The first
 argument is the feature name; an optional flag selects the commit mode.
 

@@ -70,6 +70,10 @@ scope baseline; missing mode context fails closed to strict scope.
 When opt-in outcome metrics are enabled, record only a content-free execution-stage event through
 `codeops_outcomes.py`; metrics never gate execution.
 
+When the phase header carries `> **Reasoning**: <level> — <reason>`, record it as the phase's
+advisory level for dispatch markers, inline reporting, and applied-level reporting. It is a
+suggestion: no gate reads it, and its absence means "inherit".
+
 **Spec-author dispatch (profile-gated).** Tasks marked `[spec-author]` dispatch the
 spec-test-author agent — packet per `_shared/quality-profile.md` — BEFORE any implementation
 task of that phase, and the red phase is confirmed from its report. A spec test that cannot be
@@ -300,11 +304,44 @@ receives nothing else and must not need anything else:
 - the scope mode (`strict` or `explore`) and confirmed product scope baseline; missing or invalid
   scope context fails closed to strict mode. Missing or invalid original-goal or smallest-design
   context blocks dispatch;
-- the target file paths and the project's verify command.
+- the target file paths and the project's verify command;
+- the phase's reasoning marker line (`[codeops-effort: <level>]`), resolved from the run's forced
+  `--auto-effort=<level>` level, else the phase's `Reasoning:` suggestion; omitted when neither
+  exists.
 
 Excerpting owned content into a packet is the intended retrieval mechanism, not restatement. The
 quoted AR/ST/spec content is context for the executor's *understanding* — it must not surface as a
 citation in shipped code (the executor carries the same doc-standard ban and self-check).
+
+**Reasoning marker.** Every dispatched unit — executor, reviewer, auditor, spec-test author,
+specialist, or scout — receives one standalone marker line in its packet:
+
+```text
+[codeops-effort: medium]
+```
+
+Place it immediately after the `[codeops-dispatch …]` header for quality agents, or as the first
+line for packets without a header. When neither the forced run level nor the phase suggestion
+exists, add no marker: routing policy still applies, otherwise the child inherits the parent
+variant. The marker is packet context; it never appears in shipped code comments. The
+complexity-gate design challenger is excluded because its independence contract forbids extra
+packet shaping.
+
+**Applied-level reporting.** For every dispatch, report the level and its source in the dispatch
+commentary, for example `Dispatch: executor — reasoning: medium (phase suggestion)`,
+`— reasoning: high (routing default)`, or `— inherited`. Reporting is observational; it never
+gates a dispatch.
+
+**Inline phases.** When a phase runs inline (the default):
+
+1. Print `Suggested reasoning: <level> — <reason>` before the phase's first task when the phase
+   header carries the line.
+2. Without `--auto-effort`, change nothing else — the session keeps its own variant.
+3. With `--auto-effort`, set the session level for the phase through
+   `python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_effort.py" set --dir "$CODEOPS_TMPDIR" --reasoning <level>`
+   and update it when the next phase's suggestion differs; with `--auto-effort=<level>`, set that
+   level once and keep it for the whole run.
+4. When `$CODEOPS_TMPDIR` is empty or the helper fails, print an advise-only note and continue.
 
 **Division of labor.** The PARENT — never the executor — updates `99-execution-plan.md`
 (two-stage marks), the Progress header, and the roadmap. The executor implements task-by-task,
@@ -404,8 +441,10 @@ otherwise still `[~]` — with the progress counter and Last Updated stamp curre
 2. **🚨 First: update `99-execution-plan.md`** with ALL completed tasks (before anything else).
 3. Run the verify command (output captured per the Verify-output capture rule).
 4. Handle the commit per the active commit mode (see [commit-modes.md](commit-modes.md)).
-5. Report the session summary (must include `Execution Plan Updated: ✅`).
-6. **Cleanup:** delete every temporary artifact this session created — verify logs under
+5. If this run set a session level through `--auto-effort`, clear it before the summary:
+   `python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_effort.py" clear --dir "$CODEOPS_TMPDIR"`.
+6. Report the session summary (must include `Execution Plan Updated: ✅`).
+7. **Cleanup:** delete every temporary artifact this session created — verify logs under
    `$CODEOPS_TMPDIR`, scratch directories, temporary diffs — per
    `_shared/workspace-hygiene.md`, and report `Cleanup: done` or name what was kept and why.
 

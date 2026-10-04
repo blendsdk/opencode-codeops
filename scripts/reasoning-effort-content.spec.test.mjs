@@ -91,3 +91,21 @@ describe("plugin wiring content", () => {
     assert.match(content, /reasoning-effort\.mjs/)
   })
 })
+
+describe("make-plan integration content", () => {
+  it("should carry the advisory reasoning line and link the shared contract", () => {
+    assert.match(read("skills/make-plan/templates.md"), /> \*\*Reasoning\*\*:/)
+    const skill = read("skills/make-plan/SKILL.md")
+    assert.match(skill, /> \*\*Reasoning\*\*:/)
+    assert.match(skill, /_shared\/reasoning-effort\.md/)
+  })
+})
+
+describe("exec-plan integration content", () => {
+  it("should carry the packet marker, inline suggestion, and the flag section", () => {
+    const protocol = read("skills/exec-plan/execution-protocol.md")
+    assert.match(protocol, /\[codeops-effort:/)
+    assert.match(protocol, /Suggested reasoning:/)
+    assert.match(read("skills/exec-plan/SKILL.md"), /--auto-effort/)
+  })
+})
