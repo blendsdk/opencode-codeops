@@ -1,0 +1,133 @@
+# Reasoning effort (shared contract)
+
+> **CodeOps Artifact Schema**: 1
+
+CodeOps subagents normally inherit the parent session's model variant, so a top-tier parent
+would pay top-tier reasoning cost for every child dispatch. Adaptive reasoning effort lets an
+explicit source pick a level per dispatch or per skill run. This document is the shipped
+contract consumed by the plugin and the skills. It is advisory by design and never a gate.
+
+## Levels
+
+| Level | Meaning | Typical work |
+| ----- | ------- | ------------ |
+| `low` | Mechanical, fully specified, deterministic verification | Docs and formatting edits, renames, config updates |
+| `medium` | Ordinary bounded feature work with known patterns | Standard implementation phases, recon, single-file reviews |
+| `high` | Correctness- or security-sensitive, cross-cutting, or planning/review work | Requirements, planning, correctness/security review, ambiguous implementation |
+| `max` | Adversarial or high-risk analysis where a missed detail is costly | Thorough preflight, complex or sensitive phases |
+
+The four levels are the complete suggestion vocabulary. A level is applied only when the
+runtime model exposes a matching variant; a level the model does not expose leaves the request
+unchanged and never raises a provider error. Routing policy is project configuration, not a
+suggestion: `routing.roles.<agent>.reasoning` may name any value from the provider enum
+(`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`).
+
+## Marker grammar
+
+A dispatch marker is one standalone line in a dispatch message:
+
+```text
+[codeops-effort: <level>]
+```
+
+- The whole trimmed line must match `^\[codeops-effort:\s*(low|medium|high|max)\]\s*$`.
+- The level is exactly lower-case. Unknown or malformed markers are ignored, never errors.
+- Only user-role text parts of a message are scanned; tool output, diffs, and quoted documents
+  are never scanned.
+- The first valid marker in message order wins; additional markers are ignored.
+- The marker is deliberately distinct from the human-readable plan line
+  `> **Reasoning**: ...`, so a quoted plan line can never act as a machine directive.
+
+For quality-agent packets the marker follows the dispatch header; for packet kinds without a
+header it is the first line. `exec-plan` owns the composition rule.
+
+## Precedence
+
+The most specific source wins:
+
+```text
+dispatch marker  >  session auto-effort  >  routing.roles[<agent>].reasoning  >  inherit parent variant
+```
+
+| Source | Scope | Owner |
+| ------ | ----- | ----- |
+| Dispatch marker | One child dispatch | `exec-plan` composes it from the phase suggestion or the run's forced level |
+| Session auto-effort | One skill run in the user's session | `--auto-effort` through `scripts/codeops_effort.py` |
+| Routing role default | Project policy for one agent name | `codeops/codeops.json` → `routing.roles.<agent>.reasoning` |
+| Inherit | Everything else | The child keeps the parent model and variant |
+
+Routing lookup applies only when the dispatching agent's name has an explicit `routing.roles`
+entry. There are no built-in catalog defaults, hand-authored agents are untouched, and
+generated specialists keep their embedded value unless the project adds a routing entry.
+
+## Skill recommendation table
+
+Used for suggestions and for a bare `--auto-effort`:
+
+| Skill | Recommended level | Notes |
+| ----- | ----------------- | ----- |
+| `make-requirements` | `high` | Structured discovery and gap expansion |
+| `make-plan` | `high` | Decomposition plus the Zero-Ambiguity Gate |
+| `preflight` | `high`; `max` with `--thorough` | Adversarial multi-dimension audit |
+| `grill-me` | `high` | Branch-by-branch disambiguation |
+| `exec-plan` | current phase's `Reasoning:` level | Bare flag follows the phase; `=<level>` forces a constant |
+| `retro-requirements` | `high` | Nine-phase archaeology |
+| `upgrade-plan` | `high` | Content gate plus structural migration |
+| `setup-codeops`, `setup-routing` | `high` (reference only) | Structure and policy authoring |
+| `techdocs`, `analyze-project`, `clean-comments`, `outcome-review` | `medium` (reference only) | Structured but bounded |
+| `roadmap`, `git-commit`, `github-issues` | `low` (reference only) | Mechanical bookkeeping |
+
+Skills that accept `--auto-effort` are `make-requirements`, `make-plan`, `preflight`,
+`grill-me`, `exec-plan`, `retro-requirements`, and `upgrade-plan`. Other skills document their
+recommended levels for reference only and do not implement the flag.
+
+## Plan suggestion derivation
+
+`make-plan` derives an advisory level for every phase and every task mini-plan from signals it
+already records:
+
+| Signal | Suggested level |
+| ------ | --------------- |
+| Phase carries a complexity escalation approval, or a complex/sensitive tag | `max` |
+| Phase carries a security, financial-integrity, concurrency, performance-critical, compiler-semantics, or migration lens/risk tag | `high` |
+| Docs/config/rename-only phase with deterministic verification | `low` |
+| Any other non-trivial phase | `medium` |
+
+The line is written as `> **Reasoning**: <level> — <one-line reason>`. It is a suggestion: the
+user may edit or delete it, and `exec-plan` never blocks on it. A plan without the line keeps
+the inherited behavior.
+
+## Auto-effort option
+
+Skills listed above accept the flag. Parsing follows the existing standalone-token pattern
+(`--auto-design`, `--explore-scope`): exactly one occurrence before the first `--` sentinel,
+removed before resolving targets, paths, or modes; zero means advise-only; more than one or an
+invalid `=<level>` is an argument error.
+
+| Flag | Behavior |
+| ---- | -------- |
+| *(absent)* | Print `Suggested reasoning: <level> — <reason>` once at start; change nothing |
+| `--auto-effort` | Use the skill's recommended level (`exec-plan`: the current phase level) |
+| `--auto-effort=<level>` | Use the named level; reject values outside the four-level set |
+
+Semantics:
+
+1. Announce `Auto-effort active — reasoning <level> applied for this run`.
+2. Record the level for the session run through `scripts/codeops_effort.py`.
+3. Clear it at run completion, before the final summary.
+4. Run-scoped: the level applies from the point it is set until cleared or the session ends.
+5. Fail-open: when the session temp directory is unavailable or the helper fails, print an
+   advise-only note and continue; the skill never blocks.
+6. Never a gate: effort affects cost and latency only. No readiness check, verification step,
+   reviewer requirement, or finding gate may read it.
+
+For `exec-plan`, a bare flag follows each phase's suggestion, while `--auto-effort=<level>`
+forces that level for the whole run, including every dispatch marker composed during it.
+
+## Suggestion-only guarantee
+
+| Allowed | Forbidden |
+| ------- | --------- |
+| Printing a suggested level and its reason | Blocking a run because a level is missing or unsupported |
+| Applying a level when a marker, flag, or routing entry explicitly asks | Overriding an explicit user plan edit with a derived default |
+| Reporting the applied level and its source | Treating effort as an acceptance, review, or security control |
