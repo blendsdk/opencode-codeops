@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-04 00:52
-> **Progress**: 39/41 tasks (95%)
+> **Progress**: 41/41 tasks (100%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -238,7 +238,15 @@ results are owned by the user and block Phase 5 completion until recorded.
 > kept). The phase review then reported: "**Fallback applied** (generated agent file missing) →
 > generic subagent + complete domain-specialist-reviewer packet incl. brief excerpt; No findings",
 > and the review completed with the correctness reviewer in parallel.
-- [ ] 4.3.3 Execute manual scenario ST-43 (negative detection outcome and the two-candidate cap) and record the result in this plan
+- [x] 4.3.3 Execute manual scenario ST-43 (negative detection outcome and the two-candidate cap) and record the result in this plan ✅ (completed: 2026-10-04 02:58)
+
+> **ST-43 evidence (sessions `ses_efa4473f7ffe…`, fixture `/tmp/opencode/st43-nogap`):**
+> Detection on a plain two-file repo recorded a **negative outcome** — 0 candidates proposed (up to
+> 2 allowed), every strong signal absent and all disqualifiers holding, with the git tree left
+> clean. The budget continuation showed three hypothetical candidates resolving to at most two per
+> requirements set or plan: "the third candidate is silently out of budget for that requirements
+> set/plan — no packet, no verdict, no decision, no record, no creation", resurfacing only in a
+> later scope under the same detection.
 - [x] 4.3.4 Execute manual scenario ST-44 (gap-bearing project: CodeOps asks for approval through the gate, then `setup-routing` creates the specialist; nothing is created before approval) and record the result in this plan ✅ (completed: 2026-10-04 02:36)
 
 > **ST-44 evidence (sessions `ses_efbb29b00ffeat8tEnVrTn2RI9` + headless continuation; fixture `/tmp/opencode/specialist-create-demo`):**
@@ -248,7 +256,7 @@ results are owned by the user and block Phase 5 completion until recorded.
 > were presented and `setup-routing` created the specialist: brief
 > `codeops/specialists/dual-grammar-reviewer.md`, routing defaults, generated agent, AGENTS.md
 > managed block, and `--check` clean for the custom role. Nothing existed before the approval.
-- [ ] 4.3.5 Full verification
+- [x] 4.3.5 Full verification ✅ (completed: 2026-10-04 02:58)
 
 **Deliverables**:
 - Participating skills link to `_shared/specialist-agents.md`; `make-plan` records a `Specialist Agents` outcome always
