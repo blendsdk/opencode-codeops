@@ -2,7 +2,7 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-04 12:49
+> **Last Updated**: 2026-10-04 12:48
 > **Progress**: 0/24 tasks (0%)
 > **CodeOps Artifact Schema**: 1
 
@@ -86,7 +86,7 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 **Reference**: [03-02](03-02-plugin-runtime-override.md) §Helper module, §Edge Cases · AR #15, #16
 **Objective**: Harden the helper against malformed and hostile inputs before the plugin depends on it.
 
-- [ ] 1.3.1 Write implementation tests for the internal edges listed in [07](07-testing-strategy.md) §Implementation Tests — `bin/reasoning-effort.impl.test.mjs`
+- [x] 1.3.1 Write implementation tests for the internal edges listed in [07](07-testing-strategy.md) §Implementation Tests — `bin/reasoning-effort.impl.test.mjs` ✅ (completed: 2026-10-04 12:48)
 
 **Deliverables**:
 - `_shared/reasoning-effort.md` exists with the schema stamp and all contract sections
