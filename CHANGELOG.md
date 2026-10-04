@@ -2,6 +2,17 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 1.11.0 — 2026-10-04
+
+### Features
+
+- effort: map missing levels to the nearest exposed variant
+
+### Documentation
+
+- effort: note the exposed model variant set
+- trace: record live verification and close T-03
+
 ## 1.10.3 — 2026-10-04
 
 ### Fixes
