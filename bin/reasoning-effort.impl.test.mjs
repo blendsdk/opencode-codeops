@@ -255,6 +255,13 @@ describe("applyEffort reference behavior", () => {
     assert.equal(
       applyEffort(options, "high", {
         capabilities: { reasoning: true },
+        variants: { medium: "invalid" },
+      }),
+      options
+    )
+    assert.equal(
+      applyEffort(options, "none", {
+        capabilities: { reasoning: true },
         variants: { low: { reasoningEffort: "low" } },
       }),
       options

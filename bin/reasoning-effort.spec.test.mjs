@@ -28,6 +28,7 @@ import {
   readRoutingReasoning,
   readSessionEffort,
   resolveEffort,
+  selectEffortVariant,
   sessionEffortPath,
   sessionEffortTracePath,
 } from "./lib/reasoning-effort.mjs"
@@ -151,6 +152,18 @@ describe("routing config lookup", () => {
   })
 })
 
+describe("variant selection", () => {
+  it("should choose the exact variant when exposed and the nearest otherwise", () => {
+    const model = { variants: { low: {}, high: {}, max: {} } }
+    assert.equal(selectEffortVariant("low", model), "low")
+    assert.equal(selectEffortVariant("medium", model), "high")
+    assert.equal(selectEffortVariant("xhigh", model), "max")
+    assert.equal(selectEffortVariant("none", model), undefined)
+    assert.equal(selectEffortVariant("extreme", model), undefined)
+    assert.equal(selectEffortVariant("medium", null), undefined)
+  })
+})
+
 describe("provider option application", () => {
   it("should merge the model variant options for the requested level", () => {
     const model = {
@@ -175,13 +188,83 @@ describe("provider option application", () => {
     })
   })
 
-  it("should return the original options when the model lacks the requested variant", () => {
+  it("should apply the nearest exposed variant when the requested level is missing", () => {
     const options = { topP: 0.8 }
     const model = {
       capabilities: { reasoning: true },
-      variants: { medium: { reasoningEffort: "medium" } },
+      variants: {
+        low: { reasoningEffort: "low" },
+        high: { reasoningEffort: "high" },
+        max: { reasoningEffort: "max" },
+      },
     }
-    assert.equal(applyEffort(options, "high", model), options)
+    assert.deepEqual(applyEffort(options, "medium", model), {
+      topP: 0.8,
+      reasoningEffort: "high",
+    })
+  })
+
+  it("should fall back by rank distance and round ties upward", () => {
+    const options = { topP: 0.3 }
+    const lowHighMax = {
+      capabilities: { reasoning: true },
+      variants: {
+        low: { reasoningEffort: "low" },
+        high: { reasoningEffort: "high" },
+        max: { reasoningEffort: "max" },
+      },
+    }
+    assert.deepEqual(applyEffort(options, "xhigh", lowHighMax), {
+      topP: 0.3,
+      reasoningEffort: "max",
+    })
+    assert.deepEqual(applyEffort(options, "minimal", lowHighMax), {
+      topP: 0.3,
+      reasoningEffort: "low",
+    })
+
+    const lowHigh = {
+      capabilities: { reasoning: true },
+      variants: {
+        low: { reasoningEffort: "low" },
+        high: { reasoningEffort: "high" },
+      },
+    }
+    assert.deepEqual(applyEffort(options, "medium", lowHigh), {
+      topP: 0.3,
+      reasoningEffort: "high",
+    })
+  })
+
+  it("should keep none exact-match only and ignore unusable variants", () => {
+    const options = { topP: 0.2 }
+    const lowHighMax = {
+      capabilities: { reasoning: true },
+      variants: {
+        low: { reasoningEffort: "low" },
+        high: { reasoningEffort: "high" },
+        max: { reasoningEffort: "max" },
+      },
+    }
+    assert.equal(applyEffort(options, "none", lowHighMax), options)
+
+    const withNone = {
+      capabilities: { reasoning: true },
+      variants: {
+        none: { reasoningEffort: "none" },
+        high: { reasoningEffort: "high" },
+      },
+    }
+    assert.deepEqual(applyEffort(options, "none", withNone), {
+      topP: 0.2,
+      reasoningEffort: "none",
+    })
+
+    const unusable = {
+      capabilities: { reasoning: true },
+      variants: { medium: "invalid" },
+    }
+    assert.equal(applyEffort(options, "high", unusable), options)
   })
 
   it("should return the original options when the model does not support reasoning", () => {
@@ -230,8 +313,10 @@ describe("provider option application", () => {
       topP: 0.5,
       reasoningEffort: "xhigh",
     })
-    const withoutVariant = { capabilities: { reasoning: true }, variants: { medium: {} } }
-    assert.equal(applyEffort(options, "xhigh", withoutVariant), options)
+    const nearestOnly = { capabilities: { reasoning: true }, variants: { medium: {} } }
+    const mapped = applyEffort(options, "xhigh", nearestOnly)
+    assert.deepEqual(mapped, options)
+    assert.notEqual(mapped, options)
   })
 })
 

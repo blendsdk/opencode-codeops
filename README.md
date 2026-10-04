@@ -166,8 +166,10 @@ Reasoning-heavy skills also accept `--auto-effort` (use the skill's recommended 
 `--auto-effort=high` (explicit level), announce it, and clear it before the final run summary.
 Resolution order: dispatch marker, then session `--auto-effort`, then
 `routing.roles.<agent>.reasoning` in `codeops/codeops.json`, then the inherited parent variant.
-The levels are suggestions: no permission, verification step, or review gate ever reads them. The
-full contract is in `_shared/reasoning-effort.md`.
+A level the active model does not expose resolves to the nearest exposed variant (`medium`
+becomes `high` on a `low`/`high`/`max` model). The levels are suggestions: no permission,
+verification step, or review gate ever reads them. The full contract is in
+`_shared/reasoning-effort.md`.
 
 ## Project specialists
 

@@ -21,6 +21,7 @@ import {
   readRoutingReasoning,
   readSessionEffort,
   resolveEffort,
+  selectEffortVariant,
 } from "../bin/lib/reasoning-effort.mjs"
 import type { EffortLevel } from "../bin/lib/reasoning-effort.mjs"
 
@@ -350,6 +351,7 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
           level,
           source,
           applied: changed,
+          variant: selectEffortVariant(level, input.model) ?? null,
           reasoningSupported: modelSupportsReasoning(input.model),
           variantLevels: Object.keys(extractModelVariants(input.model) ?? {}),
         })

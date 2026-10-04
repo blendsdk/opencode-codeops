@@ -84,6 +84,12 @@ export declare function extractModelVariants(
 /** Check whether a model advertises reasoning support. */
 export declare function modelSupportsReasoning(model: unknown): boolean
 
+/** Choose the model variant key to apply for a requested level. */
+export declare function selectEffortVariant(
+  level: unknown,
+  model: unknown
+): RoutingReasoning | undefined
+
 /** Merge the model's variant options for a level into the request options. */
 export declare function applyEffort(
   options: Record<string, unknown>,

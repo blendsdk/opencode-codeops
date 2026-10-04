@@ -16,19 +16,18 @@ contract consumed by the plugin and the skills. It is advisory by design and nev
 | `high` | Correctness- or security-sensitive, cross-cutting, or planning/review work | Requirements, planning, correctness/security review, ambiguous implementation |
 | `max` | Adversarial or high-risk analysis where a missed detail is costly | Thorough preflight, complex or sensitive phases |
 
-The four levels are the complete suggestion vocabulary. A level is applied only when the
-runtime model exposes a matching variant, or when the model reports reasoning support but has no
-variant record (the level is then written directly as the provider reasoning option). A level
-the model does not expose leaves the request unchanged and never raises a provider error.
-Routing policy is project configuration, not a suggestion:
-`routing.roles.<agent>.reasoning` may name any value from the provider enum
-(`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`).
+The four levels are the complete suggestion vocabulary. A level is applied through the model's
+own variant record: the exact variant when it exists, otherwise the nearest exposed level on the
+provider scale, with ties resolving to the higher level. `none` stays exact-match only, because
+mapping it to a reasoning level would enable reasoning the caller disabled. When no variant can
+be chosen — or when the model exposes no variants and does not report reasoning support — the
+request is left unchanged, and it never raises a provider error. Routing policy is project
+configuration, not a suggestion: `routing.roles.<agent>.reasoning` may name any value from the
+provider enum (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`).
 
-Not every model exposes every suggestion level. The deepseek flash model in this environment
-exposes `low`, `high`, and `max`, so a `medium` suggestion is skipped there. Confirm the active
-model's set by enabling `CODEOPS_EFFORT_TRACE=1` and reading `variantLevels` on an apply line.
-When writing plans or markers for a model with a reduced set, name an exposed level instead —
-for example `high` where the derivation table would say `medium`, and `low` for mechanical work.
+The deepseek flash model in this environment exposes `low`, `high`, and `max`, so a `medium`
+suggestion resolves to `high` there. Confirm the active model's set by enabling
+`CODEOPS_EFFORT_TRACE=1` and reading `variantLevels` on an apply line.
 
 ## Marker grammar
 
@@ -105,8 +104,8 @@ already records:
 | Docs/config/rename-only phase with deterministic verification | `low` |
 | Any other non-trivial phase | `medium` |
 
-Substitute an exposed level when the target model lacks the suggested one — for the deepseek
-flash set in this environment, `high` replaces `medium`.
+The runtime maps a missing level to the nearest exposed variant, so the four levels remain valid
+suggestions on every reasoning-capable model.
 
 The line is written as `> **Reasoning**: <level> — <one-line reason>`. It is a suggestion: the
 user may edit or delete it, and `exec-plan` never blocks on it. A plan without the line keeps
@@ -144,9 +143,9 @@ forces that level for the whole run, including every dispatch marker composed du
 Set `CODEOPS_EFFORT_TRACE=1` (or `true`) in the environment that starts OpenCode to record what
 the plugin does. One content-free JSON line is appended per marker capture and per request to
 `reasoning-effort-trace.jsonl` inside the session's scratch directory. Lines carry only a
-timestamp, event name, message id, agent name, level, source, and applied flag — never prompt
-text or file content. The trace lives with the rest of the session scratch and is removed with
-it. Tracing is off by default and never affects a request.
+timestamp, event name, message id, agent name, level, source, chosen variant, and applied flag —
+never prompt text or file content. The trace lives with the rest of the session scratch and is
+removed with it. Tracing is off by default and never affects a request.
 
 ## Suggestion-only guarantee
 

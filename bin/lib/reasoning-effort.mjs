@@ -304,18 +304,88 @@ export function modelSupportsReasoning(model) {
 }
 
 /**
+ * Order of provider reasoning levels, weakest to strongest.
+ *
+ * The scale is used only to pick the nearest exposed variant when a model
+ * does not offer the exact requested level.
+ */
+const EFFORT_RANK = Object.freeze({
+  none: 0,
+  minimal: 1,
+  low: 2,
+  medium: 3,
+  high: 4,
+  xhigh: 5,
+  max: 6,
+})
+
+/**
+ * Choose the model variant key to apply for a requested level.
+ *
+ * The exact level wins when the model exposes it. Otherwise the nearest
+ * exposed level on the provider scale is chosen, and ties resolve to the
+ * higher level so ordinary work is never under-powered. `none` is
+ * exact-match only: mapping it to a reasoning level would enable reasoning
+ * the caller explicitly disabled. Keys whose value is not a plain object are
+ * ignored, so a malformed variant can never reach the request options.
+ *
+ * @param level - Requested level (any routing enum value)
+ * @param model - Model object from the hook input
+ * @returns The variant key to apply, or `undefined` when none applies
+ *
+ * @example
+ * selectEffortVariant("medium", { variants: { low: {}, high: {} } }) // "high"
+ */
+export function selectEffortVariant(level, model) {
+  if (!isRoutingReasoning(level)) return undefined
+  const variants = extractModelVariants(model)
+  if (variants === undefined) return undefined
+
+  if (level === "none") {
+    return isPlainObject(variants.none) ? "none" : undefined
+  }
+
+  const candidates = Object.keys(variants).filter(
+    (key) =>
+      key !== "none" &&
+      Object.prototype.hasOwnProperty.call(EFFORT_RANK, key) &&
+      isPlainObject(variants[key])
+  )
+  if (candidates.includes(level)) return level
+
+  let best
+  for (const key of candidates) {
+    if (best === undefined) {
+      best = key
+      continue
+    }
+    const distance = Math.abs(EFFORT_RANK[key] - EFFORT_RANK[level])
+    const bestDistance = Math.abs(EFFORT_RANK[best] - EFFORT_RANK[level])
+    if (
+      distance < bestDistance ||
+      (distance === bestDistance && EFFORT_RANK[key] > EFFORT_RANK[best])
+    ) {
+      best = key
+    }
+  }
+  return best
+}
+
+/**
  * Merge the model's variant options for a level into the request options.
  *
  * The runtime model carries a `variants` record whose entries are the exact
  * provider options for each level (for example `reasoningEffort`, or a nested
  * `reasoning.effort`). This function is the only place that mapping is
- * consumed, so the plugin never hardcodes a provider key. A matching variant
- * is applied even when the model's reasoning capability flag is absent or
- * false: the variant itself is the provider-known option set, and the host
- * applies inherited variants the same way. Only when no variants record
- * exists does the documented `reasoningEffort` passthrough require an
- * explicit reasoning capability. The function is pure: it returns a new
- * object when a change applies and the original object reference otherwise.
+ * consumed, so the plugin never hardcodes a provider key. The applied key is
+ * chosen by {@link selectEffortVariant}: exact match first, then the nearest
+ * exposed level. A matching variant applies even when the model's reasoning
+ * capability flag is absent or false, because the variant itself is the
+ * provider-known option set and the host applies inherited variants the same
+ * way. Only when no variants record exists does the documented
+ * `reasoningEffort` passthrough require an explicit reasoning capability. The
+ * function is pure: it returns a new object when a change applies and the
+ * original object reference otherwise.
  *
  * @param options - Current provider options
  * @param level - Candidate level from {@link resolveEffort}
@@ -327,10 +397,9 @@ export function applyEffort(options, level, model) {
 
   const variants = extractModelVariants(model)
   if (variants !== undefined) {
-    if (!Object.prototype.hasOwnProperty.call(variants, level)) return options
-    const variantOptions = variants[level]
-    if (!isPlainObject(variantOptions)) return options
-    return deepMergePlain(options, variantOptions)
+    const variantKey = selectEffortVariant(level, model)
+    if (variantKey === undefined) return options
+    return deepMergePlain(options, variants[variantKey])
   }
 
   if (!modelSupportsReasoning(model)) return options
