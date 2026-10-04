@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 1.10.1 — 2026-10-04
+
+### Features
+
+- effort: add opt-in applied-level trace
+
 ## 1.10.0 — 2026-10-04
 
 ### Documentation
