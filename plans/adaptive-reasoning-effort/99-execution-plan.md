@@ -99,7 +99,7 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 
 ## Phase 2: Session helper and plugin runtime
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill)_
+> **Phase baseline tree**: `bebf78cbb7383a1cd3dbe8c99595800971c94763` (strict scope)
 > **Expected modification set** (strict scope): `scripts/effort.spec.test.mjs`,
 > `scripts/reasoning-effort-content.spec.test.mjs`, `scripts/codeops_effort.py`, `plugin/index.ts`,
 > and this plan's progress marks.
@@ -109,18 +109,18 @@ task-size criteria in [quality-checklist.md](../../skills/make-plan/quality-chec
 **Reference**: [03-02](03-02-plugin-runtime-override.md) §CLI helper, §Plugin wiring · AR #5, #11, #15, #16
 **Objective**: Pin the CLI commands, validation exits, path safety, and plugin hook presence before implementing them.
 
-- [ ] 2.1.1 Write CLI specification tests ST-20 … ST-23 — `scripts/effort.spec.test.mjs` (spawn `python3` with an overridden `TMPDIR`)
-- [ ] 2.1.2 Append the plugin wiring content guard ST-25 to `scripts/reasoning-effort-content.spec.test.mjs`
-- [ ] 2.1.3 Run the tests and verify they FAIL (red phase)
+- [x] 2.1.1 Write CLI specification tests ST-20 … ST-23 — `scripts/effort.spec.test.mjs` (spawn `python3` with an overridden `TMPDIR`) ✅ (completed: 2026-10-04 12:53)
+- [x] 2.1.2 Append the plugin wiring content guard ST-25 to `scripts/reasoning-effort-content.spec.test.mjs` ✅ (completed: 2026-10-04 12:54)
+- [x] 2.1.3 Run the tests and verify they FAIL (red phase) ✅ (completed: 2026-10-04 12:55)
 
 ### Step 2.2: Implementation
 
 **Reference**: [03-02](03-02-plugin-runtime-override.md) §Plugin wiring, §Session state file, §Failure handling · AR #3, #10, #11, #15, #16
 **Objective**: Implement the atomic session-state CLI and wire the two plugin hooks with fail-open behavior.
 
-- [ ] 2.2.1 Implement `scripts/codeops_effort.py` (set/clear/status, level allowlist, temp-root path guard, atomic temp-file + `os.replace`)
-- [ ] 2.2.2 Wire `plugin/index.ts`: `chat.message` captures the marker into a session-keyed map; `chat.params` resolves marker → session file → routing config and applies via `applyEffort`; `session.deleted` clears marker entries; every hook body catches and logs a content-free warning
-- [ ] 2.2.3 Run the tests and verify they PASS (green phase), including `npx tsc --noEmit`
+- [x] 2.2.1 Implement `scripts/codeops_effort.py` (set/clear/status, level allowlist, temp-root path guard, atomic temp-file + `os.replace`) ✅ (completed: 2026-10-04 12:56)
+- [x] 2.2.2 Wire `plugin/index.ts`: `chat.message` captures the marker into a session-keyed map; `chat.params` resolves marker → session file → routing config and applies via `applyEffort`; `session.deleted` clears marker entries; every hook body catches and logs a content-free warning ✅ (completed: 2026-10-04 12:58)
+- [x] 2.2.3 Run the tests and verify they PASS (green phase), including `npx tsc --noEmit` ✅ (completed: 2026-10-04 13:00)
 
 **Deliverables**:
 - `scripts/codeops_effort.py` performs set/clear/status with the documented exits and no writes outside the CodeOps temp root

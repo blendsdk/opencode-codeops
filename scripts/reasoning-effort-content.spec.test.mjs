@@ -4,8 +4,9 @@
  * These content guards pin the required clauses of the shipped contract
  * document: the schema stamp, the four levels, the marker literal, the
  * precedence chain, the skill table, the derivation signals, and the
- * suggestion-only guarantee. A failure here means the documentation does not
- * satisfy the contract — never that the test is wrong.
+ * suggestion-only guarantee. They also guard the plugin wiring that consumes
+ * the contract. A failure here means the content does not satisfy the
+ * contract — never that the test is wrong.
  *
  * @module reasoning-effort-content.spec.test
  */
@@ -79,5 +80,14 @@ describe("reasoning-effort contract document", () => {
     const content = read(CONTRACT_DOC)
     assert.match(content, /suggestion[- ]only/i)
     assert.match(content, /never (?:a )?gate|no gate/i)
+  })
+})
+
+describe("plugin wiring content", () => {
+  it("registers the chat hooks and imports the reasoning-effort helper", () => {
+    const content = read("plugin/index.ts")
+    assert.match(content, /"chat\.message"/)
+    assert.match(content, /"chat\.params"/)
+    assert.match(content, /reasoning-effort\.mjs/)
   })
 })

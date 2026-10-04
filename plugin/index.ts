@@ -9,6 +9,14 @@ import {
   ensureSessionTmpDir,
   removeSessionTmpDir,
 } from "../bin/lib/tmp-hygiene.mjs"
+import {
+  applyEffort,
+  findEffortMarker,
+  readRoutingReasoning,
+  readSessionEffort,
+  resolveEffort,
+} from "../bin/lib/reasoning-effort.mjs"
+import type { EffortLevel } from "../bin/lib/reasoning-effort.mjs"
 
 // ---------------------------------------------------------------------------
 // Package root — resolved at module load time so it is always the plugin's
@@ -138,10 +146,43 @@ async function warnOnVersionSkew(
 }
 
 // ---------------------------------------------------------------------------
+// Helper — log one content-free warning. Logging is best effort: a failed log
+// must never break a request.
+// ---------------------------------------------------------------------------
+async function warnContentFree(
+  client: Parameters<Plugin>[0]["client"],
+  message: string
+): Promise<void> {
+  try {
+    await client.app.log({ body: { service: "codeops", level: "warn", message } })
+  } catch {
+    // Best effort only.
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Helper — read the project routing config fresh on every request, so an edit
+// applies without restarting the session. Any failure means "no routing".
+// ---------------------------------------------------------------------------
+function readRoutingConfig(directory: string): unknown {
+  try {
+    return JSON.parse(readFileSync(join(directory, "codeops", "codeops.json"), "utf8"))
+  } catch {
+    return {}
+  }
+}
+
+// ---------------------------------------------------------------------------
 // CodeOps plugin for OpenCode
 // Replaces: hooks/hooks.json + hook_session_context.sh + hook_marker_guard.sh
 // ---------------------------------------------------------------------------
 export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
+  // Reasoning-effort state lives for the lifetime of this plugin instance:
+  // one entry per user message that carried a dispatch marker, plus a
+  // deduplication set for unsupported-level warnings.
+  const effortMarkers = new Map<string, { sessionID: string; level: EffortLevel }>()
+  const warnedEffortLevels = new Set<string>()
+
   return {
     // -----------------------------------------------------------------------
     // Hook 1 & 2: inject standards on session.created and session.compacted.
@@ -160,6 +201,13 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
       } else if (event.type === "session.deleted") {
         const info = (event.properties as { info: { id: string } }).info
         removeSessionTmpDir(info.id)
+        try {
+          for (const [messageID, entry] of effortMarkers) {
+            if (entry.sessionID === info.id) effortMarkers.delete(messageID)
+          }
+        } catch {
+          // Best effort: cleanup must never break session deletion.
+        }
       } else if (event.type === "session.compacted") {
         const sessionId: string = (event.properties as { sessionID: string }).sessionID
         await injectStandards(client, sessionId)
@@ -216,6 +264,60 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
             "owned by setup-codeops. Edit it only through the setup/migration " +
             "workflow (run the setup-codeops skill).\n"
         )
+      }
+    },
+
+    // -----------------------------------------------------------------------
+    // Hook 6: capture a dispatch marker from an incoming user message. The
+    // marker travels in the dispatch packet text; storing it by message id
+    // lets the later chat.params hook apply it to the same request.
+    // -----------------------------------------------------------------------
+    "chat.message": async (input, output) => {
+      try {
+        const texts = output.parts.map((part) =>
+          part.type === "text" ? part.text : undefined
+        )
+        const level = findEffortMarker(texts)
+        if (level !== undefined) {
+          effortMarkers.set(output.message.id, { sessionID: input.sessionID, level })
+        }
+      } catch {
+        await warnContentFree(client, "Could not scan a message for a reasoning-effort marker.")
+      }
+    },
+
+    // -----------------------------------------------------------------------
+    // Hook 7: resolve the request's reasoning level (dispatch marker, then
+    // session flag, then routing default) and merge the model's own variant
+    // options. Any failure leaves the request unchanged.
+    // -----------------------------------------------------------------------
+    "chat.params": async (input, output) => {
+      try {
+        const stored = effortMarkers.get(input.message.id)
+        const marker = stored && stored.sessionID === input.sessionID ? stored.level : undefined
+        const session = readSessionEffort(input.sessionID)
+        const routing = readRoutingReasoning(readRoutingConfig(directory), input.agent)
+        const level = resolveEffort({ marker, session, routing })
+        if (level === undefined) return
+
+        const applied = applyEffort(output.options, level, input.model)
+        if (applied === output.options) {
+          if (marker !== undefined) {
+            const warningKey = `${input.sessionID}:${marker}`
+            if (!warnedEffortLevels.has(warningKey)) {
+              warnedEffortLevels.add(warningKey)
+              await warnContentFree(
+                client,
+                `Reasoning effort ${marker} is not available for agent ${input.agent}; ` +
+                  "request left unchanged."
+              )
+            }
+          }
+          return
+        }
+        output.options = applied
+      } catch {
+        await warnContentFree(client, "Could not apply a reasoning-effort level to a request.")
       }
     },
   }
