@@ -1,7 +1,7 @@
 # Ambiguity Register: Specialist Agents
 
-> **Status**: ✅ GATE PASSED — all 26 items resolved (AR #25 and #26 added and resolved at execution time)
-> **Last Updated**: 2026-10-04 01:12
+> **Status**: ✅ GATE PASSED — all 27 items resolved (AR #25, #26, #27 added and resolved at execution time)
+> **Last Updated**: 2026-10-04 02:44
 
 | # | Category | Ambiguity / Gap | Options Presented | User Decision | Status |
 |---|----------|-----------------|-------------------|---------------|--------|
@@ -31,6 +31,7 @@
 | 24 | Scope | Detection budget: at most two specialist candidates per requirements set or plan | Record as a resolved decision / remove the budget | At most two candidates per requirements set or plan, proposed in one batch; recorded during preflight (PF-012) | ✅ Resolved — User accepted recommendation (preflight PF-012) |
 | 25 | Technical (runtime) | ST-42's oracle requires the refactored generator's catalog output to be byte-identical to `agents/executor.md`, but the pre-refactor generator never reproduced that file: `agent-templates/plan-task-executor.md` has no YAML frontmatter description (fallback text) and carries a provenance comment absent from `agents/executor.md` (`git log`: both landed in the v1.2.0 port). Satisfying the literal oracle would change catalog generation, which R5 and AC #6 forbid. | A: capture the pre-refactor catalog output as a committed golden fixture and compare against it (recommended) · B: fix the generator to reproduce `agents/*.md` (changes catalog behavior; violates R5/AC #6) · C: drop the ST-42 regression guard | Option A — golden fixture `scripts/fixtures/catalog-executor.golden.md` captured from the pre-refactor generator; ST-42 amended to compare against it | ✅ Resolved — User chose golden fixture |
 | 26 | Technical (runtime) | Phase 2 review RV-1: the sanitizer's spec wording in `03-02` ("collapse once, then remove markers") did not actually reach a fixed point when marker removal leaves double spaces; the implementation was corrected and the spec wording needed the matching correction during the phase | Keep the stale wording / correct the spec wording to the true fixed-point pass | The wording was corrected as a necessary correction belonging to the sanitizer fix; the path is added to the Phase 2 expected modification set | ✅ Resolved — necessary correction, recorded after the fact |
+| 27 | Technical (runtime) | ST-35 assumed OpenCode loads project agents only at session start, so an agent created mid-session would be unavailable. In the tested OpenCode build, a session started before `pg-migration-reviewer` existed dispatched it natively after it was created (session `ses_efba8900`, fixture `/tmp/opencode/specialist-acceptance-fallback`; "native dispatch, fallback not needed"). The "for example created after session start" example in R7/03-03/README/`_shared` is wrong for this version; the fallback requirement itself stands. | A: correct the availability wording everywhere and test fallback by a genuinely missing agent (recommended) · B: keep the wording, mark ST-35 N/A for this environment · C: adjust only the tests, leave the docs | Option A — availability wording corrected in R7, the Won't-Have note, 03-03, 07 ST-35, README, and `_shared/specialist-agents.md`; ST-35 retriggered by a missing generated agent | ✅ Resolved — User chose docs correction |
 
 ### Resolution Notes
 
@@ -86,6 +87,9 @@ Direct user decision: approved larger — with two challenger-derived trims: (1)
 - AR-21's options were A (catalog-only), B (novel subsystem), and C (OpenCode-generated). The
   challenger's middle alternative was a trimmed catalog-only variant; there is no "option D".
 - AR #24 was added by preflight decision PF-012.
+- AR #27 refines AR-19's availability claim: the tested OpenCode build resolves project agents
+  created mid-session, so the "next session" wording was removed; dispatch fallback remains for
+  genuinely unavailable specialists (missing file, invalid brief, failed dispatch).
 
 **AR-25 (runtime):** Discovered during Phase 2, task 2.1.1. ST-42 conflates "the refactor leaves
 catalog output unchanged" (the requirement) with "the generator reproduces `agents/executor.md`"

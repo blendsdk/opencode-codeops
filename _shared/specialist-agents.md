@@ -140,6 +140,7 @@ escalation)` entry.
 The authoritative dispatch rules live in `_shared/quality-profile.md` (resolution order, finding
 prefix `SR`, additional-reviewer independence, and dynamic-packet fallback). A specialist
 dispatches only when the plan's `00-index.md` "Specialist Agents" table assigns it to the phase.
-When the agent is unavailable — for example it was created after the session started — dispatch a
-generic subagent with the complete packet, including the brief excerpt, and report the fallback.
-The phase is never marked complete unreviewed because a specialist was missing.
+When the agent is unavailable — for example its generated file is missing, its brief is invalid,
+or a dispatch fails — dispatch a generic subagent with the complete packet, including the brief
+excerpt, and report the fallback. The phase is never marked complete unreviewed because a
+specialist was missing.

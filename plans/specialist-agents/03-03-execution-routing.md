@@ -67,12 +67,13 @@ dispatches none (AR #6, #16).
 
 ### Availability and fallback
 
-- OpenCode discovers agents at startup; an agent created after the session began is not in the
-  session's agent list. Planning-time creation makes specialists available to the execution
-  session (AR #19).
-- When a listed specialist is unavailable, dispatch a generic subagent with the complete packet —
-  including the relevant brief excerpt — or run inline, and report the fallback. The phase is
-  never marked complete unreviewed because a specialist was missing.
+- OpenCode resolves project agents from `.opencode/agents/` when a task is dispatched; the tested
+  build discovered an agent created mid-session (no restart needed, AR #27). Availability is still
+  never assumed.
+- When a listed specialist is unavailable — its generated agent is missing, its brief is invalid,
+  or a dispatch fails — dispatch a generic subagent with the complete packet, including the
+  relevant brief excerpt, or run inline, and report the fallback. The phase is never marked
+  complete unreviewed because a specialist was missing.
 - `--check` remains the source of truth for whether the generated agent exists and matches its
   brief.
 

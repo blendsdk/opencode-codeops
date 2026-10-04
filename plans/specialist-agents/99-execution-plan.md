@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-04 00:52
-> **Progress**: 37/41 tasks (90%)
+> **Progress**: 39/41 tasks (95%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -229,9 +229,25 @@ results are owned by the user and block Phase 5 completion until recorded.
 > re-run, so no `SR-NNN` items were triggered. The generated agent carries
 > `reasoningEffort: max` and the active model accepted it (no override recorded). Standard gate
 > (correctness review + verify) ran unchanged.
-- [ ] 4.3.2 Execute manual scenario ST-35 (session started before creation; confirm fallback and reporting) and record the result in this plan
+- [x] 4.3.2 Execute manual scenario ST-35 (session started before creation; confirm fallback and reporting) and record the result in this plan ✅ (completed: 2026-10-04 02:52)
+
+> **ST-35 evidence (AR #27 correction; fixture `/tmp/opencode/specialist-acceptance-fallback`):**
+> The original trigger ("agent created after session start") did not reproduce: the tested OpenCode
+> build dispatched the mid-session-created specialist natively. AR #27 corrected the availability
+> wording and re-triggered the scenario with the generated agent file genuinely missing (brief
+> kept). The phase review then reported: "**Fallback applied** (generated agent file missing) →
+> generic subagent + complete domain-specialist-reviewer packet incl. brief excerpt; No findings",
+> and the review completed with the correctness reviewer in parallel.
 - [ ] 4.3.3 Execute manual scenario ST-43 (negative detection outcome and the two-candidate cap) and record the result in this plan
-- [ ] 4.3.4 Execute manual scenario ST-44 (gap-bearing project: CodeOps asks for approval through the gate, then `setup-routing` creates the specialist; nothing is created before approval) and record the result in this plan
+- [x] 4.3.4 Execute manual scenario ST-44 (gap-bearing project: CodeOps asks for approval through the gate, then `setup-routing` creates the specialist; nothing is created before approval) and record the result in this plan ✅ (completed: 2026-10-04 02:36)
+
+> **ST-44 evidence (sessions `ses_efbb29b00ffeat8tEnVrTn2RI9` + headless continuation; fixture `/tmp/opencode/specialist-create-demo`):**
+> The gap check produced a candidate, dispatched the blind `design-challenger` (verdict `Simplify`),
+> and wrote **nothing** while unapproved. After the user overruled the verdict and approved (their
+> instruction in this conversation; recorded in the transcript), the escalation packet and brief
+> were presented and `setup-routing` created the specialist: brief
+> `codeops/specialists/dual-grammar-reviewer.md`, routing defaults, generated agent, AGENTS.md
+> managed block, and `--check` clean for the custom role. Nothing existed before the approval.
 - [ ] 4.3.5 Full verification
 
 **Deliverables**:

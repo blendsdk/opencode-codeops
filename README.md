@@ -168,9 +168,10 @@ only with your explicit approval — the `--auto-design` mode cannot approve the
   listed specialists are dispatched as **additional** reviewers or executors: they never replace a
   required reviewer or gate, reviewer findings use the `SR-NNN` prefix, and the generated agent
   defaults to `reasoningEffort: max` (override it with `routing.roles.<role>.reasoning`).
-- **Fallback** — OpenCode loads agents at startup, so a specialist created during a session becomes
-  available in the next one; while unavailable, dispatch falls back to a generic subagent carrying
-  the brief excerpt and reports the fallback. No review depends on a specialist existing.
+- **Fallback** — a specialist is available as soon as its generated agent exists; OpenCode's
+  discovery timing is whatever your build provides. If it is missing, invalid, or a dispatch fails,
+  dispatch falls back to a generic subagent carrying the brief excerpt and reports the fallback.
+  No review depends on a specialist existing.
 
 Lifecycle checks: `--check` reports `INVALID`, `MISSING`, `STALE`, `ORPHAN`, `HAND-AUTHORED`, and
 `AGENTS.md` states; `--remove-custom <role> --yes` deletes the generated agent and its brief and

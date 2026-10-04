@@ -56,8 +56,9 @@ document.
 - [ ] **R7 — Execution use.** A plan's `00-index.md` "Specialist Agents" table maps a role to
   phases/use. `exec-plan` dispatches a listed specialist as an additional reviewer or executor;
   specialist reviewer findings use the `SR-NNN` prefix; a specialist never replaces a required
-  reviewer or gate. When the agent is unavailable (for example created after session start),
-  dispatch falls back to a generic subagent carrying the brief excerpt and reports the fallback.
+  reviewer or gate. When the agent is unavailable (for example its generated file is missing, its
+  brief is invalid, or a dispatch fails), dispatch falls back to a generic subagent carrying the
+  brief excerpt and reports the fallback.
   (AR #16)
 - [ ] **R8 — Lifecycle.** `--check` reports missing, stale (re-render mismatch), orphaned,
   invalid-brief, and hand-authored-collision states. `--remove-custom <role> --yes` deletes the
@@ -90,7 +91,8 @@ document.
   `setup-routing`. (AR #3, AR #6)
 - Any creation without explicit user approval. (AR #4)
 - Changing reasoning defaults for the twelve catalog roles. (AR #10)
-- Hot-reload support for newly created agents; OpenCode loads agents at startup. (AR #19)
+- Hot-reload machinery beyond OpenCode's native agent discovery; availability follows whatever the
+  running OpenCode build provides. (AR #19, AR #27)
 - A second agent registry; `codeops/specialists/` and `codeops.json` are the only owners. (AR #3)
 
 ## Technical Requirements
