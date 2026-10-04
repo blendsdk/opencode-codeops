@@ -275,7 +275,7 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
     "chat.message": async (input, output) => {
       try {
         const texts = output.parts.map((part) =>
-          part.type === "text" ? part.text : undefined
+          part?.type === "text" ? part.text : undefined
         )
         const level = findEffortMarker(texts)
         if (level !== undefined) {
