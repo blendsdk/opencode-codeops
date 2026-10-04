@@ -2,6 +2,33 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 1.8.0 — 2026-10-04
+
+### Documentation
+
+- readme: document project specialists
+- skills: wire specialist agents into planning and execution
+- specialist-agents: add canonical protocol and content spec tests
+- plan: add specialist-agents plan set and roadmap
+
+### Fixes
+
+- installer: refuse a symlinked codeops parent in migration
+- installer: harden removal and migration per phase-3 review
+- installer: harden specialist generation per phase-2 review
+- test: strengthen specialist content oracle per phase-1 review
+
+### Features
+
+- installer: add migration guard and lifecycle coverage
+- installer: add specialist check, removal, and AGENTS.md sync
+- installer: generate specialist agents from project briefs
+
+### Tests
+
+- installer: lock the routing sandbox enum per re-review observation
+- installer: cover sanitizer fixed point and parser edge cases
+
 ## 1.7.1 — 2026-09-24
 
 ### Fixes
