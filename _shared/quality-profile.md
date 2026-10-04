@@ -13,7 +13,7 @@ Quality and routing configuration lives in `codeops/codeops.json`, validated aga
 configuration.
 
 The quality section controls independent review and stop conditions. The routing section controls
-optional roles, effort, model pins, sandboxes, and concurrency. Domain/risk tags in the active
+optional roles, effort, reasoning, model pins, sandboxes, and concurrency. Domain/risk tags in the active
 specification select additional reviewer roles. Outcome metrics are disabled unless
 `metrics.enabled` is explicitly `true`.
 

@@ -112,8 +112,8 @@ Creation (after the user approves a candidate, AR #4, #21):
    makes the agent immediately stale (PF-019).
 3. Run `python3 "${CODEOPS_PLUGIN_ROOT}/scripts/install_agents.py" --project . --custom <role>`.
 4. Run `--sync-agents-md` to update the managed block.
-5. Run `--check` last and report states; tell the user the agent is available from the next
-   OpenCode session.
+5. Run `--check` last and report states; tell the user the agent is available as soon as its
+   generated file exists (discovery timing follows the running OpenCode build, AR #27).
 
 Removal: confirm, run `--remove-custom <role> --yes` (which deletes agent + brief and triggers the
 AGENTS.md sync), remove the routing entry, warn when an active plan references the role, and report

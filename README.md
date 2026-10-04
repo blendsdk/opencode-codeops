@@ -179,8 +179,8 @@ updates the index.
 
 > **Upgrading:** specialist agents embed the generic template contract. When a newer plugin changes
 > those templates, `--check` reports the agent as `STALE`; re-run
-> `python3 scripts/install_agents.py --project . --custom <role>` (then `--sync-agents-md`) to
-> regenerate it.
+> `python3 "${CODEOPS_PLUGIN_ROOT}/scripts/install_agents.py" --project . --custom <role>` (then
+> `--sync-agents-md`) to regenerate it.
 
 ## Requirements
 

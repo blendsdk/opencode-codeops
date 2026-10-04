@@ -138,8 +138,20 @@ describe("ST-32 specialist wiring and routing content", () => {
 
   it("points exec-plan at the specialist routing rules", () => {
     assert.match(read("skills/exec-plan/SKILL.md"), /[Ss]pecialist/)
+    assert.match(read("skills/exec-plan/SKILL.md"), /quality-profile\.md/)
     assert.match(read("skills/exec-plan/execution-protocol.md"), /[Ss]pecialist/)
     assert.match(read("skills/exec-plan/execution-protocol.md"), /SR/)
+    assert.match(read("skills/exec-plan/execution-protocol.md"), /quality-profile\.md/)
+  })
+
+  it("does not promise next-session agent availability", () => {
+    for (const file of ["skills/setup-routing/SKILL.md", "_shared/specialist-agents.md", "README.md"]) {
+      assert.doesNotMatch(
+        read(file),
+        /next\s+(OpenCode\s+)?session/i,
+        `${file} must not promise next-session availability`,
+      )
+    }
   })
 
   it("updates the setup-routing AGENTS.md stance and documents the managed block", () => {

@@ -5,8 +5,9 @@
 This is the **single canonical definition** of project-specific specialist subagents: how a
 capability gap is detected, how a candidate is proposed and approved, and how the specialist is
 created, used, and retired. It lives at the plugin root in `_shared/`; the participating skills
-(`make-requirements`, `make-plan`, `analyze-project`, `setup-routing`, `exec-plan`) link here
-instead of carrying copies.
+(`make-requirements`, `make-plan`, `analyze-project`, `setup-routing`) link here instead of
+carrying copies. `exec-plan` dispatches per `_shared/quality-profile.md`, which owns the
+dispatch, independence, and fallback rules.
 
 A specialist is a project-local agent that carries durable domain knowledge a generic catalog role
 does not have. Routing is an optimization and a context mechanism, **never a correctness source**.

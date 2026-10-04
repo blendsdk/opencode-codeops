@@ -90,7 +90,7 @@ Creation, after approval:
 2. Write `routing.roles.<role>` policy first when a model/effort/sandbox/reasoning override is needed: routing wins over the brief, and a policy written later makes the generated agent immediately stale.
 3. Generate the agent: `python3 "${CODEOPS_PLUGIN_ROOT}/scripts/install_agents.py" --project . --custom <role>`.
 4. Sync the index: `... --sync-agents-md`.
-5. Verify last with `... --check`, then tell the user the agent is available from the next OpenCode session.
+5. Verify last with `... --check`, then tell the user the agent is available as soon as its generated file exists (discovery timing follows the running OpenCode build).
 
 Removal: confirm, run `--remove-custom <role> --yes` (it deletes the agent and brief and syncs the index), drop the routing entry, warn when an active plan references the role, and report that `exec-plan` will fall back to a dynamic packet.
 

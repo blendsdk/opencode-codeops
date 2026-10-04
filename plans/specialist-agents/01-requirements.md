@@ -121,7 +121,8 @@ document.
   migration must not move or reject it (`scripts/codeops-migrate.sh:102-106,134-152`), and it must
   preserve or refuse an existing `codeops/codeops.json` instead of overwriting it
   (`scripts/codeops-migrate.sh:297`; PF-013).
-- OpenCode current release; agents load at startup, so availability is next-session. (AR #19)
+- OpenCode current release; availability follows the running build's agent discovery — the tested
+  build resolves agents created mid-session, so no restart is promised or required. (AR #19, AR #27)
 - Python 3.8+ and Node 18+ (existing repository requirements); no new runtime dependency.
   `scripts/install_agents.py` gains the sibling scripts' `from __future__ import annotations` so
   the documented 3.8 floor stays true. (PF-024)

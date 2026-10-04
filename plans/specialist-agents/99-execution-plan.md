@@ -229,7 +229,7 @@ results are owned by the user and block Phase 5 completion until recorded.
 > re-run, so no `SR-NNN` items were triggered. The generated agent carries
 > `reasoningEffort: max` and the active model accepted it (no override recorded). Standard gate
 > (correctness review + verify) ran unchanged.
-- [x] 4.3.2 Execute manual scenario ST-35 (session started before creation; confirm fallback and reporting) and record the result in this plan ✅ (completed: 2026-10-04 02:52)
+- [x] 4.3.2 Execute manual scenario ST-35 (generated agent missing while the plan lists it; confirm fallback and reporting) and record the result in this plan ✅ (completed: 2026-10-04 02:52)
 
 > **ST-35 evidence (AR #27 correction; fixture `/tmp/opencode/specialist-acceptance-fallback`):**
 > The original trigger ("agent created after session start") did not reproduce: the tested OpenCode
@@ -283,7 +283,7 @@ results are owned by the user and block Phase 5 completion until recorded.
 **Phase 5 checklist result:** completeness, granularity, dependencies, testing,
 specification-first ordering, no-dead-code, security-first, zero-ambiguity, execution-plan
 completeness, reference-don't-restate, and format blocks all verified against the executed plan.
-`npm run verify` passing (169 tests); plan parser `Executing, 40 tasks, no problems`; roadmap sync
+`npm run verify` passing (169 tests); plan parser `Done, 41 tasks, no problems`; roadmap sync
 check clean.
 
 **Deliverables**:
@@ -303,6 +303,7 @@ Review evidence lives here; severities follow the preflight scale.
 | ----- | ----------- | -------- | ------- | -------- |
 | 1 | correctness-reviewer (strict defaults) | RV-1…RV-3 🟡 minor, RV-4…RV-5 🔵 observation | RV-1…RV-4 fixed as a follow-up commit; RV-5 is a forward reference landed by ST-32 in Phase 4 | phase diff vs `187e0be`; `npm run verify` 92 tests |
 | 2 | correctness-reviewer + security-auditor (strict defaults; security selected) | SA-001…SA-002 🟠 major, SA-003…SA-007 🟡 minor, RV-1…RV-7 🟡/🔵 | User ruled 2026-10-04: SA-001 full containment fix, SA-002 validate+escape. Fixes applied for SA-001/002/004/005/006/007 and RV-2…RV-7; SA-003 declined (body markers are inert — confirmed by re-review; stripping would destroy legitimate Markdown HTML comments); RV-1 recorded as AR #26. One scoped re-review: all fixes verified, observation SA-R1-001 (sandbox enum test) added | phase diff vs `f44ee8f`; fix diff vs `8f5263e`; `npm run verify` 129 tests |
+| 4/5 | correctness-reviewer (docs-only auditor skip logged) | RV-001 🟠 major, RV-002…RV-006 🟡 minor | User ruled 2026-10-04: complete the AR #27 availability correction with a regression assertion and apply the five minors. Fixes applied; one scoped re-review dispatched | phase diff vs `2b92d44` (release artifacts excluded); `npm run verify` 169 tests |
 | 3 | correctness-reviewer + security-auditor (strict defaults; security selected) | SA-001/RV-001 🟠 major (convergent); SA-002…SA-005 🟡/🔵; RV-002…RV-009 🟡 | User ruled 2026-10-04: SA-001 full containment fix. Fixes applied: removal parent-directory containment, migration refusal for symlinked/non-regular write targets, decode-safe marker check, invalid-brief orphan suppression, symlinked-AGENTS.md `STALE` state, dominant-newline handling, single blank-line separator, malformed-line message redaction, and the missing test pins (ST-21, PF-022 abort, trailing blank line, mixed endings, migration symlink). SA-005 declined (per-brief caps and a bounded 15-entry block; inputs are project-owned files). One scoped re-review verified every fix and reported SA-R3-001 (same-class residual: symlinked `codeops` parent redirects the migration); user ruled to fold the guard + test now — re-review scope closed without a third pass | phase diff vs `3014e72`; fix diff vs `5497e6a`; `npm run verify` 163 tests |
 
 ## Dependencies
