@@ -57,6 +57,19 @@ export declare function readSessionEffort(
   base?: string
 ): EffortLevel | undefined
 
+/** Check whether the optional trace environment switch is on. */
+export declare function isEffortTraceEnabled(value: unknown): boolean
+
+/** Compute the trace-file path inside the session temp directory. */
+export declare function sessionEffortTracePath(sessionID?: string, base?: string): string
+
+/** Append one content-free trace entry to the session trace file. */
+export declare function appendEffortTrace(
+  sessionID: string | undefined,
+  entry: unknown,
+  base?: string
+): boolean
+
 /** Read an agent's explicit reasoning entry from the project routing config. */
 export declare function readRoutingReasoning(
   config: unknown,

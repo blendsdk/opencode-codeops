@@ -126,6 +126,15 @@ Semantics:
 For `exec-plan`, a bare flag follows each phase's suggestion, while `--auto-effort=<level>`
 forces that level for the whole run, including every dispatch marker composed during it.
 
+## Optional tracing
+
+Set `CODEOPS_EFFORT_TRACE=1` (or `true`) in the environment that starts OpenCode to record what
+the plugin does. One content-free JSON line is appended per marker capture and per request to
+`reasoning-effort-trace.jsonl` inside the session's scratch directory. Lines carry only a
+timestamp, event name, message id, agent name, level, source, and applied flag — never prompt
+text or file content. The trace lives with the rest of the session scratch and is removed with
+it. Tracing is off by default and never affects a request.
+
 ## Suggestion-only guarantee
 
 | Allowed | Forbidden |

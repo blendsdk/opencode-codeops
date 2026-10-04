@@ -10,8 +10,12 @@ import {
   removeSessionTmpDir,
 } from "../bin/lib/tmp-hygiene.mjs"
 import {
+  appendEffortTrace,
   applyEffort,
   findEffortMarker,
+  isEffortLevel,
+  isEffortTraceEnabled,
+  isRoutingReasoning,
   readRoutingReasoning,
   readSessionEffort,
   resolveEffort,
@@ -173,6 +177,20 @@ function readRoutingConfig(directory: string): unknown {
 }
 
 // ---------------------------------------------------------------------------
+// Helper — append one content-free trace line when the optional
+// CODEOPS_EFFORT_TRACE switch is on. Tracing is diagnostic only: it never
+// affects a request and swallows its own failures.
+// ---------------------------------------------------------------------------
+function traceEffort(
+  enabled: boolean,
+  sessionID: string,
+  entry: Record<string, unknown>
+): void {
+  if (!enabled) return
+  appendEffortTrace(sessionID, { ts: new Date().toISOString(), ...entry })
+}
+
+// ---------------------------------------------------------------------------
 // CodeOps plugin for OpenCode
 // Replaces: hooks/hooks.json + hook_session_context.sh + hook_marker_guard.sh
 // ---------------------------------------------------------------------------
@@ -182,6 +200,7 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
   // deduplication set for unsupported-level warnings.
   const effortMarkers = new Map<string, { sessionID: string; level: EffortLevel }>()
   const warnedEffortLevels = new Set<string>()
+  const effortTraceEnabled = isEffortTraceEnabled(process.env.CODEOPS_EFFORT_TRACE)
 
   return {
     // -----------------------------------------------------------------------
@@ -280,6 +299,11 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
         const level = findEffortMarker(texts)
         if (level !== undefined) {
           effortMarkers.set(output.message.id, { sessionID: input.sessionID, level })
+          traceEffort(effortTraceEnabled, input.sessionID, {
+            event: "capture",
+            messageID: output.message.id,
+            level,
+          })
         }
       } catch {
         await warnContentFree(client, "Could not scan a message for a reasoning-effort marker.")
@@ -298,10 +322,36 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
         const session = readSessionEffort(input.sessionID)
         const routing = readRoutingReasoning(readRoutingConfig(directory), input.agent)
         const level = resolveEffort({ marker, session, routing })
-        if (level === undefined) return
+        const source = isEffortLevel(marker)
+          ? "marker"
+          : isEffortLevel(session)
+            ? "session"
+            : isRoutingReasoning(routing)
+              ? "routing"
+              : "none"
+        if (level === undefined) {
+          traceEffort(effortTraceEnabled, input.sessionID, {
+            event: "apply",
+            messageID: input.message.id,
+            agent: input.agent,
+            level: null,
+            source,
+            applied: false,
+          })
+          return
+        }
 
         const applied = applyEffort(output.options, level, input.model)
-        if (applied === output.options) {
+        const changed = applied !== output.options
+        traceEffort(effortTraceEnabled, input.sessionID, {
+          event: "apply",
+          messageID: input.message.id,
+          agent: input.agent,
+          level,
+          source,
+          applied: changed,
+        })
+        if (!changed) {
           if (marker !== undefined) {
             const warningKey = `${input.sessionID}:${marker}`
             if (!warnedEffortLevels.has(warningKey)) {

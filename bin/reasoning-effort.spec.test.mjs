@@ -15,18 +15,21 @@
  */
 
 import assert from "node:assert/strict"
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
 import { after, describe, it } from "node:test"
 
 import {
+  appendEffortTrace,
   applyEffort,
   findEffortMarker,
+  isEffortTraceEnabled,
   readRoutingReasoning,
   readSessionEffort,
   resolveEffort,
   sessionEffortPath,
+  sessionEffortTracePath,
 } from "./lib/reasoning-effort.mjs"
 
 /** Throwaway base directories created by the tests, removed afterward. */
@@ -252,5 +255,47 @@ describe("session state file", () => {
 
     writeState(base, "ses_bad_level", { schema: 1, reasoning: "extreme" })
     assert.equal(readSessionEffort("ses_bad_level", base), undefined)
+  })
+})
+
+describe("effort trace", () => {
+  it("should enable tracing only for the documented environment values", () => {
+    assert.equal(isEffortTraceEnabled("1"), true)
+    assert.equal(isEffortTraceEnabled("true"), true)
+    assert.equal(isEffortTraceEnabled("TRUE"), true)
+    assert.equal(isEffortTraceEnabled("0"), false)
+    assert.equal(isEffortTraceEnabled("false"), false)
+    assert.equal(isEffortTraceEnabled(""), false)
+    assert.equal(isEffortTraceEnabled(undefined), false)
+    assert.equal(isEffortTraceEnabled(1), false)
+  })
+
+  it("should append one JSON line per entry inside the session trace file", () => {
+    const base = makeBase()
+    assert.equal(
+      appendEffortTrace("ses_trace", { event: "capture", level: "low" }, base),
+      true
+    )
+    assert.equal(
+      appendEffortTrace("ses_trace", { event: "apply", level: "medium", applied: true }, base),
+      true
+    )
+
+    const path = sessionEffortTracePath("ses_trace", base)
+    assert.ok(path.endsWith(join("ses_trace", "reasoning-effort-trace.jsonl")))
+    const lines = readFileSync(path, "utf-8").trim().split("\n")
+    assert.equal(lines.length, 2)
+    assert.equal(JSON.parse(lines[0]).event, "capture")
+    assert.equal(JSON.parse(lines[0]).level, "low")
+    assert.equal(JSON.parse(lines[1]).event, "apply")
+    assert.equal(JSON.parse(lines[1]).applied, true)
+  })
+
+  it("should return false without throwing when the trace path cannot be written", () => {
+    const base = makeBase()
+    const blocked = dirname(sessionEffortTracePath("ses_blocked", base))
+    mkdirSync(dirname(blocked), { recursive: true })
+    writeFileSync(blocked, "not a directory", "utf-8")
+    assert.equal(appendEffortTrace("ses_blocked", { event: "apply" }, base), false)
   })
 })

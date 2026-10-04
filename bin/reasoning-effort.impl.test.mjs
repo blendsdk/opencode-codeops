@@ -17,6 +17,7 @@ import { dirname, join } from "node:path"
 import { after, describe, it } from "node:test"
 
 import {
+  appendEffortTrace,
   applyEffort,
   deepMergePlain,
   extractModelVariants,
@@ -26,6 +27,7 @@ import {
   readSessionEffort,
   resolveEffort,
   sessionEffortPath,
+  sessionEffortTracePath,
 } from "./lib/reasoning-effort.mjs"
 
 /** Throwaway base directories created by the tests, removed afterward. */
@@ -224,6 +226,24 @@ describe("resolveEffort input tolerance", () => {
     assert.equal(resolveEffort("marker"), undefined)
     assert.equal(resolveEffort([]), undefined)
     assert.equal(resolveEffort(), undefined)
+  })
+})
+
+describe("appendEffortTrace internals", () => {
+  it("should not mutate the entry and should serialize one compact line", () => {
+    const base = makeBase()
+    const entry = { event: "apply", level: "high" }
+    assert.equal(appendEffortTrace("ses_compact", entry, base), true)
+    assert.deepEqual(entry, { event: "apply", level: "high" })
+    const line = readFileSync(sessionEffortTracePath("ses_compact", base), "utf-8").trim()
+    assert.equal(line, JSON.stringify(entry))
+  })
+
+  it("should return false for an unserializable entry", () => {
+    const base = makeBase()
+    const circular = { event: "apply" }
+    circular.self = circular
+    assert.equal(appendEffortTrace("ses_circular", circular, base), false)
   })
 })
 

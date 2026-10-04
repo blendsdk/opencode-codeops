@@ -19,10 +19,10 @@
  * @module lib/reasoning-effort
  */
 
-import { lstatSync, readFileSync } from "node:fs"
+import { appendFileSync, lstatSync, readFileSync } from "node:fs"
 import { join } from "node:path"
 
-import { sessionTmpDir } from "./tmp-hygiene.mjs"
+import { ensureSessionTmpDir, sessionTmpDir } from "./tmp-hygiene.mjs"
 
 /**
  * The four levels a plan or skill may suggest.
@@ -195,6 +195,58 @@ export function readSessionEffort(sessionID, base) {
     return parseStateFile(readFileSync(path, "utf-8"))
   } catch {
     return undefined
+  }
+}
+
+/**
+ * Check whether the optional trace environment switch is on.
+ *
+ * Tracing is opt-in and diagnostic: it is enabled only when the value is
+ * exactly `1` or `true`, compared case-insensitively. Every other value,
+ * including `undefined`, disables it.
+ *
+ * @param value - Raw `CODEOPS_EFFORT_TRACE` value
+ * @returns True only for `"1"` or `"true"` in any case
+ */
+export function isEffortTraceEnabled(value) {
+  if (typeof value !== "string") return false
+  const normalized = value.trim().toLowerCase()
+  return normalized === "1" || normalized === "true"
+}
+
+/**
+ * Compute the trace-file path inside the session temp directory.
+ *
+ * @param sessionID - Session identifier
+ * @param base - Base temp directory (injectable for tests)
+ * @returns Absolute path to `reasoning-effort-trace.jsonl`
+ */
+export function sessionEffortTracePath(sessionID, base) {
+  return join(sessionTmpDir(sessionID, base), "reasoning-effort-trace.jsonl")
+}
+
+/**
+ * Append one content-free trace entry to the session trace file.
+ *
+ * The entry is serialized as one compact JSON line. Nothing here inspects or
+ * interprets the entry; callers must never pass prompt text, file content, or
+ * secrets. The session directory is created when missing. Any failure — an
+ * unwritable path, an unserializable entry — returns false instead of
+ * throwing, because tracing must never affect a request.
+ *
+ * @param sessionID - Session identifier
+ * @param entry - Plain, content-free record to append
+ * @param base - Base temp directory (injectable for tests)
+ * @returns True when the line was appended, false otherwise
+ */
+export function appendEffortTrace(sessionID, entry, base) {
+  try {
+    const line = `${JSON.stringify(entry)}\n`
+    ensureSessionTmpDir(sessionID, base)
+    appendFileSync(sessionEffortTracePath(sessionID, base), line, "utf-8")
+    return true
+  } catch {
+    return false
   }
 }
 

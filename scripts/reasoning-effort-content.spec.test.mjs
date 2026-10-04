@@ -89,6 +89,7 @@ describe("plugin wiring content", () => {
     assert.match(content, /"chat\.message"/)
     assert.match(content, /"chat\.params"/)
     assert.match(content, /reasoning-effort\.mjs/)
+    assert.match(content, /CODEOPS_EFFORT_TRACE/)
   })
 })
 
