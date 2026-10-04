@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-04 00:52
-> **Progress**: 34/40 tasks (85%)
+> **Progress**: 36/40 tasks (90%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -234,13 +234,22 @@ results are owned by the user and block Phase 5 completion until recorded.
 
 ## Phase 5: Documentation and final verification
 
+> **Phase baseline tree**: 6fb678c3aa0a24ef4a23a527820c9b5c7e99eb5c
+> **Expected modification set** (strict scope): `README.md` and this plan's progress marks.
+
 ### Step 5.1: Documentation
 
 **Reference**: [Index](00-index.md) §Related Files · AR #10, PF-032
 **Objective**: Document the specialist workflow and finalize verification.
 
-- [ ] 5.1.1 Update `README.md` (detection, creation, routing, fallback; agent-model notes; upgrade note that template changes make custom agents STALE until `--custom` re-runs)
-- [ ] 5.1.2 Run the Phase 3 quality checklist against this plan and full verification
+- [x] 5.1.1 Update `README.md` (detection, creation, routing, fallback; agent-model notes; upgrade note that template changes make custom agents STALE until `--custom` re-runs) ✅ (completed: 2026-10-04 02:03)
+- [x] 5.1.2 Run the Phase 3 quality checklist against this plan and full verification ✅ (completed: 2026-10-04 02:03)
+
+**Phase 5 checklist result:** completeness, granularity, dependencies, testing,
+specification-first ordering, no-dead-code, security-first, zero-ambiguity, execution-plan
+completeness, reference-don't-restate, and format blocks all verified against the executed plan.
+`npm run verify` passing (169 tests); plan parser `Executing, 40 tasks, no problems`; roadmap sync
+check clean.
 
 **Deliverables**:
 - README describes detection, creation, routing, fallback, and the upgrade note

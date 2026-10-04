@@ -151,6 +151,36 @@ To pin specific models per role, use the `setup-routing` skill or add overrides 
 }
 ```
 
+## Project specialists
+
+CodeOps can recommend project-specific specialist subagents when repository evidence shows a
+capability gap the twelve catalog roles and dynamic packets cannot close. Specialists are created
+only with your explicit approval — the `--auto-design` mode cannot approve them.
+
+- **Detect** — `make-requirements`, `make-plan`, and `analyze-project` run an evidence-based check
+  and record the outcome (including a negative one). At most two candidates are proposed per
+  requirements set or plan.
+- **Create** — after you approve the candidate packet, `setup-routing` writes a brief at
+  `codeops/specialists/<role>.md`, writes routing policy first, generates a visible agent with
+  `install_agents.py --custom <role>`, and updates a managed index block in `AGENTS.md` with
+  `--sync-agents-md`.
+- **Route** — a plan's `## Specialist Agents` table maps roles to phases. During `exec-plan`,
+  listed specialists are dispatched as **additional** reviewers or executors: they never replace a
+  required reviewer or gate, reviewer findings use the `SR-NNN` prefix, and the generated agent
+  defaults to `reasoningEffort: max` (override it with `routing.roles.<role>.reasoning`).
+- **Fallback** — OpenCode loads agents at startup, so a specialist created during a session becomes
+  available in the next one; while unavailable, dispatch falls back to a generic subagent carrying
+  the brief excerpt and reports the fallback. No review depends on a specialist existing.
+
+Lifecycle checks: `--check` reports `INVALID`, `MISSING`, `STALE`, `ORPHAN`, `HAND-AUTHORED`, and
+`AGENTS.md` states; `--remove-custom <role> --yes` deletes the generated agent and its brief and
+updates the index.
+
+> **Upgrading:** specialist agents embed the generic template contract. When a newer plugin changes
+> those templates, `--check` reports the agent as `STALE`; re-run
+> `python3 scripts/install_agents.py --project . --custom <role>` (then `--sync-agents-md`) to
+> regenerate it.
+
 ## Requirements
 
 - OpenCode (current)
