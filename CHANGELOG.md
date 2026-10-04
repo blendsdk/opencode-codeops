@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 1.10.3 — 2026-10-04
+
+### Fixes
+
+- effort: prefer the model variant over the reasoning-support flag
+
 ## 1.10.2 — 2026-10-04
 
 ### Fixes
