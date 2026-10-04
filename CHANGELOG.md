@@ -2,6 +2,31 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 1.10.0 — 2026-10-04
+
+### Documentation
+
+- agents: refresh managed project facts
+- routing: clarify runtime variant validation
+- plan: fix phase 3 review wording gaps
+
+### Fixes
+
+- effort: tolerate malformed message parts in marker scan
+- effort: correct phase 2 review findings
+- effort: harden helper totality and contract wording
+
+### Features
+
+- docs: add auto-effort flags and reasoning documentation
+- plan: carry reasoning suggestions through plan skills
+- effort: add session CLI and plugin runtime hooks
+- effort: add reasoning-effort contract and helper
+
+### Tests
+
+- effort: add implementation tests for reasoning-effort helper
+
 ## 1.9.0 — 2026-10-04
 
 ### Features
