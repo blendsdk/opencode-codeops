@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 2.0.3 — 2026-10-06
+
+### CI
+
+- bump checkout and setup-node actions to v7
+
 ## 2.0.2 — 2026-10-06
 
 ### Fixes
