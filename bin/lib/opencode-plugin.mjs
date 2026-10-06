@@ -70,8 +70,8 @@ export function parseOpenCodeMajor(versionText) {
  * @returns Arguments after the `opencode` executable
  *
  * @example
- * buildPluginArgs({ scope: "global", version: "2.0.0", dialect: "add", supportsGlobal: true })
- * // ["plugin", "add", "opencode-codeops@2.0.0", "--global"]
+ * buildPluginArgs({ scope: "global", version: "1.2.3", dialect: "add", supportsGlobal: true })
+ * // ["plugin", "add", "opencode-codeops@1.2.3", "--global"]
  */
 export function buildPluginArgs({ scope, version, dialect = "positional", supportsGlobal = true }) {
   const module = version ? `${PLUGIN_NAME}@${version}` : PLUGIN_NAME
