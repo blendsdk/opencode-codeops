@@ -84,10 +84,11 @@ describe("reasoning-effort contract document", () => {
 })
 
 describe("plugin wiring content", () => {
-  it("should register the chat hooks and import the reasoning-effort helper", () => {
+  it("should register the session hooks and import the reasoning-effort helper", () => {
     const content = read("plugin/index.ts")
-    assert.match(content, /"chat\.message"/)
-    assert.match(content, /"chat\.params"/)
+    assert.match(content, /session\.hook\("prompt"/)
+    assert.match(content, /session\.hook\("context"/)
+    assert.match(content, /session\.hook\("compaction"/)
     assert.match(content, /reasoning-effort\.mjs/)
     assert.match(content, /CODEOPS_EFFORT_TRACE/)
   })

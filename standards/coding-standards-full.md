@@ -54,8 +54,8 @@ These apply to all code I write unless this project's `AGENTS.md` overrides a sp
 
 - **Own your temporary artifacts.** Verification logs, diffs, patch files, commit-message files,
   scratch directories, fixture trees, and downloaded artifacts are borrowed space. Put them under
-  `$CODEOPS_TMPDIR` when the CodeOps plugin exports it (one directory per session); otherwise use
-  the OS temp directory. Never write temporary files into the repository.
+  `$CODEOPS_TMPDIR` when the CodeOps plugin exports it (one directory per OpenCode runtime);
+  otherwise use the OS temp directory. Never write temporary files into the repository.
 - **Delete at completion.** Before reporting any task, phase, or session complete, delete every
   temporary artifact the run created — including verification logs. If the user asked for an
   artifact to be kept, name its exact path and keep that file only.

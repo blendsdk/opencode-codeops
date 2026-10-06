@@ -81,6 +81,11 @@ export declare function extractModelVariants(
   model: unknown
 ): Record<string, unknown> | undefined
 
+/** Normalize a host variant collection (v2 array or v1 record) into a record. */
+export declare function normalizeModelVariants(
+  variants: unknown
+): Record<string, unknown>
+
 /** Check whether a model advertises reasoning support. */
 export declare function modelSupportsReasoning(model: unknown): boolean
 

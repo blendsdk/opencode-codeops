@@ -4,11 +4,13 @@
   "description": "Specification-first engineering for complex systems — CodeOps plugin for OpenCode",
   "type": "module",
   "engines": {
-    "node": ">=18"
+    "node": ">=18",
+    "opencode": ">=2 <3"
   },
   "main": "./plugin/index.ts",
   "exports": {
-    ".": "./plugin/index.ts"
+    ".": "./plugin/index.ts",
+    "./server": "./plugin/index.ts"
   },
   "bin": {
     "opencode-codeops": "bin/index.mjs"
@@ -62,11 +64,10 @@
   "bugs": {
     "url": "https://github.com/blendsdk/opencode-codeops/issues"
   },
-  "peerDependencies": {
-    "@opencode-ai/plugin": "^1.18.30"
+  "dependencies": {
+    "@opencode/plugin": "^2.0.24"
   },
   "devDependencies": {
-    "@opencode-ai/plugin": "1.18.30",
     "@types/node": "^22.20.2",
     "typescript": "^5.0.0"
   }

@@ -37,8 +37,9 @@ afterEach(() => {
 })
 
 /**
- * Fake command runner: succeeds for `--version` and `plugin`, returns an empty
- * plugin array for `debug config`. Records every call.
+ * Fake command runner: succeeds for `--version`, answers the plugin add help,
+ * accepts plugin registration, and returns the resolved plugins array for
+ * `debug config`. Records every call.
  *
  * @param calls - Array the joined arguments are appended to
  * @returns A runner function
@@ -48,9 +49,13 @@ function stubRun(calls = []) {
     const key = args.join(" ")
     calls.push(key)
     if (key === "debug config") {
-      return { status: 0, stdout: JSON.stringify({ plugin: ["opencode-codeops@1.0.0"] }) }
+      return { status: 0, stdout: JSON.stringify({ plugins: ["opencode-codeops@2.0.0"] }) }
     }
-    if (key === "--version" || key.startsWith("plugin ")) return { status: 0 }
+    if (key === "--version") return { status: 0, stdout: "2.0.24" }
+    if (key === "plugin add --help") {
+      return { status: 0, stdout: "opencode plugin add <module> [--global]" }
+    }
+    if (key.startsWith("plugin add ")) return { status: 0 }
     return { status: 1 }
   }
 }
@@ -162,7 +167,7 @@ describe("dispatch install", () => {
     await capture(() => dispatch(["install"], { cwd, run: stubRun(calls) }))
 
     assert.ok(calls.includes("--version"))
-    assert.ok(calls.some((call) => call.startsWith("plugin opencode-codeops")))
+    assert.ok(calls.some((call) => call.startsWith("plugin add opencode-codeops")))
   })
 
   it("skips plugin registration with --no-plugin", async () => {

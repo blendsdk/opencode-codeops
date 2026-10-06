@@ -407,6 +407,44 @@ export function applyEffort(options, level, model) {
 }
 
 /**
+ * Normalize a host model's variant collection into a keyed record.
+ *
+ * OpenCode 2 exposes model variants as an array of entries shaped
+ * `{ id, settings }`, while {@link applyEffort} consumes a record keyed by
+ * variant id. This adapter bridges the two without changing the core logic.
+ * A record input is passed through unchanged, so v1-style callers and tests
+ * keep working. Malformed entries — non-objects, missing ids, non-object
+ * settings — are skipped; anything that is not an array or plain object yields
+ * an empty record.
+ *
+ * @param variants - Variant collection from the host (any shape)
+ * @returns A record mapping variant id to its settings object
+ *
+ * @example
+ * normalizeModelVariants([{ id: "high", settings: { reasoningEffort: "high" } }])
+ * // { high: { reasoningEffort: "high" } }
+ */
+export function normalizeModelVariants(variants) {
+  if (isPlainObject(variants)) return { ...variants }
+  if (!Array.isArray(variants)) return {}
+
+  const record = {}
+  for (const entry of variants) {
+    if (!isPlainObject(entry)) continue
+    const id = entry.id
+    if (typeof id !== "string" || id.length === 0) continue
+    const settings = isPlainObject(entry.settings) ? entry.settings : {}
+    Object.defineProperty(record, id, {
+      value: settings,
+      writable: true,
+      enumerable: true,
+      configurable: true,
+    })
+  }
+  return record
+}
+
+/**
  * Recursively merge plain objects into a new object.
  *
  * Values that are not plain objects — arrays, class instances, primitives —

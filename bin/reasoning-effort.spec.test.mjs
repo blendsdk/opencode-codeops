@@ -25,6 +25,7 @@ import {
   applyEffort,
   findEffortMarker,
   isEffortTraceEnabled,
+  normalizeModelVariants,
   readRoutingReasoning,
   readSessionEffort,
   resolveEffort,
@@ -161,6 +162,51 @@ describe("variant selection", () => {
     assert.equal(selectEffortVariant("none", model), undefined)
     assert.equal(selectEffortVariant("extreme", model), undefined)
     assert.equal(selectEffortVariant("medium", null), undefined)
+  })
+})
+
+describe("host variant normalization", () => {
+  it("should convert the OpenCode 2 variants array into an id-keyed record", () => {
+    const variants = [
+      { id: "low", settings: { reasoningEffort: "low" } },
+      { id: "high", settings: { reasoningEffort: "high" } },
+    ]
+    assert.deepEqual(normalizeModelVariants(variants), {
+      low: { reasoningEffort: "low" },
+      high: { reasoningEffort: "high" },
+    })
+  })
+
+  it("should pass a v1-style record through as a copy", () => {
+    const record = { high: { reasoningEffort: "high" } }
+    const normalized = normalizeModelVariants(record)
+    assert.deepEqual(normalized, record)
+    assert.notEqual(normalized, record)
+  })
+
+  it("should skip malformed entries and tolerate hostile shapes", () => {
+    assert.deepEqual(
+      normalizeModelVariants([
+        null,
+        "high",
+        { settings: { reasoningEffort: "high" } },
+        { id: "", settings: {} },
+        { id: "max", settings: "not an object" },
+      ]),
+      { max: {} }
+    )
+    assert.deepEqual(normalizeModelVariants(undefined), {})
+    assert.deepEqual(normalizeModelVariants("high"), {})
+  })
+
+  it("should feed the existing applyEffort path with normalized v2 variants", () => {
+    const variants = normalizeModelVariants([
+      { id: "high", settings: { reasoningEffort: "high" } },
+    ])
+    assert.deepEqual(applyEffort({ topP: 0.8 }, "medium", { variants }), {
+      topP: 0.8,
+      reasoningEffort: "high",
+    })
   })
 })
 

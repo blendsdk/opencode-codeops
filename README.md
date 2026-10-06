@@ -46,8 +46,8 @@ npx -y opencode-codeops@latest update    # alias of install
 ```
 
 `install`/`update` writes the skills and subagents onto the filesystem (OpenCode discovers those
-only from disk), then registers the plugin in the OpenCode config by calling OpenCode's own
-`opencode plugin` command, so standards injection and `CODEOPS_PLUGIN_ROOT` are enabled. Restart
+only from disk), then registers the plugin in the OpenCode config by calling OpenCode 2's own
+`opencode plugin add` command, so standards injection and `CODEOPS_PLUGIN_ROOT` are enabled. Restart
 OpenCode after installing for the plugin to load. Pass `--no-plugin` to manage the config yourself.
 
 The installer also places the shared `_shared/` and `references/` documents beside the installed
@@ -56,16 +56,18 @@ them resolve at their installed location. An existing directory with either name
 with `--force`.
 
 The scope is auto-detected: inside a CodeOps project (a git repo with `.opencode/` or
-`codeops/.codeops.yml`) it installs into `./.opencode`, and registers the plugin in the project
+`codeops/.codeops.yml`) it installs into `./.opencode` and registers the plugin in the project
 config; anywhere else it installs globally into `~/.config/opencode` and the global config. Pass
-`--project` or `--global` to force one.
+`--project` or `--global` to force one. OpenCode 2's CLI manages package plugins globally, so a
+project-scope install registers the plugin globally with a note while the skills and agents stay
+project-scoped.
 
-If you prefer to register the plugin manually instead, add it to your `opencode.json`:
+If you prefer to register the plugin manually instead, add it to your `opencode.jsonc`:
 
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["opencode-codeops"]
+  "plugins": ["opencode-codeops"]
 }
 ```
 
@@ -92,22 +94,25 @@ npx -y opencode-codeops@latest uninstall
 `status` reports the installed skills and agents versions and the configured plugin entry, so a
 mismatch is visible. Use `--dry-run` to preview an install; a same-named file the package does not
 own is skipped with a warning, and `--force` replaces it. `uninstall` removes the skills and
-subagents but leaves the plugin entry in your config; remove `opencode-codeops` from the `plugin`
+subagents but leaves the plugin entry in your config; remove `opencode-codeops` from the `plugins`
 array by hand to fully disable it.
 
 ### Local development
 
-Symlink the plugin into your OpenCode plugin directory and link the installed files to a checkout,
-so edits are picked up without reinstalling. Pass `--no-plugin` so the checkout is not overwritten
-by a registered npm plugin:
+OpenCode 2's `opencode plugin add` accepts npm or Git package specifiers only, so a checkout is
+loaded through a local plugin file. Place a one-line re-export in a plugin directory and link the
+installed files to the checkout so edits are picked up without reinstalling:
 
 ```bash
-# Plugin (project or global plugin directory)
-ln -s /path/to/opencode-codeops/plugin/index.ts ~/.config/opencode/plugins/codeops.ts
+# Plugin — project scope (use ~/.config/opencode/plugins/ for every project)
+mkdir -p .opencode/plugins
+printf 'export { default } from "%s/plugin/index.ts"\n' "$PWD" > .opencode/plugins/codeops.ts
 
 # Skills and agents — link instead of copy
-node /path/to/opencode-codeops/bin/index.mjs install --link --global --no-plugin
+node bin/index.mjs install --link --global --no-plugin
 ```
+
+Pass `--no-plugin` so the checkout entry is not overwritten by a registered npm plugin.
 
 ## Setup
 
@@ -128,7 +133,8 @@ git commit -m "chore: initialize CodeOps"
 
 ## What the plugin does automatically
 
-On every OpenCode session start and after every compaction, the plugin injects:
+The plugin adds the CodeOps standards to every model request as system instructions, and also to
+every compaction summary, so they are always active:
 - `standards/coding-standards.md` — coding quality, security, testing, and working-style rules
 - `standards/output-style.md` — how to report findings, format tables, and recommend next steps
 
@@ -136,17 +142,24 @@ These standards are active without any user action. They do not need to be copie
 
 The plugin also warns (non-blocking) if any tool attempts to edit `codeops/.codeops.yml` directly — that file is managed exclusively by the `setup-codeops` skill — and if the installed skills version differs from the plugin version, so a stale install is visible.
 
-Every session also gets a workspace-hygiene guard: the plugin exports `CODEOPS_TMPDIR`, a per-session scratch directory under the OS temp directory. Skills and agents put temporary files there and delete them when the run completes; the plugin removes the directory when the session is deleted and sweeps directories abandoned by interrupted runs at session start, so CodeOps does not accumulate scratch data. The full protocol is in `_shared/workspace-hygiene.md`.
+Every session also gets a workspace-hygiene guard: the plugin exports `CODEOPS_TMPDIR`, a scratch
+directory under the OS temp directory that belongs to the running OpenCode plugin instance. Skills
+and agents put temporary files there and delete them when the run completes; the plugin removes the
+directory when it unloads and sweeps directories abandoned by interrupted runs at startup, so
+CodeOps does not accumulate scratch data. Because OpenCode 2 does not expose a session id to shell
+hooks, concurrent sessions served by one instance share this directory. The full protocol is in
+`_shared/workspace-hygiene.md`.
 
 ## Agent model configuration
 
 All CodeOps subagents inherit the model of the primary agent that invoked them. No provider-specific configuration is required out of the box.
 
-To pin specific models per role, use the `setup-routing` skill or add overrides directly in `opencode.json`:
+To pin specific models per role, use the `setup-routing` skill or add overrides directly in
+`opencode.jsonc`:
 
 ```json
 {
-  "agent": {
+  "agents": {
     "demanding-executor": { "model": "anthropic/claude-opus-4-5" },
     "executor":           { "model": "anthropic/claude-haiku-4" }
   }
@@ -204,7 +217,8 @@ updates the index.
 
 ## Requirements
 
-- OpenCode (current)
+- OpenCode 2.0+ (this release uses the OpenCode 2 plugin API; on OpenCode 1, use
+  `opencode-codeops@1`)
 - Bash
 - Python 3.8+
 - Git

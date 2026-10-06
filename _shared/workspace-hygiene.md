@@ -15,12 +15,16 @@ outputs are deliverables — not temporary artifacts — and they are never dele
 
 ## Where temporary artifacts live
 
-1. `$CODEOPS_TMPDIR` when the CodeOps plugin exports it (one directory per session). Use it for
-   every scratch file.
+1. `$CODEOPS_TMPDIR` when the CodeOps plugin exports it (one directory per OpenCode runtime).
+   Use it for every scratch file.
 2. Otherwise, the operating system's temp directory.
 3. Never inside the repository. A repository path is durable space; scratch does not belong there.
 
 Create subdirectories under the temp root lazily, only when the task needs them.
+
+OpenCode 2 does not expose a session identifier to shell hooks, so the plugin owns one scratch
+directory per runtime instead of one per session. Sessions served by the same runtime share it;
+keep scratch file names specific to the run to avoid collisions.
 
 ## Lifecycle
 
@@ -47,7 +51,7 @@ Create subdirectories under the temp root lazily, only when the task needs them.
 
 ## Automatic safety net
 
-The CodeOps plugin exports `$CODEOPS_TMPDIR` for each session and removes that session's directory
-when the session is deleted. At session start it also removes CodeOps temp directories older than
-seven days, so an interrupted run cannot leak storage forever. The safety net is a fallback, not a
-substitute: the run itself still performs the cleanup pass above.
+The CodeOps plugin exports `$CODEOPS_TMPDIR` for each runtime and removes that runtime's
+directory when the plugin unloads. At startup it also removes CodeOps temp directories older
+than seven days, so an interrupted run cannot leak storage forever. The safety net is a
+fallback, not a substitute: the run itself still performs the cleanup pass above.

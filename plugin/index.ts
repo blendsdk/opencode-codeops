@@ -1,7 +1,8 @@
-import type { Plugin } from "@opencode-ai/plugin"
+import { Plugin } from "@opencode/plugin"
+import { randomUUID } from "node:crypto"
 import { readFileSync } from "node:fs"
 import { homedir } from "node:os"
-import { join, dirname } from "node:path"
+import { dirname, join } from "node:path"
 import { fileURLToPath } from "node:url"
 
 import {
@@ -17,7 +18,7 @@ import {
   isEffortLevel,
   isEffortTraceEnabled,
   isRoutingReasoning,
-  modelSupportsReasoning,
+  normalizeModelVariants,
   readRoutingReasoning,
   readSessionEffort,
   resolveEffort,
@@ -52,7 +53,8 @@ function readPackageVersion(): string {
 }
 
 // ---------------------------------------------------------------------------
-// Load standards at startup (once). Both files are injected into every session.
+// Load standards at startup (once). Both files are injected into every request
+// as system instructions, so they also survive context compaction.
 // ---------------------------------------------------------------------------
 const codingStandards = readFileSync(
   join(PACKAGE_ROOT, "standards", "coding-standards.md"),
@@ -65,50 +67,49 @@ const outputStyle = readFileSync(
 const standardsText = `${codingStandards}\n\n${outputStyle}`
 
 // ---------------------------------------------------------------------------
-// Workspace hygiene — the plugin owns one temp directory per session (exported
-// as CODEOPS_TMPDIR) and sweeps directories abandoned by earlier interrupted
-// runs. The sweep runs at most once per plugin process, so spawning many child
-// sessions does not repeat the directory walk.
+// OpenCode 2 does not expose a session identifier to shell hooks, so the plugin
+// owns one scratch directory per plugin runtime instead of one per session.
+// Skills and subagents still receive it as CODEOPS_TMPDIR and delete their own
+// scratch; the plugin removes the runtime directory on unload and sweeps
+// directories abandoned by earlier runs. Two sessions served by the same
+// runtime share this directory; see _shared/workspace-hygiene.md.
 // ---------------------------------------------------------------------------
-let sweptStaleTmpDirs = false
+const runtimeID = `runtime-${randomUUID()}`
+
+/** Heading prefixed to the standards block injected into compaction summaries. */
+const STANDARDS_HEADING = "## CodeOps Standards (always active)"
 
 /**
- * Sweep temp directories abandoned by earlier interrupted runs, once per
- * process. Cleanup is best effort: a failure must never block a session.
+ * Check whether a value is a plain object (not an array, class instance, or
+ * `null`). Used to read unknown hook payloads without unsafe casts.
+ *
+ * @param value - Value to inspect
+ * @returns True for `{}`-shaped objects
  */
-function sweepStaleTmpDirsOnce(): void {
-  if (sweptStaleTmpDirs) return
-  sweptStaleTmpDirs = true
-  try {
-    cleanStaleTmpDirs()
-  } catch {
-    // Best effort only.
-  }
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
 }
 
-// ---------------------------------------------------------------------------
-// Helper — inject standards into a session without triggering an AI reply.
-// Uses client.session.prompt with noReply: true (confirmed from OpenCode SDK).
-// ---------------------------------------------------------------------------
-async function injectStandards(
-  client: Parameters<Plugin>[0]["client"],
-  sessionId: string
-): Promise<void> {
-  await client.session.prompt({
-    path: { id: sessionId },
-    body: {
-      noReply: true,
-      parts: [{ type: "text", text: standardsText }],
-    },
-  })
+/**
+ * Log one content-free warning. Logging is best effort: a failed log must never
+ * break a request.
+ *
+ * @param message - Warning text that never contains prompt or file content
+ */
+function warnContentFree(message: string): void {
+  console.warn(`CodeOps: ${message}`)
 }
 
-// ---------------------------------------------------------------------------
-// Helper — read the version recorded in an installed skills marker, if any.
-// The marker (`.opencode-codeops.json`) is written by the skills installer.
-// Its absence means the skills are not managed — for example a development
-// symlink — so there is no version to compare against.
-// ---------------------------------------------------------------------------
+/**
+ * Read the version recorded in an installed skills marker, if any.
+ *
+ * The marker (`.opencode-codeops.json`) is written by the skills installer.
+ * Its absence means the skills are not managed — for example a development
+ * symlink — so there is no version to compare against.
+ *
+ * @param skillsDir - Directory that may hold the installer marker
+ * @returns The recorded version, or `undefined`
+ */
 function installedSkillsVersion(skillsDir: string): string | undefined {
   try {
     const marker = JSON.parse(
@@ -120,16 +121,15 @@ function installedSkillsVersion(skillsDir: string): string | undefined {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Helper — warn (non-blocking) when the installed skills were written by a
-// different CodeOps version than this plugin. The plugin and the files are
-// installed by separate commands, so their versions can drift; a mismatch
-// usually means the skills need `npx opencode-codeops update` again.
-// ---------------------------------------------------------------------------
-async function warnOnVersionSkew(
-  client: Parameters<Plugin>[0]["client"],
-  directory: string
-): Promise<void> {
+/**
+ * Warn (non-blocking) when the installed skills were written by a different
+ * CodeOps version than this plugin. The plugin and the files are installed by
+ * separate commands, so their versions can drift; a mismatch usually means the
+ * skills need `npx opencode-codeops update` again.
+ *
+ * @param directory - Project directory whose local skills should be checked
+ */
+function warnOnVersionSkew(directory: string): void {
   const skillsDirs = [
     join(homedir(), ".config", "opencode", "skills"),
     join(directory, ".opencode", "skills"),
@@ -139,38 +139,21 @@ async function warnOnVersionSkew(
     const installed = installedSkillsVersion(skillsDir)
     if (!installed || installed === packageVersion) continue
 
-    await client.app.log({
-      body: {
-        service: "codeops",
-        level: "warn",
-        message:
-          `CodeOps skills at ${skillsDir} are version ${installed}, ` +
-          `but the plugin is version ${packageVersion}. ` +
-          `Run \`npx opencode-codeops@${packageVersion} update\` to match them.`,
-      },
-    })
+    warnContentFree(
+      `CodeOps skills at ${skillsDir} are version ${installed}, ` +
+        `but the plugin is version ${packageVersion}. ` +
+        `Run \`npx opencode-codeops@${packageVersion} update\` to match them.`
+    )
   }
 }
 
-// ---------------------------------------------------------------------------
-// Helper — log one content-free warning. Logging is best effort: a failed log
-// must never break a request.
-// ---------------------------------------------------------------------------
-async function warnContentFree(
-  client: Parameters<Plugin>[0]["client"],
-  message: string
-): Promise<void> {
-  try {
-    await client.app.log({ body: { service: "codeops", level: "warn", message } })
-  } catch {
-    // Best effort only.
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Helper — read the project routing config fresh on every request, so an edit
-// applies without restarting the session. Any failure means "no routing".
-// ---------------------------------------------------------------------------
+/**
+ * Read the project routing config fresh on every request, so an edit applies
+ * without restarting the session. Any failure means "no routing".
+ *
+ * @param directory - Project directory holding `codeops/codeops.json`
+ * @returns The parsed config, or an empty object
+ */
 function readRoutingConfig(directory: string): unknown {
   try {
     return JSON.parse(readFileSync(join(directory, "codeops", "codeops.json"), "utf8"))
@@ -179,149 +162,139 @@ function readRoutingConfig(directory: string): unknown {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Helper — append one content-free trace line when the optional
-// CODEOPS_EFFORT_TRACE switch is on. Tracing is diagnostic only: it never
-// affects a request and swallows its own failures.
-// ---------------------------------------------------------------------------
+/**
+ * Append one content-free trace line when the optional CODEOPS_EFFORT_TRACE
+ * switch is on. Tracing is diagnostic only: it never affects a request and
+ * swallows its own failures.
+ *
+ * @param enabled - Whether tracing is enabled for this runtime
+ * @param sessionID - Session the entry belongs to
+ * @param entry - Content-free trace record
+ */
 function traceEffort(
   enabled: boolean,
   sessionID: string,
   entry: Record<string, unknown>
 ): void {
   if (!enabled) return
-  appendEffortTrace(sessionID, { ts: new Date().toISOString(), ...entry })
+  appendEffortTrace(runtimeID, { ts: new Date().toISOString(), sessionID, ...entry })
+}
+
+/**
+ * Look up the active model's variant record from the model registry.
+ *
+ * OpenCode 2 request hooks carry only a model reference (provider and model
+ * id), while the provider-specific option sets live on the registered model as
+ * a `variants` array. Any lookup failure means "no variants", which leaves the
+ * request unchanged.
+ *
+ * @param ctx - Plugin context whose model registry is queried
+ * @param ref - Model reference from the request hook
+ * @returns A variant record keyed by variant id, or an empty record
+ */
+async function readModelVariants(
+  ctx: Plugin.Context,
+  ref: { providerID: string; id: string }
+): Promise<Record<string, unknown>> {
+  try {
+    const listed = await ctx.model.list()
+    const info = listed.data.find(
+      (model) => model.providerID === ref.providerID && model.id === ref.id
+    )
+    if (info === undefined) return {}
+    return normalizeModelVariants(info.variants)
+  } catch {
+    return {}
+  }
 }
 
 // ---------------------------------------------------------------------------
-// CodeOps plugin for OpenCode
+// CodeOps plugin for OpenCode 2
 // Replaces: hooks/hooks.json + hook_session_context.sh + hook_marker_guard.sh
 // ---------------------------------------------------------------------------
-export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
-  // Reasoning-effort state lives for the lifetime of this plugin instance:
-  // the latest dispatch-marker level per session, plus a deduplication set
-  // for unsupported-level warnings.
-  const effortMarkers = new Map<string, EffortLevel>()
-  const warnedEffortLevels = new Set<string>()
-  const effortTraceEnabled = isEffortTraceEnabled(process.env.CODEOPS_EFFORT_TRACE)
+export default Plugin.define({
+  id: "opencode-codeops",
+  async setup(ctx) {
+    const directory = ctx.location.directory
 
-  return {
-    // -----------------------------------------------------------------------
-    // Hook 1 & 2: inject standards on session.created and session.compacted.
-    // Both are dispatched via the generic event hook.
-    // session.created  → new session    (Codex: startup)
-    // session.compacted → after compact  (Codex: resume|compact)
-    // Also the hygiene lifecycle: a new top-level session sweeps abandoned
-    // temp directories once, and a deleted session's temp directory is removed.
-    // -----------------------------------------------------------------------
-    event: async ({ event }) => {
-      if (event.type === "session.created") {
-        const info = (event.properties as { info: { id: string; parentID?: string } }).info
-        await injectStandards(client, info.id)
-        await warnOnVersionSkew(client, directory)
-        if (!info.parentID) sweepStaleTmpDirsOnce()
-      } else if (event.type === "session.deleted") {
-        const info = (event.properties as { info: { id: string } }).info
-        removeSessionTmpDir(info.id)
-        try {
-          effortMarkers.delete(info.id)
-        } catch {
-          await warnContentFree(client, "Could not clear captured reasoning-effort markers.")
+    // Reasoning-effort state lives for the lifetime of this plugin instance:
+    // the latest dispatch-marker level per session, plus a deduplication set
+    // for unsupported-level warnings.
+    const effortMarkers = new Map<string, EffortLevel>()
+    const warnedEffortLevels = new Set<string>()
+    const effortTraceEnabled = isEffortTraceEnabled(process.env.CODEOPS_EFFORT_TRACE)
+
+    // Sweep scratch directories abandoned by earlier interrupted runs, once.
+    // Cleanup is best effort: a failure must never block a session.
+    try {
+      cleanStaleTmpDirs()
+    } catch {
+      // Best effort only.
+    }
+
+    warnOnVersionSkew(directory)
+
+    // ---------------------------------------------------------------------
+    // Session lifecycle: drop captured markers when a session is deleted, so
+    // a long-lived runtime does not remember ended sessions.
+    // ---------------------------------------------------------------------
+    const controller = new AbortController()
+    void (async () => {
+      try {
+        for await (const event of ctx.event.subscribe({ signal: controller.signal })) {
+          if (event.type === "session.deleted") {
+            effortMarkers.delete(event.data.sessionID)
+          }
         }
-      } else if (event.type === "session.compacted") {
-        const sessionId: string = (event.properties as { sessionID: string }).sessionID
-        await injectStandards(client, sessionId)
-      }
-    },
-
-    // -----------------------------------------------------------------------
-    // Hook 3: inject standards into the compaction context itself, so they
-    // survive through the compaction summary and are not lost mid-session.
-    // -----------------------------------------------------------------------
-    "experimental.session.compacting": async (_input, output) => {
-      output.context.push(
-        "## CodeOps Standards (always active — survive this compaction)\n\n" +
-          standardsText
-      )
-    },
-
-    // -----------------------------------------------------------------------
-    // Hook 4: export CODEOPS_PLUGIN_ROOT into every shell so skills can call
-    // scripts as: python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_plan.py"
-    // The value is the package root (parent of this plugin/ directory), which
-    // is where skills/, scripts/, and the other shipped assets live.
-    // CODEOPS_TMPDIR is the session's directory under the CodeOps temp root;
-    // skills and agents put every scratch file there and delete it when done.
-    // -----------------------------------------------------------------------
-    "shell.env": async (input, output) => {
-      output.env.CODEOPS_PLUGIN_ROOT = PACKAGE_ROOT
-      try {
-        output.env.CODEOPS_TMPDIR = ensureSessionTmpDir(input.sessionID)
       } catch {
-        // Best effort: a temp-directory failure must never block a shell.
+        // The stream ended or the plugin unloaded; nothing to do.
       }
-    },
+    })()
 
-    // -----------------------------------------------------------------------
-    // Hook 5: advisory guard — warn (non-blocking) if any edit tool targets
-    // codeops/.codeops.yml, which is owned exclusively by the setup-codeops
-    // skill. Equivalent to Codex PreToolUse hook_marker_guard.sh.
-    // args are on the output parameter per the OpenCode plugin type signature.
-    // -----------------------------------------------------------------------
-    "tool.execute.before": async (input, output) => {
-      const editTools = ["write", "edit", "apply_patch"]
-      if (!editTools.includes(input.tool)) return
+    // ---------------------------------------------------------------------
+    // Standards injection: add the CodeOps standards to every agent-loop
+    // request and to every compaction summary, so every agent and every turn
+    // sees them and they cannot be lost to compaction.
+    // ---------------------------------------------------------------------
+    await ctx.session.hook("context", (event) => {
+      event.system.push({ type: "text", text: standardsText })
+    })
 
-      const args = output.args as Record<string, unknown> | undefined
-      const filePath: string =
-        (args?.filePath as string | undefined) ??
-        (args?.path as string | undefined) ??
-        ""
+    await ctx.session.hook("compaction", (event) => {
+      event.system.push({ type: "text", text: `${STANDARDS_HEADING}\n\n${standardsText}` })
+    })
 
-      if (filePath.includes("codeops/.codeops.yml")) {
-        process.stderr.write(
-          "CodeOps warning: codeops/.codeops.yml is the layout marker and is " +
-            "owned by setup-codeops. Edit it only through the setup/migration " +
-            "workflow (run the setup-codeops skill).\n"
-        )
-      }
-    },
-
-    // -----------------------------------------------------------------------
-    // Hook 6: capture a dispatch marker from an incoming user message. The
-    // marker travels in the dispatch packet text; it is remembered for the
-    // whole session, because the later chat.params hook receives the latest
-    // user message, which can differ from the message that carried it.
-    // -----------------------------------------------------------------------
-    "chat.message": async (input, output) => {
+    // ---------------------------------------------------------------------
+    // Effort capture: a dispatch marker travels in the incoming user prompt.
+    // It is remembered for the whole session, because the later request hook
+    // sees the same session rather than the message that carried it.
+    // ---------------------------------------------------------------------
+    await ctx.session.hook("prompt", (event) => {
       try {
-        const texts = output.parts.map((part) =>
-          part?.type === "text" ? part.text : undefined
-        )
-        const level = findEffortMarker(texts)
+        const level = findEffortMarker([event.prompt.text])
         if (level !== undefined) {
-          effortMarkers.set(input.sessionID, level)
-          traceEffort(effortTraceEnabled, input.sessionID, {
+          effortMarkers.set(event.sessionID, level)
+          traceEffort(effortTraceEnabled, event.sessionID, {
             event: "capture",
-            messageID: output.message.id,
+            messageID: event.messageID,
             level,
           })
         }
       } catch {
-        await warnContentFree(client, "Could not scan a message for a reasoning-effort marker.")
+        warnContentFree("Could not scan a message for a reasoning-effort marker.")
       }
-    },
+    })
 
-    // -----------------------------------------------------------------------
-    // Hook 7: resolve the request's reasoning level (dispatch marker, then
-    // session flag, then routing default) and merge the model's own variant
-    // options. Any failure leaves the request unchanged.
-    // -----------------------------------------------------------------------
-    "chat.params": async (input, output) => {
+    // ---------------------------------------------------------------------
+    // Effort apply: resolve the request's reasoning level (dispatch marker,
+    // then session flag, then routing default) and merge the model's own
+    // variant options. Any failure leaves the request unchanged.
+    // ---------------------------------------------------------------------
+    await ctx.session.hook("context", async (event) => {
       try {
-        const marker = effortMarkers.get(input.sessionID)
-        const session = readSessionEffort(input.sessionID)
-        const routing = readRoutingReasoning(readRoutingConfig(directory), input.agent)
+        const marker = effortMarkers.get(event.sessionID)
+        const session = readSessionEffort(runtimeID)
+        const routing = readRoutingReasoning(readRoutingConfig(directory), event.agent)
         const level = resolveEffort({ marker, session, routing })
         const source = isEffortLevel(marker)
           ? "marker"
@@ -331,10 +304,9 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
               ? "routing"
               : "none"
         if (level === undefined) {
-          traceEffort(effortTraceEnabled, input.sessionID, {
+          traceEffort(effortTraceEnabled, event.sessionID, {
             event: "apply",
-            messageID: input.message.id,
-            agent: input.agent,
+            agent: event.agent,
             level: null,
             source,
             applied: false,
@@ -342,37 +314,88 @@ export const CodeOpsPlugin: Plugin = async ({ client, directory }) => {
           return
         }
 
-        const applied = applyEffort(output.options, level, input.model)
-        const changed = applied !== output.options
-        traceEffort(effortTraceEnabled, input.sessionID, {
+        const variants = await readModelVariants(ctx, event.model)
+        const model = { variants }
+        const applied = applyEffort(event.options, level, model)
+        const changed = applied !== event.options
+        traceEffort(effortTraceEnabled, event.sessionID, {
           event: "apply",
-          messageID: input.message.id,
-          agent: input.agent,
+          agent: event.agent,
           level,
           source,
           applied: changed,
-          variant: selectEffortVariant(level, input.model) ?? null,
-          reasoningSupported: modelSupportsReasoning(input.model),
-          variantLevels: Object.keys(extractModelVariants(input.model) ?? {}),
+          variant: selectEffortVariant(level, model) ?? null,
+          variantLevels: Object.keys(extractModelVariants(model) ?? {}),
         })
         if (!changed) {
           if (marker !== undefined) {
-            const warningKey = `${input.sessionID}:${marker}`
+            const warningKey = `${event.sessionID}:${marker}`
             if (!warnedEffortLevels.has(warningKey)) {
               warnedEffortLevels.add(warningKey)
-              await warnContentFree(
-                client,
-                `Reasoning effort ${marker} is not available for agent ${input.agent}; ` +
+              warnContentFree(
+                `Reasoning effort ${marker} is not available for agent ${event.agent}; ` +
                   "request left unchanged."
               )
             }
           }
           return
         }
-        output.options = applied
+        Object.assign(event.options, applied)
       } catch {
-        await warnContentFree(client, "Could not apply a reasoning-effort level to a request.")
+        warnContentFree("Could not apply a reasoning-effort level to a request.")
       }
-    },
-  }
-}
+    })
+
+    // ---------------------------------------------------------------------
+    // Shell environment: export CODEOPS_PLUGIN_ROOT so skills can call
+    // scripts as: python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_plan.py".
+    // CODEOPS_TMPDIR is this runtime's scratch directory; skills and agents
+    // put every scratch file there and delete it when done.
+    // ---------------------------------------------------------------------
+    await ctx.shell.hook("create.before", (event) => {
+      event.env.CODEOPS_PLUGIN_ROOT = PACKAGE_ROOT
+      try {
+        event.env.CODEOPS_TMPDIR = ensureSessionTmpDir(runtimeID)
+      } catch {
+        // Best effort: a temp-directory failure must never block a shell.
+      }
+    })
+
+    // ---------------------------------------------------------------------
+    // Advisory guard: warn (non-blocking) if any edit tool targets
+    // codeops/.codeops.yml, which is owned exclusively by the setup-codeops
+    // skill.
+    // ---------------------------------------------------------------------
+    await ctx.tool.hook("execute.before", (event) => {
+      const editTools = ["write", "edit", "apply_patch", "multiedit", "patch"]
+      if (!editTools.includes(event.tool)) return
+
+      const input = isRecord(event.input) ? event.input : undefined
+      const filePath =
+        (typeof input?.filePath === "string" ? input.filePath : undefined) ??
+        (typeof input?.path === "string" ? input.path : undefined) ??
+        ""
+
+      if (filePath.includes("codeops/.codeops.yml")) {
+        process.stderr.write(
+          "CodeOps warning: codeops/.codeops.yml is the layout marker and is " +
+            "owned by setup-codeops. Edit it only through the setup/migration " +
+            "workflow (run the setup-codeops skill).\n"
+        )
+      }
+    })
+
+    // ---------------------------------------------------------------------
+    // Plugin cleanup: stop listening for events and remove the runtime's
+    // scratch directory. Both are best effort.
+    // ---------------------------------------------------------------------
+    return () => {
+      controller.abort()
+      try {
+        removeSessionTmpDir(runtimeID)
+      } catch {
+        // Best effort only.
+      }
+    }
+  },
+})

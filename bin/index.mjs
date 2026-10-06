@@ -135,11 +135,17 @@ async function runCombined(command, rest, io) {
     const result = registerPlugin({ scope, version, cwd, run: io.run })
     if (result.ok) {
       console.log(`Plugin: registered ${result.spec} in the ${scope} OpenCode config.`)
+      if (scope === "project" && result.dialect === "add") {
+        console.log(
+          "Note: the OpenCode 2 CLI manages package plugins globally; " +
+            "skills and agents remain project-scoped."
+        )
+      }
       console.log("Restart OpenCode to load the plugin.")
     } else {
       console.log(
         `Plugin: not registered (${result.reason}). ` +
-          `Add "${PLUGIN_NAME}" to the "plugin" array in your opencode.json.`
+          `Add "${PLUGIN_NAME}" to the "plugins" array in your opencode.jsonc.`
       )
     }
   }

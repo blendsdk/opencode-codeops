@@ -17,13 +17,15 @@ contract consumed by the plugin and the skills. It is advisory by design and nev
 | `max` | Adversarial or high-risk analysis where a missed detail is costly | Thorough preflight, complex or sensitive phases |
 
 The four levels are the complete suggestion vocabulary. A level is applied through the model's
-own variant record: the exact variant when it exists, otherwise the nearest exposed level on the
-provider scale, with ties resolving to the higher level. `none` stays exact-match only, because
-mapping it to a reasoning level would enable reasoning the caller disabled. When no variant can
-be chosen — or when the model exposes no variants and does not report reasoning support — the
-request is left unchanged, and it never raises a provider error. Routing policy is project
-configuration, not a suggestion: `routing.roles.<agent>.reasoning` may name any value from the
-provider enum (`none`, `minimal`, `low`, `medium`, `high`, `xhigh`, `max`).
+own variant options: the exact variant when it exists, otherwise the nearest exposed level on the
+provider scale, with ties resolving to the higher level. On OpenCode 2 the plugin reads those
+options from the registered model's `variants` collection and merges the chosen entry's settings
+into the request. `none` stays exact-match only, because mapping it to a reasoning level would
+enable reasoning the caller disabled. When no variant can be chosen — the model exposes no
+matching variant — the request is left unchanged, and it never raises a provider error. Routing
+policy is project configuration, not a suggestion:
+`routing.roles.<agent>.reasoning` may name any value from the provider enum (`none`, `minimal`,
+`low`, `medium`, `high`, `xhigh`, `max`).
 
 The deepseek flash model in this environment exposes `low`, `high`, and `max`, so a `medium`
 suggestion resolves to `high` there. Confirm the active model's set by enabling
@@ -127,10 +129,12 @@ invalid `=<level>` is an argument error.
 Semantics:
 
 1. Announce `Auto-effort active — reasoning <level> applied for this run`.
-2. Record the level for the session run through `scripts/codeops_effort.py`.
+2. Record the level for the run in the runtime scratch directory through
+   `scripts/codeops_effort.py`. When one runtime serves more than one concurrent session, the
+   most recently recorded level applies to all of them.
 3. Clear it at run completion, before the final summary.
 4. Run-scoped: the level applies from the point it is set until cleared or the session ends.
-5. Fail-open: when the session temp directory is unavailable or the helper fails, print an
+5. Fail-open: when the runtime scratch directory is unavailable or the helper fails, print an
    advise-only note and continue; the skill never blocks.
 6. Never a gate: effort affects cost and latency only. No readiness check, verification step,
    reviewer requirement, or finding gate may read it.
@@ -142,10 +146,10 @@ forces that level for the whole run, including every dispatch marker composed du
 
 Set `CODEOPS_EFFORT_TRACE=1` (or `true`) in the environment that starts OpenCode to record what
 the plugin does. One content-free JSON line is appended per marker capture and per request to
-`reasoning-effort-trace.jsonl` inside the session's scratch directory. Lines carry only a
-timestamp, event name, message id, agent name, level, source, chosen variant, and applied flag —
-never prompt text or file content. The trace lives with the rest of the session scratch and is
-removed with it. Tracing is off by default and never affects a request.
+`reasoning-effort-trace.jsonl` inside the runtime's scratch directory. Lines carry only a
+timestamp, session id, event name, message id, agent name, level, source, chosen variant, and
+applied flag — never prompt text or file content. The trace lives with the rest of the runtime
+scratch and is removed with it. Tracing is off by default and never affects a request.
 
 ## Suggestion-only guarantee
 
