@@ -2,6 +2,16 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 2.0.0 — 2026-10-06
+
+### Breaking Changes
+
+- port plugin to the OpenCode 2 plugin API
+
+### Fixes
+
+- docs: use a placeholder version in the plugin CLI example
+
 ## 1.11.0 — 2026-10-04
 
 ### Features
