@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 2.0.1 — 2026-10-06
+
+### Fixes
+
+- installer: read plugins from the v2 configuration source list
+
 ## 2.0.0 — 2026-10-06
 
 ### Breaking Changes
