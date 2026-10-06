@@ -49,7 +49,12 @@ function stubRun(calls = []) {
     const key = args.join(" ")
     calls.push(key)
     if (key === "debug config") {
-      return { status: 0, stdout: JSON.stringify({ plugins: ["opencode-codeops@2.0.0"] }) }
+      return {
+        status: 0,
+        stdout: JSON.stringify([
+          { type: "document", path: "/tmp/opencode.jsonc", info: { plugins: ["opencode-codeops@2.0.0"] } },
+        ]),
+      }
     }
     if (key === "--version") return { status: 0, stdout: "2.0.24" }
     if (key === "plugin add --help") {

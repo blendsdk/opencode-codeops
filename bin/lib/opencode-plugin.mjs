@@ -185,10 +185,32 @@ function entrySpec(item) {
 }
 
 /**
+ * Normalize the plugin entries from one configuration document.
+ *
+ * A document's `info` may carry the native `plugins` array or the legacy
+ * singular `plugin` array; both are read so mixed configurations are reported
+ * correctly.
+ *
+ * @param info - Configuration document info object
+ * @returns The document's plugin spec strings
+ */
+function documentPlugins(info) {
+  if (!info || typeof info !== "object") return []
+  const raw = Array.isArray(info.plugins)
+    ? info.plugins
+    : Array.isArray(info.plugin)
+      ? info.plugin
+      : []
+  return raw.map(entrySpec).filter((spec) => typeof spec === "string")
+}
+
+/**
  * Reads the resolved plugin list from OpenCode's effective config.
  *
- * OpenCode 2 uses `plugins`; the legacy singular `plugin` key is still read as
- * a fallback so mixed configs are reported correctly.
+ * OpenCode 2 prints the list of configuration sources, each with its document
+ * under `info`; OpenCode 1 printed one resolved config object. Both shapes are
+ * understood, and the legacy `plugin` key is read as a fallback so mixed
+ * configurations are reported correctly.
  *
  * @param details - Inspection inputs
  * @param details.cwd - Working directory
@@ -200,14 +222,17 @@ export function readConfiguredPlugin({ cwd, run = defaultRun } = {}) {
     const result = run("opencode", ["debug", "config"], { cwd })
     if (result.error || result.status !== 0) return undefined
 
-    const config = JSON.parse(result.stdout)
-    const raw = Array.isArray(config.plugins)
-      ? config.plugins
-      : Array.isArray(config.plugin)
-        ? config.plugin
-        : []
+    const parsed = JSON.parse(result.stdout)
+    const sources = Array.isArray(parsed) ? parsed : [parsed]
+    const specs = []
+    for (const source of sources) {
+      if (source && typeof source === "object" && "info" in source) {
+        specs.push(...documentPlugins(source.info))
+      }
+    }
+    if (specs.length > 0) return specs
 
-    return raw.map(entrySpec).filter((spec) => typeof spec === "string")
+    return documentPlugins(parsed)
   } catch {
     return undefined
   }

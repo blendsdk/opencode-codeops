@@ -222,6 +222,24 @@ describe("readConfiguredPlugin", () => {
     ])
   })
 
+  it("reads the OpenCode 2 configuration source list", () => {
+    const { run } = makeRun({
+      "debug config": {
+        status: 0,
+        stdout: JSON.stringify([
+          { type: "document", path: "/home/me/opencode.jsonc", info: { $schema: "x" } },
+          {
+            type: "document",
+            path: "/home/me/.config/opencode/opencode.jsonc",
+            info: { plugins: ["opencode-codeops@2.0.0"] },
+          },
+        ]),
+      },
+    })
+
+    assert.deepEqual(readConfiguredPlugin({ run }), ["opencode-codeops@2.0.0"])
+  })
+
   it("reads the legacy singular plugin key", () => {
     const { run } = makeRun({
       "debug config": { status: 0, stdout: JSON.stringify({ plugin: ["opencode-codeops@1.0.0"] }) },
