@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 2.0.2 — 2026-10-06
+
+### Fixes
+
+- release: make a no-op release dispatch succeed
+
 ## 2.0.1 — 2026-10-06
 
 ### Fixes
