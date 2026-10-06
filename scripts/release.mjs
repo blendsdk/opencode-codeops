@@ -482,8 +482,8 @@ export function main(argv) {
     if (command === "version" || command === "release") {
       if (!options.dryRun) assertCleanTree()
       if (!changedSinceLastTag()) {
-        console.error("error: no changes since the last tag; nothing to release")
-        return 1
+        console.log(`No changes since the last tag (${lastTag()}); nothing to release.`)
+        return 0
       }
 
       const commits = readCommits()
