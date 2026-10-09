@@ -57,10 +57,10 @@ task-size criteria in the make-plan quality checklist)
 - [ ] 1.1.3 Full verification: `npm run verify`
 
 **Deliverables**:
-- [ ] `skills/analyze-agents/SKILL.md` exists with the pinned contract
-- [ ] `_shared/specialist-agents.md` carries the ledger/state/execution-surface sections
-- [ ] `make-plan` and `make-requirements` detection steps name the `analyze-agents` flow
-- [ ] All verification passing
+- `skills/analyze-agents/SKILL.md` exists with the pinned contract
+- `_shared/specialist-agents.md` carries the ledger/state/execution-surface sections
+- `make-plan` and `make-requirements` detection steps name the `analyze-agents` flow
+- All verification passing
 
 **Verify**: `npm run verify`
 
@@ -81,8 +81,8 @@ task-size criteria in the make-plan quality checklist)
 - [ ] 2.1.3 Full verification: `npm run verify`
 
 **Deliverables**:
-- [ ] The ruling step names the ledger path and row format
-- [ ] All verification passing
+- The ruling step names the ledger path and row format
+- All verification passing
 
 **Verify**: `npm run verify`
 
@@ -102,8 +102,8 @@ task-size criteria in the make-plan quality checklist)
 - [ ] 3.1.2 Full verification + minor release through the repo release flow (project release convention: every user-facing change ships in a version with CHANGELOG notes; T-07 bundles into this release), with notes covering the new skill and records
 
 **Deliverables**:
-- [ ] ST-11 result recorded
-- [ ] Release published with notes
+- ST-11 result recorded
+- Release published with notes
 
 **Verify**: `npm run verify`
 
