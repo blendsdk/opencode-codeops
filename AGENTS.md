@@ -89,3 +89,8 @@ node scripts/release.mjs release --type auto --tag next --dry-run
 - CodeOps layout: this repo is flat (no `codeops/.codeops.yml` marker); `codeops/codeops.json`
   is not committed here.
 <!-- CODEOPS-PROJECT:END -->
+
+<!-- CODEOPS-SPECIALISTS:START -->
+Specialist agents (routing: `codeops/codeops.json`; briefs: `codeops/specialists/`):
+- `agent-pipeline-reviewer` — "Reviews CodeOps agent/skill generation, install, check, and migration changes against OpenCode parsing rules and containment invariants." (Required for: any phase changing scripts/install_agents.py, bin/install-*.mjs, bin/lib/opencode-install.mjs, agent-templates/**, agents/*.md, or the AGENTS.md managed blocks)
+<!-- CODEOPS-SPECIALISTS:END -->
