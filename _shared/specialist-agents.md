@@ -92,6 +92,24 @@ Running the check records one small project file:
 - Absent, unreadable, or malformed state means **never checked** for consumers; the
   `analyze-project` coverage line then recommends a run. Fail loud, never silent.
 
+## Findings ledger
+
+`exec-plan` records each ruling batch in the plan's findings ledger — one compact row per batch,
+identifiers and area tokens only:
+
+- Location: `plans/<plan>/05-findings.md` (flat) or
+  `codeops/features/<f>/plans/<plan>/05-findings.md` (nested), per
+  [`layout-convention.md`](layout-convention.md).
+- Format:
+
+  | Finding | Phase | Severity | Area | Ruling |
+  | ------- | ----- | -------- | ---- | ------ |
+  | RV-001 | 2 | MAJOR | scripts/install_agents.py | fixed |
+
+- Writer: `exec-plan`'s ruling step appends the batch's rows after each ruling batch; runtime
+  complexity decisions stay in the ambiguity register.
+- The `analyze-agents` check reads these rows for finding-area recurrence.
+
 ## Routing layers
 
 | Layer | Owner | Content | Consumer |
@@ -103,6 +121,9 @@ Running the check records one small project file:
 | `AGENTS.md` managed block | `setup-routing` (rendered by `install_agents.py --sync-agents-md`) | Compact index with when-to-use / required-for rules | every project agent |
 
 ## Detection integration
+
+The `analyze-agents` skill is the execution surface for the criteria in every flow below; each
+step keeps its criteria summary so the flow still works when the skill is unavailable.
 
 ### make-requirements
 

@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-09 15:28
-> **Progress**: 1/8 tasks (12%)
+> **Progress**: 2/8 tasks (25%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -53,7 +53,7 @@ task-size criteria in the make-plan quality checklist)
 **Objective**: Pin and then implement the skill contract and the shared-protocol additions.
 
 - [x] 1.1.1 [spec-author] Write the content spec tests for ST-1 … ST-7 and ST-9 — `scripts/analyze-agents-content.spec.test.mjs` — and verify the red phase ✅ (completed: 2026-10-09 15:28)
-- [ ] 1.1.2 Implement `skills/analyze-agents/SKILL.md`, the `_shared/specialist-agents.md` updates (ledger convention, check-state consumption, execution surface), and the detection delegation in `skills/make-plan/SKILL.md` and `skills/make-requirements/SKILL.md` (additive to T-07's edits; manual criteria fallback retained) — green on the new tests
+- [x] 1.1.2 Implement `skills/analyze-agents/SKILL.md`, the `_shared/specialist-agents.md` updates (ledger convention, check-state consumption, execution surface), and the detection delegation in `skills/make-plan/SKILL.md` and `skills/make-requirements/SKILL.md` (additive to T-07's edits; manual criteria fallback retained) — green on the new tests ✅ (completed: 2026-10-09 15:30)
 - [ ] 1.1.3 Full verification: `npm run verify`
 
 **Deliverables**:
