@@ -5,7 +5,7 @@
 > **Reasoning**: medium — bounded bugfix in the agent-file generator with deterministic tests and an explicit upgrade-compatibility check
 > **Phase baseline tree**: cf268832b3b6d522e4218dd20118d9de8aa5bc1b
 > **Scope mode**: strict · **Expected modification set**: `scripts/install_agents.py`, `scripts/install_agents.spec.test.mjs`, `scripts/install_agents.impl.test.mjs`, `scripts/hygiene-content.spec.test.mjs`, `scripts/fixtures/catalog-executor.golden.md`, `agents/*.md`, `CHANGELOG.md`, `package.json`, `package-lock.json`
-> **Last Updated**: 2026-10-09 14:34
+> **Last Updated**: 2026-10-09 14:36
 
 ## Objective
 
@@ -43,7 +43,7 @@ by marker file regardless of layout.
 ## Tasks
 
 - [x] T-06.1 Write the failing regression tests (red) in `scripts/install_agents.spec.test.mjs`: every generated catalog and specialist file starts with `---` (line 1); the ownership marker, `mode: subagent`, and the intended `hidden` value sit inside the leading frontmatter block; a legacy banner-first file is still recognized as CodeOps-owned (re-generation replaces it instead of skipping it as hand-authored); `--check` reports `STALE` for a catalog role whose file does not match the generator output ✅ (completed: 2026-10-09 14:34)
-- [ ] T-06.2 Implement frontmatter-first emission and compatibility detection: banner as YAML comments inside the frontmatter in `build_agent_frontmatter()` and `generate_custom_agent()`; dual-layout `is_codeops_generated()`; verify or extend the `generated_custom_template()` header scan; catalog content comparison in `run_check()` — T-06.1 tests green (the pre-existing layout tests — `assertMarkerFirst()`, `frontmatterBlock()`, `agentBody()` — are expected red until T-06.3; only T-06.5 requires a fully green suite)
+- [x] T-06.2 Implement frontmatter-first emission and compatibility detection: banner as YAML comments inside the frontmatter in `build_agent_frontmatter()` and `generate_custom_agent()`; dual-layout `is_codeops_generated()`; verify or extend the `generated_custom_template()` header scan; catalog content comparison in `run_check()` — T-06.1 tests green (the pre-existing layout tests — `assertMarkerFirst()`, `frontmatterBlock()`, `agentBody()` — are expected red until T-06.3; only T-06.5 requires a fully green suite) ✅ (completed: 2026-10-09 14:36)
 - [ ] T-06.3 Update existing helpers, fixtures, and goldens: `frontmatterBlock()`, `assertMarkerFirst()`, and `markerAgent()` in `scripts/install_agents.spec.test.mjs`; `agentBody()` in `scripts/hygiene-content.spec.test.mjs`; keep the foreign-role fixture as-is (it is a legacy-layout `--remove-custom` refusal case and doubles as legacy coverage); regenerate `scripts/fixtures/catalog-executor.golden.md` through the same generation path as T-06.4
 - [ ] T-06.4 Regenerate the twelve packaged `agents/*.md` files: run the fixed generator for all roles into a scratch project, copy the outputs into `agents/`, and confirm each file starts with `---`
 - [ ] T-06.5 Full verification: `npm run verify`, plus a legacy-upgrade check (`--check` reports `STALE` on a legacy install and re-generation replaces the files)

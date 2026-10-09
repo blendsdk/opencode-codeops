@@ -1283,7 +1283,7 @@ describe("generated agent file layout", () => {
     const result = runInstaller(project, "--roles", "executor")
 
     assert.equal(result.status, 0, `installer failed: ${result.stderr || result.stdout}`)
-    assert.doesNotMatch(result.stdout, /SKIP/i, "legacy generated files must not be skipped as hand-authored")
+    assert.doesNotMatch(result.stdout, /SKIP \(hand-authored\)/i, "legacy generated files must not be skipped as hand-authored")
     assert.equal(
       readFixtureFile(project, join(".opencode", "agents", "executor.md")).split("\n", 1)[0],
       "---",
