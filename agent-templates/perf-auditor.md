@@ -1,4 +1,5 @@
 <!-- Agent template: perf-auditor
+     description: Reviews ONE completed CodeOps phase diff for performance risks — hot paths, allocations, algorithmic complexity, N+1 query patterns, blocking I/O. Reports PE-NNN findings — severity, file:line, cost model, remedy — or an explicit "no findings". Read-only: never edits, fixes, or commits. Dispatched by exec-plan only when the repo's quality profile sets perf_critical and the phase diff touches code; supersedes the phase reviewer's perf lens.
      See agents/ for the OpenCode agent definition files generated from this template.
      Do not add YAML frontmatter here â use install_agents.py to generate agent files. -->
 

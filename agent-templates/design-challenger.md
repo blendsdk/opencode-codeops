@@ -1,4 +1,5 @@
 <!-- Agent template: design-challenger
+     description: Independent second opinion on a consequential decision. Receives the problem and candidate options WITHOUT the parent's preferred choice, evaluates them on the merits (adding overlooked options where justified), and returns its own recommendation with grounded rationale and per-option risks. Read-only, no Bash. Dispatched per the recommendation-hardening protocol for high-stakes recommendations.
      See agents/ for the OpenCode agent definition files generated from this template.
      Do not add YAML frontmatter here â use install_agents.py to generate agent files. -->
 

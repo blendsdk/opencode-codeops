@@ -1,4 +1,5 @@
 <!-- Agent template: financial-integrity-auditor
+     description: Independently audits a bounded change for ledger, money-movement, precision, idempotency, atomicity, reconciliation, and auditability defects.
      See agents/ for the OpenCode agent definition files generated from this template.
      Do not add YAML frontmatter here â use install_agents.py to generate agent files. -->
 

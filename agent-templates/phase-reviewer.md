@@ -1,4 +1,5 @@
 <!-- Agent template: phase-reviewer
+     description: Reviews ONE completed CodeOps phase diff against its dispatch packet through the always-on lenses (correctness, maintainability, standards) plus the packet's add-on lenses. Verifies spec-test integrity (no *.spec.test.* file touched). Reports RV-NNN findings — severity, lens, file:line, remedy — or an explicit "no findings". Read-only: never edits, fixes, or commits. Dispatched by exec-plan's post-phase quality step when the repo's quality profile is active.
      See agents/ for the OpenCode agent definition files generated from this template.
      Do not add YAML frontmatter here â use install_agents.py to generate agent files. -->
 

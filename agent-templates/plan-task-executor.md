@@ -1,4 +1,5 @@
 <!-- Agent template: plan-task-executor
+     description: Executes one dispatched lower-sensitivity unit — normally a whole phase, occasionally a single task — from a CodeOps exec-plan. Implements code, writes/updates tests, runs the project verify command, reports pass/fail per task. Use for trivial and standard phases when a cheaper model than the session's is warranted.
      See agents/ for the OpenCode agent definition files generated from this template.
      Do not add YAML frontmatter here â use install_agents.py to generate agent files. -->
 

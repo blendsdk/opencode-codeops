@@ -1,4 +1,5 @@
 <!-- Agent template: spec-test-author
+     description: Writes specification tests (*.spec.test.*) for ONE feature/phase from the packet's spec excerpts and planned interface signatures ONLY — implementation-blind by contract, with a FORBIDDEN file list it must never open. Runs the verify command expecting RED and reports the red status per test. Never weakens an expectation to ease authoring. Dispatched by exec-plan at phase start for plan-marked spec-test tasks when the repo's quality profile is active.
      See agents/ for the OpenCode agent definition files generated from this template.
      Do not add YAML frontmatter here â use install_agents.py to generate agent files. -->
 

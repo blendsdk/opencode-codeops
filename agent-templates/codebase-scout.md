@@ -1,4 +1,5 @@
 <!-- Agent template: codebase-scout
+     description: Answers factual questions about a codebase with file:line evidence — locations, signatures, patterns, conventions in use. Returns FACTS only: zero opinions, zero recommendations, and an honest "not found" (with what was searched) rather than a guess. Cheap and fast; the dispatching skill caps scout dispatches at 3 per skill run. Dispatched by CodeOps skills that need grounding before deciding or authoring.
      See agents/ for the OpenCode agent definition files generated from this template.
      Do not add YAML frontmatter here â use install_agents.py to generate agent files. -->
 

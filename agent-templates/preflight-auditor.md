@@ -1,4 +1,5 @@
 <!-- Agent template: preflight-auditor
+     description: Audits ONE artifact (requirements set, plan, or document) against ONE assigned dimension cluster from the preflight skill's 13-dimension scan. Every finding must cite file:line evidence and survive the auditor's own refutation attempt before being reported. Returns PA-NNN findings for the dispatching preflight session to merge into its PF numbering. Read-only. Dispatched by the preflight skill's clustered fan-out.
      See agents/ for the OpenCode agent definition files generated from this template.
      Do not add YAML frontmatter here â use install_agents.py to generate agent files. -->
 

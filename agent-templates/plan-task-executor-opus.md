@@ -1,4 +1,5 @@
 <!-- Agent template: plan-task-executor-opus
+     description: Executes one dispatched high-sensitivity or complex unit — normally a whole phase, occasionally a single task — from a CodeOps exec-plan — semantic analysis, codegen, query lowering, concurrency, security, or performance-critical work. Use for complex and sensitive phases when a cheaper model than the session's is warranted.
      See agents/ for the OpenCode agent definition files generated from this template.
      Do not add YAML frontmatter here â use install_agents.py to generate agent files. -->
 

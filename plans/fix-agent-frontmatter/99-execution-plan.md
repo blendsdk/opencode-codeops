@@ -52,3 +52,18 @@ by marker file regardless of layout.
 - [ ] T-06.8 Released-artifact verification and issue close-out: install the released package into a scratch scope, re-run the `opencode debug agents` check, then update and close issue #2 through the github-issues skill (mutation explicitly authorized) with the fix reference
 
 **Verify**: `npm run verify`
+
+## Quality Review
+
+Post-task review on the whole-task diff (baseline tree `cf268832`), 2026-10-09. The specialist
+reviewer agents were not installable at review time (the condition this task fixes); one independent
+correctness reviewer and one security/migration auditor ran on generic packets and both returned
+**PASS WITH NOTES**.
+
+| ID | Severity | Finding | Resolution |
+|----|----------|---------|------------|
+| RV-001 / SA-002 | MINOR | `--check` catalog comparison could abort on a missing or unreadable template | Guarded: reports `INVALID: <role>` instead of a traceback |
+| RV-002 / SA-001 | MINOR | Regeneration replaced the curated agent descriptions with generic fallbacks | Curated descriptions restored in `agent-templates/*.md` (parsed from the provenance comment) and catalog descriptions emitted as quoted YAML scalars; packaged agents and golden regenerated |
+| SA-003 | OBSERVATION | Catalog `--check` lacked the custom branch's symlink guard | Symlinked catalog files now report `HAND-AUTHORED (skip)` |
+| RV-004 | OBSERVATION | `is_codeops_generated()` docstring imprecise about the scan window | Wording corrected (within the first eight lines) |
+| RV-003 | OBSERVATION | Matcher change scrutinized for spec-test weakening | Confirmed legitimate (exact skip-marker match); no action |
