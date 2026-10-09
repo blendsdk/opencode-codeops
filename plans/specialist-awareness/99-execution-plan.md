@@ -1,11 +1,11 @@
 # Task T-07: Specialist awareness — visible checks, proposal split, analyze-project coverage
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 3/4 tasks (75%)
+> **Progress**: 4/4 tasks (100%)
 > **Reasoning**: medium — policy and wording changes across shared docs and skills, with content assertions as the verification surface
 > **Phase baseline tree**: c1a650115c8d1897adee3437a9a63786d0f5644d
 > **Scope mode**: strict · **Expected modification set**: `_shared/specialist-agents.md`, `skills/make-requirements/SKILL.md`, `skills/make-plan/SKILL.md`, `skills/make-plan/quality-checklist.md`, `skills/analyze-project/SKILL.md`, `scripts/specialist-content.spec.test.mjs`, `plans/*`
-> **Last Updated**: 2026-10-09 15:12
+> **Last Updated**: 2026-10-09 15:16
 
 ## Objective
 
@@ -33,6 +33,6 @@ script, no new CLI surface.
 - [x] T-07.1 Extend the content specification tests (red), following the `scripts/specialist-content.spec.test.mjs` conventions: lightweight-proposal format and gate split present in `_shared/specialist-agents.md`; fixed "Specialist check" summary-line requirement in `skills/make-plan/SKILL.md` and `skills/make-requirements/SKILL.md`; the specialist item in `skills/make-plan/quality-checklist.md`; coverage-line and recommendation instructions plus the check-state interface in `skills/analyze-project/SKILL.md` ✅ (completed: 2026-10-09 15:12)
 - [x] T-07.2 Apply the policy and wording edits: `_shared/specialist-agents.md` (new proposal and check-state sections; detection-integration updates); `skills/make-requirements/SKILL.md` (proposal split; summary line); `skills/make-plan/SKILL.md` (Phase 4 summary line); `skills/make-plan/quality-checklist.md` (enforcement item); `skills/analyze-project/SKILL.md` (coverage line + recommendation logic, layout-aware) — T-07.1 tests green ✅ (completed: 2026-10-09 15:13)
 - [x] T-07.3 Full verification: `npm run verify` ✅ (completed: 2026-10-09 15:14)
-- [ ] T-07.4 Live smoke in a scratch repository: `analyze-project` with no state file shows "never checked — run `analyze-agents`"; with an up-to-date fixture state it shows "up to date"; with a stale fixture state it shows the recommendation
+- [x] T-07.4 Live smoke in a scratch repository: `analyze-project` with no state file shows "never checked — run `analyze-agents`"; with an up-to-date fixture state it shows "up to date"; with a stale fixture state it shows the recommendation ✅ (completed: 2026-10-09 15:16)
 
 **Verify**: `npm run verify`
