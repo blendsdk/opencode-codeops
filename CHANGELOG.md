@@ -2,6 +2,29 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 2.0.4 — 2026-10-09
+
+### Chores
+
+- plan: sync the T-06 progress header (6/8 tasks)
+- plan: record T-06.6 live spot-check on OpenCode 2.0.24
+- plan: record T-06.5 full verification and legacy-upgrade check
+
+### Documentation
+
+- plans: add the specialist-awareness task plan and the analyze-agents register
+
+### Fixes
+
+- agents: restore curated role descriptions and harden --check
+- agents: regenerate the packaged agent files in the frontmatter-first layout
+- agents: emit frontmatter-first agent files and keep legacy installs upgradeable
+
+### Tests
+
+- agents: move layout helpers and the catalog golden to frontmatter-first
+- agents: add frontmatter-first regression tests (red phase)
+
 ## 2.0.3 — 2026-10-06
 
 ### CI
