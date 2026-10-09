@@ -201,3 +201,39 @@ describe("ST-31 layout and content hygiene", () => {
     assert.deepEqual(missing, [], `skills missing a name: field: ${missing.join(", ")}`)
   })
 })
+
+describe("ST-33 specialist awareness and proposal split", () => {
+  it("splits lightweight proposals from the creation gate in the protocol document", () => {
+    const content = read("_shared/specialist-agents.md")
+    assert.match(content, /lightweight proposal/i)
+    assert.match(content, /chooses to proceed/i)
+  })
+
+  it("defines the check-state interface in the protocol document", () => {
+    const content = read("_shared/specialist-agents.md")
+    assert.match(content, /codeops\/specialist-check\.json/)
+    assert.match(content, /checkedAt/)
+    assert.match(content, /never checked/i)
+  })
+
+  it("requires the Specialist check summary line in make-plan", () => {
+    assert.match(read("skills/make-plan/SKILL.md"), /Specialist check:/)
+  })
+
+  it("requires lightweight proposals and the Specialist check summary line in make-requirements", () => {
+    const content = read("skills/make-requirements/SKILL.md")
+    assert.match(content, /lightweight proposal/i)
+    assert.match(content, /Specialist check:/)
+  })
+
+  it("enforces the Specialist Agents section in the plan quality checklist", () => {
+    assert.match(read("skills/make-plan/quality-checklist.md"), /Specialist Agents/)
+  })
+
+  it("documents the coverage line and recommendation in analyze-project", () => {
+    const content = read("skills/analyze-project/SKILL.md")
+    assert.match(content, /specialist-check\.json/)
+    assert.match(content, /analyze-agents/)
+    assert.match(content, /never checked/i)
+  })
+})
