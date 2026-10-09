@@ -199,9 +199,16 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
    `[!]`, preserve the diff without marking it verified, and switch to the full standalone-plan
    path. The new `00-ambiguity-register.md` owns the packet and decision. Resume only after that
    plan's gates pass.
-4. **Record decisions durably** in the finding artifact after each ruling batch. When the user
-   approves larger machinery, also append a `Technical (complexity escalation)` runtime AR with
-   every approval-evidence field required by the shared gate; the RV finding references that AR.
+4. **Record decisions durably** in the plan's findings ledger after each ruling batch. The ledger
+   is `plans/<plan>/05-findings.md` (flat) or
+   `codeops/features/<f>/plans/<plan>/05-findings.md` (nested), created lazily on first use, with a
+   one-line title and one compact row per batch:
+   `| Finding | Phase | Severity | Area | Ruling |` — values such as `RV-001`, the phase number,
+   `CRITICAL`/`MAJOR`/`MINOR`, a path or domain token, and
+   `fixed`/`accepted`/`deferred`/`dismissed`; identifiers and area tokens only, never prose. Task
+   mini-plans keep their ledger in their own plan folder. When the user approves larger machinery,
+   also append a `Technical (complexity escalation)` runtime AR with every approval-evidence field
+   required by the shared gate; the RV finding references that AR.
 5. **Accepted fixes:** implement → verify → follow-up commit per the commit mode. If any 🔴/🟠
    fix was applied, dispatch ONE re-review scoped to the fix diff — never a third pass. A fix
    the re-review still rejects is reported. Normal mode returns the ruling to the user; active
