@@ -4,6 +4,12 @@ All notable changes to CodeOps are recorded here.
 
 ## 2.1.1 — 2026-10-09
 
+### Upgrade Notes
+
+- Update and restart the OpenCode service to pick up the fix: until the 2.1.1
+  plugin is loaded, plugin unloads keep deleting the shared `$CODEOPS_TMPDIR`
+  directory of running sessions.
+
 ### Fixes
 
 - plugin: stop deleting the shared scratch directory on unload
