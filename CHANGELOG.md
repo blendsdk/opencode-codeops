@@ -2,6 +2,44 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 2.1.0 — 2026-10-09
+
+### Documentation
+
+- readme: list the analyze-agents skill and the on-demand detection flow
+- exec-plan: record ruling batches in the per-plan findings ledger
+- skills: complete T-07 with the coverage-line smoke and render clarifications
+- skills: surface specialist checks and split proposals from the creation gate
+- plans: resolve the analyze-agents preflight findings and pass the plan
+- plans: add the analyze-agents feature plan set (gate passed)
+- changelog: add the 2.0.4 upgrade notes and record the release
+
+### Chores
+
+- plan: record the 3.1.1 live smoke
+- plan: record 2.1.3 full verification
+- plan: record 1.1.3 full verification
+- plan: use plain-bullet deliverables so progress counts only tasks
+- plan: record T-07.3 full verification
+- plan: complete T-06 - v2.0.4 verified and issue #2 closed
+
+### Fixes
+
+- skills: harden the ledger assertions per the phase-2 review
+- skills: anchor the phase-1 review assertions and clarify the fallback wording
+- tests: drop the borrowed ST id from the T-07 content suite
+- skills: resolve the T-07 review findings
+
+### Tests
+
+- skills: extend the analyze-agents content tests with the ledger wiring (red phase)
+- skills: add analyze-agents content spec tests (red phase)
+- skills: add specialist awareness content tests (red phase)
+
+### Features
+
+- skills: add the analyze-agents check skill and protocol wiring
+
 ## 2.0.4 — 2026-10-09
 
 ### Upgrade Notes
