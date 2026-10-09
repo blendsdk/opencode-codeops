@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-09 15:02
-> **Progress**: 0/8 tasks (0%)
+> **Last Updated**: 2026-10-09 15:28
+> **Progress**: 1/8 tasks (12%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -44,7 +44,7 @@ task-size criteria in the make-plan quality checklist)
 
 ## Phase 1: Skill and protocol wiring
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill from a temporary-index snapshot)_
+> **Phase baseline tree**: 7f2a162aef50b85d5292010346ccb26c5e2add65
 > **Reasoning**: max — carries the AR #15 approved complexity machinery (skill + records), where a wrong contract propagates to every project check
 
 ### Step 1.1: Skill contract and shared protocol
@@ -52,7 +52,7 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 03-01 §Skill Contract · 03-02 §Check State · AR #1, #2, #4, #9, #10, #12, #13, #15
 **Objective**: Pin and then implement the skill contract and the shared-protocol additions.
 
-- [ ] 1.1.1 [spec-author] Write the content spec tests for ST-1 … ST-7 and ST-9 — `scripts/analyze-agents-content.spec.test.mjs` — and verify the red phase
+- [x] 1.1.1 [spec-author] Write the content spec tests for ST-1 … ST-7 and ST-9 — `scripts/analyze-agents-content.spec.test.mjs` — and verify the red phase ✅ (completed: 2026-10-09 15:28)
 - [ ] 1.1.2 Implement `skills/analyze-agents/SKILL.md`, the `_shared/specialist-agents.md` updates (ledger convention, check-state consumption, execution surface), and the detection delegation in `skills/make-plan/SKILL.md` and `skills/make-requirements/SKILL.md` (additive to T-07's edits; manual criteria fallback retained) — green on the new tests
 - [ ] 1.1.3 Full verification: `npm run verify`
 
