@@ -3,7 +3,7 @@
 > **Feature-Set**: opencode-codeops
 > **Status**: In Progress
 > **Created**: 2026-10-04
-> **Last Updated**: 2026-10-09 14:27
+> **Last Updated**: 2026-10-09 14:52
 > **Progress**: n/a
 > **CodeOps Artifact Schema**: 1
 
@@ -22,5 +22,5 @@
 | T-03 | Opt-in reasoning-effort request trace | — | [reasoning-effort-trace](reasoning-effort-trace/99-execution-plan.md) | Done | ✅ | 2026-10-04 14:06 | — |
 | T-04 | Note the exposed model variant set (`low`/`high`/`max`) in the effort docs | — | — | Done | ✅ | 2026-10-04 14:08 | — |
 | T-05 | Map missing reasoning levels to the nearest exposed variant | — | [effort-level-fallback](effort-level-fallback/99-execution-plan.md) | Done | ✅ | 2026-10-04 14:13 | — |
-| T-06 | Fix agent frontmatter layout so mode/hidden/permissions apply (issue #2) | — | [fix-agent-frontmatter](fix-agent-frontmatter/99-execution-plan.md) | Executing | 🔄 | 2026-10-09 | — |
+| T-06 | Fix agent frontmatter layout so mode/hidden/permissions apply (issue #2) | — | [fix-agent-frontmatter](fix-agent-frontmatter/99-execution-plan.md) | Done | ✅ | 2026-10-09 | — |
 | T-07 | Specialist awareness: visible checks, proposal split, analyze-project coverage | — | [specialist-awareness](specialist-awareness/99-execution-plan.md) | Backlog | ⬜ | 2026-10-09 | — |
