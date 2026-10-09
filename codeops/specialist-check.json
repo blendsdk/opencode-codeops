@@ -1,0 +1,14 @@
+{
+  "checkedAt": "2026-10-09T14:35:49Z",
+  "plans": [
+    "adaptive-reasoning-effort",
+    "analyze-agents",
+    "effort-level-fallback",
+    "fix-agent-frontmatter",
+    "fix-release-tag-push",
+    "fix-shared-reference-install",
+    "reasoning-effort-trace",
+    "specialist-agents",
+    "specialist-awareness"
+  ]
+}
