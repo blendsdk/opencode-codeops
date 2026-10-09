@@ -1,11 +1,11 @@
 # Task T-06: Emit frontmatter-first agent files so OpenCode honors mode, hidden, and permissions
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 6/8 tasks (75%)
+> **Progress**: 7/8 tasks (88%)
 > **Reasoning**: medium — bounded bugfix in the agent-file generator with deterministic tests and an explicit upgrade-compatibility check
 > **Phase baseline tree**: cf268832b3b6d522e4218dd20118d9de8aa5bc1b
 > **Scope mode**: strict · **Expected modification set**: `scripts/install_agents.py`, `scripts/install_agents.spec.test.mjs`, `scripts/install_agents.impl.test.mjs`, `scripts/hygiene-content.spec.test.mjs`, `scripts/fixtures/catalog-executor.golden.md`, `agents/*.md`, `CHANGELOG.md`, `package.json`, `package-lock.json`
-> **Last Updated**: 2026-10-09 14:46
+> **Last Updated**: 2026-10-09 14:49
 
 ## Objective
 
@@ -48,7 +48,7 @@ by marker file regardless of layout.
 - [x] T-06.4 Regenerate the twelve packaged `agents/*.md` files: run the fixed generator for all roles into a scratch project, copy the outputs into `agents/`, and confirm each file starts with `---` ✅ (completed: 2026-10-09 14:37)
 - [x] T-06.5 Full verification: `npm run verify`, plus a legacy-upgrade check (`--check` reports `STALE` on a legacy install and re-generation replaces the files) ✅ (completed: 2026-10-09 14:38)
 - [x] T-06.6 Live spot-check with OpenCode 2.0.24: install the regenerated agents into a scratch project; `opencode debug agents` reports `mode: subagent`, the intended `hidden` value, and the permission rules; the agent cycle no longer lists the roles ✅ (completed: 2026-10-09 14:38)
-- [ ] T-06.7 Release patch v2.0.4: commit through the git-commit skill; run the repo release flow (`node scripts/release.mjs release --type auto --tag latest`); the release notes/CHANGELOG must state the upgrade steps for existing installs (package `update`/`install`; project files need a `--roles`/`--custom` re-run; `--check` reports `STALE` until then) and must not claim `temperature`/`reasoningEffort` behavior changes (model pins now apply; request settings remain preserved but unsent in OpenCode V2); confirm the CHANGELOG entry and the published version
+- [x] T-06.7 Release patch v2.0.4: commit through the git-commit skill; run the repo release flow (`node scripts/release.mjs release --type auto --tag latest`); the release notes/CHANGELOG must state the upgrade steps for existing installs (package `update`/`install`; project files need a `--roles`/`--custom` re-run; `--check` reports `STALE` until then) and must not claim `temperature`/`reasoningEffort` behavior changes (model pins now apply; request settings remain preserved but unsent in OpenCode V2); confirm the CHANGELOG entry and the published version ✅ (completed: 2026-10-09 14:49)
 - [ ] T-06.8 Released-artifact verification and issue close-out: install the released package into a scratch scope, re-run the `opencode debug agents` check, then update and close issue #2 through the github-issues skill (mutation explicitly authorized) with the fix reference
 
 **Verify**: `npm run verify`

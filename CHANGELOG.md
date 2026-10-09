@@ -4,6 +4,16 @@ All notable changes to CodeOps are recorded here.
 
 ## 2.0.4 — 2026-10-09
 
+### Upgrade Notes
+
+- Existing installs upgrade in place: run `npx opencode-codeops update` (package-scope installs) or
+  re-run `install_agents.py --roles` / `--custom` (project-generated agents); `--check` reports
+  `STALE` until the files are regenerated.
+- Generated agent files now open with `---`, so OpenCode parses `mode`, `hidden`, `permissions`,
+  descriptions, and model pins. Catalog roles are hidden subagents instead of selectable primary
+  agents. `temperature`/`reasoningEffort` values remain preserved but are not yet sent by the
+  OpenCode V2 runner.
+
 ### Chores
 
 - plan: sync the T-06 progress header (6/8 tasks)
