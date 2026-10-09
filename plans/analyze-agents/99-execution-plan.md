@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-09 15:28
-> **Progress**: 5/8 tasks (62%)
+> **Progress**: 6/8 tasks (75%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -78,7 +78,7 @@ task-size criteria in the make-plan quality checklist)
 
 - [x] 2.1.1 [spec-author] Extend the content tests with ST-8 (the exec-plan ruling step — `execution-protocol.md` and `SKILL.md` — writes `plans/<plan>/05-findings.md` rows with the 03-02 title template, value vocabularies, and lazy creation; no undefined "finding artifact" reference remains) — verify the red phase ✅ (completed: 2026-10-09 15:36)
 - [x] 2.1.2 Implement the exec-plan ruling-step edits in `skills/exec-plan/execution-protocol.md` and `skills/exec-plan/SKILL.md` (ledger path and row format, one-line title, value vocabularies, lazy creation, mini-plan locus) — green on the new tests ✅ (completed: 2026-10-09 15:37)
-- [ ] 2.1.3 Full verification: `npm run verify`
+- [x] 2.1.3 Full verification: `npm run verify` ✅ (completed: 2026-10-09 15:37)
 
 **Deliverables**:
 - The ruling step names the ledger path and row format
