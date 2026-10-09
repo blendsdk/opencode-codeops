@@ -74,7 +74,7 @@ node scripts/release.mjs release --type auto --tag next --dry-run
 
 - Type: OpenCode plugin — TypeScript entry `plugin/index.ts`, Python tooling under `scripts/`,
   Markdown skills and shared conventions under `skills/` and `_shared/`.
-- Verify: `npm run verify` (tsc + `node --test` + version parity); CI uses Node 20; runtime
+- Verify: `npm run verify` (tsc + `node --test` + version parity); CI uses Node 24; runtime
   requires Python 3.8+.
 - Structure: `bin/lib/` holds framework-free `.mjs` helpers with `.d.mts` declarations consumed
   by the plugin (temp-dir hygiene, reasoning effort); `skills/` and `_shared/` ship agent
