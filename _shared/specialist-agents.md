@@ -64,6 +64,34 @@ escalation)` entry.
 - Rejection and deferral are valid outcomes. A rejected candidate may not reappear in the same
   scope without new evidence.
 
+## Proposals and the creation gate
+
+A **lightweight proposal** is a short, evidence-backed suggestion — role slug, kind, one-line
+capability, evidence (`file:line`), the smallest alternative and why it is insufficient — surfaced
+in the normal findings/plan flow. Proposals need no gate: they are suggestions, not machinery.
+
+The Complexity Escalation Gate, the independent challenger verdict, and the reserved-authority
+decision apply only when the user chooses to proceed to creation. Approved roles are then created
+through `setup-routing` as described below; the lightweight proposal format is what `analyze-agents`
+and every detection step emit for at most two candidates per scope.
+
+## Check state
+
+Running the check records one small project file:
+
+```json
+{
+  "checkedAt": "<ISO-8601 timestamp>",
+  "plans": ["<plan folder>", "<plan folder>"]
+}
+```
+
+- Path: `codeops/specialist-check.json` (project-level in both layouts).
+- Written at the end of every check run — including `None` outcomes — by the execution surface
+  (`analyze-agents`); the `plans` list is layout-aware.
+- Absent, unreadable, or malformed state means **never checked** for consumers; the
+  `analyze-project` coverage line then recommends a run. Fail loud, never silent.
+
 ## Routing layers
 
 | Layer | Owner | Content | Consumer |

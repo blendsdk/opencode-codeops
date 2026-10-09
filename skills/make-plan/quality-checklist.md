@@ -7,6 +7,7 @@ Run this before finalizing the plan documents. The **Specification-First Testing
 - [ ] All affected components identified
 - [ ] All scope decisions documented
 - [ ] All dependencies mapped
+- [ ] The `## Specialist Agents` outcome is recorded in `00-index.md` (candidate or `None` with evidence)
 - [ ] Every planned item traces to the confirmed scope baseline or a user-kept `SE-*` entry
 - [ ] Strict scope contains no optional suggestions; exploration proposals remain non-executable
       until the user chooses `Keep`
