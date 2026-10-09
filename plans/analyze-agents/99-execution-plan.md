@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-09 15:28
-> **Progress**: 6/8 tasks (75%)
+> **Progress**: 7/8 tasks (88%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -90,7 +90,7 @@ task-size criteria in the make-plan quality checklist)
 
 ## Phase 3: Smoke and release
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill from a temporary-index snapshot)_
+> **Phase baseline tree**: 2bf581c436fcf9edbd6619e0ee2b97455e84ae55
 > **Reasoning**: low — verification and release mechanics with deterministic outcomes
 
 ### Step 3.1: Live smoke and release
@@ -98,8 +98,8 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 07 §ST-11 · Acceptance Criteria §4–5
 **Objective**: Prove the end-to-end behavior on a scratch repository, then release.
 
-- [ ] 3.1.1 Live smoke (ST-11): recurrence candidate and `None` paths in scratch repositories; state file written both times; coverage line reads it
-- [ ] 3.1.2 Full verification + minor release through the repo release flow (project release convention: every user-facing change ships in a version with CHANGELOG notes; T-07 bundles into this release), with notes covering the new skill and records; update the README skills list
+- [x] 3.1.1 Live smoke (ST-11): recurrence candidate and `None` paths in scratch repositories; state file written both times; coverage line reads it ✅ (completed: 2026-10-09 15:44)
+- [~] 3.1.2 Full verification + minor release through the repo release flow (project release convention: every user-facing change ships in a version with CHANGELOG notes; T-07 bundles into this release), with notes covering the new skill and records; update the README skills list ⏳ (implemented: 2026-10-09 15:44)
 
 **Deliverables**:
 - ST-11 result recorded
