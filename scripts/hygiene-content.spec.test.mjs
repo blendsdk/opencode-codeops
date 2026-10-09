@@ -57,8 +57,14 @@ function read(relativePath) {
  * @returns {string} The trimmed body text.
  */
 function agentBody(content) {
-  const frontmatter = content.match(/^[\s\S]*?\n---\n[\s\S]*?\n---\n/)
-  const rest = frontmatter ? content.slice(frontmatter[0].length) : content
+  let rest = content
+  if (content.startsWith("---\n")) {
+    const end = content.indexOf("\n---", 4)
+    if (end !== -1) rest = content.slice(end + 4)
+  } else {
+    const frontmatter = content.match(/\n---\n[\s\S]*?\n---\n/)
+    if (frontmatter) rest = content.slice(frontmatter.index + frontmatter[0].length)
+  }
   return rest.replace(/<!-- Agent template:[\s\S]*?-->/, "").trim()
 }
 
