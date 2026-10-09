@@ -9,8 +9,7 @@
  * - it computes the per-session directory the plugin exports as
  *   `$CODEOPS_TMPDIR`, under a CodeOps-owned root inside the OS temp directory;
  * - it sweeps directories abandoned by interrupted runs once they are older
- *   than a safety cap; and
- * - it removes exactly one session's directory when that session is deleted.
+ *   than a safety cap.
  *
  * Safety is the whole point: every path derives from a sanitized session
  * identifier, the sweep walks only the CodeOps-owned root, symlinked entries
@@ -22,7 +21,7 @@
 
 import { lstatSync, mkdirSync, readdirSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
-import { join, resolve, sep } from "node:path"
+import { join, resolve } from "node:path"
 
 /**
  * Age after which a session directory is treated as abandoned.
@@ -146,35 +145,4 @@ export function cleanStaleTmpDirs({
   }
 
   return removed
-}
-
-/**
- * Remove exactly one session's temp directory.
- *
- * Used when a session is deleted: its scratch can no longer be needed. The
- * removal refuses anything that is not a regular directory strictly inside
- * the CodeOps temp root, so a symlink or an unexpected path is left alone.
- *
- * @param sessionID - Session identifier whose directory should be removed
- * @param base - Base temp directory (injectable for tests)
- * @returns True when the directory was removed
- */
-export function removeSessionTmpDir(sessionID, base = tmpdir()) {
-  const root = resolve(codeopsTmpRoot(base))
-  const dir = sessionTmpDir(sessionID, base)
-
-  if (!resolve(dir).startsWith(root + sep)) return false
-
-  try {
-    if (!lstatSync(dir).isDirectory()) return false
-  } catch {
-    return false
-  }
-
-  try {
-    rmSync(dir, { recursive: true, force: true })
-    return true
-  } catch {
-    return false
-  }
 }

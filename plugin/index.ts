@@ -8,7 +8,6 @@ import { fileURLToPath } from "node:url"
 import {
   cleanStaleTmpDirs,
   ensureSessionTmpDir,
-  removeSessionTmpDir,
 } from "../bin/lib/tmp-hygiene.mjs"
 import {
   appendEffortTrace,
@@ -70,9 +69,9 @@ const standardsText = `${codingStandards}\n\n${outputStyle}`
 // OpenCode 2 does not expose a session identifier to shell hooks, so the plugin
 // owns one scratch directory per plugin runtime instead of one per session.
 // Skills and subagents still receive it as CODEOPS_TMPDIR and delete their own
-// scratch; the plugin removes the runtime directory on unload and sweeps
-// directories abandoned by earlier runs. Two sessions served by the same
-// runtime share this directory; see _shared/workspace-hygiene.md.
+// scratch; the startup sweep reclaims directories abandoned by earlier runs.
+// Several sessions can share one runtime directory, so the plugin must never
+// delete it on unload; see _shared/workspace-hygiene.md.
 // ---------------------------------------------------------------------------
 const runtimeID = `runtime-${randomUUID()}`
 
@@ -386,16 +385,12 @@ export default Plugin.define({
     })
 
     // ---------------------------------------------------------------------
-    // Plugin cleanup: stop listening for events and remove the runtime's
-    // scratch directory. Both are best effort.
+    // Plugin cleanup: stop listening for events. The runtime's scratch
+    // directory is deliberately left in place — other sessions may still be
+    // using it — and the startup sweep reclaims abandoned directories.
     // ---------------------------------------------------------------------
     return () => {
       controller.abort()
-      try {
-        removeSessionTmpDir(runtimeID)
-      } catch {
-        // Best effort only.
-      }
     }
   },
 })

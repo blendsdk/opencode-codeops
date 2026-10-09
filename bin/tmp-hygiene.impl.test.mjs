@@ -2,8 +2,8 @@
  * Implementation tests for the CodeOps temporary-directory lifecycle helper.
  *
  * These cases exercise the safety net behind the workspace-hygiene protocol:
- * per-session directories under a CodeOps-owned temp root, an age-gated sweep
- * of abandoned directories, and exact removal of one session's directory.
+ * per-session directories under a CodeOps-owned temp root and an age-gated
+ * sweep of abandoned directories.
  * Every case runs against a throwaway base directory, never the real system
  * temp directory.
  *
@@ -31,7 +31,6 @@ import {
   cleanStaleTmpDirs,
   codeopsTmpRoot,
   ensureSessionTmpDir,
-  removeSessionTmpDir,
   sanitizeSessionId,
   sessionTmpDir,
 } from "./lib/tmp-hygiene.mjs"
@@ -173,36 +172,5 @@ describe("stale-directory sweep", () => {
 
     assert.deepEqual(removed, [first, second].sort())
     assert.deepEqual(readdirSync(codeopsTmpRoot(base)), [])
-  })
-})
-
-describe("exact session-directory removal", () => {
-  it("removes one session directory and leaves the rest", () => {
-    const base = makeBase()
-    const target = makeSessionDir(base, "ses_done")
-    const other = makeSessionDir(base, "ses_live")
-
-    assert.equal(removeSessionTmpDir("ses_done", base), true)
-    assert.ok(!existsSync(target))
-    assert.ok(existsSync(other))
-  })
-
-  it("reports false for a missing directory", () => {
-    const base = makeBase()
-    assert.equal(removeSessionTmpDir("ses_missing", base), false)
-  })
-
-  it("refuses to remove a symlink planted at the session path", () => {
-    const base = makeBase()
-    const outside = makeBase()
-    const target = join(outside, "real-dir")
-    mkdirSync(target, { recursive: true })
-
-    const root = codeopsTmpRoot(base)
-    mkdirSync(root, { recursive: true })
-    symlinkSync(target, join(root, "ses_link"), "dir")
-
-    assert.equal(removeSessionTmpDir("ses_link", base), false)
-    assert.ok(existsSync(target), "symlink target must survive")
   })
 })

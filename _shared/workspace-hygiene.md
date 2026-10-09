@@ -51,7 +51,9 @@ keep scratch file names specific to the run to avoid collisions.
 
 ## Automatic safety net
 
-The CodeOps plugin exports `$CODEOPS_TMPDIR` for each runtime and removes that runtime's
-directory when the plugin unloads. At startup it also removes CodeOps temp directories older
-than seven days, so an interrupted run cannot leak storage forever. The safety net is a
-fallback, not a substitute: the run itself still performs the cleanup pass above.
+The CodeOps plugin exports `$CODEOPS_TMPDIR` for each runtime. At startup it removes CodeOps
+temp directories older than seven days, so an interrupted run cannot leak storage forever.
+The plugin never deletes a runtime's directory while sessions may still be running — several
+sessions can share one directory, so reclamation happens only through the age-based sweep.
+The safety net is a fallback, not a substitute: the run itself still performs the cleanup
+pass above.

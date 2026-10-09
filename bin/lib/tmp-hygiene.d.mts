@@ -33,6 +33,3 @@ export interface CleanStaleTmpDirsOptions {
 
 /** Remove session directories abandoned by interrupted or crashed runs. */
 export declare function cleanStaleTmpDirs(options?: CleanStaleTmpDirsOptions): string[]
-
-/** Remove exactly one session's temp directory. */
-export declare function removeSessionTmpDir(sessionID?: string, base?: string): boolean

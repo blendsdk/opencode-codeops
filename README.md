@@ -145,11 +145,11 @@ The plugin also warns (non-blocking) if any tool attempts to edit `codeops/.code
 
 Every session also gets a workspace-hygiene guard: the plugin exports `CODEOPS_TMPDIR`, a scratch
 directory under the OS temp directory that belongs to the running OpenCode plugin instance. Skills
-and agents put temporary files there and delete them when the run completes; the plugin removes the
-directory when it unloads and sweeps directories abandoned by interrupted runs at startup, so
-CodeOps does not accumulate scratch data. Because OpenCode 2 does not expose a session id to shell
-hooks, concurrent sessions served by one instance share this directory. The full protocol is in
-`_shared/workspace-hygiene.md`.
+and agents put temporary files there and delete them when the run completes; the plugin sweeps
+directories abandoned by interrupted runs at startup (older than seven days), so CodeOps does not
+accumulate scratch data. Because OpenCode 2 does not expose a session id to shell hooks, concurrent
+sessions served by one instance share this directory, and no session's scratch is deleted while
+others may still use it. The full protocol is in `_shared/workspace-hygiene.md`.
 
 ## Agent model configuration
 
