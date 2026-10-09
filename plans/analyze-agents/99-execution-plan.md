@@ -53,12 +53,13 @@ task-size criteria in the make-plan quality checklist)
 **Objective**: Pin and then implement the skill contract and the shared-protocol additions.
 
 - [ ] 1.1.1 [spec-author] Write the content spec tests for ST-1 … ST-7 and ST-9 — `scripts/analyze-agents-content.spec.test.mjs` — and verify the red phase
-- [ ] 1.1.2 Implement `skills/analyze-agents/SKILL.md` and the `_shared/specialist-agents.md` updates (ledger convention, check-state consumption, execution surface) — green on the new tests
+- [ ] 1.1.2 Implement `skills/analyze-agents/SKILL.md`, the `_shared/specialist-agents.md` updates (ledger convention, check-state consumption, execution surface), and the detection delegation in `skills/make-plan/SKILL.md` and `skills/make-requirements/SKILL.md` (additive to T-07's edits; manual criteria fallback retained) — green on the new tests
 - [ ] 1.1.3 Full verification: `npm run verify`
 
 **Deliverables**:
 - [ ] `skills/analyze-agents/SKILL.md` exists with the pinned contract
 - [ ] `_shared/specialist-agents.md` carries the ledger/state/execution-surface sections
+- [ ] `make-plan` and `make-requirements` detection steps name the `analyze-agents` flow
 - [ ] All verification passing
 
 **Verify**: `npm run verify`
@@ -98,7 +99,7 @@ task-size criteria in the make-plan quality checklist)
 **Objective**: Prove the end-to-end behavior on a scratch repository, then release.
 
 - [ ] 3.1.1 Live smoke (ST-11): recurrence candidate and `None` paths in scratch repositories; state file written both times; coverage line reads it
-- [ ] 3.1.2 Full verification + minor release (2.1.0) through the repo release flow, with CHANGELOG notes covering the new skill and records
+- [ ] 3.1.2 Full verification + minor release through the repo release flow (project release convention: every user-facing change ships in a version with CHANGELOG notes; T-07 bundles into this release), with notes covering the new skill and records
 
 **Deliverables**:
 - [ ] ST-11 result recorded

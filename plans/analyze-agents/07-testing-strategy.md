@@ -29,7 +29,7 @@
 | # | Input / Scenario | Expected Output / Behavior | Source |
 | --- | ---------------- | -------------------------- | ------ |
 | ST-1 | Inspect `skills/analyze-agents/SKILL.md` | File exists; frontmatter has `name: analyze-agents` and a description; body documents invocation, evidence reads, detection flow, output, state write, hand-off, and layout-awareness | R1, AR #1, AR #2 |
-| ST-2 | Same file | States native reading: no script invocation; evidence sources are requirements/plans, ledgers, and manifests; no network or dependency use | R2, AR #10 |
+| ST-2 | Same file | States native reading as a required statement — the skill names its evidence sources and contains no script invocation; no network or dependency use | R2, AR #10 |
 | ST-3 | Same file | Requires writing `codeops/specialist-check.json` on every run including `None`; shape `{ checkedAt, plans[] }`; layout-aware plan list | R4, AR #4, AR #9 |
 | ST-4 | Same file | Requires at most two candidates in the T-07 lightweight proposal format, or `None` with evidence | R3, AR #2, AR #6 |
 | ST-5 | Same file | Documents degradation: missing ledger → reduced-signal note; malformed rows skipped with a note; corrupt state → never checked | R2, AR #13 |

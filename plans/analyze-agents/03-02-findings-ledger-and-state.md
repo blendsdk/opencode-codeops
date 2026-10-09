@@ -61,6 +61,8 @@ their own folder; runtime complexity rulings continue to live in the ambiguity r
 - Written by `analyze-agents` at the end of every run — including `None` outcomes (AR #9).
 - Absent, unreadable, or malformed state is treated as "never checked" by consumers; the coverage
   line then recommends a run. Fail loud, never silent (AR #9, AR #13).
+- The path is project-level `codeops/specialist-check.json` in both layouts; the skill creates the
+  `codeops/` directory lazily when it does not exist (AR #13).
 - The skill writes only this file; it never touches agent files (R7).
 
 ## Compatibility

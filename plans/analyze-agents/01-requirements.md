@@ -38,7 +38,8 @@ applies.
   `plans/<plan>/05-findings.md` using the compact row format (id, phase, severity, area, ruling)
   (AR #3, AR #8).
 - R6 — The detection steps in `make-plan` and `make-requirements` delegate to the same detection
-  flow while keeping the manual criteria fallback (AR #12).
+  flow while keeping the manual criteria fallback (AR #12); `analyze-project` delegates by
+  recommending the skill from its T-07 coverage line rather than re-running detection.
 - R7 — The skill never creates or modifies agent files, briefs, routing policy, or AGENTS.md; on
   user interest it hands off to `setup-routing` (AR #15 scope).
 - R8 — All paths are layout-aware: flat (`plans/`) and nested
@@ -91,7 +92,7 @@ Options and rationale live in the register; this table records the binding choic
 
 ## Acceptance Criteria
 
-1. [ ] The `analyze-agents` skill exists with the contract pinned by ST-1 … ST-6 and ST-9
+1. [ ] The `analyze-agents` skill exists with the contract pinned by ST-1 … ST-6
 2. [ ] Ledger and state conventions are documented and wired (ST-3, ST-7, ST-8)
 3. [ ] The existing detection steps delegate (ST-9)
 4. [ ] Full verify passes; the live smoke confirms state write and proposal/`None` behavior (ST-10, ST-11)

@@ -73,7 +73,5 @@ ledger reduces the signal set and the output says so; malformed rows are skipped
 
 ## Testing Requirements
 
-- Content spec tests pin the required sections, the native-read rule (no script), the
-  candidate/`None` outputs, the state-write instruction, the hand-off boundary, and
-  layout-awareness (ST-1 … ST-6, ST-9).
+- Content spec tests pin the required sections, the native-read rule (no script invocation — asserted as a required statement in the skill text), the candidate/`None` outputs, the state-write instruction, the hand-off boundary, and layout-awareness (ST-1 … ST-6).
 - Live smoke verifies the state write and the proposal/`None` behavior end to end (ST-10, ST-11).
