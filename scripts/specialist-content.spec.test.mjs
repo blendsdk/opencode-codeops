@@ -202,7 +202,7 @@ describe("ST-31 layout and content hygiene", () => {
   })
 })
 
-describe("ST-34 specialist awareness and proposal split", () => {
+describe("specialist awareness and proposal split", () => {
   it("splits lightweight proposals from the creation gate in the protocol document", () => {
     const content = read("_shared/specialist-agents.md")
     assert.match(content, /lightweight proposal/i)
