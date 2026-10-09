@@ -203,7 +203,8 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
    is `plans/<plan>/05-findings.md` (flat) or
    `codeops/features/<f>/plans/<plan>/05-findings.md` (nested), created lazily on first use, with a
    one-line title and one compact row per batch:
-   `| Finding | Phase | Severity | Area | Ruling |` — values such as `RV-001`, the phase number,
+   `| Finding | Phase | Severity | Area | Ruling |` — finding ids use the review prefixes
+   `RV-`/`SA-`/`PE-`/`SR-` (for example `RV-001`), followed by the phase number,
    `CRITICAL`/`MAJOR`/`MINOR`, a path or domain token, and
    `fixed`/`accepted`/`deferred`/`dismissed`; identifiers and area tokens only, never prose. Task
    mini-plans keep their ledger in their own plan folder. When the user approves larger machinery,

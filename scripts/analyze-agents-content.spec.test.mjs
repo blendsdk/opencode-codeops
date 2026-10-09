@@ -112,10 +112,14 @@ describe("findings ledger wiring in exec-plan", () => {
   it("records ruling batches in the per-plan findings ledger with the documented format", () => {
     const protocol = read("skills/exec-plan/execution-protocol.md")
     assert.match(protocol, /plans\/<plan>\/05-findings\.md/)
+    assert.match(protocol, /codeops\/features\/<f>\/plans\/<plan>\/05-findings\.md/)
     assert.match(protocol, /one-line title/i)
     assert.match(protocol, /\| Finding \| Phase \| Severity \| Area \| Ruling \|/)
+    assert.match(protocol, /RV-[^.]*SA-[^.]*PE-[^.]*SR-/i)
+    assert.match(protocol, /CRITICAL[^\n]*MAJOR[^\n]*MINOR/)
     assert.match(protocol, /fixed[^.]*accepted[^.]*deferred[^.]*dismissed/i)
     assert.match(protocol, /lazily/i)
+    assert.match(protocol, /mini-plans keep their ledger/i)
     assert.doesNotMatch(protocol, /durable finding artifact|the finding artifact/i)
   })
 
