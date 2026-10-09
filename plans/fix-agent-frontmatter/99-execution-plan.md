@@ -1,11 +1,11 @@
 # Task T-06: Emit frontmatter-first agent files so OpenCode honors mode, hidden, and permissions
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 0/8 tasks (0%)
+> **Progress**: 6/8 tasks (75%)
 > **Reasoning**: medium — bounded bugfix in the agent-file generator with deterministic tests and an explicit upgrade-compatibility check
 > **Phase baseline tree**: cf268832b3b6d522e4218dd20118d9de8aa5bc1b
 > **Scope mode**: strict · **Expected modification set**: `scripts/install_agents.py`, `scripts/install_agents.spec.test.mjs`, `scripts/install_agents.impl.test.mjs`, `scripts/hygiene-content.spec.test.mjs`, `scripts/fixtures/catalog-executor.golden.md`, `agents/*.md`, `CHANGELOG.md`, `package.json`, `package-lock.json`
-> **Last Updated**: 2026-10-09 14:37
+> **Last Updated**: 2026-10-09 14:46
 
 ## Objective
 
