@@ -202,7 +202,7 @@ describe("ST-31 layout and content hygiene", () => {
   })
 })
 
-describe("ST-33 specialist awareness and proposal split", () => {
+describe("ST-34 specialist awareness and proposal split", () => {
   it("splits lightweight proposals from the creation gate in the protocol document", () => {
     const content = read("_shared/specialist-agents.md")
     assert.match(content, /lightweight proposal/i)
@@ -212,7 +212,8 @@ describe("ST-33 specialist awareness and proposal split", () => {
   it("defines the check-state interface in the protocol document", () => {
     const content = read("_shared/specialist-agents.md")
     assert.match(content, /codeops\/specialist-check\.json/)
-    assert.match(content, /checkedAt/)
+    assert.match(content, /"checkedAt"/)
+    assert.match(content, /"plans"/)
     assert.match(content, /never checked/i)
   })
 
@@ -234,6 +235,9 @@ describe("ST-33 specialist awareness and proposal split", () => {
     const content = read("skills/analyze-project/SKILL.md")
     assert.match(content, /specialist-check\.json/)
     assert.match(content, /analyze-agents/)
+    assert.match(content, /Specialist coverage:/)
+    assert.match(content, /up to date \(<YYYY-MM-DD>\)/)
+    assert.match(content, /check due/)
     assert.match(content, /never checked/i)
   })
 })

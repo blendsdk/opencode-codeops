@@ -107,12 +107,14 @@ Running the check records one small project file:
 ### make-requirements
 
 1. After domain-lens selection and scope confirmation, run the detection criteria.
-2. For each candidate, open an ambiguity-register entry (`Technical (complexity escalation)`) with
-   the candidate packet, run the challenger, and obtain the user's decision.
+2. Surface at most two candidates in one batch as lightweight proposals (§Proposals and the
+   creation gate). When the user chooses to proceed to creation, open an ambiguity-register entry
+   (`Technical (complexity escalation)`) with the candidate packet, run the challenger, and obtain
+   the user's decision.
 3. Approved candidates are created through `setup-routing` or noted for creation before the first
    implementing plan; rejected candidates are recorded and dropped.
-4. Record the check in the final summary. No new requirements-template section is created; the
-   brief and the register are the durable records.
+4. Record the check in the final summary as a `Specialist check:` line. No new requirements-template
+   section is created; the brief and the register are the durable records.
 
 ### make-plan
 
@@ -139,16 +141,18 @@ Running the check records one small project file:
    standing specialist would close.
    ```
 
-3. Candidate approval, challenger, and persistence follow the shared gate exactly. Approved roles
-   are created through `setup-routing` before execution begins; the plan remains valid without them
-   via dynamic-packet fallback.
+3. Candidates surface as lightweight proposals (§Proposals and the creation gate); when the user
+   chooses to proceed to creation, the Complexity Escalation Gate, the challenger, and persistence
+   apply exactly as defined there. Approved roles are created through `setup-routing` before
+   execution begins; the plan remains valid without them via dynamic-packet fallback.
 
 ### analyze-project
 
 1. While inspecting manifests and conventions, note specialization signals (specialized
    framework/DSL, domain invariants, conventions a generic agent would miss).
-2. When a signal is strong and no specialist exists, report the candidate with evidence and
-   recommend running `setup-routing`; never write agent files or candidate artifacts, and keep
+2. When a signal is strong and no specialist exists, surface the candidate as a lightweight
+   proposal (§Proposals and the creation gate) with evidence, and recommend running `setup-routing`
+   when the user chooses to proceed; never write agent files or candidate artifacts, and keep
    `AGENTS.md` compact.
 3. Preserve the `<!-- CODEOPS-SPECIALISTS:START -->` / `<!-- CODEOPS-SPECIALISTS:END -->` block
    byte-for-byte when refreshing managed guidance.

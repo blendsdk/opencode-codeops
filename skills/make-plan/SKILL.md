@@ -274,6 +274,8 @@ Report what was created:
 
 **Summary:** Total Phases: X · Total Sessions: X · Estimated Time: X–X hours
 
+**Specialist check:** [None — evidence / candidate names]
+
 **To begin implementation:** use the exec-plan skill on `[feature-name]`.
 ```
 
