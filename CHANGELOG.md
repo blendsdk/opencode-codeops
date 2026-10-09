@@ -2,6 +2,20 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 2.1.1 — 2026-10-09
+
+### Fixes
+
+- plugin: stop deleting the shared scratch directory on unload
+
+### Tests
+
+- plugin: pin the scratch-directory lifecycle contract (red phase)
+
+### Documentation
+
+- changelog: add the 2.1.0 usage notes and complete the feature
+
 ## 2.1.0 — 2026-10-09
 
 ### Usage
