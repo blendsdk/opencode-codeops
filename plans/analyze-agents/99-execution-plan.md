@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-09 15:28
-> **Progress**: 3/8 tasks (38%)
+> **Progress**: 4/8 tasks (50%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -68,7 +68,7 @@ task-size criteria in the make-plan quality checklist)
 
 ## Phase 2: Findings ledger wiring (exec-plan)
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill from a temporary-index snapshot)_
+> **Phase baseline tree**: f1665866d3d7c88b93542c27d6f60dc0bb9d716f
 > **Reasoning**: medium — one protocol edit with deterministic content assertions
 
 ### Step 2.1: Ruling step writes the ledger
@@ -76,7 +76,7 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 03-02 §Ledger · AR #3, #8
 **Objective**: Concretize the undefined "durable finding artifact" into the per-plan ledger.
 
-- [ ] 2.1.1 [spec-author] Extend the content tests with ST-8 (the exec-plan ruling step — `execution-protocol.md` and `SKILL.md` — writes `plans/<plan>/05-findings.md` rows with the 03-02 title template, value vocabularies, and lazy creation; no undefined "finding artifact" reference remains) — verify the red phase
+- [x] 2.1.1 [spec-author] Extend the content tests with ST-8 (the exec-plan ruling step — `execution-protocol.md` and `SKILL.md` — writes `plans/<plan>/05-findings.md` rows with the 03-02 title template, value vocabularies, and lazy creation; no undefined "finding artifact" reference remains) — verify the red phase ✅ (completed: 2026-10-09 15:36)
 - [ ] 2.1.2 Implement the exec-plan ruling-step edits in `skills/exec-plan/execution-protocol.md` and `skills/exec-plan/SKILL.md` (ledger path and row format, one-line title, value vocabularies, lazy creation, mini-plan locus) — green on the new tests
 - [ ] 2.1.3 Full verification: `npm run verify`
 

@@ -107,3 +107,21 @@ describe("detection delegation in the existing skills", () => {
     }
   })
 })
+
+describe("findings ledger wiring in exec-plan", () => {
+  it("records ruling batches in the per-plan findings ledger with the documented format", () => {
+    const protocol = read("skills/exec-plan/execution-protocol.md")
+    assert.match(protocol, /plans\/<plan>\/05-findings\.md/)
+    assert.match(protocol, /one-line title/i)
+    assert.match(protocol, /\| Finding \| Phase \| Severity \| Area \| Ruling \|/)
+    assert.match(protocol, /fixed[^.]*accepted[^.]*deferred[^.]*dismissed/i)
+    assert.match(protocol, /lazily/i)
+    assert.doesNotMatch(protocol, /durable finding artifact|the finding artifact/i)
+  })
+
+  it("removes the undefined finding-artifact reference from the exec-plan summary", () => {
+    const skill = read("skills/exec-plan/SKILL.md")
+    assert.match(skill, /05-findings\.md/)
+    assert.doesNotMatch(skill, /durable finding artifact/i)
+  })
+})
