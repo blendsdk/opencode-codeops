@@ -4,6 +4,13 @@ All notable changes to CodeOps are recorded here.
 
 ## 2.1.0 — 2026-10-09
 
+### Usage
+
+- Run the `analyze-agents` skill on demand for a project-level specialist check; it records
+  `codeops/specialist-check.json`, and `analyze-project` reports the coverage line.
+- `exec-plan` records each ruling batch in `plans/<plan>/05-findings.md`, which feeds finding-area
+  recurrence in the check.
+
 ### Documentation
 
 - readme: list the analyze-agents skill and the on-demand detection flow
