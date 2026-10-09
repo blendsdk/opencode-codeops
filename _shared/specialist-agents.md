@@ -123,7 +123,8 @@ identifiers and area tokens only:
 ## Detection integration
 
 The `analyze-agents` skill is the execution surface for the criteria in every flow below; each
-step keeps its criteria summary so the flow still works when the skill is unavailable.
+step keeps an instruction referencing these criteria so the flow still works when the skill is
+unavailable.
 
 ### make-requirements
 

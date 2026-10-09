@@ -76,8 +76,8 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 03-02 §Ledger · AR #3, #8
 **Objective**: Concretize the undefined "durable finding artifact" into the per-plan ledger.
 
-- [ ] 2.1.1 [spec-author] Extend the content tests with ST-8 (exec-plan ruling step writes `plans/<plan>/05-findings.md` rows; no undefined artifact reference) — verify the red phase
-- [ ] 2.1.2 Implement the `skills/exec-plan/execution-protocol.md` ruling-step edits — green on the new tests
+- [ ] 2.1.1 [spec-author] Extend the content tests with ST-8 (the exec-plan ruling step — `execution-protocol.md` and `SKILL.md` — writes `plans/<plan>/05-findings.md` rows with the 03-02 title template, value vocabularies, and lazy creation; no undefined "finding artifact" reference remains) — verify the red phase
+- [ ] 2.1.2 Implement the exec-plan ruling-step edits in `skills/exec-plan/execution-protocol.md` and `skills/exec-plan/SKILL.md` (ledger path and row format, one-line title, value vocabularies, lazy creation, mini-plan locus) — green on the new tests
 - [ ] 2.1.3 Full verification: `npm run verify`
 
 **Deliverables**:
@@ -99,7 +99,7 @@ task-size criteria in the make-plan quality checklist)
 **Objective**: Prove the end-to-end behavior on a scratch repository, then release.
 
 - [ ] 3.1.1 Live smoke (ST-11): recurrence candidate and `None` paths in scratch repositories; state file written both times; coverage line reads it
-- [ ] 3.1.2 Full verification + minor release through the repo release flow (project release convention: every user-facing change ships in a version with CHANGELOG notes; T-07 bundles into this release), with notes covering the new skill and records
+- [ ] 3.1.2 Full verification + minor release through the repo release flow (project release convention: every user-facing change ships in a version with CHANGELOG notes; T-07 bundles into this release), with notes covering the new skill and records; update the README skills list
 
 **Deliverables**:
 - ST-11 result recorded

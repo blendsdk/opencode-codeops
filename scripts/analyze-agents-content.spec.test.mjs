@@ -47,13 +47,14 @@ describe("analyze-agents skill contract", () => {
     assert.match(content, /requirements and plans|requirements\/|plan documents/i)
     assert.match(content, /ledger/i)
     assert.match(content, /manifest/i)
-    assert.doesNotMatch(content, /\bpython3\b|\bnpx\b|scripts\//i)
+    assert.doesNotMatch(content, /\bpython3\b|\bpip\b|\bnode\b|\bnpm\b|\bnpx\b|\byarn\b|\bpnpm\b|\bcurl\b|\bwget\b|\bbash\b|https?:\/\/|scripts\//i)
   })
 
   it("writes the check-state file on every run, including a None outcome", () => {
     const content = read(SKILL_PATH)
     assert.match(content, /codeops\/specialist-check\.json/)
-    assert.match(content, /checkedAt/)
+    assert.match(content, /"checkedAt"/)
+    assert.match(content, /"plans"/)
     assert.match(content, /every run/i)
     assert.match(content, /none/i)
   })
@@ -62,6 +63,8 @@ describe("analyze-agents skill contract", () => {
     const content = read(SKILL_PATH)
     assert.match(content, /at most (?:two|2)/i)
     assert.match(content, /lightweight proposal/i)
+    assert.match(content, /file:line/)
+    assert.match(content, /None[^.]*evidence/i)
     assert.match(content, /smallest alternative/i)
   })
 
@@ -85,13 +88,13 @@ describe("specialist protocol ledger and execution surface", () => {
     assert.match(content, /05-findings\.md/)
     assert.match(content, /plans\/<plan>\/05-findings\.md/)
     assert.match(content, /\| Finding \| Phase \| Severity \| Area \| Ruling \|/)
-    assert.match(content, /exec-plan/)
+    assert.match(content, /exec-plan[^.]*ruling step/i)
   })
 
   it("names analyze-agents as the detection execution surface", () => {
     const content = read("_shared/specialist-agents.md")
     assert.match(content, /analyze-agents/)
-    assert.match(content, /execution surface/i)
+    assert.match(content, /execution surface for the criteria/i)
   })
 })
 
@@ -100,7 +103,7 @@ describe("detection delegation in the existing skills", () => {
     for (const file of ["skills/make-plan/SKILL.md", "skills/make-requirements/SKILL.md"]) {
       const content = read(file)
       assert.match(content, /analyze-agents/, `${file} must delegate to analyze-agents`)
-      assert.match(content, /fallback/i, `${file} must retain the manual fallback`)
+      assert.match(content, /fallback when the skill is unavailable/i, `${file} must retain the manual fallback`)
     }
   })
 })
