@@ -16,6 +16,7 @@ Turn an idea or existing system into ambiguity-free requirements, grounded speci
 | `exec-plan` | Execute a plan — implement → verify → commit loop with quality reviews |
 | `roadmap` | Live feature-set roadmap — make, update, review, archive |
 | `analyze-project` | Analyze repo and create/refresh CodeOps-aware `AGENTS.md` guidance |
+| `analyze-agents` | Run the project-level specialist check on demand — proposals or a recorded None, with check state |
 | `setup-codeops` | Set up or migrate CodeOps in a git repo |
 | `setup-routing` | Configure per-role subagent model and policy routing |
 | `upgrade-plan` | Upgrade legacy CodeOps artifacts to current schema |
@@ -191,8 +192,10 @@ capability gap the twelve catalog roles and dynamic packets cannot close. Specia
 only with your explicit approval — the `--auto-design` mode cannot approve them.
 
 - **Detect** — `make-requirements`, `make-plan`, and `analyze-project` run an evidence-based check
-  and record the outcome (including a negative one). At most two candidates are proposed per
-  requirements set or plan.
+  and record the outcome (including a negative one); the `analyze-agents` skill runs the same
+  check on demand and maintains `codeops/specialist-check.json` for the coverage line. At most two
+  candidates per scope surface as lightweight, evidence-backed proposals; the creation gate
+  applies when you choose to proceed.
 - **Create** — after you approve the candidate packet, `setup-routing` writes a brief at
   `codeops/specialists/<role>.md`, writes routing policy first, generates a visible agent with
   `install_agents.py --custom <role>`, and updates a managed index block in `AGENTS.md` with
