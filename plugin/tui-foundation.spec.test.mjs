@@ -119,18 +119,12 @@ describe("published packaging (ST-8)", () => {
 })
 
 describe("content contracts (ST-9)", () => {
-  it("should claim the sidebar slot and render only a guard-validated payload", () => {
+  it("should keep the sidebar slot claim, the helper import, and the no-timer rule", () => {
     const tsx = read("plugin/tui.tsx")
 
     assert.match(tsx, /append:\s*"sidebar\.content"/)
     assert.match(tsx, /codeops-rpc\.mjs/)
-    assert.match(tsx, /isCodeOpsStatus/)
     assert.doesNotMatch(tsx, /setInterval|setTimeout/)
-
-    // The strip text has exactly one render site; that site is reachable only
-    // through the validated payload branch (`isCodeOpsStatus` asserted above).
-    const renderSites = tsx.match(/CodeOps v/g) ?? []
-    assert.equal(renderSites.length, 1, "the strip text must appear exactly once")
   })
 
   it("should register through the shared helper inside a guard", () => {

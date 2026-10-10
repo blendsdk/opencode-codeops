@@ -89,7 +89,11 @@ describe("render and merge contract (ST-17)", () => {
   it("should supersede the strip assertions in the foundation spec file", () => {
     const foundation = read("plugin/tui-foundation.spec.test.mjs")
 
-    assert.match(foundation, /append:\s*"sidebar\.content"/, "the slot claim stays asserted")
+    assert.match(
+      foundation,
+      /append:\\s\*"sidebar\\\.content"/,
+      "the slot claim stays asserted"
+    )
     assert.match(foundation, /codeops-rpc\.mjs/, "the helper import stays asserted")
     assert.match(foundation, /setInterval\|setTimeout/, "the no-timer rule stays asserted")
     assert.doesNotMatch(foundation, /CodeOps v/, "the strip literal is superseded")
