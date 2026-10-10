@@ -108,24 +108,34 @@ describe("README and CHANGELOG content (ST-21)", () => {
     assert.match(readme, /source of truth/)
   })
 
-  it("should add the Unreleased Added entry and revise the foundation Notes entry", () => {
+  it("should carry the feature entry in the newest changelog section and drop the strip wording", () => {
     const changelog = read("CHANGELOG.md")
-    const unreleased = changelog.slice(
-      changelog.indexOf("## Unreleased"),
-      changelog.indexOf("\n## 2.1.1")
-    )
+    const heading = /^## (?:Unreleased|[0-9]+\.[0-9]+\.[0-9]+[^\n]*)$/m.exec(changelog)
+    assert.ok(heading, "the changelog must open with the unreleased or newest version section")
 
-    assert.match(unreleased, /### Added/)
-    assert.match(unreleased, /codeops_progress/)
-    assert.match(unreleased, /sidebar/i)
+    const rest = changelog.slice(heading.index)
+    const end = rest.indexOf("\n## ", 1)
+    const top = end === -1 ? rest : rest.slice(0, end)
 
-    assert.match(unreleased, /`\.\/tui`/, "the tui entry fact is kept")
-    assert.match(unreleased, /v2\.0\.26/, "the verified build fact is kept")
+    if (/^## Unreleased/.test(top)) {
+      assert.match(top, /### Added/)
+      assert.match(top, /codeops_progress/)
+      assert.match(top, /sidebar/i)
+      assert.match(top, /`\.\/tui`/, "the tui entry fact is kept")
+      assert.match(top, /v2\.0\.26/, "the verified build fact is kept")
+    } else {
+      // The release tool folds the unreleased section into a generated,
+      // commit-derived section, so the released state guarantees the feature
+      // group and the progress entries instead of the hand-written prose.
+      assert.match(top, /### Features/)
+      assert.match(top, /progress/i)
+    }
+
     assert.doesNotMatch(
-      unreleased,
+      top,
       /minimal\s+sidebar\s+status\s+line/,
       "the replaced strip must no longer be described"
     )
-    assert.doesNotMatch(unreleased, /strip behaves/, "the strip wording is superseded")
+    assert.doesNotMatch(top, /strip behaves/, "the strip wording is superseded")
   })
 })
