@@ -1,7 +1,7 @@
 ## Ambiguity Register: live-task-progress (full live feature, slice 2)
 
 > **Status**: ✅ GATE PASSED — all 15 items resolved (14 resolved · 1 explicitly deferred)
-> **Last Updated**: 2026-10-10 18:41
+> **Last Updated**: 2026-10-10 19:18
 > **Scope**: feature plan for the full live CodeOps task-progress feature — the in-memory run
 > state in the server plugin, the agent-callable `codeops_progress` tool, RPC event push, the
 > sidebar's live view, and the exec-plan reporting protocol. Slice 2 of the staged
@@ -15,7 +15,7 @@
 | # | Category | Ambiguity / Gap | Options Presented | User Decision | Status |
 |---|----------|-----------------|-------------------|---------------|--------|
 | 1 | Scope | Re-derived slice-2 scope baseline (requirements R1–R10; pillar set: tool + state + events, sidebar view, protocol integration, delegation display, agent-template integration, remote acceptance) | a–d + f (core + delegation display + remote acceptance; agent-template integration deferred) / a–d only (remote deferred too) / all a–f | User (this conversation): a–d + f — core pillars + delegation display + remote acceptance run; agent-template integration deferred (row 15) | ✅ Resolved |
-| 2 | UX & presentation | Sidebar content and state behavior (running / stale / blocked / waiting / done / idle) | two-line compact view with an always-visible as-of time and state markers (recommended) / single-line view / user adjustment | User (this conversation): accepted the presentation draft as specified — `CodeOps · <plan>` / `Phase <n> · <activity>` / `<task> · N/M · as of HH:MM`; stale >10 min; done persists; idle renders nothing | ✅ Resolved |
+| 2 | UX & presentation | Sidebar content and state behavior (running / stale / blocked / waiting / done / idle) | three-line compact view with an always-visible as-of time and state markers (recommended) / single-line view / user adjustment | User (this conversation): accepted the presentation draft as specified — `CodeOps · <plan>` / `Phase <n> · <activity>` / `<task> · N/M verified · as of HH:MM`; stale at ≥10 min; done persists; idle renders nothing | ✅ Resolved |
 | 3 | Scope | README coverage for the completed feature | short section (recommended) / CHANGELOG only | User (this conversation): add the short README section | ✅ Resolved |
 | 4 | Technical unknowns | Live update mechanism | agent tool → server in-memory state → RPC events → sidebar subscription; no poll/watch/timer; snapshot method + event push (AI) | AI — delegated by --auto-design (note A) | ✅ Resolved |
 | 5 | Data & state | Run-state model and ownership | one active run per location; last reporter owns; cleared on session delete / restart; the plan file stays the durable source of truth (AI) | AI — delegated by --auto-design (note B) | ✅ Resolved |
@@ -50,11 +50,14 @@ Decision: the agent reports transitions through a new `codeops_progress` tool; t
   keeps an in-memory live run state per location; every accepted update emits a `codeops` RPC
   event (`updated`); the sidebar obtains an initial snapshot via a new `progress` method and then
   follows events. No polling, timers, watchers, file signaling, or persistence.
-Evidence: v2.0.26 API — ctx.tool.transform + ToolContext carries sessionID/agent
-  (@opencode/plugin/dist/promise/tool.d.ts:16-45; @opencode/schema/dist/tool.d.ts:10-16);
-  RpcRegistration.events.emit (@opencode/plugin/dist/promise/rpc.d.ts:10-22); client
-  events.subscribe/on (@opencode/client/dist/promise/rpc.d.ts:11-28); events are ephemeral with
-  no replay (client docs); the live-proven 2.0.26 round-trip including location scoping
+Evidence: host API verified against the installed `@opencode/plugin` 2.0.24 `.d.ts` files
+  (byte-identical in 2.0.26) — ctx.tool.transform + ToolContext carries sessionID/agent
+  (@opencode/plugin/dist/promise/tool.d.ts:16-28,53-61; @opencode/schema/dist/tool.d.ts:10-16);
+  RpcRegistration.events.emit (@opencode/plugin/dist/promise/rpc.d.ts:12-16); client
+  events.subscribe/on (nested
+  @opencode/plugin/node_modules/@opencode/client/dist/promise/rpc.d.ts:11-28); events are
+  ephemeral with no replay (inherited from the foundation's client-docs evidence; not re-verified
+  locally); the live-proven OpenCode v2.0.26 round-trip including location scoping
   (foundation AR #22).
 Rejected alternatives: server file-watch/poll of the plan file (new watcher/timer machinery plus
   parser duplication or subprocess use — complexity escalation); file-based signaling (rejected by
@@ -78,11 +81,13 @@ Authority: AI — delegated by --auto-design
 Eligibility: data structures and state ownership inside the recorded feature; the state is
   ephemeral (no retention beyond the process lifetime; no migration surface).
 Objective: one unambiguous live view of the active run for the sidebar.
-Decision: one active run per project location. Fields: plan {name, directory}, phase, task
-  {id, title}, activity (enum), detail, verified, total, updatedAt, sessionID (last reporter),
-  startedAt. Reports are partial updates — fields present replace, counts carry forward. The
-  state clears when the reporting session is deleted and on server restart. A second run's first
-  report replaces the first (last reporter owns).
+Decision: one active run per project location. Fields: plan (string — the plan folder name),
+  phase (string|null), task (string|null), activity (enum), detail (string|null), verified
+  (integer), total (integer|null), updatedAt, sessionID (last reporter), startedAt. Reports are
+  partial updates — optional fields present replace, absent optional fields carry, counts carry
+  forward; `plan` and `activity` are present on every report (note C). The state clears when the
+  reporting session is deleted and on server restart. A first report for a different plan starts
+  a new run and discards the previous one (last reporter owns; same-plan reports merge).
 Evidence: ToolContext carries sessionID/agent (@opencode/schema/dist/tool.d.ts:10-16);
   the plugin already subscribes to session.deleted (plugin/index.ts:241-252); the sidebar slot
   input carries { sessionID } (@opencode/plugin/dist/tui/context.d.ts:161-178).
@@ -106,15 +111,17 @@ Decision: `codeops_progress` tool input (JSON Schema): plan (string, required), 
   task, detail (strings), verified, total (non-negative integers) — everything except plan and
   activity optional; output { ok: boolean }. The existing `codeops` RPC definition gains method
   `progress` (empty input; output = run snapshot or null) and events `updated` (schema = run
-  snapshot; the full snapshot per emission) and `cleared` (schema = {plan, sessionID}; the
-  cleared run's identity, so a newer run is never wiped). The sidebar subscribes to `updated`
-  first and then merges an initial `progress` snapshot; snapshots are merged monotonically by
-  updatedAt, so late or duplicate delivery cannot regress the view. Schemas, the state
+  snapshot; the full snapshot per emission) and `cleared` (schema = {plan, sessionID, clearedAt};
+  the cleared run's identity and the server-stamped clear time, so a newer run is never wiped and
+  a pre-clear update or snapshot cannot resurrect the cleared run). The sidebar subscribes to
+  the events before requesting an initial `progress` snapshot; snapshots are merged
+  monotonically by `updatedAt` and both merge paths ignore a snapshot at or before the last
+  accepted `clearedAt`, so late or duplicate delivery cannot regress the view. Schemas, the state
   transitions, and the guards (`isCodeOpsProgressReport`, `isCodeOpsRunState`) live in
   `bin/lib/codeops-progress.mjs` (+ `.d.mts`), following the foundation helper pattern
   (foundation AR #9, #20).
 Evidence: JSON Schema is accepted for tool input/output and RPC event schemas
-  (@opencode/schema/dist/tool.d.ts:32-45, rpc.d.ts:36-49); the shared-helper pattern is
+  (@opencode/schema/dist/tool.d.ts:32-45, rpc.d.ts:15-18,23-35); the shared-helper pattern is
   established and unit-testable under node --test.
 Rejected alternatives: Standard Schema builders (plain objects keep `Rpc.define` runtime-free
   and testable — foundation note B); a separate RPC id (splits one definition's methods from its
@@ -136,11 +143,12 @@ Objective: the view never presents stale or unverified data as live truth.
 Decision: only reported values are shown; every snapshot carries the server-side updatedAt; the
   view always shows the last-update time; a staleness label is computed at render from
   updatedAt vs now (no client timers); verified counts come from reports only (never counting
-  [~]); done persists until the next run or restart; blocked shows the reported reason; when
+  [~]); done persists until the next run, the reporting session's deletion, or a restart; blocked shows the reported reason; when
   nothing is known the sidebar renders nothing.
 Evidence: the brief's honesty rule is recorded in foundation note E; the exec-plan protocol
-  forbids promoting [x] before verify (execution-protocol.md); the server clock is the single
-  time reference.
+  forbids promoting [x] before verify (execution-protocol.md); timestamps are server-stamped, and
+  the staleness comparison uses the viewer's clock — exact for a same-host client, approximate
+  for a remote client (R10's ST-23).
 Rejected alternatives: client-side ticking timers (new timer machinery; the visible timestamp
   already carries the truth); showing expected/approximate values (violates the honesty rule).
 Strongest counterargument: with no further events the staleness recomputes only on a render
@@ -163,8 +171,11 @@ Decision: (a) content/spec tests (Node) for schemas, guards, protocol wording, a
   computation, clearing); (c) fake-context runtime tests for the server wiring (tool transform
   captured and invoked, RPC params captured and invoked, event emission captured, containment
   without the new APIs); (d) pty live smoke on the packed tarball: tool-registration ground
-  truth, event round-trip via a control emit plus a client subscription (footer probe), an
-  agent-driven `codeops_progress` call, and the render path; the sidebar pane stays
+  truth, event round-trip via a control emit plus a temp-only probe contribution in the scratch project's plugin
+  (`prompt.footer` slot) that subscribes to the RPC events and appends each received event to a
+  ground-truth file under the temp root, an agent-driven `codeops_progress` call (if the live
+  model does not call the tool, re-prompt once, then record the miss as layer-attributed
+  inconclusive for that signal), and the render path; the sidebar pane stays
   user-assisted (it has not rendered in captures — foundation ST-12 note); (e) remote-client
   acceptance run: `opencode serve` (isolated) plus `opencode <project> --server <url>` in the
   pty, asserting the same signals; if the connect path demands machinery beyond the established
@@ -189,9 +200,9 @@ Decision: server side — feature-detect `ctx.tool.transform` and `ctx.rpc.regis
   content-free warning when absent; registration wrapped; the tool handler validates defensively
   and returns a structured result instead of throwing; event emission failures are swallowed.
   TUI side — subscription APIs guarded; any failure renders nothing; no retry loops or timers.
-Evidence: the host validates tool input against the schema before execute, so the handler guard
-  is defense in depth; the foundation's guard contract and ST-10/ST-11 are the established
-  pattern.
+Evidence: the handler-side guard keeps containment regardless of host pre-validation (host
+  pre-validation is expected but not verifiable from the installed typings); the foundation's
+  guard contract and ST-10/ST-11 are the established pattern.
 Rejected alternatives: hard failures with retries (violates containment and the no-timer rule).
 Confidence: High.
 Reopen triggers: an API-shape change on a newer build.
@@ -226,7 +237,7 @@ Eligibility: implementation sequencing and interfaces within the recorded protoc
   pillar; the Markdown progress authority is untouched.
 Objective: the state machine receives the transitions the sidebar needs at zero execution cost.
 Decision: the exec-plan documents instruct one call at each of — run start (plan + phase + first
-  task, activity starting→implementing); phase start; task implemented ([~]); verifying (before
+  task, activity `implementing`; the first phase's start is covered by this call); phase start; task implemented ([~]); verifying (before
   the verify run); task verified ([x]) with verified/total from the progress step; blocked ([!])
   with the reason; delegating around dispatches with the role as detail; reviewing during the
   quality step; waiting when pausing for user input; done when all tasks complete. Every

@@ -23,12 +23,13 @@ agent (exec-plan)                server plugin (per location)            termina
                                      │                                      │   mergeRunState (monotonic)
     sidebar snapshot call            │                                      │
     ◄──── progress() ────────────────┤ runtime.snapshot()                   │
-    session deleted ─► clearSession ─┤ emit("cleared", {plan,sessionID}) ──►│ clears matching run
+    session deleted ─► clearSession ─┤ emit("cleared", {plan,sessionID,clearedAt}) ──►│ clears matching run
 ```
 
 Data flow rules: the run state lives only in the server plugin's memory; every emitted event
-carries the full snapshot; the TUI subscribes before requesting the snapshot and merges
-snapshots monotonically by `updatedAt` so late or duplicate delivery cannot regress the view
+carries the full snapshot; the TUI subscribes before requesting the snapshot, merges snapshots
+monotonically by `updatedAt`, and ignores any update or snapshot at or before the last accepted
+`clearedAt`, so late or duplicate delivery (including across a clear) cannot regress the view
 (register note C). No file is read anywhere in this feature (R6).
 
 ## Contracts
@@ -40,7 +41,7 @@ snapshots monotonically by `updatedAt` so late or duplicate delivery cannot regr
 | Name | `codeops_progress` |
 | Description | "Report live CodeOps task progress so the sidebar shows the current run. Use at run, phase, and task transitions, and for blocked, waiting, delegating, reviewing, and done states." |
 | Input schema | see below |
-| Output schema | `{ type: "object", additionalProperties: false, required: ["ok"], properties: { ok: { type: "boolean" } } }` |
+| Output schema | `ProgressOutputSchema` (below) |
 
 Tool input schema (verbatim; register note C):
 
@@ -64,9 +65,24 @@ export const ProgressReportSchema = {
 }
 ```
 
-The host validates input against this schema before the handler runs; the runtime additionally
-normalizes defensively (see §Normalization) because the schema result types as `unknown` in the
-handler.
+The tool output schema is a named constant next to the input schema:
+
+```js
+export const ProgressOutputSchema = {
+  type: "object",
+  additionalProperties: false,
+  required: ["ok"],
+  properties: { ok: { type: "boolean" } },
+}
+```
+
+The host is expected to validate input against `ProgressReportSchema` before the handler runs
+(not directly verifiable from the installed typings); the runtime additionally normalizes
+defensively regardless (see §Normalization) because the schema result types as `unknown` in the
+handler. The contract also relies on the host accepting the JSON Schema forms used here —
+nullable `type` arrays and `anyOf`; if the host's schema codec rejects any form, registration is
+contained (the sidebar stays hidden), and the ST-22 smoke asserts that `progress`, `updated`, and
+`cleared` actually register on the tested build.
 
 ### The extended `codeops` RPC definition (R3)
 
@@ -94,8 +110,12 @@ export const RunStateSchema = {
 export const RunClearedSchema = {
   type: "object",
   additionalProperties: false,
-  required: ["plan", "sessionID"],
-  properties: { plan: { type: "string" }, sessionID: { type: "string" } },
+  required: ["plan", "sessionID", "clearedAt"],
+  properties: {
+    plan: { type: "string" },
+    sessionID: { type: "string" },
+    clearedAt: { type: "integer", minimum: 0 },
+  },
 }
 
 // in CodeOpsRpc:
@@ -128,10 +148,11 @@ Guards and acceptors (defensive against unknown input):
 | `isCodeOpsProgressReport` | A plain object matching `ProgressReportSchema`'s required fields and enum exactly (no extra keys). |
 | `isCodeOpsRunState` | A plain object matching `RunStateSchema` exactly (all ten required fields, correct types, enum-bounded activity, non-negative integers). |
 | `acceptRunUpdate` | `(event, directory) => CodeOpsRunState \| null` — returns the validated snapshot when the envelope's `location.directory` matches and `data` passes `isCodeOpsRunState`; otherwise `null`. A plain function (not a predicate) so the narrowed value type-checks at the call site. |
-| `acceptRunCleared` | `(event, directory) => { plan: string, sessionID: string } \| null` — the same envelope/location rule for the `cleared` event. |
+| `acceptRunCleared` | `(event, directory) => { plan: string, sessionID: string, clearedAt: number } \| null` — the same envelope/location rule for the `cleared` event. |
 
-Constants: `CODE_OPS_TOOL_NAME`, `CODE_OPS_TOOL_DESCRIPTION`, `CODE_OPS_STRING_CAP = 200`,
-`CODE_OPS_COUNT_MAX = 1_000_000`, `CODE_OPS_STALE_MS = 600_000`.
+Constants and schemas: `CODE_OPS_TOOL_NAME`, `CODE_OPS_TOOL_DESCRIPTION`,
+`ProgressReportSchema`, `ProgressOutputSchema`, `RunStateSchema`, `RunClearedSchema`,
+`CODE_OPS_STRING_CAP = 200`, `CODE_OPS_COUNT_MAX = 1_000_000`, `CODE_OPS_STALE_MS = 600_000`.
 
 ## Run state (R2)
 
@@ -141,7 +162,7 @@ Constants: `CODE_OPS_TOOL_NAME`, `CODE_OPS_TOOL_DESCRIPTION`, `CODE_OPS_STRING_C
 | ------ | -------- |
 | `report(input, sessionID, nowMs?)` | Normalizes; on reject returns `null` (state untouched). On accept: creates or merges the run, sets `updatedAt = nowMs ?? Date.now()`, records `sessionID`, and — when an emit is bound — emits `updated` with the new snapshot (failures swallowed). Returns the snapshot. |
 | `snapshot()` | The current snapshot, or `null`. |
-| `clearSession(sessionID)` | When the current run's `sessionID` matches: clears it and returns `{ plan, sessionID }` for the `cleared` emission; otherwise `null`. |
+| `clearSession(sessionID)` | When the current run's `sessionID` matches: clears it, emits `cleared` through the bound emit (when one is bound), and returns the cleared identity `{ plan, sessionID, clearedAt }` for logging and tests; otherwise `null`. |
 | `bindEmit(emit)` | Binds `(name, payload) => void|Promise<void>`; every later emission call is wrapped so a throwing or rejecting emit is swallowed (register note F). |
 
 Merge semantics (register note B):
@@ -149,7 +170,7 @@ Merge semantics (register note B):
 | Case | Behavior |
 | ---- | -------- |
 | No current run | Create: `startedAt = updatedAt = now`; `phase/task/detail` from the report or `null`; `verified` from the report or `0`; `total` from the report or `null`; `activity` from the report. |
-| Current run, same `plan` | Merge: every report field present replaces its state field; absent fields carry; counts replace independently when provided. |
+| Current run, same `plan` | Merge: every optional report field present replaces its state field; absent optional fields carry; counts replace independently when provided; `plan` and `activity` are present on every report by contract. |
 | Current run, different `plan` | The report starts a new run; the previous run is discarded (last reporter owns; register note B). |
 | Invalid report | `null`; no state change, no emission. |
 

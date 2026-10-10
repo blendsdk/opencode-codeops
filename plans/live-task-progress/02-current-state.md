@@ -29,16 +29,18 @@ Phase 1, and the spec test's version-strip content assertions (`CodeOps v` liter
 render site — `:122-134`) in Phase 3, where the live view replaces the strip (register row 2;
 03-03 §Superseding the Foundation Strip).
 
-**Host surface (installed `@opencode/plugin` 2.0.26; verified against the `.d.ts` files).**
+**Host surface (installed `@opencode/plugin` 2.0.24 — lockfile-pinned; the local OpenCode
+build is v2.0.26; the cited `.d.ts` files are byte-identical in 2.0.24 and 2.0.26, verified
+against the installed files).**
 
 | Capability | Evidence |
 | ---------- | -------- |
-| Tool registration: `ctx.tool.transform((editor) => editor.add({ name, description, input, output, execute }))`; `Transform<Input>` returns a `Registration` | `dist/promise/tool.d.ts:16-45,53-61`; `dist/promise/registration.d.ts:6` |
+| Tool registration: `ctx.tool.transform((editor) => editor.add({ name, description, input, output, execute }))`; `Transform<Input>` returns a `Registration` | `dist/promise/tool.d.ts:16-28,53-61`; `dist/promise/registration.d.ts:1-3,12` |
 | Tool handler context carries the calling `sessionID` and `agent`; promise flavor adds `signal` + `progress` | `dist/promise/tool.d.ts:9-15`; `@opencode/schema/dist/tool.d.ts:10-16` |
 | RPC registration returns `RpcRegistration` with `events.emit` | `dist/promise/rpc.d.ts:10-22` |
-| Client-side event subscription: `client.rpc(def).events.on(name, handler)` (unsubscribe function) and `subscribe(name)` (async iterable) | `@opencode/client/dist/promise/rpc.d.ts:14-17` |
-| RPC event payload: `{ type: "rpc.<id>.<name>", data, location }` with a required location | `@opencode/client/dist/promise/rpc.d.ts:19-25`; `@opencode/schema/dist/rpc.d.ts:101-111` |
-| Events are ephemeral: live-only, no replay; slow consumers create backpressure | client docs (foundation AR #21 evidence trail) |
+| Client-side event subscription: `client.rpc(def).events.on(name, handler)` (unsubscribe function) and `subscribe(name)` (async iterable) | nested `@opencode/plugin/node_modules/@opencode/client/dist/promise/rpc.d.ts:14-17` |
+| RPC event payload: `{ type: "rpc.<id>.<name>", data, location }` with a required location | nested `@opencode/plugin/node_modules/@opencode/client/dist/promise/rpc.d.ts:19-25`; `@opencode/schema/dist/rpc.d.ts:101-111` |
+| Events are ephemeral: live-only, no replay; slow consumers create backpressure | inherited — client docs cited by the foundation's smoke work; not verifiable from the installed packages |
 | RPC calls and registrations are location-scoped; the session location must be passed explicitly | foundation AR #22 (proven on v2.0.26) |
 | `sidebar.content` slot input carries `{ sessionID }` | `dist/tui/context.d.ts:161-178` |
 
@@ -53,7 +55,7 @@ render site — `:122-134`) in Phase 3, where the live view replaces the strip (
 | `skills/exec-plan/SKILL.md`, `execution-protocol.md` | Reporting protocol | Add the fail-soft reporting points (03-04) |
 | `README.md`, `CHANGELOG.md` | Docs | README section; `## Unreleased` entry (03-04) |
 | `plugin/tui-foundation.spec.test.mjs`, `plugin/tui-foundation.impl.test.mjs` | Foundation tests | Two assertion groups superseded by this plan's approved behavior (see §What Exists) |
-| Test files (new) | Spec/impl coverage | `plugin/progress-core.*`, `plugin/progress-server.*`, `plugin/tui-progress.*`, `scripts/exec-plan-progress.spec.test.mjs` (07) |
+| Test files (new) | Spec/impl coverage | `plugin/progress-core.*`, `plugin/progress-server.*`, `plugin/tui-progress.*`, `scripts/exec-plan-progress-content.spec.test.mjs` (07) |
 
 ### Code Analysis
 

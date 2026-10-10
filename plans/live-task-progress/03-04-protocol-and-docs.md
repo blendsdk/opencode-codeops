@@ -24,21 +24,21 @@ Mandate. Content contract:
   silently.
 - One table of the ten call points:
 
-| Moment | Report payload (absent fields are carried by the state) |
+| Moment | Report payload (`plan` and `activity` are always present; absent optional fields are carried by the state) |
 | ------ | -------------------------------------------------------- |
 | Run start (start point determined) | `{ plan, phase, task, activity: "implementing" }` |
-| Phase start (subsequent phases) | `{ phase, activity: "starting" }` |
-| Task implemented (after the `[~]` mark) | `{ task, activity: "implementing" }` |
-| Verification (before running verify) | `{ activity: "verifying" }` |
-| Task verified (after `[x]` + the progress-bar display) | `{ verified, total, activity: "implementing" }` — counts from that display |
-| Blocker (after the `[!]` mark) | `{ activity: "blocked", detail: "<short reason>" }` |
-| Delegation (around an executor/reviewer dispatch) | `{ activity: "delegating", detail: "<role>" }` |
-| Review step (post-phase quality loop) | `{ activity: "reviewing" }` |
-| Waiting (before pausing for an explicit user decision) | `{ activity: "waiting" }` |
-| Run done (all tasks complete) | `{ activity: "done" }` |
+| Phase start (subsequent phases) | `{ plan, phase, activity: "starting" }` |
+| Task implemented (after the `[~]` mark) | `{ plan, task, activity: "implementing" }` |
+| Verification (before running verify) | `{ plan, activity: "verifying" }` |
+| Task verified (after `[x]` + the progress-bar display) | `{ plan, verified, total, activity: "implementing" }` — counts from that display |
+| Blocker (after the `[!]` mark) | `{ plan, activity: "blocked", detail: "<short reason>" }` |
+| Delegation (around an executor/reviewer dispatch) | `{ plan, activity: "delegating", detail: "<role>" }` |
+| Review step (post-phase quality loop) | `{ plan, activity: "reviewing" }` |
+| Waiting (before pausing for an explicit user decision) | `{ plan, activity: "waiting" }` |
+| Run done (all tasks complete) | `{ plan, activity: "done" }` |
 
-- The tool name is `codeops_progress`; `plan` is the plan folder name; one call per listed
-  moment, no other calls (noise control).
+- The tool name is `codeops_progress`; `plan` is the plan folder name; every call carries
+  `plan` and `activity`; one call per listed moment, no other calls (noise control).
 
 ### `skills/exec-plan/SKILL.md`
 
@@ -52,7 +52,7 @@ Add one short bullet in the per-task loop (Step 2): report progress — when the
 
 Add a short section, **Live task progress in the sidebar**, under the plugin-behavior area:
 what the sidebar shows while an exec-plan run is active (plan, phase, task, activity, verified
-counts), the honesty rules (always-visible as-of time, stale marker after 10 minutes without an
+counts), the honesty rules (always-visible as-of time, stale marker at 10 minutes without an
 update, nothing rendered when no run is active or the host lacks the plugin APIs), and the
 source-of-truth statement. Target length: ~10 lines.
 
@@ -78,6 +78,6 @@ source-of-truth statement. Target length: ~10 lines.
 
 ## Testing Requirements
 
-- Spec tests ST-19…ST-21 in `scripts/exec-plan-progress.spec.test.mjs` (07): the ten reporting
+- Spec tests ST-19…ST-21 in `scripts/exec-plan-progress-content.spec.test.mjs` (07): the ten reporting
   points and the tool name; the fail-soft and authority wording; the README/CHANGELOG content.
 - No implementation test file: the change is text; the spec suite is the complete oracle.

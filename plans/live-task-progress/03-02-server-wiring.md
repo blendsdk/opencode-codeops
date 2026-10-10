@@ -41,8 +41,9 @@ Inside `setup(ctx)`, alongside the existing blocks (order matters only for the e
    unavailable in this OpenCode build; the sidebar stays hidden."), a thrown error a second
    one; setup always completes.
 4. **Extend the existing event loop** — in the `session.deleted` branch (currently deleting the
-   effort marker), add `progress.clearSession(event.data.sessionID)`; when it returns an
-   identity the bound emit pushes `cleared` (03-01 §Run state).
+   effort marker), add `progress.clearSession(event.data.sessionID)`; when a run is cleared the
+   runtime emits `cleared` through the bound emit and returns the cleared identity (03-01
+   §Run state).
 5. **Cleanup** — unchanged: the returned cleanup aborts the event subscription; the runtime is
    per-instance memory and needs no disposal.
 
@@ -74,5 +75,6 @@ Registration failure combinations (all acceptable, all honest):
   new APIs (fake context extended with `tool.transform` and a capturing `rpc.register`), and
   the `session.deleted` clearing path through a scripted event stream.
 - Implementation tests in `plugin/progress-server.impl.test.mjs`: registration-failure matrix,
-  warning-once behavior for repeated setup calls, double-registration tolerance, and the
-  existing foundation containment tests (ST-11 there) still passing unchanged.
+  one warning per failed registration (no cross-call deduplication; repeated setups each warn
+  once), double-registration tolerance, and the existing foundation containment tests (ST-11
+  there) still passing unchanged.

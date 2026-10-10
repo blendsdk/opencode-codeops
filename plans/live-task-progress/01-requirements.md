@@ -31,7 +31,8 @@ view (register rows 1–3, notes A–D).
       subscription are scoped to the session's location; the section renders nothing when no run
       is known or the APIs are unavailable (register rows 2, notes C–D).
 - [ ] **R5 — Honesty.** Only reported values are shown; the view always shows the last-update
-      time; a staleness marker appears when the last update is older than 10 minutes; blocked and
+      time; a staleness marker is shown whenever the view renders with a last update 10 minutes old
+      or older (no timers — it refreshes on the next render); blocked and
       waiting are explicit; verified counts never include unverified tasks; nothing is claimed
       when nothing is known (register rows 2, note D).
 - [ ] **R6 — Server-side data path.** The sidebar obtains all data from the server plugin via the
@@ -72,9 +73,12 @@ view (register rows 1–3, notes A–D).
 ### Compatibility
 
 - OpenCode v2 only; the tested minimum build is recorded from the live smoke (foundation: v2.0.26).
-- Every new host API is feature-detected and contained (R9); the existing `codeops.status` RPC,
-  `requestStatus`, and the foundation's tests keep working unchanged.
-- The package's exports, dependencies, and shipped files do not change.
+- Every new host API is feature-detected and contained (R9); the existing `codeops.status` RPC
+  and `requestStatus` keep working unchanged; the foundation suites keep passing, with the two
+  recorded, user-approved assertion evolutions (the impl test's definition shape in Phase 1; the
+  spec test's strip assertions in Phase 3).
+- The package's exports, dependency declarations, and packaged `files` patterns do not change;
+  the new helper files ship through the existing `bin/` inclusion, like `reasoning-effort.mjs`.
 
 ### Security
 

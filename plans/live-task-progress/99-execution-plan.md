@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 18:40
-> **Progress**: 0/22 tasks (0%)
+> **Last Updated**: 2026-10-10 19:18
+> **Progress**: 0/21 tasks (0%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -24,10 +24,10 @@ appears in no task.
 | ----- | ----- | ----- |
 | 1 | Progress core: contracts, state, display | 6 |
 | 2 | Server wiring: tool and RPC registration | 5 |
-| 3 | Sidebar live view | 5 |
+| 3 | Sidebar live view | 4 |
 | 4 | Protocol, docs, and live evidence | 6 |
 
-**Total: 22 tasks across 4 phases** (no fabricated hour estimates — scope is bounded by the
+**Total: 21 tasks across 4 phases** (no fabricated hour estimates — scope is bounded by the
 task-size criteria in the make-plan quality checklist)
 
 > **⚠️ EXECUTION RULE — APPLIES TO EVERY AGENT EXECUTING THIS PLAN:**
@@ -110,10 +110,9 @@ task-size criteria in the make-plan quality checklist)
 **Objective**: The live view replaces the strip, subscribes and merges correctly, and renders the shared display lines.
 
 - [ ] 3.1.1 [spec-author] Write the specification tests for ST-16…ST-18 — `plugin/tui-progress.spec.test.mjs` — and verify the red phase
-- [ ] 3.1.2 Rewrite `plugin/tui.tsx` per 03-03 §Component design — ST-16 and ST-18 green
-- [ ] 3.1.3 Supersede the strip assertions in `plugin/tui-foundation.spec.test.mjs` per 03-03 §Superseding the Foundation Strip (retain the slot/import/no-timer/guarded-render invariants) — ST-17 green
-- [ ] 3.1.4 Write the implementation tests — `plugin/tui-progress.impl.test.mjs` — green
-- [ ] 3.1.5 Full verification: `npm run verify`
+- [ ] 3.1.2 Rewrite `plugin/tui.tsx` per 03-03 §Component design and supersede the strip assertions in `plugin/tui-foundation.spec.test.mjs` per 03-03 §Superseding the Foundation Strip (retain the slot/import/no-timer invariants; the guard-validated-render contract is owned by `plugin/tui-progress.spec.test.mjs`) — ST-16…ST-18 green
+- [ ] 3.1.3 Write the implementation tests — `plugin/tui-progress.impl.test.mjs` — green
+- [ ] 3.1.4 Full verification: `npm run verify`
 
 **Deliverables**:
 - The live sidebar view replacing the strip
@@ -127,7 +126,7 @@ task-size criteria in the make-plan quality checklist)
 ## Phase 4: Protocol, docs, and live evidence
 
 > **Phase baseline tree**: _(recorded by the exec-plan skill)_
-> **Expected modification set**: `skills/exec-plan/SKILL.md`, `skills/exec-plan/execution-protocol.md`, `README.md`, `CHANGELOG.md`, `scripts/exec-plan-progress.spec.test.mjs` (new) + this plan's progress/evidence notes (smoke artifacts stay under the temp root) · **Scope mode**: strict
+> **Expected modification set**: `skills/exec-plan/SKILL.md`, `skills/exec-plan/execution-protocol.md`, `README.md`, `CHANGELOG.md`, `scripts/exec-plan-progress-content.spec.test.mjs` (new) + this plan's progress/evidence notes (smoke artifacts stay under the temp root) · **Scope mode**: strict
 > **Reasoning**: medium — text contracts plus live evidence with fallback paths
 
 ### Step 4.1: Evidence and notes
@@ -135,10 +134,10 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 03-04 §Protocol/§Docs · 07 ST-19…ST-23 · AR notes D–H, rows 2, 3, 14 · Req R8, R10
 **Objective**: The agent protocol reports fail-soft, the docs describe the shipped feature, and the live evidence is recorded.
 
-- [ ] 4.1.1 [spec-author] Write the specification tests for ST-19…ST-21 — `scripts/exec-plan-progress.spec.test.mjs` — and verify the red phase
+- [ ] 4.1.1 [spec-author] Write the specification tests for ST-19…ST-21 — `scripts/exec-plan-progress-content.spec.test.mjs` — and verify the red phase
 - [ ] 4.1.2 Add the reporting protocol to `skills/exec-plan/SKILL.md` and `execution-protocol.md` per 03-04 §Protocol — ST-19 and ST-20 green
 - [ ] 4.1.3 Update `README.md` and `CHANGELOG.md` per 03-04 §Docs — ST-21 green
-- [ ] 4.1.4 Execute the live smoke ST-22 (packed tarball, scratch project, pty launch, registration ground truth, control event round-trip, agent-driven `codeops_progress` call, render capture; user-assisted fallback) and record the tested build, attribution, and outcome in this task's completion note
+- [ ] 4.1.4 Execute the live smoke ST-22 in two recorded parts — (i) deterministic evidence: pack, load, registration ground truth, control-event round-trip; (ii) live evidence: agent-driven `codeops_progress` call, render capture with the user-assisted fallback — and record the tested build, attribution, and outcome for each part in this task's completion note
 - [ ] 4.1.5 Execute the remote-client acceptance ST-23 (`opencode serve` plus `opencode <project> --server <url>` in the pty) and record the outcome or the named limitation in this task's completion note
 - [ ] 4.1.6 Final full verification: `npm run verify`, then review the Success Criteria below
 
@@ -165,7 +164,7 @@ Phase 1 (core contracts) ──┬─► Phase 2 (server wiring) ──┐
 
 **This plan is complete when:**
 
-1. ✅ All phases completed; Progress 22/22
+1. ✅ All phases completed; Progress 21/21
 2. ✅ All verification passing: `npm run verify` (typecheck + tests + version parity)
 3. ✅ ST-1…ST-21 pass; the red phases were recorded; implementation tests pass
 4. ✅ ST-22 records the live smoke evidence (registration, event round-trip, agent-driven call, render path or layer-attributed miss) with the tested OpenCode build

@@ -69,8 +69,8 @@ codeops_progress({ plan: "live-task-progress", phase: "Phase 2: Server wiring",
 
 ```
 CodeOps · live-task-progress
-Phase 2 · implementing
-2.1.3 Wire plugin/index.ts · 6/21 · as of 18:37
+Phase 2: Server wiring · implementing
+2.1.3 Wire plugin/index.ts · 6/21 verified · as of 18:37
 ```
 
 ## Specialist Agents
@@ -91,12 +91,14 @@ New: `bin/lib/codeops-progress.mjs`, `bin/lib/codeops-progress.d.mts`,
 `plugin/progress-core.spec.test.mjs`, `plugin/progress-core.impl.test.mjs`,
 `plugin/progress-server.spec.test.mjs`, `plugin/progress-server.impl.test.mjs`,
 `plugin/tui-progress.spec.test.mjs`, `plugin/tui-progress.impl.test.mjs`,
-`scripts/exec-plan-progress.spec.test.mjs`.
+`scripts/exec-plan-progress-content.spec.test.mjs`.
 
 Changed: `bin/lib/codeops-rpc.mjs`, `bin/lib/codeops-rpc.d.mts`, `plugin/index.ts`,
-`plugin/tui.tsx`, `skills/exec-plan/SKILL.md`, `skills/exec-plan/execution-protocol.md`,
-`README.md`, `CHANGELOG.md`.
+`plugin/tui.tsx`, `plugin/tui-foundation.spec.test.mjs`, `plugin/tui-foundation.impl.test.mjs`,
+`skills/exec-plan/SKILL.md`, `skills/exec-plan/execution-protocol.md`, `README.md`,
+`CHANGELOG.md`.
 
-Depends on: the installed OpenCode v2 plugin surface (`@opencode/plugin` 2.0.26:
-`ctx.tool.transform`, RPC events, `sidebar.content`) and the foundation's proven mechanisms
-(`plans/live-task-sidebar/`, register note A evidence).
+Depends on: the installed OpenCode v2 plugin surface (`@opencode/plugin` 2.0.24 —
+lockfile-pinned; the local OpenCode build is v2.0.26: `ctx.tool.transform`, RPC events,
+`sidebar.content`) and the foundation's proven mechanisms (`plans/live-task-sidebar/`,
+register note A evidence).

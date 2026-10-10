@@ -18,9 +18,9 @@ The user-approved presentation (register row 2) replaces the `CodeOps v<version>
 foundation's content assertions that pin the strip — the `CodeOps v` literal and the
 strip-specific render guard in `plugin/tui-foundation.spec.test.mjs` (`:122-134`) — are
 superseded in the same phase the view ships: the retained invariants (slot claim via
-`append: "sidebar.content"`, helper import, no timers, rendering only guard-validated data)
-stay asserted there, and the live-view content contract is owned by the new ST-16…ST-18 in
-`plugin/tui-progress.spec.test.mjs`. The supersession is a consequence of the confirmed scope
+`append: "sidebar.content"`, helper import, no timers) stay asserted there, and the
+guard-validated-render contract plus the rest of the live-view content contract are owned by
+the new ST-16…ST-18 in `plugin/tui-progress.spec.test.mjs`. The supersession is a consequence of the confirmed scope
 decision, executed spec-first: the new spec file is written and red before the TSX changes.
 
 ## Component design (R3, R4, R5, R7)
@@ -34,19 +34,48 @@ function CodeOpsProgress() {
   const location = context.location ?? context.data.location.default()
   const directory = location?.directory ?? ""
   const [run, setRun] = createSignal<CodeOpsRunState | null>(null)
+  const [clearedAt, setClearedAt] = createSignal(0)
 
   // Subscribe BEFORE the snapshot (register note C): events are live-only.
   // Guarded: a host without the events API still renders from the snapshot.
-  const dispose = subscribe(context.client, directory, setRun)
+  const stops: (() => void)[] = []
+  try {
+    const events = context.client.rpc(CodeOpsRpc).events
+    stops.push(
+      events.on("updated", (event) => {
+        const snapshot = acceptRunUpdate(event, directory)
+        if (snapshot && snapshot.updatedAt > clearedAt()) {
+          setRun((current) => mergeRunState(current, snapshot))
+        }
+      }),
+      events.on("cleared", (event) => {
+        const cleared = acceptRunCleared(event, directory)
+        const current = run()
+        if (
+          cleared &&
+          current &&
+          cleared.plan === current.plan &&
+          cleared.sessionID === current.sessionID
+        ) {
+          setClearedAt(cleared.clearedAt)
+          setRun(null)
+        }
+      }),
+    )
+  } catch {
+    // Events unavailable: the snapshot-only view below still renders.
+  }
+  onCleanup(() => stops.forEach((stop) => stop()))
 
-  // Initial snapshot; null or a failure means "nothing known".
+  // Initial snapshot; null or a failure means "nothing known". The clear guard
+  // applies here too: a snapshot at or before the last clear is ignored.
   const [initial] = createResource(async () => requestProgress(context.client, { location }))
   createEffect(() => {
     const snapshot = initial()
-    if (snapshot) setRun((current) => mergeRunState(current, snapshot))
+    if (snapshot && snapshot.updatedAt > clearedAt()) {
+      setRun((current) => mergeRunState(current, snapshot))
+    }
   })
-
-  onCleanup(dispose)
 
   return (
     <Show when={run()}>
@@ -64,8 +93,8 @@ Behavioral contract (stories the spec tests pin; the exact Solid idiom is implem
 | Rule | Behavior |
 | ---- | -------- |
 | Subscription order | Subscribe to both events before the snapshot call; each handler ignores events whose `location.directory` differs (`acceptRunUpdate` / `acceptRunCleared`). |
-| Merge | `updated` events and the snapshot both flow through `mergeRunState` — monotonic by `updatedAt`; late delivery cannot regress the view. |
-| Cleared | A `cleared` event removes the run only when `plan` **and** `sessionID` match the current snapshot (a newer run is never wiped). |
+| Merge | `updated` events and the snapshot both flow through `mergeRunState` — monotonic by `updatedAt`; both merge paths ignore a snapshot at or before the last accepted `clearedAt`, so late delivery cannot regress the view. |
+| Cleared | A `cleared` event removes the run only when `plan` **and** `sessionID` match the current snapshot (a newer run is never wiped); the handler records the event's `clearedAt`, and updates/snapshots at or before it are ignored (the initial-snapshot race included). |
 | Render source | The visible text comes from `describeRun` only — one display owner (03-01 §Display). Three `<text>` lines; no other literal progress text. |
 | Empty states | No run → renders nothing; snapshot `null` or RPC failure → renders nothing; events API missing → snapshot-only view; every failure path silent. |
 | No timers | No `setInterval`/`setTimeout` anywhere (foundation invariant kept); the as-of text refreshes on re-renders (register note D). |
