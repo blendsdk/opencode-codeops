@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-10 19:59
-> **Progress**: 14/21 tasks (67%)
+> **Progress**: 15/21 tasks (71%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -113,7 +113,7 @@ task-size criteria in the make-plan quality checklist)
 - [x] 3.1.1 [spec-author] Write the specification tests for ST-16…ST-18 — `plugin/tui-progress.spec.test.mjs` — and verify the red phase ✅ (completed: 2026-10-10 19:57)
 - [x] 3.1.2 Rewrite `plugin/tui.tsx` per 03-03 §Component design and supersede the strip assertions in `plugin/tui-foundation.spec.test.mjs` per 03-03 §Superseding the Foundation Strip (retain the slot/import/no-timer invariants; the guard-validated-render contract is owned by `plugin/tui-progress.spec.test.mjs`) — ST-16…ST-18 green ✅ (completed: 2026-10-10 19:58)
 - [x] 3.1.3 Write the implementation tests — `plugin/tui-progress.impl.test.mjs` — green ✅ (completed: 2026-10-10 19:59)
-- [ ] 3.1.4 Full verification: `npm run verify`
+- [x] 3.1.4 Full verification: `npm run verify` ✅ (completed: 2026-10-10 19:59)
 
 **Deliverables**:
 - The live sidebar view replacing the strip
