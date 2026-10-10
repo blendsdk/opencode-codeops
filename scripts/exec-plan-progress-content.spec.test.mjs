@@ -123,7 +123,7 @@ describe("README and CHANGELOG content (ST-21)", () => {
     assert.match(unreleased, /v2\.0\.26/, "the verified build fact is kept")
     assert.doesNotMatch(
       unreleased,
-      /minimal sidebar status line/,
+      /minimal\s+sidebar\s+status\s+line/,
       "the replaced strip must no longer be described"
     )
     assert.doesNotMatch(unreleased, /strip behaves/, "the strip wording is superseded")

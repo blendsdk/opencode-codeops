@@ -160,12 +160,13 @@ task-size criteria in the make-plan quality checklist)
 > plugin's own registration (registration ground truth); `REGISTERED probechan emit=function`;
 > control round-trip `EMITTED tick` → `TICK {"mark":"control"}` received and painted
 > (`P-TICK-OK`); `progress` answers `null` (no run yet); probe markers painted in the capture.
-> **Part (ii) live** (run `ses_st22live3…`, 2026-10-10 20:22): an agent-driven call
+> **Part (ii) live** (re-recorded run `ses_st22live4…`, 2026-10-10 20:36; retained artifacts:
+> `st22/gt-client-st22live.log` and `st22/live4-capture.bin`): an agent-driven call
 > (`›codeops_progress [plan=st22-smoke, activity=implementing]`, model-reported
-> `{"ok": true}`) produced `UPDATED {"plan":"st22-smoke",…,"sessionID":"ses_st22live3…"}` over
+> `{"ok": true}`) produced `UPDATED {"plan":"st22-smoke",…,"sessionID":"ses_st22live4…"}` over
 > the event channel, and a follow-up `progress` call returned the identical snapshot
 > (`UPDATED-SNAPSHOT`); the view text rendered in the capture —
-> `CodeOps · st22-smoke`, `implementing`, `as of 20:22` (the `describeRun` output; the sidebar
+> `CodeOps · st22-smoke`, `implementing`, `as of 20:36` (the `describeRun` output; the sidebar
 > pane's visual presentation remains the user-assisted check).
 > **Environment attribution (recorded):** the first two live attempts were blocked by the
 > machine's globally installed `opencode-codeops@2.1.1` registry plugin being auto-loaded
@@ -177,7 +178,8 @@ task-size criteria in the make-plan quality checklist)
 > isolation.
 >
 > **ST-23 note (4.1.5).** Tested build: OpenCode CLI v2.0.26 (same fixture and isolated-config
-> setup as ST-22). `opencode serve --port 7799` started from the scratch project (its generated
+> setup as ST-22; retained artifacts: `st23/st23-gt-client.log`, `st23/run5.out`,
+> `st23/client5-capture.bin`). `opencode serve --port 7799` started from the scratch project (its generated
 > password passed to the clients through the environment, never recorded); an interactive remote
 > client (`opencode <project> --server http://127.0.0.1:7799`) carried the events probe; the
 > agent-driven call ran headless against the same server

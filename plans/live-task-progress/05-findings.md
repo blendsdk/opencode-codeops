@@ -17,3 +17,7 @@
 | RV-001 | 3 | MINOR | plugin/tui-progress.spec.test.mjs | fixed |
 | RV-002 | 3 | MAJOR | plugin/tui.tsx | fixed |
 | RV-003 | 3 | MINOR | plugin/tui.tsx | fixed |
+| RV-001 | 4 | MINOR | scripts/exec-plan-progress-content.spec.test.mjs | fixed |
+| RV-002 | 4 | MINOR | README.md | fixed |
+| RV-003 | 4 | MINOR | README.md | fixed |
+| RV-004 | 4 | MINOR | plans/live-task-progress/99-execution-plan.md | fixed |

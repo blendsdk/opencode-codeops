@@ -154,12 +154,13 @@ others may still use it. The full protocol is in `_shared/workspace-hygiene.md`.
 ## Live task progress in the sidebar
 
 While an `exec-plan` run is active, the sidebar shows the current run — plan, phase, task,
-activity (`implementing`, `verifying`, `reviewing`, `delegating`, `blocked`, `waiting`, `done`),
-and the verified-task count — reported by the agent through the `codeops_progress` tool. The view
-is intentionally honest: every line carries an always-visible "as of" time; a run with no update
-for 10 minutes is marked "stale" instead of looking live; and nothing renders when no run is
-active, when the host lacks the plugin APIs, or when every call fails. The Markdown execution plan
-remains the single progress source of truth; the live view never gates execution.
+activity (`starting`, `implementing`, `verifying`, `reviewing`, `delegating`, `blocked`,
+`waiting`, `done`), and the verified-task count — reported by the agent through the
+`codeops_progress` tool. The view is intentionally honest: it always shows an "as of" time; a
+run with no update for 10 minutes is marked "stale" instead of looking live; and nothing renders
+when no run is active, when the host lacks the plugin APIs, or when every call fails. The
+Markdown execution plan remains the single progress source of truth; the live view never gates
+execution.
 
 ## Agent model configuration
 
