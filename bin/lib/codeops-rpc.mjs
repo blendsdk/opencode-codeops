@@ -5,7 +5,9 @@
  * reserved-name validation only — so this module needs no runtime import of
  * the SDK and `node --test` can exercise it directly. The registration guard
  * keeps the surface safe on builds that do not implement custom RPCs: it never
- * throws and reports success with a boolean.
+ * throws and reports success with a boolean. The status request helper turns
+ * every transport failure into "no status", so a rendering component never has
+ * to catch.
  *
  * @module codeops-rpc
  */
@@ -88,4 +90,24 @@ export function isCodeOpsStatus(value) {
     typeof value.openCodeVersion === "string" &&
     typeof value.directory === "string"
   )
+}
+
+/**
+ * Request the codeops status payload from a host client, converting every
+ * transport failure into `undefined`.
+ *
+ * A caller can therefore render from the result without a `catch`: a host
+ * without the RPC, a server plugin that failed to register, and a failed call
+ * all collapse into the same "no status" outcome. The payload is returned as
+ * received; narrow it with {@link isCodeOpsStatus} before use.
+ *
+ * @param client - Host client exposing `rpc(definition).status({})`.
+ * @returns The raw status payload, or `undefined` when the call fails.
+ */
+export async function requestStatus(client) {
+  try {
+    return await client.rpc(CodeOpsRpc).status({})
+  } catch {
+    return undefined
+  }
 }

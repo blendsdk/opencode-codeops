@@ -13,7 +13,7 @@
 import { Plugin, usePlugin } from "@opencode/plugin/tui"
 import { createResource, Show } from "solid-js"
 
-import { CodeOpsRpc, isCodeOpsStatus } from "../bin/lib/codeops-rpc.mjs"
+import { isCodeOpsStatus, requestStatus } from "../bin/lib/codeops-rpc.mjs"
 
 /**
  * The sidebar status strip.
@@ -27,7 +27,7 @@ import { CodeOpsRpc, isCodeOpsStatus } from "../bin/lib/codeops-rpc.mjs"
 function CodeOpsStrip() {
   const context = usePlugin()
   const [status] = createResource(async () => {
-    const payload = await context.client.rpc(CodeOpsRpc).status({})
+    const payload = await requestStatus(context.client)
     return isCodeOpsStatus(payload) ? payload : undefined
   })
   return (

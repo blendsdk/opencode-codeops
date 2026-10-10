@@ -11,7 +11,7 @@
 import assert from "node:assert/strict"
 import { describe, it } from "node:test"
 
-import { CodeOpsRpc, isCodeOpsStatus } from "../bin/lib/codeops-rpc.mjs"
+import { CodeOpsRpc, isCodeOpsStatus, requestStatus } from "../bin/lib/codeops-rpc.mjs"
 
 describe("isCodeOpsStatus payload guard", () => {
   it("should accept exactly the three string fields", () => {
@@ -63,6 +63,37 @@ describe("isCodeOpsStatus payload guard", () => {
     for (const value of [undefined, null, "text", 42, true, ["2.1.1", "2.0.24", "/project"]]) {
       assert.equal(isCodeOpsStatus(value), false, `must reject ${JSON.stringify(value)}`)
     }
+  })
+})
+
+describe("requestStatus transport containment", () => {
+  it("should return the raw payload when the status call resolves", async () => {
+    const payload = { pluginVersion: "2.1.1", openCodeVersion: "2.0.24", directory: "/project" }
+    const client = { rpc: () => ({ status: async () => payload }) }
+
+    assert.deepEqual(await requestStatus(client), payload)
+  })
+
+  it("should return undefined when the status call rejects", async () => {
+    const client = {
+      rpc: () => ({
+        status: async () => {
+          throw new Error("rpc unavailable")
+        },
+      }),
+    }
+
+    assert.equal(await requestStatus(client), undefined)
+  })
+
+  it("should return undefined when the client rpc accessor throws", async () => {
+    const client = {
+      rpc: () => {
+        throw new Error("no rpc API")
+      },
+    }
+
+    assert.equal(await requestStatus(client), undefined)
   })
 })
 

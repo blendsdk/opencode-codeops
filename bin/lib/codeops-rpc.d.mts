@@ -62,3 +62,16 @@ export declare function registerCodeOpsRpc(
 
 /** Validate an unknown RPC payload as a complete CodeOps status record. */
 export declare function isCodeOpsStatus(value: unknown): value is CodeOpsStatus
+
+/** Structural client shape {@link requestStatus} consumes. */
+export interface CodeOpsStatusClient {
+  readonly rpc: (definition: CodeOpsRpcDefinition) => {
+    readonly status: (input: Record<string, never>) => Promise<unknown>
+  }
+}
+
+/**
+ * Request the raw status payload from a host client, converting every
+ * transport failure into `undefined`.
+ */
+export declare function requestStatus(client: CodeOpsStatusClient): Promise<unknown>
