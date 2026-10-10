@@ -6,9 +6,10 @@
 > counting rule in `scripts/codeops_plan.py`; slice 1 is the live spike (packaged `./tui` entry,
 > a `sidebar.content` status strip, and the server `codeops` RPC foundation). Systematically
 > reviewed across all 12 categories.
-> **Auto-design**: active for this workflow chain — eligible technical decisions are delegated
-> under `_shared/auto-design.md` policy version 1, root invocation ID `AD-LTS-20261010-1`;
-> reserved decisions remain user-owned.
+> **Auto-design**: active — eligible technical decisions are delegated under `_shared/auto-design.md`
+> policy version 1. Each `--auto-design` invocation carries its own root ID: planning chain
+> `AD-LTS-20261010-1`, preflight run `AD-PF-LTS-20261010-1`, execution run `AD-EX-LTS-20261010-1`
+> (note I). Reserved decisions remain user-owned.
 
 | # | Category | Ambiguity / Gap | Options Presented | User Decision | Status |
 |---|----------|-----------------|-------------------|---------------|--------|
@@ -258,7 +259,8 @@ Evidence: the host installs registry-name plugin specs into its own cache (unpub
   server-side (control-probe ground truth written to a file); `client.rpc(CodeOpsRpc).status({})`
   from the TUI fails with `{"type":"rpc.unavailable","message":"RPC is unavailable: codeops"}` on
   v2.0.24 in `--standalone` and against the shared service, reproduced with a minimal control RPC
-  under both load routes; the `sidebar.content` pane did not render in any captured view
+  (`probeprobe`) under both plugin-load routes and in both run configurations; the `sidebar.content`
+  pane did not render in any captured view
   (home/session/diff; 160–240 cols; leader-bind and palette routes explored).
 Rejected alternatives: registry-spec install (impossible for the unpublished 2.1.1); `cli.json`
   path forms (inert in the isolated probe runs; not pursued further); a committed smoke harness
@@ -266,7 +268,8 @@ Rejected alternatives: registry-spec install (impossible for the unpublished 2.1
   state churn).
 Strongest counterargument: file-route loading is not the registry install path users will have,
   and the client-bridge failure may be an artifact of the probe environment rather than the build.
-  Mitigation: the failure was control-reproduced with a minimal plugin and across three routes,
+  Mitigation: the failure was control-reproduced with a minimal plugin under both plugin-load
+  routes and in both run configurations (standalone and the shared service),
   and registry-install behavior itself was directly observed (install failure for an unpublished
   name); all residuals are recorded for the go/no-go.
 Confidence: High for the load and registration findings; Med for the client-bridge attribution
