@@ -13,6 +13,7 @@ import re
 import sys
 from dataclasses import asdict, dataclass
 from pathlib import Path
+from typing import Iterator
 
 
 IMPLEMENTS_RE = re.compile(r"^>[ \t]*\*\*Implements\*\*:[ \t]*(.+?)[ \t]*$", re.MULTILINE)
@@ -21,7 +22,9 @@ TARGET_RE = re.compile(
     r"(?:RD-(?:[A-Za-z0-9]+-)*\d+|T-\d+|REQ-[A-Za-z0-9]+(?:-[A-Za-z0-9]+)*)"
     r"(?![A-Za-z0-9_-])"
 )
-TASK_RE = re.compile(r"^-\s*\[([ xX~!])\]\s+(.+?)\s*$", re.MULTILINE)
+TASK_RE = re.compile(r"^-\s*\[([ xX~!])\]\s+(.+?)\s*$")
+FENCE_OPEN_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
+TASK_ID_RE = re.compile(r"^\s*(?:\*\*)?([0-9]+\.[0-9]+\.[0-9]+|T-[0-9]+\.[0-9]+)(?=[\s*—–-]|$)")
 BLOCKED_REASON_RE = re.compile(r"(?:blocked|reason)\s*:\s*\S", re.IGNORECASE)
 _PROGRESS_WIDTH = 10
 _PROGRESS_FILLED = "█"
@@ -67,9 +70,57 @@ def parse_implements(index_text: str) -> tuple[str, ...]:
     return tuple(dict.fromkeys(TARGET_RE.findall(match.group(1))))
 
 
+def _task_lines(execution_text: str) -> Iterator[tuple[str, str, str]]:
+    """Yield ``(marker, text, task_id)`` for every real execution-task line.
+
+    A line qualifies when it carries one of the four checkbox markers outside a
+    fenced code block and its text begins with a task id. Fences follow the
+    Markdown shape: an opening run of three or more backticks or tildes (at
+    most three leading spaces, optional info string) hides everything up to a
+    closing run of the same character with at least the same length and nothing
+    else on the line; an unclosed fence hides the rest of the document. An id
+    is ``N.N.N`` or ``T-N.N`` after an optional ``**`` opener and must be
+    followed by whitespace, ``*``, a dash, or the end of the line, so
+    near-misses such as ``1.1.1.1``, ``T-05.1x``, and ``1.1.1:`` stay ignored.
+    Duplicate ids are yielded; the caller decides which occurrence counts.
+    """
+    fence_char = ""
+    fence_length = 0
+    for line in execution_text.splitlines():
+        line = line.rstrip()
+        if fence_char:
+            indent = len(line) - len(line.lstrip(" "))
+            body = line[indent:] if indent <= 3 else ""
+            if len(body) >= fence_length and body == fence_char * len(body):
+                fence_char = ""
+            continue
+        opener = FENCE_OPEN_RE.match(line)
+        if opener:
+            fence_char = opener.group(1)[0]
+            fence_length = len(opener.group(1))
+            continue
+        task = TASK_RE.match(line)
+        task_id = TASK_ID_RE.match(task.group(2)) if task else None
+        if task_id is None:
+            continue
+        yield task.group(1).lower(), task.group(2).strip(), task_id.group(1)
+
+
 def parse_tasks(execution_text: str) -> tuple[Task, ...]:
-    """Parse only the four authoritative execution checklist markers."""
-    return tuple(Task(marker.lower(), text.strip()) for marker, text in TASK_RE.findall(execution_text))
+    """Return the execution tasks a plan document really declares.
+
+    Fenced examples and checkbox lines without a task id (deliverable and
+    acceptance lists, quoted templates) are ignored, and a task id that appears
+    more than once counts once, from its first occurrence in document order.
+    """
+    tasks: list[Task] = []
+    seen: set[str] = set()
+    for marker, text, task_id in _task_lines(execution_text):
+        if task_id in seen:
+            continue
+        seen.add(task_id)
+        tasks.append(Task(marker, text))
+    return tuple(tasks)
 
 
 def next_task(tasks: tuple[Task, ...]) -> Task | None:
