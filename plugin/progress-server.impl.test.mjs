@@ -289,6 +289,32 @@ describe("emission failure swallowing at the binding", () => {
   })
 })
 
+describe("host promise contract", () => {
+  it("should return promises from the tool handler and the progress method", async () => {
+    const runtime = createCodeOpsProgress()
+    let handlers
+    const rpcCtx = {
+      rpc: {
+        register: async (definition, captured) => {
+          handlers = captured
+          return { events: { emit: () => {} } }
+        },
+      },
+    }
+    assert.equal(await registerCodeOpsRpc(rpcCtx, { pluginVersion: "2.1.1", runtime }), true)
+
+    const progressResult = handlers.progress()
+    assert.ok(progressResult instanceof Promise, "the progress method must return a promise")
+    assert.equal(await progressResult, null)
+
+    const adds = []
+    await registerCodeOpsProgressTool({ tool: toolDomain(adds) }, runtime)
+    const toolResult = adds[0].execute({ plan: "p", activity: "done" }, { sessionID: "s1" })
+    assert.ok(toolResult instanceof Promise, "the tool handler must return a promise")
+    assert.deepEqual(await toolResult, { output: { ok: true } })
+  })
+})
+
 describe("session-deletion identity matching", () => {
   it("should leave the run intact when a different session is deleted, then clear its own", async () => {
     const base = makeBase()

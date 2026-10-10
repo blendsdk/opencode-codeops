@@ -543,7 +543,10 @@ export async function registerCodeOpsProgressTool(ctx, runtime) {
         description: CODE_OPS_TOOL_DESCRIPTION,
         input: ProgressReportSchema,
         output: ProgressOutputSchema,
-        execute(input, toolContext) {
+        // The host adapter wraps the handler in a promise constructor and
+        // rejects a synchronous return, so the handler must be async even
+        // though it never awaits.
+        async execute(input, toolContext) {
           try {
             const accepted = runtime?.report(input, toolContext?.sessionID ?? "") ?? null
             return { output: { ok: accepted !== null } }

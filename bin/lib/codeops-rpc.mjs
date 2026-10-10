@@ -87,7 +87,9 @@ export async function registerCodeOpsRpc(ctx, { pluginVersion, runtime } = {}) {
           directory: asText(ctx?.location?.directory),
         }
       },
-      progress() {
+      // The host adapter requires handlers to return promises; a synchronous
+      // return fails the call. async even though nothing is awaited.
+      async progress() {
         return runtime?.snapshot() ?? null
       },
     })
