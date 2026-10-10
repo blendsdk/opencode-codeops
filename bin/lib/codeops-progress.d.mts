@@ -65,7 +65,7 @@ export interface CodeOpsRunCleared {
 }
 
 /** JSON-Schema shape of the progress tool's input. */
-export interface CodeOpsProgressReportSchema {
+export type CodeOpsProgressReportSchema = {
   readonly type: "object"
   readonly additionalProperties: false
   readonly required: readonly ["plan", "activity"]
@@ -81,7 +81,7 @@ export interface CodeOpsProgressReportSchema {
 }
 
 /** JSON-Schema shape of the progress tool's acknowledgement. */
-export interface CodeOpsProgressOutputSchema {
+export type CodeOpsProgressOutputSchema = {
   readonly type: "object"
   readonly additionalProperties: false
   readonly required: readonly ["ok"]
@@ -89,7 +89,7 @@ export interface CodeOpsProgressOutputSchema {
 }
 
 /** JSON-Schema shape of a complete run snapshot. */
-export interface CodeOpsRunStateSchema {
+export type CodeOpsRunStateSchema = {
   readonly type: "object"
   readonly additionalProperties: false
   readonly required: readonly [
@@ -119,7 +119,7 @@ export interface CodeOpsRunStateSchema {
 }
 
 /** JSON-Schema shape of the cleared-event payload. */
-export interface CodeOpsRunClearedSchema {
+export type CodeOpsRunClearedSchema = {
   readonly type: "object"
   readonly additionalProperties: false
   readonly required: readonly ["plan", "sessionID", "clearedAt"]

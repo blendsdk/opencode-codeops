@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 19:43
-> **Progress**: 5/21 tasks (24%)
+> **Last Updated**: 2026-10-10 19:45
+> **Progress**: 6/21 tasks (29%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -61,7 +61,7 @@ task-size criteria in the make-plan quality checklist)
 - [x] 1.1.3 Extend the module with the runtime: `createCodeOpsProgress`, `mergeRunState`, `isRunStale`, `describeRun` per 03-01 §Run state/§Display — ST-5…ST-8 green ✅ (completed: 2026-10-10 19:41)
 - [x] 1.1.4 Extend `bin/lib/codeops-rpc.mjs` and `.d.mts`: the `progress` method, the `updated`/`cleared` events, the runtime option with the emit binding, and `requestProgress` per 03-01 §Helpers — ST-9…ST-11 green; update the definition-shape assertion in `plugin/tui-foundation.impl.test.mjs` to the evolved contract ✅ (completed: 2026-10-10 19:42)
 - [x] 1.1.5 Write the implementation tests — `plugin/progress-core.impl.test.mjs` — green ✅ (completed: 2026-10-10 19:43)
-- [ ] 1.1.6 Full verification: `npm run verify`
+- [x] 1.1.6 Full verification: `npm run verify` ✅ (completed: 2026-10-10 19:45)
 
 **Deliverables**:
 - The core module with schemas, guards, runtime, display, and typings
