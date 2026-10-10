@@ -2,6 +2,21 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+### Fixes
+
+- plans: count only id-prefixed execution tasks when deriving progress; deliverable checkboxes
+  and fenced examples no longer inflate totals, and migration admission stays checkbox-based so
+  legacy id-less checklists keep migrating
+
+### Notes
+
+- tui: add the packaged `./tui` foundation — a guarded `codeops.status` RPC and a minimal sidebar
+  status line that renders only when the server answers. The live check on OpenCode v2.0.24 passed
+  for entry loading and server registration; the client-side RPC round-trip and the sidebar render
+  stay unproven on that build and gate the full live feature.
+
 ## 2.1.1 — 2026-10-09
 
 ### Upgrade Notes
