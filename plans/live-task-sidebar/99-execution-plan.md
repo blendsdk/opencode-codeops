@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 13:21
-> **Progress**: 13/14 tasks (93%)
+> **Last Updated**: 2026-10-10 13:23
+> **Progress**: 14/14 tasks (100%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -113,7 +113,7 @@ task-size criteria in the make-plan quality checklist)
 
 > **ST-12 note (3.1.1).** Tested build: OpenCode v2.0.24 (SDK `@opencode/plugin` 2.0.24, Node 22.23, Python-pty capture, isolated XDG; one cross-check run against the default shared service). Packed artifact: `npm pack` → `opencode-codeops-2.1.1.tgz`; its contents loaded via the host's project plugin route (`.opencode/plugins/opencode-codeops/` with root `index.ts`/`tui.tsx` shims re-exporting the packed entries) and, as a cross-check, `opencode.json` `file://` directory specs. **Proven layers:** (a) entry load — the packed server and TUI entries load with no errors; (b) server registration — `ctx.rpc.register` succeeds (control-probe ground truth written to a file; same call path as `registerCodeOpsRpc`). Pre-probe findings: the host installs registry-name plugin specs into its own cache (an unpublished name fails the install); a tarball `file://` spec is rejected ("configured plugin path must be a directory"); `.ts` TUI entries fail with a JSX syntax error (`.tsx` required). **Unproven layers (attributed):** (c) client RPC bridge — `client.rpc(CodeOpsRpc).status({})` from the TUI fails with `{"type":"rpc.unavailable","message":"RPC is unavailable: codeops"}` on v2.0.24 in `--standalone` and against the shared service, reproduced with a minimal control RPC (`probeprobe`) under both load routes — a platform limitation, not this code (runtime method adaptations: AR #21); (d) sidebar slot render — the `sidebar.content` pane did not render in any captured view (home / session / diff; 160–240 cols; leader-bind and palette routes explored), so the strip text never appears in the capture (observed limitation, per the documented handling). **User-assisted fallback (pending):** on a newer build, run `opencode` in a directory containing `.opencode/plugins/opencode-codeops/` copied from the smoke fixture and watch the session sidebar — expect `CodeOps v2.1.1` only once the client RPC bridge works. **Slice-2 input:** re-prove the RPC round-trip on OpenCode ≥2.0.26 (the build already offered the update) before slice 2 relies on it.
 - [x] 3.1.2 Add the `CHANGELOG.md` `## Unreleased` entry (Fixes: execution-task counting; Notes: packaged TUI foundation), per AR #15 ✅ (completed: 2026-10-10 13:22)
-- [ ] 3.1.3 Final full verification: `npm run verify`, then report the slice-2 go/no-go inputs (what was proven, what was not, the recorded build) to the user
+- [x] 3.1.3 Final full verification: `npm run verify`, then report the slice-2 go/no-go inputs (what was proven, what was not, the recorded build) to the user ✅ (completed: 2026-10-10 13:23)
 
 **Deliverables**:
 - ST-12 evidence recorded with the tested OpenCode build
