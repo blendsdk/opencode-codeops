@@ -1,0 +1,113 @@
+// Generated from plugin/tui.tsx — do not edit; run `npm run build:tui` to regenerate.
+import { insert as _$insert } from "@opentui/solid";
+import { createElement as _$createElement } from "@opentui/solid";
+import { memo as _$memo } from "@opentui/solid";
+import { createComponent as _$createComponent } from "@opentui/solid";
+/**
+ * The CodeOps TUI entry: the live run-progress view in the session sidebar.
+ *
+ * The view is deliberately honest: it shows only reported values from the
+ * server's run state, always with an as-of time, and it renders nothing when
+ * there is no run, when the host lacks the events API, or when every call
+ * fails. There are no timers — the text recomputes whenever the component
+ * re-renders — and no file access; all display and merge logic lives in the
+ * shared helper module so it can be tested under plain Node.
+ *
+ * @module tui
+ */
+
+import { Plugin, usePlugin } from "@opencode/plugin/tui";
+import { createEffect, createResource, createSignal, onCleanup, Show } from "solid-js";
+import { acceptRunCleared, acceptRunUpdate, describeRun, mergeRunState } from "../bin/lib/codeops-progress.mjs";
+import { CodeOpsRpc, requestProgress } from "../bin/lib/codeops-rpc.mjs";
+
+/**
+ * The live run-progress view.
+ *
+ * Resolves the session's location once, subscribes to the `updated` and
+ * `cleared` events before requesting an initial snapshot, and merges both
+ * delivery paths monotonically. A clear records its server-stamped
+ * `clearedAt`; both merge paths ignore deliveries at or before it, so a late
+ * snapshot or update can never resurrect a cleared run. Every failure path is
+ * silent: a host without the events API still renders from the snapshot, and
+ * an invalid or missing snapshot renders nothing.
+ *
+ * @returns The three display lines, or nothing when no run is known.
+ */
+function CodeOpsProgress() {
+  const context = usePlugin();
+  const location = context.location ?? context.data.location.default();
+  const directory = location?.directory ?? "";
+  const [run, setRun] = createSignal(null);
+  const [clearedAt, setClearedAt] = createSignal(0);
+
+  // Subscribe BEFORE the snapshot: events are live-only, so a snapshot
+  // fetched first could miss an update arriving in between. Guarded: a host
+  // without the events API still renders from the snapshot below.
+  const stops = [];
+  try {
+    const events = context.client.rpc(CodeOpsRpc).events;
+    const stopUpdated = events.on("updated", event => {
+      const snapshot = acceptRunUpdate(event, directory);
+      if (snapshot && snapshot.updatedAt > clearedAt()) {
+        setRun(current => mergeRunState(current, snapshot));
+      }
+    });
+    stops.push(stopUpdated);
+    const stopCleared = events.on("cleared", event => {
+      const cleared = acceptRunCleared(event, directory);
+      if (!cleared) return;
+      // Record the clear time for every accepted clear, before the identity
+      // gate: a clear that arrives before the initial snapshot must still
+      // suppress that snapshot, or a cleared run could reappear.
+      setClearedAt(cleared.clearedAt);
+      const current = run();
+      if (current && cleared.plan === current.plan && cleared.sessionID === current.sessionID) {
+        setRun(null);
+      }
+    });
+    stops.push(stopCleared);
+  } catch {
+    // Events unavailable: the snapshot-only view below still renders.
+  }
+  onCleanup(() => stops.forEach(stop => stop()));
+
+  // Initial snapshot; null or a failure means "nothing known". The clear
+  // guard applies here too: a snapshot at or before the last clear is ignored.
+  const [initial] = createResource(async () => requestProgress(context.client, {
+    location
+  }));
+  createEffect(() => {
+    const snapshot = initial();
+    if (snapshot && snapshot.updatedAt > clearedAt()) {
+      setRun(current => mergeRunState(current, snapshot));
+    }
+  });
+  return _$createComponent(Show, {
+    get when() {
+      return run();
+    },
+    children: snapshot => {
+      const view = () => describeRun(snapshot(), Date.now());
+      return _$memo(() => view().lines.map(line => (() => {
+        var _el$ = _$createElement("text");
+        _$insert(_el$, line);
+        return _el$;
+      })()));
+    }
+  });
+}
+
+/**
+ * The opencode-codeops TUI plugin: claims the sidebar content slot with the
+ * live run view. The host disposes the claim when the plugin unloads.
+ */
+export default Plugin.define({
+  id: "opencode-codeops-tui",
+  setup(context) {
+    return context.ui.slot({
+      append: "sidebar.content",
+      render: () => _$createComponent(CodeOpsProgress, {})
+    });
+  }
+});

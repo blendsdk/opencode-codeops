@@ -95,8 +95,15 @@ describe("published packaging (ST-8)", () => {
   it("should expose the ./tui entry and keep plugin test files out of the package", () => {
     const manifest = JSON.parse(read("package.json"))
 
-    assert.equal(manifest.exports["./tui"], "./plugin/tui.tsx")
-    assert.equal(existsSync(join(ROOT, "plugin", "tui.tsx")), true, "plugin/tui.tsx must exist")
+    // The published entry is precompiled: the host skips its JSX transpilation
+    // inside node_modules, so a source .tsx entry cannot load from an install.
+    assert.equal(manifest.exports["./tui"], "./plugin/tui.js")
+    assert.equal(existsSync(join(ROOT, "plugin", "tui.js")), true, "plugin/tui.js must exist")
+    assert.equal(
+      existsSync(join(ROOT, "plugin", "tui.tsx")),
+      true,
+      "plugin/tui.tsx must exist as the source"
+    )
     assert.ok(manifest.files.includes("plugin/"), "files must include plugin/")
     assert.ok(
       manifest.files.includes("!plugin/*.test.mjs"),
@@ -110,7 +117,7 @@ describe("published packaging (ST-8)", () => {
     const packed = spawnSync("npm", ["pack", "--dry-run", "--json"], { cwd: ROOT, encoding: "utf8" })
     assert.equal(packed.status, 0, packed.stderr)
     const entries = JSON.parse(packed.stdout)[0].files.map((file) => file.path)
-    assert.ok(entries.includes("plugin/tui.tsx"), "the tui entry must ship in the tarball")
+    assert.ok(entries.includes("plugin/tui.js"), "the tui entry must ship in the tarball")
     assert.ok(
       !entries.some((path) => /^plugin\/.*\.test\.mjs$/.test(path)),
       `plugin test files must not ship: ${entries.filter((path) => /\.test\.mjs$/.test(path)).join(", ")}`

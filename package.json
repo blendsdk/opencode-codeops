@@ -11,13 +11,14 @@
   "exports": {
     ".": "./plugin/index.ts",
     "./server": "./plugin/index.ts",
-    "./tui": "./plugin/tui.tsx"
+    "./tui": "./plugin/tui.js"
   },
   "bin": {
     "opencode-codeops": "bin/index.mjs"
   },
   "scripts": {
     "test": "node --test",
+    "build:tui": "node scripts/build-tui.mjs",
     "typecheck": "tsc --noEmit",
     "check:version": "node scripts/check-version.mjs",
     "verify": "npm run typecheck && npm run test && npm run check:version",
