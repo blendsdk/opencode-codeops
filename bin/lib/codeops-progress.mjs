@@ -315,3 +315,205 @@ export function normalizeProgressReport(value) {
 function truncateText(text) {
   return text.length > CODE_OPS_STRING_CAP ? text.slice(0, CODE_OPS_STRING_CAP) : text
 }
+
+/**
+ * Build the display label for a snapshot's activity.
+ *
+ * Four activities render as their own word. `delegating`, `waiting`, and
+ * `blocked` attach the reported detail when one is present, so the sidebar
+ * shows where a delegation went, what the run waits for, or why it stopped.
+ *
+ * @param snapshot - The run snapshot.
+ * @returns The activity label for the second display line.
+ */
+function activityLabel(snapshot) {
+  switch (snapshot.activity) {
+    case "delegating":
+      return snapshot.detail === null ? "delegating" : `delegating to ${snapshot.detail}`
+    case "waiting":
+      return snapshot.detail === null ? "waiting" : `waiting (${snapshot.detail})`
+    case "blocked":
+      return snapshot.detail === null ? "blocked" : `blocked: ${snapshot.detail}`
+    default:
+      return snapshot.activity
+  }
+}
+
+/**
+ * Format a snapshot timestamp as local `HH:MM` clock text.
+ *
+ * The viewer's local time zone applies: exact for a same-host client,
+ * approximate when the server runs elsewhere.
+ *
+ * @param ms - Epoch milliseconds (server-stamped).
+ * @returns The local time as `HH:MM`.
+ */
+function formatLocalTime(ms) {
+  const date = new Date(ms)
+  const hours = String(date.getHours()).padStart(2, "0")
+  const minutes = String(date.getMinutes()).padStart(2, "0")
+  return `${hours}:${minutes}`
+}
+
+/**
+ * Create one in-memory run-state runtime.
+ *
+ * The runtime holds a single active run: the first accepted report creates it,
+ * same-plan reports merge into it field by field, and a report for a different
+ * plan replaces it (last reporter owns). Every accepted report emits the new
+ * snapshot to a bound emitter; clearing emits the cleared identity.
+ *
+ * @returns {object} The runtime: `report`, `snapshot`, `clearSession`, and
+ *   `bindEmit`.
+ */
+export function createCodeOpsProgress() {
+  let current = null
+  let emitFn = null
+
+  /**
+   * Emit one event through the bound emitter, swallowing every failure.
+   *
+   * A missing binding, a synchronous throw, and a rejected promise all leave
+   * the report or clear successful — the state is already truthful.
+   *
+   * @param name - Event name (`updated` or `cleared`).
+   * @param payload - Event data.
+   */
+  function emitEvent(name, payload) {
+    if (emitFn === null) return
+    try {
+      const result = emitFn(name, payload)
+      if (result !== null && typeof result === "object" && typeof result.then === "function") {
+        result.then(undefined, () => {})
+      }
+    } catch {
+      // An emitter failure never breaks a report or a clear.
+    }
+  }
+
+  return {
+    /**
+     * Normalize and apply one progress report.
+     *
+     * @param input - The raw report; rejected when it does not normalize.
+     * @param sessionID - The reporting session, recorded as the run's owner.
+     * @param nowMs - Server time override for tests; defaults to `Date.now()`.
+     * @returns The resulting snapshot, or `null` when the report is rejected
+     *   (the state is then untouched and no event is emitted).
+     */
+    report(input, sessionID, nowMs) {
+      const normalized = normalizeProgressReport(input)
+      if (normalized === null) return null
+      const now = nowMs ?? Date.now()
+      if (current === null || current.plan !== normalized.plan) {
+        current = {
+          plan: normalized.plan,
+          phase: Object.hasOwn(normalized, "phase") ? normalized.phase : null,
+          task: Object.hasOwn(normalized, "task") ? normalized.task : null,
+          detail: Object.hasOwn(normalized, "detail") ? normalized.detail : null,
+          activity: normalized.activity,
+          verified: Object.hasOwn(normalized, "verified") ? normalized.verified : 0,
+          total: Object.hasOwn(normalized, "total") ? normalized.total : null,
+          startedAt: now,
+          updatedAt: now,
+          sessionID,
+        }
+      } else {
+        const merged = { ...current, activity: normalized.activity, updatedAt: now, sessionID }
+        for (const key of ["phase", "task", "detail", "verified", "total"]) {
+          if (Object.hasOwn(normalized, key)) merged[key] = normalized[key]
+        }
+        current = merged
+      }
+      emitEvent("updated", current)
+      return current
+    },
+
+    /**
+     * Read the current snapshot.
+     *
+     * @returns The snapshot, or `null` when no run is active.
+     */
+    snapshot() {
+      return current
+    },
+
+    /**
+     * Clear the active run when the session owns it.
+     *
+     * @param sessionID - The session requesting the clear.
+     * @returns The cleared identity `{ plan, sessionID, clearedAt }`, or
+     *   `null` when no run exists or a different session owns it.
+     */
+    clearSession(sessionID) {
+      if (current === null || current.sessionID !== sessionID) return null
+      const cleared = { plan: current.plan, sessionID: current.sessionID, clearedAt: Date.now() }
+      current = null
+      emitEvent("cleared", cleared)
+      return cleared
+    },
+
+    /**
+     * Bind the event emitter used by every later report and clear.
+     *
+     * @param emit - `(name, payload) => void|Promise<void>`; a non-function
+     *   value unbinds emission without failing the runtime.
+     */
+    bindEmit(emit) {
+      emitFn = typeof emit === "function" ? emit : null
+    },
+  }
+}
+
+/**
+ * Pick the newer of two snapshots for a monotonic view update.
+ *
+ * An equal `updatedAt` lets the incoming snapshot win so the view converges
+ * on the latest delivery.
+ *
+ * @param current - The snapshot currently displayed, or `null`.
+ * @param incoming - The snapshot that just arrived.
+ * @returns `incoming` when it is at least as new, otherwise `current`.
+ */
+export function mergeRunState(current, incoming) {
+  if (current === null) return incoming
+  return incoming.updatedAt >= current.updatedAt ? incoming : current
+}
+
+/**
+ * Test whether a run has not been updated for ten minutes.
+ *
+ * @param snapshot - The run snapshot (only `updatedAt` is read).
+ * @param nowMs - The viewer's current time.
+ * @returns `true` when the last update is {@link CODE_OPS_STALE_MS} old or older.
+ */
+export function isRunStale(snapshot, nowMs) {
+  return nowMs - snapshot.updatedAt >= CODE_OPS_STALE_MS
+}
+
+/**
+ * Render the visible sidebar lines for a run snapshot.
+ *
+ * The function is the single source of the displayed text; the TUI renders
+ * these strings as plain text. The as-of time refreshes whenever the
+ * component re-renders — there are no timers — so a longer-idle run shows
+ * the stale suffix on its next render.
+ *
+ * @param snapshot - The run snapshot.
+ * @param nowMs - The viewer's current time, used only for the stale check.
+ * @returns The three display lines and the stale flag.
+ */
+export function describeRun(snapshot, nowMs) {
+  const stale = isRunStale(snapshot, nowMs)
+  const activityText = activityLabel(snapshot)
+  const lines = [
+    `CodeOps · ${snapshot.plan}`,
+    snapshot.phase === null ? activityText : `${snapshot.phase} · ${activityText}`,
+  ]
+  const segments = []
+  if (snapshot.task !== null) segments.push(snapshot.task)
+  if (snapshot.total !== null) segments.push(`${snapshot.verified}/${snapshot.total} verified`)
+  segments.push(`as of ${formatLocalTime(snapshot.updatedAt)}${stale ? " (stale)" : ""}`)
+  lines.push(segments.join(" · "))
+  return { lines, stale }
+}

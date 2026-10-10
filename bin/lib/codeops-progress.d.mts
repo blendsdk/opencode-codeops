@@ -180,3 +180,47 @@ export declare function acceptRunCleared(
 
 /** Normalize an unknown report; `null` means rejection. */
 export declare function normalizeProgressReport(value: unknown): NormalizedProgressReport | null
+
+/** Emit binding accepted by {@link CodeOpsProgressRuntime.bindEmit}. */
+export type CodeOpsEmit = (name: string, payload: unknown) => void | Promise<void>
+
+/** The in-memory run-state runtime shared by the tool handler and the RPC. */
+export interface CodeOpsProgressRuntime {
+  /** Normalize and apply a report; `null` means the report was rejected. */
+  report(input: unknown, sessionID: string, nowMs?: number): CodeOpsRunState | null
+  /** The current snapshot, or `null` when no run is active. */
+  snapshot(): CodeOpsRunState | null
+  /**
+   * Clear the active run when `sessionID` is the last reporter; returns the
+   * cleared identity, or `null` when a different session owns the run.
+   */
+  clearSession(sessionID: string): CodeOpsRunCleared | null
+  /** Bind the event emitter; a throwing or rejecting emitter is swallowed. */
+  bindEmit(emit: CodeOpsEmit): void
+}
+
+/** Create one in-memory run-state runtime. */
+export declare function createCodeOpsProgress(): CodeOpsProgressRuntime
+
+/**
+ * Pick the newer of two snapshots; an equal `updatedAt` lets `incoming` win,
+ * so the view converges on the latest delivery.
+ */
+export declare function mergeRunState(
+  current: CodeOpsRunState | null,
+  incoming: CodeOpsRunState
+): CodeOpsRunState
+
+/** Test whether a run has not been updated for ten minutes. */
+export declare function isRunStale(snapshot: Pick<CodeOpsRunState, "updatedAt">, nowMs: number): boolean
+
+/** The rendered sidebar text for a run snapshot. */
+export interface CodeOpsRunDisplay {
+  /** The three display lines (fewer segments when values are unknown). */
+  readonly lines: string[]
+  /** Whether the last update is ten minutes old or older. */
+  readonly stale: boolean
+}
+
+/** Render the visible sidebar lines for a run snapshot. */
+export declare function describeRun(snapshot: CodeOpsRunState, nowMs: number): CodeOpsRunDisplay
