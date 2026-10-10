@@ -101,12 +101,19 @@ export function isCodeOpsStatus(value) {
  * all collapse into the same "no status" outcome. The payload is returned as
  * received; narrow it with {@link isCodeOpsStatus} before use.
  *
- * @param client - Host client exposing `rpc(definition).status({})`.
+ * Pass the calling session's location in `options`. The host resolves RPC
+ * calls against a location, and a call without one can miss the plugin's
+ * registration — the default location does not necessarily match a project
+ * opened through a path argument.
+ *
+ * @param client - Host client exposing `rpc(definition).status({}, options)`.
+ * @param {{ location?: { directory?: string, workspaceID?: string } }} [options]
+ *   - Call options forwarded to the status call.
  * @returns The raw status payload, or `undefined` when the call fails.
  */
-export async function requestStatus(client) {
+export async function requestStatus(client, options) {
   try {
-    return await client.rpc(CodeOpsRpc).status({})
+    return await client.rpc(CodeOpsRpc).status({}, options)
   } catch {
     return undefined
   }

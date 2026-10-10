@@ -74,6 +74,25 @@ describe("requestStatus transport containment", () => {
     assert.deepEqual(await requestStatus(client), payload)
   })
 
+  it("should forward the call options to the status call", async () => {
+    const payload = { pluginVersion: "2.1.1", openCodeVersion: "2.0.26", directory: "/project" }
+    const captured = {}
+    const client = {
+      rpc: () => ({
+        status: async (input, options) => {
+          captured.input = input
+          captured.options = options
+          return payload
+        },
+      }),
+    }
+
+    const options = { location: { directory: "/project" } }
+    assert.deepEqual(await requestStatus(client, options), payload)
+    assert.deepEqual(captured.input, {})
+    assert.deepEqual(captured.options, options)
+  })
+
   it("should return undefined when the status call rejects", async () => {
     const client = {
       rpc: () => ({

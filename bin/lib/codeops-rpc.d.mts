@@ -63,15 +63,36 @@ export declare function registerCodeOpsRpc(
 /** Validate an unknown RPC payload as a complete CodeOps status record. */
 export declare function isCodeOpsStatus(value: unknown): value is CodeOpsStatus
 
+/** The location a status call is scoped to. */
+export interface CodeOpsLocation {
+  readonly directory: string
+  readonly workspaceID?: string
+}
+
+/** Call options forwarded to the status call. */
+export interface CodeOpsCallOptions {
+  readonly location?: CodeOpsLocation
+}
+
 /** Structural client shape {@link requestStatus} consumes. */
 export interface CodeOpsStatusClient {
   readonly rpc: (definition: CodeOpsRpcDefinition) => {
-    readonly status: (input: Record<string, never>) => Promise<unknown>
+    readonly status: (
+      input: Record<string, never>,
+      options?: CodeOpsCallOptions
+    ) => Promise<unknown>
   }
 }
 
 /**
  * Request the raw status payload from a host client, converting every
  * transport failure into `undefined`.
+ *
+ * Pass the calling session's location in `options`: the host resolves RPC
+ * calls against it, and a call without one can miss the plugin's registration
+ * when the session's project differs from the host's default location.
  */
-export declare function requestStatus(client: CodeOpsStatusClient): Promise<unknown>
+export declare function requestStatus(
+  client: CodeOpsStatusClient,
+  options?: CodeOpsCallOptions
+): Promise<unknown>

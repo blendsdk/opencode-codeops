@@ -1,7 +1,7 @@
 ## Ambiguity Register: live-task-sidebar (slices 0–1: parser counting fix + live TUI spike)
 
-> **Status**: ✅ GATE PASSED — all 21 items resolved
-> **Last Updated**: 2026-10-10 13:21
+> **Status**: ✅ GATE PASSED — all 22 items resolved
+> **Last Updated**: 2026-10-10 18:20
 > **Scope**: feature plan for the live-task-sidebar foundation. Slice 0 fixes the execution-task
 > counting rule in `scripts/codeops_plan.py`; slice 1 is the live spike (packaged `./tui` entry,
 > a `sidebar.content` status strip, and the server `codeops` RPC foundation). Systematically
@@ -34,6 +34,7 @@
 | 19 | Technical unknowns | Verify command | `npm run verify` — repository fact, not a decision | ✅ Resolved — `AGENTS.md` §Verification commands | ✅ Resolved |
 | 20 | Integration points | Where the RPC payload type guard lives (the coding standards ban unsafe casts, so the `unknown` JsonSchema result needs validation) | export `isCodeOpsStatus(value)` from the shared helper alongside the definition (AI) / guard inside `plugin/tui.tsx` | AI — delegated by --auto-design (note H) | ✅ Resolved |
 | 21 | Technical (runtime) | Live-smoke method under the host's actual plugin loading and RPC behavior | host-supported file loading (project plugin discovery + `opencode.json` directory specs), layered attribution, and the user-assisted fallback (AI) / registry-spec install / committed harness | AI — delegated by --auto-design (note I) | ✅ Resolved |
+| 22 | Technical (runtime) | Plugin RPC calls from the TUI fail with `rpc.unavailable` when the session's project differs from the host's default location | pass the session location into the status call (user) / keep the plain documented call | User (this conversation): fix, prove, commit, push | ✅ Resolved |
 
 ### Resolution Notes
 
@@ -279,6 +280,48 @@ Reopen triggers: an OpenCode build ≥2.0.26 (the 2.0.24 build already offered t
   captured evidence.
 Policy version: 1
 Root invocation ID: AD-EX-LTS-20261010-1
+```
+
+**Note J — row 22 (plugin RPC location scoping; post-plan re-probe).**
+```text
+Authority: User (this conversation) — explicit directive: fix, prove, commit, push (not an
+  auto-design grant; outside the exec-plan auto-design chain).
+Objective: complete the ST-12 open item — re-prove the client RPC round-trip on OpenCode ≥2.0.26
+  and make the sidebar strip work in both documented launch flows.
+Decision: scope the strip's status call to the calling session's location —
+  `requestStatus(context.client, { location })` with
+  `location = context.location ?? context.data.location.default()`; `requestStatus` forwards call
+  options to the status call.
+Evidence (build v2.0.26, SDK @opencode/plugin 2.0.26, packed opencode-codeops-2.1.1.tgz from the
+  fixed tree):
+  (a) server registration ground truth: `typeof ctx.rpc=function typeof register=function |
+      registered`;
+  (b) plain `client.rpc(CodeOpsRpc).status({})`: works when the CLI's cwd equals the project
+      directory; fails with `{"type":"rpc.unavailable","message":"RPC is unavailable: codeops"}`
+      when the project is passed positionally from another cwd (default-location mismatch,
+      reproduced with a minimal control RPC);
+  (c) explicit `{ location: { directory: <project> } }`: works in both flows and delivers the real
+      payload `{"pluginVersion":"2.1.1","openCodeVersion":"2.0.26","directory":"<project>"}`;
+  (d) the context-derived location resolves to the project directory and works in the positional
+      flow;
+  (e) with the fixed artifact, the strip's exact path (`requestStatus` + `isCodeOpsStatus`) renders
+      `F-STRIP-OK:CodeOps v2.1.1` in the previously failing positional flow; probe captures under
+      the execution temp root (`repro/fixed-capture.bin`, plus `location-capture.bin`,
+      `cwd-capture.bin`, `context-location-capture.bin`).
+Rejected alternatives: keeping the plain call (broken in the `opencode <dir>` flow; silent
+  no-strip); documenting only (leaves the defect shipped); hardcoding a directory (mis-scopes
+  multi-project sessions).
+Strongest counterargument: the plain call is the documented pattern and works in the primary
+  `cd project && opencode` flow; passing the location explicitly could diverge from a future host
+  default. Mitigation: the value comes from the host's own context and is what other
+  location-scoped host APIs use; when no location is available the call degrades to the previous
+  behavior.
+Confidence: High (direct payload delivery and fixed-path render in both flows; the control RPC
+  reproduced both outcomes).
+Reopen triggers: a host build changes RPC location defaults (re-check both flows); the sidebar
+  paint remains user-assisted (pending).
+Policy version: n/a (user-directed follow-up; recorded for traceability)
+Root invocation ID: n/a (outside the exec-plan auto-design chain)
 ```
 
 **Other categories reviewed with no open items.** Feature gaps (slices are user-staged; slice 2

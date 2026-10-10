@@ -13,9 +13,10 @@ All notable changes to CodeOps are recorded here.
 ### Notes
 
 - tui: add the packaged `./tui` foundation — a guarded `codeops.status` RPC and a minimal sidebar
-  status line that renders only when the server answers. The live check on OpenCode v2.0.24 passed
-  for entry loading and server registration; the client-side RPC round-trip and the sidebar render
-  stay unproven on that build and gate the full live feature.
+  status line that renders only when the server answers. Verified end-to-end on OpenCode v2.0.26:
+  the packed entries load, the server registers the RPC, and the call returns the plugin, host,
+  and project identity. The status call is scoped to the session's location, so the strip behaves
+  the same whether the terminal opens inside the project or with a project path argument.
 
 ## 2.1.1 — 2026-10-09
 
