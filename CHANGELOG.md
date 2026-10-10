@@ -2,6 +2,13 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 2.2.1 — 2026-10-10
+
+### Fixes
+
+- scripts: pin the changelog feature guard to the document, not one release
+- tui: precompile the packaged TUI entry for npm installs
+
 ## 2.2.0 — 2026-10-10
 
 ### Fixes
