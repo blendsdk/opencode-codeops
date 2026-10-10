@@ -9,6 +9,7 @@ import {
   cleanStaleTmpDirs,
   ensureSessionTmpDir,
 } from "../bin/lib/tmp-hygiene.mjs"
+import { registerCodeOpsRpc } from "../bin/lib/codeops-rpc.mjs"
 import {
   appendEffortTrace,
   applyEffort,
@@ -383,6 +384,24 @@ export default Plugin.define({
         )
       }
     })
+
+    // ---------------------------------------------------------------------
+    // Status RPC: expose the plugin, host, and project identity for the
+    // optional sidebar strip. Registration is feature-detected and never
+    // blocks the plugin: builds without custom RPCs keep working unchanged,
+    // and the sidebar simply stays hidden.
+    // ---------------------------------------------------------------------
+    try {
+      const registered = await registerCodeOpsRpc(ctx, { pluginVersion: packageVersion })
+      if (!registered) {
+        warnContentFree(
+          "The codeops status RPC is unavailable in this OpenCode build; " +
+            "the sidebar status stays hidden."
+        )
+      }
+    } catch {
+      warnContentFree("Could not register the codeops status RPC.")
+    }
 
     // ---------------------------------------------------------------------
     // Plugin cleanup: stop listening for events. The runtime's scratch
