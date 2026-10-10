@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 12:38
-> **Progress**: 5/14 tasks (36%)
+> **Last Updated**: 2026-10-10 12:43
+> **Progress**: 6/14 tasks (43%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -72,7 +72,8 @@ task-size criteria in the make-plan quality checklist)
 
 ## Phase 2: TUI entry and guarded status RPC (slice 1 core)
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill from a temporary-index snapshot of committed, staged, unstaged, and untracked phase-start state)_
+> **Phase baseline tree**: `f0e1a179a2fd597b931bb2e5b1154049cb40f879`
+> **Expected modification set**: `bin/lib/codeops-rpc.mjs` (new), `bin/lib/codeops-rpc.d.mts` (new), `plugin/index.ts`, `plugin/tui.tsx` (new), `plugin/tui-foundation.spec.test.mjs` (new), `plugin/tui-foundation.impl.test.mjs` (new), `package.json`, `package-lock.json`, `tsconfig.json` · **Scope mode**: strict
 > **Reasoning**: high — new packaging and JSX surface under a containment constraint on the always-on server plugin
 
 ### Step 2.1: Foundation components
@@ -80,7 +81,7 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 03-02 §Component A–D, §Error Handling · AR #6 … #13, #16
 **Objective**: Add the packaged TUI entry, the shared RPC helper, and the never-throwing registration.
 
-- [ ] 2.1.1 [spec-author] Write the foundation spec tests for ST-8 … ST-11 — `plugin/tui-foundation.spec.test.mjs` — and verify the red phase
+- [x] 2.1.1 [spec-author] Write the foundation spec tests for ST-8 … ST-11 — `plugin/tui-foundation.spec.test.mjs` — and verify the red phase ✅ (completed: 2026-10-10 12:43)
 - [ ] 2.1.2 Create `bin/lib/codeops-rpc.mjs` and `bin/lib/codeops-rpc.d.mts` per 03-02 §Component A — ST-10 green
 - [ ] 2.1.3 Wire the guarded registration into `plugin/index.ts` per 03-02 §Component B — ST-11 green
 - [ ] 2.1.4 Create `plugin/tui.tsx` per 03-02 §Component C and apply the packaging changes per 03-02 §Component D (`./tui` export, devDependencies with `solid-js@1.9.12`, optional peerDependencies, test-file `files` negations, tsconfig JSX settings with `plugin/**/*.tsx` added to the existing include, then `npm install` to update `package-lock.json`) — ST-8, ST-9 green and `npx tsc --noEmit` clean
