@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 19:42
-> **Progress**: 4/21 tasks (19%)
+> **Last Updated**: 2026-10-10 19:43
+> **Progress**: 5/21 tasks (24%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -60,7 +60,7 @@ task-size criteria in the make-plan quality checklist)
 - [x] 1.1.2 Create `bin/lib/codeops-progress.mjs` and `.d.mts` with the contracts: schemas, constants, guards/acceptors, normalization per 03-01 §Contracts/§Normalization — ST-1…ST-4 green ✅ (completed: 2026-10-10 19:40)
 - [x] 1.1.3 Extend the module with the runtime: `createCodeOpsProgress`, `mergeRunState`, `isRunStale`, `describeRun` per 03-01 §Run state/§Display — ST-5…ST-8 green ✅ (completed: 2026-10-10 19:41)
 - [x] 1.1.4 Extend `bin/lib/codeops-rpc.mjs` and `.d.mts`: the `progress` method, the `updated`/`cleared` events, the runtime option with the emit binding, and `requestProgress` per 03-01 §Helpers — ST-9…ST-11 green; update the definition-shape assertion in `plugin/tui-foundation.impl.test.mjs` to the evolved contract ✅ (completed: 2026-10-10 19:42)
-- [ ] 1.1.5 Write the implementation tests — `plugin/progress-core.impl.test.mjs` — green
+- [x] 1.1.5 Write the implementation tests — `plugin/progress-core.impl.test.mjs` — green ✅ (completed: 2026-10-10 19:43)
 - [ ] 1.1.6 Full verification: `npm run verify`
 
 **Deliverables**:
