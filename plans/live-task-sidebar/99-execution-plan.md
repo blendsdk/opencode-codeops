@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-10-10 12:43
-> **Progress**: 6/14 tasks (43%)
+> **Progress**: 7/14 tasks (50%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -82,7 +82,7 @@ task-size criteria in the make-plan quality checklist)
 **Objective**: Add the packaged TUI entry, the shared RPC helper, and the never-throwing registration.
 
 - [x] 2.1.1 [spec-author] Write the foundation spec tests for ST-8 … ST-11 — `plugin/tui-foundation.spec.test.mjs` — and verify the red phase ✅ (completed: 2026-10-10 12:43)
-- [ ] 2.1.2 Create `bin/lib/codeops-rpc.mjs` and `bin/lib/codeops-rpc.d.mts` per 03-02 §Component A — ST-10 green
+- [x] 2.1.2 Create `bin/lib/codeops-rpc.mjs` and `bin/lib/codeops-rpc.d.mts` per 03-02 §Component A — ST-10 green ✅ (completed: 2026-10-10 12:44)
 - [ ] 2.1.3 Wire the guarded registration into `plugin/index.ts` per 03-02 §Component B — ST-11 green
 - [ ] 2.1.4 Create `plugin/tui.tsx` per 03-02 §Component C and apply the packaging changes per 03-02 §Component D (`./tui` export, devDependencies with `solid-js@1.9.12`, optional peerDependencies, test-file `files` negations, tsconfig JSX settings with `plugin/**/*.tsx` added to the existing include, then `npm install` to update `package-lock.json`) — ST-8, ST-9 green and `npx tsc --noEmit` clean
 - [ ] 2.1.5 Write the foundation impl tests — `plugin/tui-foundation.impl.test.mjs` (payload guard accept/reject cases, definition schema invariants) — green
