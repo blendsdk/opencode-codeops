@@ -2,27 +2,79 @@
 
 All notable changes to CodeOps are recorded here.
 
-## Unreleased
-
-### Added
-
-- tui: live task progress in the sidebar — the `codeops_progress` tool, the in-memory live run
-  state with RPC event push (`updated`/`cleared`), and the sidebar view with honest as-of
-  staleness, driven by the exec-plan reporting protocol
+## 2.2.0 — 2026-10-10
 
 ### Fixes
 
-- plans: count only id-prefixed execution tasks when deriving progress; deliverable checkboxes
-  and fenced examples no longer inflate totals, and migration admission stays checkbox-based so
-  legacy id-less checklists keep migrating
+- scripts: make the changelog content test survive the release fold
+- docs: address the Phase 4 review findings
+- tui: arm the clear guard before the identity gate
+- progress: return promises from the tool and progress handlers
+- progress: align schema typings with the host JsonSchema contract
+- tui: scope the status RPC call to the session location
+- tui: contain status transport failures in the strip
+- plan: keep migration admission checkbox-based
+- plan: count only id-prefixed execution tasks
 
-### Notes
+### Chores
 
-- tui: add the packaged `./tui` entry — the live run-progress view over a guarded `codeops.status`
-  RPC. Verified end-to-end on OpenCode v2.0.26: the packed entries load, the server registers the
-  RPC, and the call returns the plugin, host, and project identity. The status call is scoped to
-  the session's location, so it behaves the same whether the terminal opens inside the project or
-  with a project path argument.
+- repo: ignore the local project-scope install
+- progress: complete the final full verification
+- progress: pass the Phase 3 full verification
+- progress: pass the Phase 2 full verification
+- plan: final verification and go/no-go record
+- plan: phase 2 full verification
+- plan: phase 1 full verification
+- codeops: refresh the specialist check state
+- codeops: record the specialist check state
+
+### Documentation
+
+- roadmap: mark REQ-LIVE-TASK-PROGRESS done
+- document the live sidebar and update the changelog
+- exec-plan: add the fail-soft progress reporting protocol
+- plan: pass the live-task-progress preflight and resolve 29 findings
+- plan: add the live-task-progress plan set (gate passed)
+- plan: fix the phase 3 review nits and record the review
+- changelog: add the Unreleased entry for the foundation slices
+- plan: record phase 2 review evidence
+- agents: refresh the specialist coverage line
+- agents: add the specialist coverage line to managed project facts
+- changelog: add the 2.1.1 upgrade notes
+
+### Tests
+
+- progress: record the ST-23 remote-client acceptance
+- progress: record the ST-22 live smoke evidence
+- progress: add the exec-plan protocol and docs content tests
+- tui: add the sidebar view implementation tests
+- progress: add the sidebar live-view specification tests
+- progress: add the server wiring implementation tests
+- progress: add the server wiring specification tests
+- progress: add the core implementation tests
+- progress: add the live progress core specification tests
+- smoke: record the live TUI smoke evidence (v2.0.24)
+- tui: add foundation implementation tests
+- tui: add foundation spec tests (red phase)
+- plan: add parser counting implementation tests
+- plan: add the parser counting spec tests (red phase)
+
+### Features
+
+- tui: replace the status strip with the live progress view
+- progress: wire the live run state into the server plugin
+- progress: add the guarded progress tool registration
+- rpc: add the progress method, live events, and emit binding
+- progress: add the run-state runtime and honesty display
+- progress: add the live progress core contracts
+- tui: add the sidebar status strip and packaging
+- tui: register the codeops status RPC from the server plugin
+- tui: add the shared codeops status RPC helper
+- agents: add the agent-pipeline-reviewer specialist
+
+### CI
+
+- test on Node 24 instead of end-of-life Node 20
 
 ## 2.1.1 — 2026-10-09
 
