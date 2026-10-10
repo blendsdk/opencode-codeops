@@ -6,6 +6,9 @@
 > subscription registration).
 > **Re-review**: phase 2 fix diff `67f9edd` confirmed — RV-001 and RV-002 resolved; no new
 > findings.
+> **Re-review**: phase 3 fix diff `b2adb57` confirmed — RV-001…RV-003 resolved; no new findings.
+> Non-blocking observation (not fixed, out of scope): the `clearedAt` overwrite is not
+> monotonic; reordered or same-window clear deliveries are self-healing.
 
 | Finding | Phase | Severity | Area | Ruling |
 | ------- | ----- | -------- | ---- | ------ |
