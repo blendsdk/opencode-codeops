@@ -139,7 +139,7 @@ task-size criteria in the make-plan quality checklist)
 - [x] 4.1.2 Add the reporting protocol to `skills/exec-plan/SKILL.md` and `execution-protocol.md` per 03-04 §Protocol — ST-19 and ST-20 green ✅ (completed: 2026-10-10 20:07)
 - [x] 4.1.3 Update `README.md` and `CHANGELOG.md` per 03-04 §Docs — ST-21 green ✅ (completed: 2026-10-10 20:08)
 - [x] 4.1.4 Execute the live smoke ST-22 in two recorded parts — (i) deterministic evidence: pack, load, registration ground truth, control-event round-trip; (ii) live evidence: agent-driven `codeops_progress` call, render capture with the user-assisted fallback — and record the tested build, attribution, and outcome for each part in this task's completion note ✅ (completed: 2026-10-10 20:25)
-- [ ] 4.1.5 Execute the remote-client acceptance ST-23 (`opencode serve` plus `opencode <project> --server <url>` in the pty) and record the outcome or the named limitation in this task's completion note
+- [x] 4.1.5 Execute the remote-client acceptance ST-23 (`opencode serve` plus `opencode <project> --server <url>` in the pty) and record the outcome or the named limitation in this task's completion note ✅ (completed: 2026-10-10 20:31)
 - [ ] 4.1.6 Final full verification: `npm run verify`, then review the Success Criteria below
 
 **Deliverables**:
@@ -175,6 +175,21 @@ task-size criteria in the make-plan quality checklist)
 > registration; this is a smoke-environment isolation lesson, not a product defect (the RPC id
 > predates this plan). A pre-isolation probe double-mount artifact did not reproduce under
 > isolation.
+>
+> **ST-23 note (4.1.5).** Tested build: OpenCode CLI v2.0.26 (same fixture and isolated-config
+> setup as ST-22). `opencode serve --port 7799` started from the scratch project (its generated
+> password passed to the clients through the environment, never recorded); an interactive remote
+> client (`opencode <project> --server http://127.0.0.1:7799`) carried the events probe; the
+> agent-driven call ran headless against the same server
+> (`opencode run --server … --model deepseek/deepseek-flash`), 2026-10-10 20:30.
+> **Outcome — all signals hold across the client/server boundary:** the control event
+> round-tripped to the remote client (`TICK {"mark":"control"}`); `progress` answered `null`
+> before any run; the agent-driven call reported `{ "ok": true }` on the server and arrived as
+> `UPDATED {"plan":"st23-remote",…,"sessionID":"ses_st23run…5"}` in the remote client's
+> ground truth, with a follow-up `progress` call returning the identical snapshot; the server
+> side registered the tool (`codeops_progress` in the tool list) and the control channel. No
+> limitation was required, and the probe-method boundary was respected (no new harness). The
+> test server was stopped by exact PID with the port verified closed afterwards.
 
 **Verify**: `npm run verify`
 
