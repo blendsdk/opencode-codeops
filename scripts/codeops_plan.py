@@ -123,6 +123,19 @@ def parse_tasks(execution_text: str) -> tuple[Task, ...]:
     return tuple(tasks)
 
 
+def has_checkbox_lines(execution_text: str) -> bool:
+    """Return whether a document carries at least one checklist line.
+
+    Presence is deliberately id-agnostic: legacy execution plans may list
+    tasks without ids, and migration admission must stay tolerant of them.
+    Counting correctness is ``parse_tasks``' job; this predicate only answers
+    "does the document look like it declares tasks at all". Fences are not
+    stripped here for the same reason — a quoted checklist still proves the
+    document format.
+    """
+    return any(TASK_RE.match(line.rstrip()) for line in execution_text.splitlines())
+
+
 def next_task(tasks: tuple[Task, ...]) -> Task | None:
     """Resume verification first, otherwise start the first untouched task."""
     return next((task for task in tasks if task.marker == "~"), None) or next(

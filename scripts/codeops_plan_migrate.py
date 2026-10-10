@@ -17,9 +17,21 @@ from dataclasses import dataclass
 from pathlib import Path
 
 try:
-    from scripts.codeops_plan import BLOCKED_REASON_RE, IMPLEMENTS_RE, parse_implements, parse_tasks
+    from scripts.codeops_plan import (
+        BLOCKED_REASON_RE,
+        IMPLEMENTS_RE,
+        has_checkbox_lines,
+        parse_implements,
+        parse_tasks,
+    )
 except ModuleNotFoundError:  # Direct execution adds scripts/, not the repository root, to sys.path.
-    from codeops_plan import BLOCKED_REASON_RE, IMPLEMENTS_RE, parse_implements, parse_tasks
+    from codeops_plan import (
+        BLOCKED_REASON_RE,
+        IMPLEMENTS_RE,
+        has_checkbox_lines,
+        parse_implements,
+        parse_tasks,
+    )
 
 
 TARGET_ID_RE = re.compile(
@@ -231,7 +243,9 @@ def inspect_migration(codeops_root: Path) -> Migration:
                 continue
             execution_text = execution.read_text(encoding="utf-8")
             tasks = parse_tasks(execution_text)
-            if not tasks:
+            # Presence stays checkbox-based (id-agnostic) so legacy id-less
+            # checklists keep migrating; only real tasks are checked further.
+            if not has_checkbox_lines(execution_text):
                 problems.append(f"{execution}: contains no execution tasks")
             for task in tasks:
                 if task.marker == "!" and not BLOCKED_REASON_RE.search(task.text):
