@@ -87,12 +87,12 @@ describe("fail-soft reporting wording (ST-20)", () => {
     assert.match(text, /verify/i)
     assert.match(text, /commit/i)
     assert.match(text, /plan\s+update/)
-    assert.match(text, /Markdown execution plan[\s\S]{0,80}source of truth/)
+    assert.match(text, /Markdown\s+execution\s+plan[\s\S]{0,80}source of truth/)
   })
 
   it("should state that a failed or missing report never blocks a step in the SKILL", () => {
     const skill = read("skills/exec-plan/SKILL.md")
-    assert.match(skill, /failed or missing report never blocks/)
+    assert.match(skill, /failed or\s+missing\s+report\s+never\s+blocks/)
   })
 })
 
@@ -104,7 +104,7 @@ describe("README and CHANGELOG content (ST-21)", () => {
     assert.match(readme, /as[- ]of/i)
     assert.match(readme, /stale/)
     assert.match(readme, /10 minutes/)
-    assert.match(readme, /nothing renders when no run is active/)
+    assert.match(readme, /nothing renders when no run\s+is active/)
     assert.match(readme, /source of truth/)
   })
 

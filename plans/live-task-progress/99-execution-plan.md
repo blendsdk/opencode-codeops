@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 20:05
-> **Progress**: 16/21 tasks (76%)
+> **Last Updated**: 2026-10-10 20:07
+> **Progress**: 17/21 tasks (81%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -136,7 +136,7 @@ task-size criteria in the make-plan quality checklist)
 **Objective**: The agent protocol reports fail-soft, the docs describe the shipped feature, and the live evidence is recorded.
 
 - [x] 4.1.1 [spec-author] Write the specification tests for ST-19…ST-21 — `scripts/exec-plan-progress-content.spec.test.mjs` — and verify the red phase ✅ (completed: 2026-10-10 20:05)
-- [ ] 4.1.2 Add the reporting protocol to `skills/exec-plan/SKILL.md` and `execution-protocol.md` per 03-04 §Protocol — ST-19 and ST-20 green
+- [x] 4.1.2 Add the reporting protocol to `skills/exec-plan/SKILL.md` and `execution-protocol.md` per 03-04 §Protocol — ST-19 and ST-20 green ✅ (completed: 2026-10-10 20:07)
 - [ ] 4.1.3 Update `README.md` and `CHANGELOG.md` per 03-04 §Docs — ST-21 green
 - [ ] 4.1.4 Execute the live smoke ST-22 in two recorded parts — (i) deterministic evidence: pack, load, registration ground truth, control-event round-trip; (ii) live evidence: agent-driven `codeops_progress` call, render capture with the user-assisted fallback — and record the tested build, attribution, and outcome for each part in this task's completion note
 - [ ] 4.1.5 Execute the remote-client acceptance ST-23 (`opencode serve` plus `opencode <project> --server <url>` in the pty) and record the outcome or the named limitation in this task's completion note

@@ -444,6 +444,35 @@ otherwise still `[~]` — with the progress counter and Last Updated stamp curre
 
 ---
 
+## Progress Reporting (fail-soft)
+
+While a plan executes, the agent may report live progress through the `codeops_progress` tool so
+the sidebar shows the current run. Reporting is an observability aid only: the Markdown execution
+plan remains the single progress source of truth, and a missing tool or a failed call never
+blocks, delays, or changes any verify, commit, or plan update — when the tool is unavailable,
+execution proceeds silently.
+
+Report at these moments; `plan` is the plan folder name, and every call carries `plan` and
+`activity` (absent optional fields are carried by the run state):
+
+| Moment | Report payload |
+| ------ | -------------- |
+| Run start (start point determined) | `{ plan, phase, task, activity: "implementing" }` |
+| Phase start (subsequent phases) | `{ plan, phase, activity: "starting" }` |
+| Task implemented (after the `[~]` mark) | `{ plan, task, activity: "implementing" }` |
+| Verification (before running verify) | `{ plan, activity: "verifying" }` |
+| Task verified (after `[x]` + the progress-bar display) | `{ plan, verified, total, activity: "implementing" }` — counts from that display |
+| Blocker (after the `[!]` mark) | `{ plan, activity: "blocked", detail: "<short reason>" }` |
+| Delegation (around an executor/reviewer dispatch) | `{ plan, activity: "delegating", detail: "<role>" }` |
+| Review step (post-phase quality loop) | `{ plan, activity: "reviewing" }` |
+| Waiting (before pausing for an explicit user decision) | `{ plan, activity: "waiting" }` |
+| Run done (all tasks complete) | `{ plan, activity: "done" }` |
+
+One call per listed moment, no other calls (noise control). A reporting failure or a host without
+the tool never blocks, delays, or changes any step.
+
+---
+
 ## Step 3: Session Wrap-Up
 
 1. Complete the current task before stopping.

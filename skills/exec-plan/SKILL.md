@@ -172,6 +172,11 @@ For each task, in order:
    the Master Progress Checklist — see the protocol's dual-format detection) and bump the Progress
    counter / Last Updated stamp as soon as implementation finishes (crash-safe), promote it to
    `[x]` only after its verification passes. A task never shows `[x]` with a failing verify.
+
+   - **Report progress** — when the `codeops_progress` tool is available — at the transition
+     points in [execution-protocol.md](execution-protocol.md) §Progress Reporting; a failed or
+     missing report never blocks any step.
+
 3. **Verify** — run your project's verify command (from the project's AGENTS.md, or detected
    project conventions), output captured per the protocol's **Verify-output capture rule**
    (PASS one-liner; on failure the last 50 log lines + log path). Pass → promote `[~]` → `[x]`;
