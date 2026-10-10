@@ -108,7 +108,7 @@ describe("README and CHANGELOG content (ST-21)", () => {
     assert.match(readme, /source of truth/)
   })
 
-  it("should carry the feature entry in the newest changelog section and drop the strip wording", () => {
+  it("should keep the feature documented in the changelog and drop the strip wording", () => {
     const changelog = read("CHANGELOG.md")
     const heading = /^## (?:Unreleased|[0-9]+\.[0-9]+\.[0-9]+[^\n]*)$/m.exec(changelog)
     assert.ok(heading, "the changelog must open with the unreleased or newest version section")
@@ -118,24 +118,25 @@ describe("README and CHANGELOG content (ST-21)", () => {
     const top = end === -1 ? rest : rest.slice(0, end)
 
     if (/^## Unreleased/.test(top)) {
+      // Development state: the hand-written entry carries the feature prose.
       assert.match(top, /### Added/)
       assert.match(top, /codeops_progress/)
       assert.match(top, /sidebar/i)
       assert.match(top, /`\.\/tui`/, "the tui entry fact is kept")
       assert.match(top, /v2\.0\.26/, "the verified build fact is kept")
     } else {
-      // The release tool folds the unreleased section into a generated,
-      // commit-derived section, so the released state guarantees the feature
-      // group and the progress entries instead of the hand-written prose.
-      assert.match(top, /### Features/)
-      assert.match(top, /progress/i)
+      // Released state: the release tool regenerates the newest section from
+      // commits since the previous tag, so the feature is pinned by its
+      // historical release section instead.
+      assert.match(changelog, /### Features/)
+      assert.match(changelog, /progress/i)
     }
 
     assert.doesNotMatch(
-      top,
+      changelog,
       /minimal\s+sidebar\s+status\s+line/,
       "the replaced strip must no longer be described"
     )
-    assert.doesNotMatch(top, /strip behaves/, "the strip wording is superseded")
+    assert.doesNotMatch(changelog, /strip behaves/, "the strip wording is superseded")
   })
 })
