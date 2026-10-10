@@ -117,14 +117,20 @@ describe("requestStatus transport containment", () => {
 })
 
 describe("codeops RPC definition invariants", () => {
-  it("should keep one status method with an empty-object input and no events", () => {
+  it("should carry status plus progress methods and the live events", () => {
     assert.equal(CodeOpsRpc.id, "codeops")
-    assert.deepEqual(Object.keys(CodeOpsRpc.methods), ["status"])
+    assert.deepEqual(Object.keys(CodeOpsRpc.methods), ["status", "progress"])
     assert.deepEqual(CodeOpsRpc.methods.status.input, {
       type: "object",
       additionalProperties: false,
     })
-    assert.deepEqual(CodeOpsRpc.events, {})
+    assert.deepEqual(CodeOpsRpc.methods.progress.input, {
+      type: "object",
+      additionalProperties: false,
+    })
+    assert.deepEqual(Object.keys(CodeOpsRpc.events).sort(), ["cleared", "updated"])
+    assert.ok(CodeOpsRpc.events.updated.schema, "the updated event carries its snapshot schema")
+    assert.ok(CodeOpsRpc.events.cleared.schema, "the cleared event carries its identity schema")
   })
 
   it("should require exactly the three string fields in the output schema", () => {
