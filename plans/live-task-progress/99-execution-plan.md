@@ -138,7 +138,7 @@ task-size criteria in the make-plan quality checklist)
 - [x] 4.1.1 [spec-author] Write the specification tests for ST-19…ST-21 — `scripts/exec-plan-progress-content.spec.test.mjs` — and verify the red phase ✅ (completed: 2026-10-10 20:05)
 - [x] 4.1.2 Add the reporting protocol to `skills/exec-plan/SKILL.md` and `execution-protocol.md` per 03-04 §Protocol — ST-19 and ST-20 green ✅ (completed: 2026-10-10 20:07)
 - [x] 4.1.3 Update `README.md` and `CHANGELOG.md` per 03-04 §Docs — ST-21 green ✅ (completed: 2026-10-10 20:08)
-- [ ] 4.1.4 Execute the live smoke ST-22 in two recorded parts — (i) deterministic evidence: pack, load, registration ground truth, control-event round-trip; (ii) live evidence: agent-driven `codeops_progress` call, render capture with the user-assisted fallback — and record the tested build, attribution, and outcome for each part in this task's completion note
+- [x] 4.1.4 Execute the live smoke ST-22 in two recorded parts — (i) deterministic evidence: pack, load, registration ground truth, control-event round-trip; (ii) live evidence: agent-driven `codeops_progress` call, render capture with the user-assisted fallback — and record the tested build, attribution, and outcome for each part in this task's completion note ✅ (completed: 2026-10-10 20:25)
 - [ ] 4.1.5 Execute the remote-client acceptance ST-23 (`opencode serve` plus `opencode <project> --server <url>` in the pty) and record the outcome or the named limitation in this task's completion note
 - [ ] 4.1.6 Final full verification: `npm run verify`, then review the Success Criteria below
 
@@ -147,6 +147,34 @@ task-size criteria in the make-plan quality checklist)
 - README section and `## Unreleased` CHANGELOG entry
 - ST-22/ST-23 evidence recorded with the tested OpenCode build
 - All verification passing
+
+> **ST-22 note (4.1.4).** Tested build: OpenCode CLI v2.0.26 (scratch project `@opencode/plugin`
+> 2.0.26; Node 22.23; Python-pty capture 50×160). Fixture (temp-only): `npm pack` of the fixed
+> tree into a scratch project as `plugins/opencode-codeops/` (root `index.ts`/`tui.tsx` shims)
+> plus a temp-only `events-probe` plugin (server: control RPC `probechan` with one event and a
+> host tool-list snapshot; TUI: subscribes to `updated`/`cleared` and the control event, pings
+> the control RPC, reads one `progress` snapshot, appends every payload to ground-truth files,
+> and paints marker text in a footer slot).
+> **Part (i) deterministic** (run `ses_st22det6…`, 2026-10-10 20:21): both plugins load with no
+> failure; `TOOL-TRANSFORM function`; the host tool list contains `codeops_progress` from the
+> plugin's own registration (registration ground truth); `REGISTERED probechan emit=function`;
+> control round-trip `EMITTED tick` → `TICK {"mark":"control"}` received and painted
+> (`P-TICK-OK`); `progress` answers `null` (no run yet); probe markers painted in the capture.
+> **Part (ii) live** (run `ses_st22live3…`, 2026-10-10 20:22): an agent-driven call
+> (`›codeops_progress [plan=st22-smoke, activity=implementing]`, model-reported
+> `{"ok": true}`) produced `UPDATED {"plan":"st22-smoke",…,"sessionID":"ses_st22live3…"}` over
+> the event channel, and a follow-up `progress` call returned the identical snapshot
+> (`UPDATED-SNAPSHOT`); the view text rendered in the capture —
+> `CodeOps · st22-smoke`, `implementing`, `as of 20:22` (the `describeRun` output; the sidebar
+> pane's visual presentation remains the user-assisted check).
+> **Environment attribution (recorded):** the first two live attempts were blocked by the
+> machine's globally installed `opencode-codeops@2.1.1` registry plugin being auto-loaded
+> alongside the scratch plugin — the duplicate `codeops` RPC id made the scratch plugin fail to
+> load ("Plugin failed: opencode-codeops"; the tool was absent and the model's call rejected).
+> Re-running with an isolated `XDG_CONFIG_HOME` (empty plugins list) shows no failure and full
+> registration; this is a smoke-environment isolation lesson, not a product defect (the RPC id
+> predates this plan). A pre-isolation probe double-mount artifact did not reproduce under
+> isolation.
 
 **Verify**: `npm run verify`
 
