@@ -1,7 +1,7 @@
 ## Ambiguity Register: live-task-sidebar (slices 0–1: parser counting fix + live TUI spike)
 
-> **Status**: ✅ GATE PASSED — all 20 items resolved
-> **Last Updated**: 2026-10-10 11:42
+> **Status**: ✅ GATE PASSED — all 21 items resolved
+> **Last Updated**: 2026-10-10 13:21
 > **Scope**: feature plan for the live-task-sidebar foundation. Slice 0 fixes the execution-task
 > counting rule in `scripts/codeops_plan.py`; slice 1 is the live spike (packaged `./tui` entry,
 > a `sidebar.content` status strip, and the server `codeops` RPC foundation). Systematically
@@ -32,6 +32,7 @@
 | 18 | Feature gaps | Handling of the user-held slice-2 design brief | slice 2 is planned separately when the user decides; this plan references its intent in one line and does not copy or restate it (AI) | AI — delegated by --auto-design (note G) | ✅ Resolved |
 | 19 | Technical unknowns | Verify command | `npm run verify` — repository fact, not a decision | ✅ Resolved — `AGENTS.md` §Verification commands | ✅ Resolved |
 | 20 | Integration points | Where the RPC payload type guard lives (the coding standards ban unsafe casts, so the `unknown` JsonSchema result needs validation) | export `isCodeOpsStatus(value)` from the shared helper alongside the definition (AI) / guard inside `plugin/tui.tsx` | AI — delegated by --auto-design (note H) | ✅ Resolved |
+| 21 | Technical (runtime) | Live-smoke method under the host's actual plugin loading and RPC behavior | host-supported file loading (project plugin discovery + `opencode.json` directory specs), layered attribution, and the user-assisted fallback (AI) / registry-spec install / committed harness | AI — delegated by --auto-design (note I) | ✅ Resolved |
 
 ### Resolution Notes
 
@@ -235,6 +236,46 @@ Strongest counterargument: the helper now owns a slice-2-flavored concern; mitig
   contract module, and slice 2 replaces the guard alongside the schema.
 Confidence: High.
 Reopen triggers: slice 2 adopts Standard Schema, making runtime narrowing unnecessary.
+```
+
+**Note I — row 21 (live-smoke method adaptation).**
+```text
+Authority: AI — delegated by --auto-design
+Eligibility: testing strategy within approved scope; the recorded smoke intent (packed artifact
+  loads; sidebar slot renders; RPC round-trips; tested build recorded) and the pre-authorized
+  fallbacks (observed-limitation recording; user-assisted observation) are unchanged.
+Objective: run the ST-12 smoke against the installed build with faithful, attributable evidence.
+Decision: load the packed artifact through the host-supported file routes — the project discovery
+  layout (`<project>/.opencode/plugins/opencode-codeops/` with root `index.ts`/`tui.tsx` shims
+  re-exporting the packed `plugin/index.ts`/`plugin/tui.tsx`) and, as a cross-check,
+  `opencode.json` `file://` directory specs; capture with a Python pty (160–240 cols) and scheduled
+  key injection; attribute every missing strip by layer; record platform limitations and hand the
+  visual confirmation to the user-assisted fallback.
+Evidence: the host installs registry-name plugin specs into its own cache (unpublished versions
+  cannot be registry-loaded); a tarball `file://` spec is rejected with "configured plugin path must
+  be a directory"; `.ts` TUI entries fail to load with a JSX syntax error (`.tsx` required); the
+  packed entries loaded with no errors via both file routes; `ctx.rpc.register` succeeds
+  server-side (control-probe ground truth written to a file); `client.rpc(CodeOpsRpc).status({})`
+  from the TUI fails with `{"type":"rpc.unavailable","message":"RPC is unavailable: codeops"}` on
+  v2.0.24 in `--standalone` and against the shared service, reproduced with a minimal control RPC
+  under both load routes; the `sidebar.content` pane did not render in any captured view
+  (home/session/diff; 160–240 cols; leader-bind and palette routes explored).
+Rejected alternatives: registry-spec install (impossible for the unpublished 2.1.1); `cli.json`
+  path forms (inert in the isolated probe runs; not pursued further); a committed smoke harness
+  (AR #14 boundary); driving the user's shared service harder than one smoke session (avoided
+  state churn).
+Strongest counterargument: file-route loading is not the registry install path users will have,
+  and the client-bridge failure may be an artifact of the probe environment rather than the build.
+  Mitigation: the failure was control-reproduced with a minimal plugin and across three routes,
+  and registry-install behavior itself was directly observed (install failure for an unpublished
+  name); all residuals are recorded for the go/no-go.
+Confidence: High for the load and registration findings; Med for the client-bridge attribution
+  (byte-level captured errors and a control plugin, but no upstream issue cross-reference yet).
+Reopen triggers: an OpenCode build ≥2.0.26 (the 2.0.24 build already offered the update); an
+  upstream confirmation about the client RPC bridge; a user-assisted observation contradicting the
+  captured evidence.
+Policy version: 1
+Root invocation ID: AD-EX-LTS-20261010-1
 ```
 
 **Other categories reviewed with no open items.** Feature gaps (slices are user-staged; slice 2
