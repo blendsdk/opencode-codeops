@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 12:39
-> **Progress**: 4/14 tasks (29%)
+> **Last Updated**: 2026-10-10 12:38
+> **Progress**: 5/14 tasks (36%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -58,7 +58,7 @@ task-size criteria in the make-plan quality checklist)
 - [x] 1.1.2 Implement the counting rule in `scripts/codeops_plan.py` (fence stripping, task-id gate, first-occurrence dedupe per 03-01 §Counting Rule) — green on ST-1 … ST-7 ✅ (completed: 2026-10-10 12:37)
 - [x] 1.1.3 Write the parser impl tests — `scripts/codeops_plan.impl.test.mjs` (unclosed fence, `~~~` fences, info strings, CRLF, indented and mixed fences, multi-digit ids, duplicates across fences, empty document) — green ✅ (completed: 2026-10-10 12:38)
 - [x] 1.1.4 Keep `scripts/codeops_plan_migrate.py` admission-stable: its "contains no execution tasks" check stays checkbox-line based (shared or mirrored with the parser's checkbox detection) so id-less checklists do not newly block migration — ST-13 green ✅ (completed: 2026-10-10 12:39)
-- [ ] 1.1.5 Full verification: `npm run verify`
+- [x] 1.1.5 Full verification: `npm run verify` ✅ (completed: 2026-10-10 12:38)
 
 **Deliverables**:
 - `scripts/codeops_plan.spec.test.mjs` covers ST-1…ST-7 and `scripts/codeops_plan_migrate.spec.test.mjs` covers ST-13, both with a recorded red phase
