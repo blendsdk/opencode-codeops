@@ -41,27 +41,26 @@ function CodeOpsProgress() {
   const stops: (() => void)[] = []
   try {
     const events = context.client.rpc(CodeOpsRpc).events
-    stops.push(
-      events.on("updated", (event) => {
-        const snapshot = acceptRunUpdate(event, directory)
-        if (snapshot && snapshot.updatedAt > clearedAt()) {
-          setRun((current) => mergeRunState(current, snapshot))
-        }
-      }),
-      events.on("cleared", (event) => {
-        const cleared = acceptRunCleared(event, directory)
-        const current = run()
-        if (
-          cleared &&
-          current &&
-          cleared.plan === current.plan &&
-          cleared.sessionID === current.sessionID
-        ) {
-          setClearedAt(cleared.clearedAt)
-          setRun(null)
-        }
-      }),
-    )
+    const stopUpdated = events.on("updated", (event) => {
+      const snapshot = acceptRunUpdate(event, directory)
+      if (snapshot && snapshot.updatedAt > clearedAt()) {
+        setRun((current) => mergeRunState(current, snapshot))
+      }
+    })
+    stops.push(stopUpdated)
+    const stopCleared = events.on("cleared", (event) => {
+      const cleared = acceptRunCleared(event, directory)
+      if (!cleared) return
+      // Record the clear time for every accepted clear, before the identity
+      // gate: a clear that arrives before the initial snapshot must still
+      // suppress that snapshot, or a cleared run could reappear.
+      setClearedAt(cleared.clearedAt)
+      const current = run()
+      if (current && cleared.plan === current.plan && cleared.sessionID === current.sessionID) {
+        setRun(null)
+      }
+    })
+    stops.push(stopCleared)
   } catch {
     // Events unavailable: the snapshot-only view below still renders.
   }

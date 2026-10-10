@@ -94,7 +94,11 @@ describe("render and merge contract (ST-17)", () => {
       /append:\\s\*"sidebar\\\.content"/,
       "the slot claim stays asserted"
     )
-    assert.match(foundation, /codeops-rpc\.mjs/, "the helper import stays asserted")
+    assert.match(
+      foundation,
+      /codeops-rpc\\\.mjs/,
+      "the helper import stays asserted"
+    )
     assert.match(foundation, /setInterval\|setTimeout/, "the no-timer rule stays asserted")
     assert.doesNotMatch(foundation, /CodeOps v/, "the strip literal is superseded")
     assert.doesNotMatch(foundation, /isCodeOpsStatus/, "the strip guard assertion is superseded")

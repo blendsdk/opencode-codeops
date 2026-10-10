@@ -62,6 +62,16 @@ describe("handler filter and merge expressions", () => {
     const guards = tsx.match(/updatedAt > clearedAt\(\)/g) ?? []
     assert.equal(guards.length, 2)
   })
+
+  it("should arm the clear time before the identity gate", () => {
+    const tsx = read("plugin/tui.tsx")
+
+    const arm = tsx.indexOf("setClearedAt(cleared.clearedAt)")
+    const identity = tsx.indexOf("cleared.plan === current.plan")
+    assert.ok(arm !== -1, "the clear time is recorded")
+    assert.ok(identity !== -1, "the identity gate exists")
+    assert.ok(arm < identity, "the clear time arms for every accepted clear, before the gate")
+  })
 })
 
 describe("subscription cleanup", () => {
