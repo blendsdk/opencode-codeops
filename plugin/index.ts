@@ -9,6 +9,10 @@ import {
   cleanStaleTmpDirs,
   ensureSessionTmpDir,
 } from "../bin/lib/tmp-hygiene.mjs"
+import {
+  createCodeOpsProgress,
+  registerCodeOpsProgressTool,
+} from "../bin/lib/codeops-progress.mjs"
 import { registerCodeOpsRpc } from "../bin/lib/codeops-rpc.mjs"
 import {
   appendEffortTrace,
@@ -224,6 +228,11 @@ export default Plugin.define({
     const warnedEffortLevels = new Set<string>()
     const effortTraceEnabled = isEffortTraceEnabled(process.env.CODEOPS_EFFORT_TRACE)
 
+    // The live run state is memory-only, for the lifetime of this plugin
+    // instance: it is never persisted and clears when the reporting session
+    // ends, so it can never outlive the run it describes.
+    const progress = createCodeOpsProgress()
+
     // Sweep scratch directories abandoned by earlier interrupted runs, once.
     // Cleanup is best effort: a failure must never block a session.
     try {
@@ -235,8 +244,9 @@ export default Plugin.define({
     warnOnVersionSkew(directory)
 
     // ---------------------------------------------------------------------
-    // Session lifecycle: drop captured markers when a session is deleted, so
-    // a long-lived runtime does not remember ended sessions.
+    // Session lifecycle: drop captured markers and the session's live run
+    // when a session is deleted, so a long-lived runtime does not remember
+    // ended sessions.
     // ---------------------------------------------------------------------
     const controller = new AbortController()
     void (async () => {
@@ -244,6 +254,7 @@ export default Plugin.define({
         for await (const event of ctx.event.subscribe({ signal: controller.signal })) {
           if (event.type === "session.deleted") {
             effortMarkers.delete(event.data.sessionID)
+            progress.clearSession(event.data.sessionID)
           }
         }
       } catch {
@@ -386,13 +397,18 @@ export default Plugin.define({
     })
 
     // ---------------------------------------------------------------------
-    // Status RPC: expose the plugin, host, and project identity for the
-    // optional sidebar strip. Registration is feature-detected and never
-    // blocks the plugin: builds without custom RPCs keep working unchanged,
-    // and the sidebar simply stays hidden.
+    // CodeOps RPC: expose the plugin identity and the live run snapshot for
+    // the sidebar. Registration is feature-detected and never blocks the
+    // plugin: builds without custom RPCs keep working unchanged, and the
+    // sidebar simply stays hidden. When the host hands back an event emitter,
+    // the registration binds it into the runtime, so accepted reports and
+    // clears push live events to connected clients.
     // ---------------------------------------------------------------------
     try {
-      const registered = await registerCodeOpsRpc(ctx, { pluginVersion: packageVersion })
+      const registered = await registerCodeOpsRpc(ctx, {
+        pluginVersion: packageVersion,
+        runtime: progress,
+      })
       if (!registered) {
         warnContentFree(
           "The codeops status RPC is unavailable in this OpenCode build; " +
@@ -401,6 +417,24 @@ export default Plugin.define({
       }
     } catch {
       warnContentFree("Could not register the codeops status RPC.")
+    }
+
+    // ---------------------------------------------------------------------
+    // Progress tool: let the agent report live task progress for the sidebar.
+    // The tool registers behind feature-detection; on every failure the
+    // plugin, the agent loop, and the Markdown execution plan keep working
+    // exactly as before.
+    // ---------------------------------------------------------------------
+    try {
+      const registered = await registerCodeOpsProgressTool(ctx, progress)
+      if (!registered) {
+        warnContentFree(
+          "The codeops progress tool is unavailable in this OpenCode build; " +
+            "the sidebar stays hidden."
+        )
+      }
+    } catch {
+      warnContentFree("Could not register the codeops progress tool.")
     }
 
     // ---------------------------------------------------------------------
