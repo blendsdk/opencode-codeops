@@ -3,7 +3,7 @@
 > **Feature-Set**: opencode-codeops
 > **Status**: In Progress
 > **Created**: 2026-10-04
-> **Last Updated**: 2026-10-10 19:36
+> **Last Updated**: 2026-10-10 20:39
 > **Progress**: n/a
 > **CodeOps Artifact Schema**: 1
 
@@ -26,4 +26,4 @@
 | T-07 | Specialist awareness: visible checks, proposal split, analyze-project coverage | — | [specialist-awareness](specialist-awareness/99-execution-plan.md) | Done | ✅ | 2026-10-09 | — |
 | REQ-ANALYZE-AGENTS | Active specialist discovery: the analyze-agents skill with durable evidence | — | [analyze-agents](analyze-agents/00-index.md) | Done | ✅ | 2026-10-09 | T-07 |
 | REQ-LIVE-TASK-SIDEBAR | Live CodeOps task progress in the sidebar — foundation slices 0–1 (counting fix + TUI spike) | — | [live-task-sidebar](live-task-sidebar/00-index.md) | Done | ✅ | 2026-10-10 | — |
-| REQ-LIVE-TASK-PROGRESS | Live CodeOps task progress in the sidebar — the full feature (slice 2: progress tool, live state, sidebar view, exec-plan reporting) | — | [live-task-progress](live-task-progress/00-index.md) | Executing | 🔄 | 2026-10-10 19:36 | — |
+| REQ-LIVE-TASK-PROGRESS | Live CodeOps task progress in the sidebar — the full feature (slice 2: progress tool, live state, sidebar view, exec-plan reporting) | — | [live-task-progress](live-task-progress/00-index.md) | Done | ✅ | 2026-10-10 20:39 | — |
