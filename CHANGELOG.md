@@ -4,6 +4,12 @@ All notable changes to CodeOps are recorded here.
 
 ## Unreleased
 
+### Added
+
+- tui: live task progress in the sidebar — the `codeops_progress` tool, the in-memory live run
+  state with RPC event push (`updated`/`cleared`), and the sidebar view with honest as-of
+  staleness, driven by the exec-plan reporting protocol
+
 ### Fixes
 
 - plans: count only id-prefixed execution tasks when deriving progress; deliverable checkboxes
@@ -12,11 +18,11 @@ All notable changes to CodeOps are recorded here.
 
 ### Notes
 
-- tui: add the packaged `./tui` foundation — a guarded `codeops.status` RPC and a minimal sidebar
-  status line that renders only when the server answers. Verified end-to-end on OpenCode v2.0.26:
-  the packed entries load, the server registers the RPC, and the call returns the plugin, host,
-  and project identity. The status call is scoped to the session's location, so the strip behaves
-  the same whether the terminal opens inside the project or with a project path argument.
+- tui: add the packaged `./tui` entry — the live run-progress view over a guarded `codeops.status`
+  RPC. Verified end-to-end on OpenCode v2.0.26: the packed entries load, the server registers the
+  RPC, and the call returns the plugin, host, and project identity. The status call is scoped to
+  the session's location, so it behaves the same whether the terminal opens inside the project or
+  with a project path argument.
 
 ## 2.1.1 — 2026-10-09
 

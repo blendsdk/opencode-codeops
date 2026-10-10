@@ -104,7 +104,7 @@ describe("README and CHANGELOG content (ST-21)", () => {
     assert.match(readme, /as[- ]of/i)
     assert.match(readme, /stale/)
     assert.match(readme, /10 minutes/)
-    assert.match(readme, /nothing renders when no run\s+is active/)
+    assert.match(readme, /nothing\s+renders\s+when\s+no\s+run\s+is\s+active/)
     assert.match(readme, /source of truth/)
   })
 
