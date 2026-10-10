@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 19:18
-> **Progress**: 0/21 tasks (0%)
+> **Last Updated**: 2026-10-10 19:39
+> **Progress**: 1/21 tasks (5%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -47,7 +47,7 @@ task-size criteria in the make-plan quality checklist)
 
 ## Phase 1: Progress core: contracts, state, display
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill)_
+> **Phase baseline tree**: 6542695962bdcdf88e6500d048800d2e7b62778b
 > **Expected modification set**: `bin/lib/codeops-progress.mjs` (new), `bin/lib/codeops-progress.d.mts` (new), `bin/lib/codeops-rpc.mjs`, `bin/lib/codeops-rpc.d.mts`, `plugin/progress-core.spec.test.mjs` (new), `plugin/progress-core.impl.test.mjs` (new), `plugin/tui-foundation.impl.test.mjs` · **Scope mode**: strict
 > **Reasoning**: high — schemas, state semantics, and display text are the contract everything else consumes
 
@@ -56,7 +56,7 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 03-01 §Contracts/§Run state/§Normalization/§Display · AR notes A–D, G · Req R1–R5
 **Objective**: The shared core module plus the RPC extension, proven in plain Node.
 
-- [ ] 1.1.1 [spec-author] Write the specification tests for ST-1…ST-11 — `plugin/progress-core.spec.test.mjs` — and verify the red phase
+- [x] 1.1.1 [spec-author] Write the specification tests for ST-1…ST-11 — `plugin/progress-core.spec.test.mjs` — and verify the red phase ✅ (completed: 2026-10-10 19:39)
 - [ ] 1.1.2 Create `bin/lib/codeops-progress.mjs` and `.d.mts` with the contracts: schemas, constants, guards/acceptors, normalization per 03-01 §Contracts/§Normalization — ST-1…ST-4 green
 - [ ] 1.1.3 Extend the module with the runtime: `createCodeOpsProgress`, `mergeRunState`, `isRunStale`, `describeRun` per 03-01 §Run state/§Display — ST-5…ST-8 green
 - [ ] 1.1.4 Extend `bin/lib/codeops-rpc.mjs` and `.d.mts`: the `progress` method, the `updated`/`cleared` events, the runtime option with the emit binding, and `requestProgress` per 03-01 §Helpers — ST-9…ST-11 green; update the definition-shape assertion in `plugin/tui-foundation.impl.test.mjs` to the evolved contract
