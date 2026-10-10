@@ -10,7 +10,8 @@
   "main": "./plugin/index.ts",
   "exports": {
     ".": "./plugin/index.ts",
-    "./server": "./plugin/index.ts"
+    "./server": "./plugin/index.ts",
+    "./tui": "./plugin/tui.tsx"
   },
   "bin": {
     "opencode-codeops": "bin/index.mjs"
@@ -24,6 +25,8 @@
   },
   "files": [
     "plugin/",
+    "!plugin/*.test.mjs",
+    "!plugin/*.spec.test.mjs",
     "skills/",
     "_shared/",
     "standards/",
@@ -68,7 +71,26 @@
     "@opencode/plugin": "^2.0.24"
   },
   "devDependencies": {
+    "@opentui/core": "0.5.17",
+    "@opentui/solid": "0.5.17",
     "@types/node": "^22.20.2",
+    "solid-js": "1.9.12",
     "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@opentui/core": ">=0.5.14",
+    "@opentui/solid": ">=0.5.14",
+    "solid-js": ">=1.9.0"
+  },
+  "peerDependenciesMeta": {
+    "@opentui/core": {
+      "optional": true
+    },
+    "@opentui/solid": {
+      "optional": true
+    },
+    "solid-js": {
+      "optional": true
+    }
   }
 }

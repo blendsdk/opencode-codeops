@@ -6,13 +6,13 @@
  */
 
 /** JSON-Schema shape of the empty input accepted by the `status` method. */
-export interface CodeOpsRpcStatusInput {
+export type CodeOpsRpcStatusInput = {
   readonly type: "object"
   readonly additionalProperties: false
 }
 
 /** JSON-Schema shape of the payload the `status` method returns. */
-export interface CodeOpsRpcStatusOutput {
+export type CodeOpsRpcStatusOutput = {
   readonly type: "object"
   readonly additionalProperties: false
   readonly required: readonly ["pluginVersion", "openCodeVersion", "directory"]
