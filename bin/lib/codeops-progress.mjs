@@ -517,3 +517,45 @@ export function describeRun(snapshot, nowMs) {
   lines.push(segments.join(" · "))
   return { lines, stale }
 }
+
+/**
+ * Register the agent-callable progress tool on a plugin context,
+ * feature-detected and never-throwing.
+ *
+ * The handler validates defensively through the runtime and always answers
+ * with the boolean acknowledgement shape: a rejected report yields
+ * `{ ok: false }` without throwing, so a reporting mistake can never break an
+ * agent turn. Registration failures are contained the same way as the RPC
+ * guard: a missing `tool.transform`, a throwing transform, and any other
+ * failure all report `false`.
+ *
+ * @param ctx - Server plugin context; only `tool.transform` is read.
+ * @param runtime - The run-state runtime the handler reports into.
+ * @returns `true` when the transform completed, `false` when the host lacks
+ *   the tool API or the registration failed. Never throws.
+ */
+export async function registerCodeOpsProgressTool(ctx, runtime) {
+  if (typeof ctx?.tool?.transform !== "function") return false
+  try {
+    await ctx.tool.transform((tool) =>
+      tool.add({
+        name: CODE_OPS_TOOL_NAME,
+        description: CODE_OPS_TOOL_DESCRIPTION,
+        input: ProgressReportSchema,
+        output: ProgressOutputSchema,
+        execute(input, toolContext) {
+          try {
+            const accepted = runtime?.report(input, toolContext?.sessionID ?? "") ?? null
+            return { output: { ok: accepted !== null } }
+          } catch {
+            // A reporting failure must never break an agent turn.
+            return { output: { ok: false } }
+          }
+        },
+      })
+    )
+    return true
+  } catch {
+    return false
+  }
+}

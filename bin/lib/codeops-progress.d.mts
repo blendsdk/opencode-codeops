@@ -224,3 +224,13 @@ export interface CodeOpsRunDisplay {
 
 /** Render the visible sidebar lines for a run snapshot. */
 export declare function describeRun(snapshot: CodeOpsRunState, nowMs: number): CodeOpsRunDisplay
+
+/**
+ * Register the agent-callable progress tool on a plugin context,
+ * feature-detected and never-throwing; `false` when the host lacks the tool
+ * API or the registration failed.
+ */
+export declare function registerCodeOpsProgressTool(
+  ctx: unknown,
+  runtime: CodeOpsProgressRuntime
+): Promise<boolean>
