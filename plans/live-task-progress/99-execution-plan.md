@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 19:45
-> **Progress**: 6/21 tasks (29%)
+> **Last Updated**: 2026-10-10 19:49
+> **Progress**: 7/21 tasks (33%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -50,6 +50,7 @@ task-size criteria in the make-plan quality checklist)
 > **Phase baseline tree**: 6542695962bdcdf88e6500d048800d2e7b62778b
 > **Expected modification set**: `bin/lib/codeops-progress.mjs` (new), `bin/lib/codeops-progress.d.mts` (new), `bin/lib/codeops-rpc.mjs`, `bin/lib/codeops-rpc.d.mts`, `plugin/progress-core.spec.test.mjs` (new), `plugin/progress-core.impl.test.mjs` (new), `plugin/tui-foundation.impl.test.mjs` · **Scope mode**: strict
 > **Reasoning**: high — schemas, state semantics, and display text are the contract everything else consumes
+> **Phase review**: correctness review — no findings (2026-10-10)
 
 ### Step 1.1: Specification-first progress core
 
@@ -74,7 +75,7 @@ task-size criteria in the make-plan quality checklist)
 
 ## Phase 2: Server wiring: tool and RPC registration
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill)_
+> **Phase baseline tree**: dfdb8f0b679b3357d51aa78e00c3aa35d8f009ce
 > **Expected modification set**: `plugin/index.ts`, `bin/lib/codeops-progress.mjs`, `bin/lib/codeops-progress.d.mts`, `plugin/progress-server.spec.test.mjs` (new), `plugin/progress-server.impl.test.mjs` (new) · **Scope mode**: strict
 > **Reasoning**: high — an always-on plugin gains a new registration surface; containment is the invariant
 
@@ -83,7 +84,7 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 03-02 §Tool registration guard/§Wiring/§Error Handling · AR notes A, B, F · Req R1, R2, R9
 **Objective**: The tool registers behind a guard, the plugin wires runtime + tool + clearing, and setup never throws.
 
-- [ ] 2.1.1 [spec-author] Write the specification tests for ST-12…ST-15 — `plugin/progress-server.spec.test.mjs` — and verify the red phase
+- [x] 2.1.1 [spec-author] Write the specification tests for ST-12…ST-15 — `plugin/progress-server.spec.test.mjs` — and verify the red phase ✅ (completed: 2026-10-10 19:49)
 - [ ] 2.1.2 Add `registerCodeOpsProgressTool` to `bin/lib/codeops-progress.mjs` and `.d.mts` per 03-02 §Tool registration guard — ST-12 green
 - [ ] 2.1.3 Wire `plugin/index.ts` per 03-02 §Wiring: runtime creation, the extended RPC call, the guarded tool block, and the `session.deleted` clearing — ST-13…ST-15 green
 - [ ] 2.1.4 Write the implementation tests — `plugin/progress-server.impl.test.mjs` — green (the foundation containment test ST-11 passes unchanged)
