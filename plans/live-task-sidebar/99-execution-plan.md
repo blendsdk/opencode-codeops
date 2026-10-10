@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 12:46
-> **Progress**: 10/14 tasks (71%)
+> **Last Updated**: 2026-10-10 12:47
+> **Progress**: 11/14 tasks (79%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -86,7 +86,7 @@ task-size criteria in the make-plan quality checklist)
 - [x] 2.1.3 Wire the guarded registration into `plugin/index.ts` per 03-02 §Component B — ST-11 green ✅ (completed: 2026-10-10 12:44)
 - [x] 2.1.4 Create `plugin/tui.tsx` per 03-02 §Component C and apply the packaging changes per 03-02 §Component D (`./tui` export, devDependencies with `solid-js@1.9.12`, optional peerDependencies, test-file `files` negations, tsconfig JSX settings with `plugin/**/*.tsx` added to the existing include, then `npm install` to update `package-lock.json`) — ST-8, ST-9 green and `npx tsc --noEmit` clean ✅ (completed: 2026-10-10 12:46)
 - [x] 2.1.5 Write the foundation impl tests — `plugin/tui-foundation.impl.test.mjs` (payload guard accept/reject cases, definition schema invariants) — green ✅ (completed: 2026-10-10 12:46)
-- [ ] 2.1.6 Full verification: `npm run verify`
+- [x] 2.1.6 Full verification: `npm run verify` ✅ (completed: 2026-10-10 12:47)
 
 **Deliverables**:
 - `bin/lib/codeops-rpc.mjs` + `.d.mts` with the pinned register contract
