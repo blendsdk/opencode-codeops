@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 19:52
-> **Progress**: 10/21 tasks (48%)
+> **Last Updated**: 2026-10-10 19:53
+> **Progress**: 11/21 tasks (52%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -88,7 +88,7 @@ task-size criteria in the make-plan quality checklist)
 - [x] 2.1.2 Add `registerCodeOpsProgressTool` to `bin/lib/codeops-progress.mjs` and `.d.mts` per 03-02 §Tool registration guard — ST-12 green ✅ (completed: 2026-10-10 19:50)
 - [x] 2.1.3 Wire `plugin/index.ts` per 03-02 §Wiring: runtime creation, the extended RPC call, the guarded tool block, and the `session.deleted` clearing — ST-13…ST-15 green ✅ (completed: 2026-10-10 19:51)
 - [x] 2.1.4 Write the implementation tests — `plugin/progress-server.impl.test.mjs` — green (the foundation containment test ST-11 passes unchanged) ✅ (completed: 2026-10-10 19:52)
-- [ ] 2.1.5 Full verification: `npm run verify`
+- [x] 2.1.5 Full verification: `npm run verify` ✅ (completed: 2026-10-10 19:53)
 
 **Deliverables**:
 - The guarded tool registration
