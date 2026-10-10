@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-10 20:08
-> **Progress**: 18/21 tasks (86%)
+> **Last Updated**: 2026-10-10 20:32
+> **Progress**: 21/21 tasks (100%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -140,7 +140,7 @@ task-size criteria in the make-plan quality checklist)
 - [x] 4.1.3 Update `README.md` and `CHANGELOG.md` per 03-04 §Docs — ST-21 green ✅ (completed: 2026-10-10 20:08)
 - [x] 4.1.4 Execute the live smoke ST-22 in two recorded parts — (i) deterministic evidence: pack, load, registration ground truth, control-event round-trip; (ii) live evidence: agent-driven `codeops_progress` call, render capture with the user-assisted fallback — and record the tested build, attribution, and outcome for each part in this task's completion note ✅ (completed: 2026-10-10 20:25)
 - [x] 4.1.5 Execute the remote-client acceptance ST-23 (`opencode serve` plus `opencode <project> --server <url>` in the pty) and record the outcome or the named limitation in this task's completion note ✅ (completed: 2026-10-10 20:31)
-- [ ] 4.1.6 Final full verification: `npm run verify`, then review the Success Criteria below
+- [x] 4.1.6 Final full verification: `npm run verify`, then review the Success Criteria below ✅ (completed: 2026-10-10 20:32)
 
 **Deliverables**:
 - The reporting protocol in the exec-plan skill files
