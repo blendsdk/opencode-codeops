@@ -3,7 +3,7 @@
 > **Feature-Set**: opencode-codeops
 > **Status**: In Progress
 > **Created**: 2026-10-04
-> **Last Updated**: 2026-10-23
+> **Last Updated**: 2026-10-24
 > **Progress**: n/a
 > **CodeOps Artifact Schema**: 1
 
@@ -27,4 +27,4 @@
 | REQ-ANALYZE-AGENTS | Active specialist discovery: the analyze-agents skill with durable evidence | — | [analyze-agents](analyze-agents/00-index.md) | Done | ✅ | 2026-10-09 | T-07 |
 | REQ-LIVE-TASK-SIDEBAR | Live CodeOps task progress in the sidebar — foundation slices 0–1 (counting fix + TUI spike) | — | [live-task-sidebar](live-task-sidebar/00-index.md) | Done | ✅ | 2026-10-10 | — |
 | REQ-LIVE-TASK-PROGRESS | Live CodeOps task progress in the sidebar — the full feature (slice 2: progress tool, live state, sidebar view, exec-plan reporting) | — | [live-task-progress](live-task-progress/00-index.md) | Done | ✅ | 2026-10-10 20:39 | — |
-| REQ-DISCOVERY | Discovery — answer CodeOps question rounds in a local Fluent UI page; Submit wakes the agent (opt-in; make-plan + preflight) | — | [discovery](discovery/00-index.md) | Plan Preflighted | 🔬 | 2026-10-23 | — |
+| REQ-DISCOVERY | Discovery — answer CodeOps question rounds in a local Fluent UI page; Submit wakes the agent (opt-in; make-plan + preflight) | — | [discovery](discovery/00-index.md) | Executing | 🔄 | 2026-10-24 | — |

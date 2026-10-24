@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-23 09:26
-> **Progress**: 0/76 tasks (0%)
+> **Last Updated**: 2026-10-24 10:27
+> **Progress**: 4/76 tasks (5%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -57,7 +57,7 @@ task-size criteria in the make-plan quality checklist)
 
 ## Phase 1: Host spike
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill)_
+> **Phase baseline tree**: 833828049712ba44207ce3f968cba2029b1a50e2
 > **Expected modification set**: this document's Phase 1 note only; every probe file stays under `$CODEOPS_TMPDIR` and is deleted · **Scope mode**: strict
 > **Reasoning**: high — unverified host behaviour decides which pre-agreed fallbacks the later phases follow
 
@@ -66,14 +66,56 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 03-01 §Assumptions/§Probe Method/§Recording · AR-19, AR-57
 **Objective**: Outcomes for assumptions A–F recorded with ground truth; fallbacks and the active spec-test variant set selected.
 
-- [ ] 1.1.1 Build the temp-only probe plugin, two `git init` scratch projects, and the isolated `XDG_CONFIG_HOME` per 03-01 §Probe Method — all under `$CODEOPS_TMPDIR`
-- [ ] 1.1.2 Run assumptions A (idle and busy wake through `ctx.session.prompt`), C (tool routing per directory, and that a non-opted-in project's session does not see the Discovery tools), and F (a second process resolving and prompting the first process's session); capture ground-truth lines
-- [ ] 1.1.3 Run assumptions B (shared `globalThis` state across instances), D (service outlives the terminal UI), and E (`ctx.tool.reload` timing); capture ground-truth lines
-- [ ] 1.1.4 Record each outcome A–F, the OpenCode build, the selected fallbacks, and the spec-test variant set in the Phase 1 note below; stop probe processes by exact PID and delete the scratch tree; when C failed, mark this task `[!]` and stop
+- [x] 1.1.1 Build the temp-only probe plugin, two `git init` scratch projects, and the isolated `XDG_CONFIG_HOME` per 03-01 §Probe Method — all under `$CODEOPS_TMPDIR` ✅ (completed: 2026-10-24 10:22)
+- [x] 1.1.2 Run assumptions A (idle and busy wake through `ctx.session.prompt`), C (tool routing per directory, and that a non-opted-in project's session does not see the Discovery tools), and F (a second process resolving and prompting the first process's session); capture ground-truth lines ✅ (completed: 2026-10-24 10:26)
+- [x] 1.1.3 Run assumptions B (shared `globalThis` state across instances), D (service outlives the terminal UI), and E (`ctx.tool.reload` timing); capture ground-truth lines ✅ (completed: 2026-10-24 10:27)
+- [x] 1.1.4 Record each outcome A–F, the OpenCode build, the selected fallbacks, and the spec-test variant set in the Phase 1 note below; stop probe processes by exact PID and delete the scratch tree; when C failed, mark this task `[!]` and stop ✅ (completed: 2026-10-24 10:27)
 
-> **Phase 1 note** _(filled by task 1.1.4)_: OpenCode build · A · B · C · D · E · F · fallbacks
-> selected (03-04 §Fallback B, 03-05 §Fallback A) or "none" · spec-test variants active
-> (ST-27B/34B/37B, ST-44A/45A/62A) or "none".
+> **Phase 1 note** _(filled by task 1.1.4)_: OpenCode **2.1.3**, model `deepseek/deepseek-flash`.
+> Isolation: `opencode serve` with an isolated `XDG_CONFIG_HOME` whose config loaded only the
+> temporary probe plugin; clients connected with `--server`; auth and session data stayed in the
+> normal data directory so sessions were real. Every probe artifact lived under `$CODEOPS_TMPDIR`
+> and was deleted at the end of this phase. The four tasks ran as one interleaved probe; their
+> marks were written together at 10:27 with the completion times shown. Evidence timestamps below
+> are UTC; completion stamps are local time (UTC+2).
+>
+> - **A — pass.** *Idle:* `session.get` found the session and
+>   `session.prompt({ sessionID, text, delivery: "queue" })` was accepted at 08:24:20.951Z; the
+>   user turn "probe wake idle" ran at 08:24:20.997Z and an assistant turn answered at
+>   08:24:22.922Z. *Busy:* a turn running `sleep 20` was still active when the wake was accepted
+>   at 08:24:55.548Z; the wake's user turn appeared at 08:25:12.404Z, after `BUSY-DONE` at
+>   08:25:11.233Z — queued behind the current turn, never interleaved.
+> - **B — pass.** Two plugin instances in one process (p1 and p2 locations) shared the
+>   `globalThis[Symbol.for("opencode-codeops.discovery")]` slot: in pid 2825615 the p1 setup
+>   recorded `globalCount: 1` at 08:23:13.854Z and the p2 setup recorded `globalCount: 2` at
+>   08:23:17.655Z.
+> - **C — pass.** `probe_where` executed in the instance whose `ctx.location.directory` was the
+>   calling session's directory, and the tool list was per instance: the p1 list contained
+>   `probe_p1_only`, the p2 list did not (08:23:15.610Z / 08:23:18.909Z). Opt-in visibility
+>   therefore holds per location.
+> - **D — pass (proxy).** `opencode service status` reports a running background service
+>   (`http://127.0.0.1:49374`), and the probe listeners kept answering after every client
+>   exited. The user's live TUI was not restarted for the spike; the fallback is
+>   documentation-only, so this does not change a design decision.
+> - **E — pass.** `ctx.tool.reload()` called from a `context` hook changed the instance tool list
+>   immediately (08:25:37.999Z), but the model catalog for that same request did not include the
+>   new tool; the next request did and the tool executed (08:25:47.395Z). AR-45's "next request"
+>   wording is therefore correct.
+> - **F — pass, with a recorded mechanism.** The second process (pid 2829871) resolved the p1
+>   session at 08:26:03.267Z and its `session.prompt` call was accepted at 08:26:03.594Z. That
+>   call made the second process attach the session's p1 location: it set up a p1 runtime at
+>   08:26:03.435Z, the wake ran there (`probe_where` and `probe_p1_only` executed in pid 2829871
+>   with `directory` = p1 at 08:26:05.583Z), and the assistant answered at 08:26:05.653Z and
+>   08:26:07.638Z. So a process that calls `session.prompt` becomes the host of a session it did
+>   not host before; the wake is never silently lost, and no fallback is selected. The
+>   one-process-per-project recommendation stays because two processes can now each hold a
+>   runtime (and a listener) for the same project.
+> - **Fallbacks selected:** none — all six assumptions held.
+> - **Spec-test variants active:** none (ST-27B/34B/37B and ST-44A/45A/62A are not used).
+> - **Probe defects (not host results):** the first wake used the wrong `session.prompt` shape
+>   (`prompt: { text }`) and was rejected with a SchemaError; the corrected probe used the
+>   top-level `text` field. A missing output schema made `probe_where` return an error to the
+>   model, but its ground-truth record was still written before the host rejected the result.
 
 **Deliverables**:
 - Recorded outcomes for A–F, the fallback selection, and the active variant set
