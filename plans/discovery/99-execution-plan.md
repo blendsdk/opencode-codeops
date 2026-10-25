@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-24 10:27
-> **Progress**: 4/76 tasks (5%)
+> **Last Updated**: 2026-10-24 23:33
+> **Progress**: 13/76 tasks (17%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -136,21 +136,23 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 07 ST-1…ST-12 · 03-02 · AR-6, AR-16, AR-24–AR-26, AR-29, AR-42, AR-43, AR-50, AR-51
 **Objective**: The rules contract encoded before any implementation exists.
 
-- [ ] 2.1.1 [spec-author] Write the specification tests for ST-1…ST-12 — `bin/discovery-rules.spec.test.mjs`
-- [ ] 2.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification
+- [x] 2.1.1 [spec-author] Write the specification tests for ST-1…ST-12 — `bin/discovery-rules.spec.test.mjs` ✅ (completed: 2026-10-24 21:04)
+- [x] 2.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification ✅ (completed: 2026-10-24 21:05) — one suite fails at import (`ERR_MODULE_NOT_FOUND`); zero cases pass
 
 ### Step 2.2: Implementation
 
-- [ ] 2.2.1 Create `bin/lib/discovery-rules.mjs` and `.d.mts` with the constants, `DiscoveryPublishSchema`, and `validatePublish` rules 1–5 and 8 per 03-02 §Constants/§Publish contract/§validatePublish rules
-- [ ] 2.2.2 Add `validatePublish` rules 6–7, `toAnswer`, `validateAnswer`, `validateDefer`, and `questionFingerprint` per 03-02 §Answer shape/§Functions
-- [ ] 2.2.3 Add `evaluatePlan` per 03-02 §evaluatePlan semantics
-- [ ] 2.2.4 Add `groupReadiness` and `planCounts` per 03-02 §groupReadiness semantics
-- [ ] 2.2.5 Run the spec tests and verify they pass (green phase); on a failure fix the implementation, never the test
+- [x] 2.2.1 Create `bin/lib/discovery-rules.mjs` and `.d.mts` with the constants, `DiscoveryPublishSchema`, and `validatePublish` rules 1–5 and 8 per 03-02 §Constants/§Publish contract/§validatePublish rules ✅ (completed: 2026-10-24 21:05)
+- [x] 2.2.2 Add `validatePublish` rules 6–7, `toAnswer`, `validateAnswer`, `validateDefer`, and `questionFingerprint` per 03-02 §Answer shape/§Functions ✅ (completed: 2026-10-24 21:05)
+- [x] 2.2.3 Add `evaluatePlan` per 03-02 §evaluatePlan semantics ✅ (completed: 2026-10-24 21:05)
+- [x] 2.2.4 Add `groupReadiness` and `planCounts` per 03-02 §groupReadiness semantics ✅ (completed: 2026-10-24 21:05)
+
+  > Tasks 2.2.1–2.2.4 were implemented as one module write; their marks were written together.
+- [x] 2.2.5 Run the spec tests and verify they pass (green phase); on a failure fix the implementation, never the test ✅ (completed: 2026-10-24 21:06) — 19/19 pass
 
 ### Step 2.3: Implementation tests and hardening
 
-- [ ] 2.3.1 Write the implementation tests — `bin/discovery-rules.impl.test.mjs` (normalization edges, every error path, cap boundaries)
-- [ ] 2.3.2 Full verification: `npm run verify`
+- [x] 2.3.1 Write the implementation tests — `bin/discovery-rules.impl.test.mjs` (normalization edges, every error path, cap boundaries) ✅ (completed: 2026-10-24 21:06) — 17/17 pass
+- [x] 2.3.2 Full verification: `npm run verify` ✅ (completed: 2026-10-24 21:07; re-verified 23:33 after the phase review) — typecheck, 469 tests, version parity pass
 
 **Deliverables**:
 - The browser-safe rules module with typings

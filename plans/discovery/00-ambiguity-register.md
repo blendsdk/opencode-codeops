@@ -1,7 +1,7 @@
 ## Ambiguity Register: discovery
 
-> **Status**: ✅ GATE PASSED — all 63 items resolved (53 user decisions · 10 delegated under auto-design)
-> **Last Updated**: 2026-10-23 09:22
+> **Status**: ✅ GATE PASSED — all 64 items resolved (54 user decisions · 10 delegated under auto-design)
+> **Last Updated**: 2026-10-24 21:07
 > **Scope**: standalone feature plan for Discovery — a local web application where CodeOps
 > discovery questions are answered in the browser instead of the terminal, with the CodeOps plugin
 > publishing questions and waking the owning session on Submit. Reviewed across all 12 categories
@@ -10,7 +10,9 @@
 > to continue with `--auto-design`: eligible technical decisions are delegated under
 > `_shared/auto-design.md` policy version 1, root invocation ID `AD-DISC-20261023-1`; reserved
 > decisions remain user-owned. Row 63 records the clarifications that came out of the preflight
-> audit (2026-10-23) under its own invocation, `PF-DISC-20261023-1`.
+> audit (2026-10-23) under its own invocation, `PF-DISC-20261023-1`. Row 64 is a `(runtime)`
+> decision made while executing Phase 2 (2026-10-24): the rules module consumes a JSON-friendly
+> state object so the store, the API, and the page share one shape.
 
 | # | Category | Ambiguity / Gap | Options Presented | User Decision | Status |
 |---|----------|-----------------|-------------------|---------------|--------|
@@ -77,6 +79,7 @@
 | 61 | Technical unknowns | Phase decomposition and sequencing | 8 phases, spike first, rules → store → server → plugin → UI → skills → docs/E2E | AI — delegated by --auto-design (note AD-61) | ✅ Resolved |
 | 62 | Integration points | Skill protocol mechanics: how make-plan and preflight map questions and findings onto the page and back, and how `analyze-project` edits the config and the managed line | as in note AD-62 / new rule features | AI — delegated by --auto-design (note AD-62) | ✅ Resolved |
 | 63 | Behavioral | Readiness guard, full-republish rule, and delivery claim semantics surfaced by the preflight audit | keep the guard + `nothing-to-submit` reason / remove it; full-set publish / retire on omission; one prompt per plan with claim-then-prompt / per-submission prompts | AI — delegated by --auto-design (note AD-63) | ✅ Resolved |
+| 64 | Technical (runtime) | In-memory state and count shapes consumed by the rules module | JSON-friendly `Record` + array / `Map` + `Set` | User chose: `PlanState = { questions: Record<key, QuestionState>, submittedGroups: string[] }`; `PlanCounts = { open, answered, deferred, discussion, submitted, recorded }`; hidden questions excluded from every count | ✅ Resolved |
 
 ### Resolution Notes
 

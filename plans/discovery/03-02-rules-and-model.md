@@ -93,11 +93,39 @@ export function planCounts(plan: PublishedPlan, state: PlanState, evaluation: Ev
 
 `PlanState` holds, per question key: `answer`, `notes`, `defer`, `needsDiscussion`,
 `proposalDismissed`, the stored lifecycle `status` (`open | submitted | recorded | retired`),
-`changed`, `revisedAt`, `recordedAs`, and the set of submitted group keys. "Answered" (AR-16) means
+`changed`, `revisedAt`, `recordedAs`, and the set of submitted group keys. Its concrete shape is
+JSON-friendly so the store record, the API payload, and the page share one representation:
+
+```ts
+interface QuestionState {
+  answer: Answer | null
+  notes: string
+  defer: Defer | null
+  needsDiscussion: boolean
+  proposalDismissed: boolean
+  status: "open" | "submitted" | "recorded" | "retired"
+  changed: boolean
+  revisedAt: number
+  recordedAs: string | null
+}
+
+interface PlanState {
+  questions: Record<string, QuestionState>
+  submittedGroups: string[]
+}
+```
+
+A question missing from `state.questions` is `open`, unanswered, `changed: false`, `revisedAt: 0`,
+with no notes, deferral, discussion flag, or recorded id.
+
+"Answered" (AR-16) means
 an `open` question with an effective answer. A valid deferral and "needs discussion" also satisfy
 readiness (AR-42) but are separate states: `planCounts` reports `answered`, `deferred`, and
 `discussion` in their own buckets, so a count never claims a question was submitted when it was not.
-A submitted question counts in `submitted` regardless of how it was answered.
+A submitted question counts in `submitted` regardless of how it was answered. The full count shape
+is `{ open, answered, deferred, discussion, submitted, recorded }`; hidden questions are excluded
+from every bucket (AR-51), and `open` counts the remaining visible questions whose status is
+`open`.
 
 `evaluatePlan` returns one `Evaluation` per plan; the store, `groupReadiness`, and the view models
 consume exactly this shape:
