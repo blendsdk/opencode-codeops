@@ -42,8 +42,9 @@ project.json  { schemaVersion: 1, slug, directory, name, branch, repository: { i
 ```
 
 Times are ISO-8601 strings from an injectable clock. `SubmittedAnswer` is
-`{ key, title, answer, source: "user" | "implied", impliedBy: [key], overridesImplied, notes,
-defer, needsDiscussion: false }` — the effective answer at submit time (AR-27). Questions marked
+`{ key, title, answer, source: "user" | "implied" | null, impliedBy: [key], overridesImplied, notes,
+defer, needsDiscussion: false }` — the effective answer at submit time (AR-27); `source` is `null`
+when the question was submitted with a deferral instead of an answer. Questions marked
 "needs discussion" stay `open` and are not part of the submission (AR-42).
 
 ### Identity (AR-15, AR-22, AD-54)
@@ -86,12 +87,14 @@ interface DiscoveryStore {
   pendingDeliveries(projectSlug: string): Promise<{ planSlug: string; submissions: Submission[] }[]>
   claimDelivery(projectSlug: string, planSlug: string, submissionId: number, sessionID: string): Promise<boolean>
   releaseDelivery(projectSlug: string, planSlug: string, submissionId: number): Promise<void>
+  markDelivered(projectSlug: string, planSlug: string, submissionIds: number[], sessionID: string): Promise<number>
   readAnswers(projectSlug: string, planSlug: string, sessionID: string):
-    Promise<{ ok: true; plan: PlanRecord; submissions: Submission[] } | { ok: false; reason: "owned"; owner: string }>
+    Promise<{ ok: true; plan: PlanRecord; submissions: Submission[] } |
+            { ok: false; reason: "owned" | "not-found"; owner?: string }>
   resolve(projectSlug: string, planSlug: string, sessionID: string,
           input: { recorded?: { key: string; as: string }[]; retire?: string[] }):
     Promise<{ ok: true; recorded: number; retired: number } |
-            { ok: false; reason: "owned" | "invalid"; owner?: string; errors?: string[] }>
+            { ok: false; reason: "owned" | "invalid" | "not-found"; owner?: string; errors?: string[] }>
   markOrphaned(projectSlug: string, sessionID: string): Promise<number>
   setArchived(projectSlug: string, planSlug: string, archived: boolean): Promise<boolean>
   deletePlan(projectSlug: string, planSlug: string): Promise<boolean>
@@ -114,6 +117,7 @@ Refusing is the only throw: every other failure uses the documented result union
 | `submit` | `group` given → that group must be ready (`not-ready` with `missing`); `null` → every ready unlocked group, the rest listed in `skipped`; none ready → `nothing-ready`. `baseRevision` older than any pending question's `revisedAt` in the submitted groups → `stale` (AR-49). Answered and deferred questions become `submitted`; "needs discussion" ones stay `open`; each submitted group gets `submittedAt` (first time); a submission with the next id, `claimedBy: null`, and `deliveredAt: null` is appended. | AR-5, AR-42, AR-47 |
 | `claimDelivery` | Sets `claimedBy` (pid and time) only when `deliveredAt` is unset and no live claim exists; returns whether this call claimed it. `deliveredAt` is written by the caller after the prompt resolves, or by `readAnswers` when it hands the submission to the agent. | AR-5, AR-46 |
 | `releaseDelivery` | Clears `claimedBy` (and any `deliveredAt`) after a failed wake prompt so the next delivery point retries. Claims whose pid is no longer running are released at store creation. | AR-5, AD-57 |
+| `markDelivered` | After the wake prompt resolves, sets `deliveredAt` and `deliveredTo` for the given submissions that have no `deliveredAt` yet, clears their claims, and returns how many changed. A duplicate call changes nothing. | AR-5, AR-46 |
 | `readAnswers` | Ownership as in `publish` without takeover (no owner or orphaned → caller adopts, AR-40; other owner → `owned`). Returns submissions whose questions are still `submitted`; claims every undelivered submission for the caller. | AR-40, AD-56 |
 | `resolve` | Ownership as in `readAnswers`. `recorded` keys must be `submitted` → `recorded` with `recordedAs`; `retire` keys → `retired` unless recorded. Unknown keys → `invalid`. | AR-14, AR-27 |
 | `markOrphaned` | Every plan of the project owned by the session gets `orphaned: true`. | AR-40 |

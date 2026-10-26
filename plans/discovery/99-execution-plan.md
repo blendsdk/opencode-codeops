@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-24 23:33
-> **Progress**: 13/76 tasks (17%)
+> **Last Updated**: 2026-10-26 09:34
+> **Progress**: 24/76 tasks (32%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -164,7 +164,7 @@ task-size criteria in the make-plan quality checklist)
 
 ## Phase 3: Store
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill)_
+> **Phase baseline tree**: d0e0453f9a52b21f414aa892e865baa2becd31a5
 > **Expected modification set**: `bin/lib/discovery-store.mjs` (new), `bin/lib/discovery-store.d.mts` (new), `bin/discovery-store.spec.test.mjs` (new), `bin/discovery-store.impl.test.mjs` (new) · **Scope mode**: strict
 > **Reasoning**: high — durable data, ownership, and exactly-once delivery
 
@@ -173,23 +173,25 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 07 ST-13…ST-26 · 03-03 · AR-5, AR-15, AR-22–AR-24, AR-27–AR-29, AR-40, AR-42, AR-46, AR-47, AR-49, AR-52, AR-53, AD-54
 **Objective**: The store contract encoded before implementation.
 
-- [ ] 3.1.1 [spec-author] Write the specification tests for ST-13…ST-26 — `bin/discovery-store.spec.test.mjs`
-- [ ] 3.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification
+- [x] 3.1.1 [spec-author] Write the specification tests for ST-13…ST-26 — `bin/discovery-store.spec.test.mjs` ✅ (completed: 2026-10-25 23:37)
+- [x] 3.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification ✅ (completed: 2026-10-25 23:37) — one suite fails at import (`ERR_MODULE_NOT_FOUND`); zero cases pass
 
 ### Step 3.2: Implementation
 
-- [ ] 3.2.1 Create `bin/lib/discovery-store.mjs` and `.d.mts` with `resolveDataDir`, `createDiscoveryStore`, the process-wide per-file queue, atomic writes, containment checks, permissions, and the typed `DiscoveryDataError` refusals per 03-03 §Durability — ST-13 green
-- [ ] 3.2.2 Add projects: `registerProject`, slugs, `listProjects`, `getProject`, `findProjectByDirectory` per 03-03 §Identity — ST-14, ST-15 green
-- [ ] 3.2.3 Add `publish` (plan identity, ownership, full-set merge, submitted-question retention, type-change refusal, unarchive) per 03-03 §Identity/§Transitions — ST-16 green
-- [ ] 3.2.4 Add `getPlan`, `findPlan`, `listPlans`, `setArchived`, `deletePlan` per 03-03 §API/§Transitions — ST-19 green
-- [ ] 3.2.5 Add `saveAnswer` (including re-validating `reconfirm`) and `submit` with `baseRevision` per 03-03 §Transitions — ST-20…ST-22 green
-- [ ] 3.2.6 Add `pendingDeliveries`, `claimDelivery`/`releaseDelivery` (claim → prompt → `deliveredAt`, dead-claim sweep), `readAnswers`, `resolve`, `markOrphaned` per 03-03 §Transitions — ST-17, ST-23, ST-24, ST-26 green
-- [ ] 3.2.7 Run the spec tests and verify they pass (green phase) — ST-18 and ST-25 green
+- [x] 3.2.1 Create `bin/lib/discovery-store.mjs` and `.d.mts` with `resolveDataDir`, `createDiscoveryStore`, the process-wide per-file queue, atomic writes, containment checks, permissions, and the typed `DiscoveryDataError` refusals per 03-03 §Durability — ST-13 green ✅ (completed: 2026-10-25 23:38)
+- [x] 3.2.2 Add projects: `registerProject`, slugs, `listProjects`, `getProject`, `findProjectByDirectory` per 03-03 §Identity — ST-14, ST-15 green ✅ (completed: 2026-10-25 23:38)
+- [x] 3.2.3 Add `publish` (plan identity, ownership, full-set merge, submitted-question retention, type-change refusal, unarchive) per 03-03 §Identity/§Transitions — ST-16 green ✅ (completed: 2026-10-25 23:38)
+- [x] 3.2.4 Add `getPlan`, `findPlan`, `listPlans`, `setArchived`, `deletePlan` per 03-03 §API/§Transitions — ST-19 green ✅ (completed: 2026-10-25 23:38)
+- [x] 3.2.5 Add `saveAnswer` (including re-validating `reconfirm`) and `submit` with `baseRevision` per 03-03 §Transitions — ST-20…ST-22 green ✅ (completed: 2026-10-25 23:38)
+- [x] 3.2.6 Add `pendingDeliveries`, `claimDelivery`/`releaseDelivery` (claim → prompt → `deliveredAt`, dead-claim sweep), `readAnswers`, `resolve`, `markOrphaned` per 03-03 §Transitions — ST-17, ST-23, ST-24, ST-26 green ✅ (completed: 2026-10-25 23:38)
+- [x] 3.2.7 Run the spec tests and verify they pass (green phase) — ST-18 and ST-25 green ✅ (completed: 2026-10-25 23:38) — 16/16 pass
+
+  > Tasks 3.2.1–3.2.6 were implemented as one module write; their marks were written together.
 
 ### Step 3.3: Implementation tests and hardening
 
-- [ ] 3.3.1 Write the implementation tests — `bin/discovery-store.impl.test.mjs` (slug edge cases, temp-file cleanup on failure, queue ordering, dead-claim release)
-- [ ] 3.3.2 Full verification: `npm run verify`
+- [x] 3.3.1 Write the implementation tests — `bin/discovery-store.impl.test.mjs` (slug edge cases, temp-file cleanup on failure, queue ordering, dead-claim release) ✅ (completed: 2026-10-25 23:40) — 12/12 pass
+- [x] 3.3.2 Full verification: `npm run verify` ✅ (completed: 2026-10-25 23:42; re-verified after the phase review) — typecheck, 500 tests, version parity pass
 
 **Deliverables**:
 - The store with typings and permission-hardened, crash-safe writes

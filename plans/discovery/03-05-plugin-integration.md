@@ -106,8 +106,9 @@ sends `"delivered"`. Tool descriptions state when to use each tool and point to 
   measures the cross-process case and selects the pre-agreed fallback in 03-01.
 - **Deliver (plan)**: claim every undelivered submission of the plan (`claimDelivery`), then send
   **one** `ctx.session.prompt({ sessionID, text, delivery: "queue" })` per plan covering all claimed
-  submissions. On success record `deliveredAt` for each claim; when the prompt rejects, release
-  every claim so the next delivery point retries. A submission with a live claim held by this
+  submissions. On success call
+  `store.markDelivered(projectSlug, planSlug, ids, ownerSessionID)` for the claimed ids; when the
+  prompt rejects, release every claim so the next delivery point retries. A submission with a live claim held by this
   process is never prompted twice; claims left by a dead pid are released when the store is created.
 - **Delivery points**: after a page submit (the server calls the project's `deliver`), at enable /
   setup, and at the next Discovery tool call for that plan. `codeops_discovery_answers` also claims

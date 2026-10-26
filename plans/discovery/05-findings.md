@@ -19,3 +19,12 @@ Findings ledger for the execution quality loop. One row per finding.
 | RV-006 | 2 | MINOR | bin tests (case naming convention) | fixed |
 | RV-007 | 2 | MINOR | 00-ambiguity-register.md (stale Last Updated) | fixed |
 | RV-008 | 2 | MINOR | bin/lib/discovery-rules.mjs (absent vs empty evidence fingerprint) | fixed |
+| RV-001 | 3 | MAJOR | bin/lib/discovery-store.mjs (concurrent first publishes could collide) | fixed |
+| RV-002 | 3 | MAJOR | 03-03 + store (no markDelivered for wake completion) | fixed |
+| RV-003 | 3 | MINOR | bin/lib/discovery-store.mjs (dead claims not swept at creation) | fixed |
+| RV-004 | 3 | MINOR | store readAnswers/resolve missing-plan sentinel | fixed |
+| RV-005 | 3 | MINOR | bin/lib/discovery-store.mjs (stale project slugs trusted) | fixed |
+| RV-006 | 3 | MINOR | bin/lib/discovery-store.mjs (reconfirm wiped notes/defer/discussion) | fixed |
+| RV-007 | 3 | MINOR | 03-03 SubmittedAnswer source typing | fixed |
+| RV-008 | 3 | MINOR | bin/lib/discovery-store.mjs (slug cap after collision suffix) | fixed |
+| RV-009 | 3 | MINOR | bin/discovery-store.impl.test.mjs (forced write-failure cleanup) | fixed |
