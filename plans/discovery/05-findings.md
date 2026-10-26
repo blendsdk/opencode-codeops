@@ -28,3 +28,10 @@ Findings ledger for the execution quality loop. One row per finding.
 | RV-007 | 3 | MINOR | 03-03 SubmittedAnswer source typing | fixed |
 | RV-008 | 3 | MINOR | bin/lib/discovery-store.mjs (slug cap after collision suffix) | fixed |
 | RV-009 | 3 | MINOR | bin/discovery-store.impl.test.mjs (forced write-failure cleanup) | fixed |
+| RV-001 | 4 | MAJOR | bin/lib/discovery-server.mjs (raw directory registration key) | fixed |
+| RV-002 | 4 | MINOR | bin/lib/discovery-server.mjs (closeIfIdle during in-flight listen) | fixed |
+| RV-003 | 4 | MINOR | bin/lib/discovery-server.mjs (archive changed event payload) | fixed |
+| RV-004 | 4 | MINOR | bin/lib/discovery-server.mjs (write checks before route slugs) | fixed |
+| RV-005 | 4 | MINOR | bin/discovery-server.spec.test.mjs (header/error-code assertions) | fixed |
+| RV-006 | 4 | MINOR | bin/discovery-server.spec.test.mjs (delete-404, hello name, submit-all) | fixed |
+| RV-007 | 4 | MINOR | bin/discovery-server.impl.test.mjs (closeIfIdle with open SSE) | fixed |

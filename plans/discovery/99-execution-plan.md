@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-26 09:34
-> **Progress**: 24/76 tasks (32%)
+> **Last Updated**: 2026-10-26 12:51
+> **Progress**: 35/76 tasks (46%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -203,7 +203,7 @@ task-size criteria in the make-plan quality checklist)
 
 ## Phase 4: Shared listener and API
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill)_
+> **Phase baseline tree**: 1bde4a28f3a081bf536aa4516a50d5db127ca251
 > **Expected modification set**: `bin/lib/discovery-server.mjs` (new), `bin/lib/discovery-server.d.mts` (new), `bin/discovery-server.spec.test.mjs` (new), `bin/discovery-server.impl.test.mjs` (new) · **Scope mode**: strict
 > **Reasoning**: max — a local network listener whose protections must hold against browser-originated attacks, plus live delivery
 
@@ -212,23 +212,25 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 07 ST-27…ST-38 · 03-04 (and §Fallback B when Phase 1 selected it) · AR-3, AR-4, AR-21, AR-29–AR-31, AR-37, AR-41, AR-48, AD-55
 **Objective**: The listener contract encoded before implementation.
 
-- [ ] 4.1.1 [spec-author] Write the specification tests for ST-27…ST-38 (plus the fallback variants when Phase 1 selected them) — `bin/discovery-server.spec.test.mjs`
-- [ ] 4.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification
+- [x] 4.1.1 [spec-author] Write the specification tests for ST-27…ST-38 (plus the fallback variants when Phase 1 selected them) — `bin/discovery-server.spec.test.mjs` ✅ (completed: 2026-10-26 10:40)
+- [x] 4.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification ✅ (completed: 2026-10-26 10:40) — one suite fails at import (`ERR_MODULE_NOT_FOUND`); zero cases pass
 
 ### Step 4.2: Implementation
 
-- [ ] 4.2.1 Create `bin/lib/discovery-server.mjs` and `.d.mts` with `resolvePort`, `createDiscoveryRuntime`, the `getDiscoveryRuntime` wrapper, `ensureListening` with single-flight and the port fallback, `registerProject` (identity-checked unregister), `closeIfIdle` (ends SSE first) per 03-04 §Runtime API — ST-27, ST-28, ST-37, ST-38 green
-- [ ] 4.2.2 Add the request pipeline (Host, route-slug validation, write checks, body cap, headers, error envelope, internal 500) and `GET /api/health` per 03-04 §Request pipeline — ST-29 green
-- [ ] 4.2.3 Add static assets, the per-request nonce and CSP, the asset re-list after a missing `dist/`, and the not-built page per 03-04 §Static assets and CSP — ST-32, ST-33 green
-- [ ] 4.2.4 Add the read endpoints per 03-04 §Endpoints — ST-34 green
-- [ ] 4.2.5 Add the write endpoints (including `baseRevision` and the `woken`/`pending` result) and the delivery hook per 03-04 §Endpoints — ST-30, ST-31, ST-35 green
-- [ ] 4.2.6 Add the events stream, viewer counting, `notify` (changed/delivered) per 03-04 §Live events — ST-36 green
-- [ ] 4.2.7 Run the spec tests and verify they pass (green phase)
+- [x] 4.2.1 Create `bin/lib/discovery-server.mjs` and `.d.mts` with `resolvePort`, `createDiscoveryRuntime`, the `getDiscoveryRuntime` wrapper, `ensureListening` with single-flight and the port fallback, `registerProject` (identity-checked unregister), `closeIfIdle` (ends SSE first) per 03-04 §Runtime API — ST-27, ST-28, ST-37, ST-38 green ✅ (completed: 2026-10-26 10:42)
+- [x] 4.2.2 Add the request pipeline (Host, route-slug validation, write checks, body cap, headers, error envelope, internal 500) and `GET /api/health` per 03-04 §Request pipeline — ST-29 green ✅ (completed: 2026-10-26 10:42)
+- [x] 4.2.3 Add static assets, the per-request nonce and CSP, the asset re-list after a missing `dist/`, and the not-built page per 03-04 §Static assets and CSP — ST-32, ST-33 green ✅ (completed: 2026-10-26 10:42)
+- [x] 4.2.4 Add the read endpoints per 03-04 §Endpoints — ST-34 green ✅ (completed: 2026-10-26 10:42)
+- [x] 4.2.5 Add the write endpoints (including `baseRevision` and the `woken`/`pending` result) and the delivery hook per 03-04 §Endpoints — ST-30, ST-31, ST-35 green ✅ (completed: 2026-10-26 10:42)
+- [x] 4.2.6 Add the events stream, viewer counting, `notify` (changed/delivered) per 03-04 §Live events — ST-36 green ✅ (completed: 2026-10-26 10:42)
+- [x] 4.2.7 Run the spec tests and verify they pass (green phase) ✅ (completed: 2026-10-26 10:43) — 15/15 pass
+
+  > Tasks 4.2.1–4.2.6 were implemented as one module write; their marks were written together.
 
 ### Step 4.3: Implementation tests and hardening
 
-- [ ] 4.3.1 Write the implementation tests — `bin/discovery-server.impl.test.mjs` (MIME map, asset allow-list, viewer counting on disconnect, internal-error path, single-flight bind)
-- [ ] 4.3.2 Full verification: `npm run verify`
+- [x] 4.3.1 Write the implementation tests — `bin/discovery-server.impl.test.mjs` (MIME map, asset allow-list, viewer counting on disconnect, internal-error path, single-flight bind) ✅ (completed: 2026-10-26 10:45) — 9/9 pass
+- [x] 4.3.2 Full verification: `npm run verify` ✅ (completed: 2026-10-26 10:46; re-verified 2026-10-26 12:51 after the phase review) — typecheck, 528 tests, version parity pass
 
 **Deliverables**:
 - The shared listener with the approved local protections

@@ -118,9 +118,9 @@ registered here; otherwise the submission stays pending (AR-41, AR-46).
 ### Live events (AR-24, AR-30, AD-55)
 
 The events stream sends `event: hello` with `{ instanceId, revision }` on connect, then
-`event: changed` with `{ revision }` after any mutation of that plan and `event: delivered` with
-`{ submissionId }` after a delivery. Each open stream counts as one viewer of its plan until it
-closes. The page compares `instanceId` across reconnects to show the restart notice.
+`event: changed` with `{ revision }` after any mutation of that plan (a delete, which leaves no plan
+to read, sends `revision: 0`) and `event: delivered` with `{ submissionId }` after a delivery. Each
+open stream counts as one viewer of its plan until it closes. The page compares `instanceId` across reconnects to show the restart notice.
 
 ### Fallback B (spike B failed, AR-19)
 
