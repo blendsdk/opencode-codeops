@@ -121,6 +121,7 @@ export interface PlanSummary {
   title: string
   revision: number
   archived: boolean
+  orphaned: boolean
   updatedAt: string
   counts: PlanCounts
 }

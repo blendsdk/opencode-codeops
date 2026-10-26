@@ -114,7 +114,7 @@ describe("published packaging (ST-8)", () => {
       "files must exclude plugin *.spec.test.mjs files"
     )
 
-    const packed = spawnSync("npm", ["pack", "--dry-run", "--json"], { cwd: ROOT, encoding: "utf8" })
+    const packed = spawnSync("npm", ["pack", "--dry-run", "--json", "--ignore-scripts"], { cwd: ROOT, encoding: "utf8" })
     assert.equal(packed.status, 0, packed.stderr)
     const entries = JSON.parse(packed.stdout)[0].files.map((file) => file.path)
     assert.ok(entries.includes("plugin/tui.js"), "the tui entry must ship in the tarball")

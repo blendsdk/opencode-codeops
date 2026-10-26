@@ -61,6 +61,32 @@ adds `discovery-ui/dist/` (AR-37).
 slug pattern, and maps anything unknown to `{ view: "not-found" }`. The header shows a breadcrumb
 `Projects › <project> › <plan>`.
 
+### Module contracts
+
+The pure modules expose these signatures; the views only consume their output:
+
+```ts
+type Route =
+  | { view: "projects" }
+  | { view: "project"; project: string }
+  | { view: "plan"; project: string; plan: string }
+  | { view: "not-found" }
+
+parseRoute(hash: string): Route
+formatRoute(route: Route): string
+
+planView(record: PlanRecord): PlanView        // order, labels, counts, readiness
+projectsView(repositories: Repository[]): ProjectsView
+
+createApi(baseUrl: string, fetchImpl?: typeof fetch): DiscoveryApi
+createAppRenderer(nonce: string, targetDocument?: Document): Renderer
+```
+
+`planView` derives everything from the stored record (questions with `state`, groups with
+`submittedAt`) so the page and the tests see one representation. `createApi` returns
+`{ ok: true, data }` or `{ ok: false, kind, message }`, where `kind` is the server's error code or
+`network`.
+
 ### Views
 
 - **ProjectsPage**: one section per repository (name), each listing its checkouts as rows with
@@ -68,8 +94,8 @@ slug pattern, and maps anything unknown to `{ view: "not-found" }`. The header s
   `live` is false (answers still save and wait, AR-41).
 - **ProjectPage**: the project's plans in a table (title, kind badge, counts, updated time,
   orphaned/archived badges); a switch shows archived plans.
-- **PlanPage** (PAT-004): header with plan title, `project · branch`, kind badge, counts, and a
-  menu with Archive/Unarchive and Delete… (Dialog confirmation, AR-28); message bars for an
+- **PlanPage** (PAT-004): header with plan title, `project · branch`, kind badge, counts, and an
+  action group with Archive/Unarchive and Delete… buttons (Dialog confirmation, AR-28); message bars for an
   orphaned plan (AR-40 text), an unarchived plan (AR-53), and connection state; group sections in
   `dependsOn` order; a command bar with **Submit all ready groups**.
 - **GroupSection**: title, description, readiness summary ("3 of 5 ready"); locked groups render

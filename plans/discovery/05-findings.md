@@ -44,3 +44,21 @@ Findings ledger for the execution quality loop. One row per finding.
 | RV-007 | 5 | MINOR | plugin/discovery-plugin.spec.test.mjs (runtime/impliedBy/dead-pid gaps) | fixed |
 | RV-008 | 5 | MINOR | 03-05 + tools (warn channel and doc pointer) | fixed |
 | RV-009 | 5 | MINOR | plans/discovery/99-execution-plan.md (task note placement) | fixed |
+| RV-001 | 6 | MAJOR | views/DeferFields.tsx (invalid empty deferral) | fixed |
+| RV-002 | 6 | MAJOR | app.tsx (errors replace the page; no silent reloads) | fixed |
+| RV-003 | 6 | MAJOR | app.tsx / views (no debounce or blur flush) | fixed |
+| RV-004 | 6 | MAJOR | app.tsx (no aria-live announcements) | fixed |
+| RV-005 | 6 | MAJOR | app.tsx (plan state survives a route change) | fixed |
+| RV-006 | 6 | MAJOR | views/QuestionCard.tsx (unlabelled checkboxes) | fixed |
+| RV-007 | 6 | MINOR | store listPlans (orphaned missing) | fixed |
+| RV-008 | 6 | MINOR | spec ST-49 (weak counts/summary assertions) | fixed |
+| RV-009 | 6 | MINOR | spec ST-50 (vacuous griffel check) | fixed |
+| RV-010 | 6 | MINOR | spec ST-51 (routes asserted together) | fixed |
+| RV-011 | 6 | MINOR | spec ST-52 (renderer attribute assertion) | fixed |
+| RV-012 | 6 | MINOR | views/ProjectPage.tsx (no archived switch) | fixed |
+| RV-013 | 6 | MINOR | view-models countsLabel (submitted omitted) | fixed |
+| RV-014 | 6 | MINOR | view-models status precedence | fixed |
+| RV-015 | 6 | MINOR | views/GroupSection.tsx (raw missing codes) | fixed |
+| RV-016 | 6 | MINOR | UI dead code | fixed |
+| RV-017 | 6 | MINOR | 03-06 menu wording vs buttons | fixed |
+| RV-018 | 6 | MINOR | views/QuestionCard.tsx (duplicated radio block) | fixed |

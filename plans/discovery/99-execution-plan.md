@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-26 13:58
-> **Progress**: 46/76 tasks (61%)
+> **Last Updated**: 2026-10-26 16:05
+> **Progress**: 60/76 tasks (79%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -283,7 +283,7 @@ task-size criteria in the make-plan quality checklist)
 
 ## Phase 6: Web UI and packaging
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill)_
+> **Phase baseline tree**: ab69cfab208ca3cd0a870b012beb1418d7d7af7a
 > **Expected modification set**: `discovery-ui/` (new: `index.html`, `tsconfig.json`, `src/**`), `scripts/build-discovery-ui.mjs` (new), `scripts/discovery-ui.spec.test.mjs` (new), `scripts/discovery-ui.impl.test.mjs` (new), `package.json`, `package-lock.json`, `.gitignore`, `plugin/tui-foundation.spec.test.mjs` (adds `--ignore-scripts`) · **Scope mode**: strict
 > **Reasoning**: high — a new build pipeline, CSP nonce wiring, and the user-visible surface
 
@@ -294,26 +294,26 @@ Executors load the `fluentui` and `fluentui-design` skills before writing view c
 **Reference**: 07 ST-48…ST-55 · 03-06 · AR-3, AR-6, AR-24–AR-26, AR-29, AR-30, AR-32, AR-36, AR-37, AR-41, AR-43, AR-44, AR-47, AR-52, AR-53, AD-58, AD-59
 **Objective**: The UI contract encoded before implementation.
 
-- [ ] 6.1.1 [spec-author] Write the specification tests for ST-48…ST-55 — `scripts/discovery-ui.spec.test.mjs`
-- [ ] 6.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification
+- [x] 6.1.1 [spec-author] Write the specification tests for ST-48…ST-55 — `scripts/discovery-ui.spec.test.mjs` ✅ (completed: 2026-10-26 14:29)
+- [x] 6.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification ✅ (completed: 2026-10-26 14:29) — one suite fails at import (`ERR_MODULE_NOT_FOUND`); zero cases pass
 
 ### Step 6.2: Implementation
 
-- [ ] 6.2.1 Add the devDependencies (`package.json`, `package-lock.json`, including `@griffel/react`), `discovery-ui/tsconfig.json` (with `allowImportingTsExtensions` and `erasableSyntaxOnly`), and `discovery-ui/index.html` per 03-06 §Proposed Changes
-- [ ] 6.2.2 Add `scripts/build-discovery-ui.mjs` (with the metafile result), the `package.json` scripts and `files` entry, the `.gitignore` entry, and `--ignore-scripts` in `plugin/tui-foundation.spec.test.mjs` per 03-06 §Build — ST-54 green
-- [ ] 6.2.3 Add `src/renderer.ts` (injectable document), `src/route.ts`, and `src/hooks.ts` (`useHashRoute`, `useSystemTheme` touched only from effects) per 03-06 §Routes/§CSP nonce and theme — ST-48, ST-52 green
-- [ ] 6.2.4 Add `src/main.tsx` and the `src/app.tsx` shell with `{ route, api, initial }` props (header, breadcrumb, routed view) per 03-06 §Views (PAT-001)
-- [ ] 6.2.5 Add `src/api.ts` (submit sends `baseRevision`) and `src/view-models.ts` per 03-06 §Data flow/§Views — ST-49, ST-55 green
-- [ ] 6.2.6 Add `ProjectsPage` and `ProjectPage` per 03-06 §Views (PAT-002)
-- [ ] 6.2.7 Add `QuestionCard` and `DeferFields` per 03-06 §Views/§Data flow (PAT-004)
-- [ ] 6.2.8 Add `PlanPage` and `GroupSection` with the archive/delete menu per 03-06 §Views (PAT-004)
-- [ ] 6.2.9 Add `SubmitDialog`, `ConnectionBanner`, and `usePlanEvents` per 03-06 §Views/§Data flow — ST-51 green
-- [ ] 6.2.10 Run the spec tests and verify they pass (green phase), including ST-50 against the complete shell and ST-53 against a fresh build with `--ignore-scripts`
+- [x] 6.2.1 Add the devDependencies (`package.json`, `package-lock.json`, including `@griffel/react`), `discovery-ui/tsconfig.json` (with `allowImportingTsExtensions` and `erasableSyntaxOnly`), and `discovery-ui/index.html` per 03-06 §Proposed Changes ✅ (completed: 2026-10-26 14:29)
+- [x] 6.2.2 Add `scripts/build-discovery-ui.mjs` (with the metafile result), the `package.json` scripts and `files` entry, the `.gitignore` entry, and `--ignore-scripts` in `plugin/tui-foundation.spec.test.mjs` per 03-06 §Build — ST-54 green ✅ (completed: 2026-10-26 14:29)
+- [x] 6.2.3 Add `src/renderer.ts` (injectable document), `src/route.ts`, and `src/hooks.ts` (`useHashRoute`, `useSystemTheme` touched only from effects) per 03-06 §Routes/§CSP nonce and theme — ST-48, ST-52 green ✅ (completed: 2026-10-26 14:29)
+- [x] 6.2.4 Add `src/main.tsx` and the `src/app.tsx` shell with `{ route, api, initial }` props (header, breadcrumb, routed view) per 03-06 §Views (PAT-001) ✅ (completed: 2026-10-26 14:29)
+- [x] 6.2.5 Add `src/api.ts` (submit sends `baseRevision`) and `src/view-models.ts` per 03-06 §Data flow/§Views — ST-49, ST-55 green ✅ (completed: 2026-10-26 14:29)
+- [x] 6.2.6 Add `ProjectsPage` and `ProjectPage` per 03-06 §Views (PAT-002) ✅ (completed: 2026-10-26 14:29)
+- [x] 6.2.7 Add `QuestionCard` and `DeferFields` per 03-06 §Views/§Data flow (PAT-004) ✅ (completed: 2026-10-26 14:29)
+- [x] 6.2.8 Add `PlanPage` and `GroupSection` with the archive/delete menu per 03-06 §Views (PAT-004) ✅ (completed: 2026-10-26 14:29)
+- [x] 6.2.9 Add `SubmitDialog`, `ConnectionBanner`, and `usePlanEvents` per 03-06 §Views/§Data flow — ST-51 green ✅ (completed: 2026-10-26 14:29)
+- [x] 6.2.10 Run the spec tests and verify they pass (green phase), including ST-50 against the complete shell and ST-53 against a fresh build with `--ignore-scripts` ✅ (completed: 2026-10-26 14:29) — 13/13 UI spec cases pass
 
 ### Step 6.3: Implementation tests and hardening
 
-- [ ] 6.3.1 Write the implementation tests — `scripts/discovery-ui.impl.test.mjs` (route encoding edges, view-model edge states)
-- [ ] 6.3.2 Full verification: `npm run verify`, then `npm pack --dry-run`
+- [x] 6.3.1 Write the implementation tests — `scripts/discovery-ui.impl.test.mjs` (route encoding edges, view-model edge states) ✅ (completed: 2026-10-26 14:29)
+- [x] 6.3.2 Full verification: `npm run verify`, then `npm pack --dry-run` ✅ (completed: 2026-10-26 14:30; re-verified 2026-10-26 16:05 after the phase review) — typecheck, 570 tests, version parity; the pack lists the built UI and no sources
 
 **Deliverables**:
 - The Fluent UI app, its build, and packaging

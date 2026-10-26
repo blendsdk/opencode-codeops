@@ -627,6 +627,7 @@ export function createDiscoveryStore(options) {
           title: record.title,
           revision: record.revision,
           archived: record.archived,
+          orphaned: record.orphaned,
           updatedAt: record.updatedAt,
           counts: planCounts(record, state, evaluatePlan(record, state)),
         }
