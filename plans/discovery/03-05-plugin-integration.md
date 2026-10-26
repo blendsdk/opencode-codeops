@@ -49,6 +49,7 @@ export function readDiscoveryConfig(directory: string): { enabled: boolean; chat
 export function createDiscoveryController(ctx: unknown, deps: {
   directory: string; dataDir: string; assetsDir: string; version: string;
   openBrowser?: (url: string) => boolean; branchOf?: (directory: string) => string | null;
+  warn?: (message: string) => void;
 }): DiscoveryController
 
 interface DiscoveryController {
@@ -56,10 +57,16 @@ interface DiscoveryController {
   sync(): Promise<void>
   isEnabled(): boolean
   onSessionDeleted(sessionID: string): Promise<void>
-  /** The runtime this controller owns; its `store` is the only store the tools write through. */
-  readonly runtime: DiscoveryRuntime
-  /** Unregister this project, dispose the transform, and close the listener when idle. */
+  /** The runtime this controller owns, or null until Discovery is first enabled. */
+  readonly runtime: DiscoveryRuntime | null
+  /** Unregister this project, reload the tool list, and close the listener when idle. */
   dispose(): Promise<void>
+  /** Publish a plan round; the tool handler delegates here so the injected opener and delivery stay in one place. */
+  publish(input: unknown, sessionID: string): Promise<DiscoveryToolResult>
+  /** Read submitted answers; the tool handler delegates here. */
+  answers(input: unknown, sessionID: string): Promise<DiscoveryToolResult>
+  /** Record or retire questions; the tool handler delegates here. */
+  resolve(input: unknown, sessionID: string): Promise<DiscoveryToolResult>
 }
 ```
 
@@ -80,9 +87,9 @@ The controller owns the process-wide runtime and its store; both are created on 
 
 `registerDiscoveryTools(ctx, controller)` feature-detects `ctx.tool.transform`; its transform
 adds the three tools only while `controller.isEnabled()`; it never throws and returns a boolean
-like `registerCodeOpsProgressTool`. Every handler is `async`, uses `controller.runtime.store`
-(never a second store), resolves the project from `ctx.location.directory`, and returns
-`{ output: … }`:
+like `registerCodeOpsProgressTool`. The transform wires each tool to the matching controller
+method, which uses `runtime.store` (never a second store) and resolves the project from
+`ctx.location.directory`; every handler is `async` and returns `{ output: … }`:
 
 | Tool | Input | Output (success) |
 | --- | --- | --- |

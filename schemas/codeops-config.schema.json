@@ -46,6 +46,14 @@
         }
       }
     },
+    "discovery": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {"type": "boolean"},
+        "chatMaxQuestions": {"type": "integer", "minimum": 0}
+      }
+    },
     "metrics": {
       "type": "object",
       "additionalProperties": false,

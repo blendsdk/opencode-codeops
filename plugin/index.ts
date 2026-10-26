@@ -15,6 +15,11 @@ import {
 } from "../bin/lib/codeops-progress.mjs"
 import { registerCodeOpsRpc } from "../bin/lib/codeops-rpc.mjs"
 import {
+  createDiscoveryController,
+  registerDiscoveryTools,
+} from "../bin/lib/discovery-tools.mjs"
+import { resolveDataDir } from "../bin/lib/discovery-store.mjs"
+import {
   appendEffortTrace,
   applyEffort,
   extractModelVariants,
@@ -221,6 +226,13 @@ export default Plugin.define({
   async setup(ctx) {
     const directory = ctx.location.directory
 
+    // Discovery is opt-in; the controller is declared here so the
+    // session.deleted branch below can reach it.
+    let discovery: ReturnType<typeof createDiscoveryController> | null = null
+    // Read through a function so the later assignment is visible to the
+    // long-lived event loop without a cast.
+    const currentDiscovery = () => discovery
+
     // Reasoning-effort state lives for the lifetime of this plugin instance:
     // the latest dispatch-marker level per session, plus a deduplication set
     // for unsupported-level warnings.
@@ -255,6 +267,7 @@ export default Plugin.define({
           if (event.type === "session.deleted") {
             effortMarkers.delete(event.data.sessionID)
             progress.clearSession(event.data.sessionID)
+            await currentDiscovery()?.onSessionDeleted(event.data.sessionID)
           }
         }
       } catch {
@@ -438,11 +451,39 @@ export default Plugin.define({
     }
 
     // ---------------------------------------------------------------------
-    // Plugin cleanup: stop listening for events. The runtime's scratch
-    // directory is deliberately left in place — other sessions may still be
-    // using it — and the startup sweep reclaims abandoned directories.
+    // Discovery: opt-in browser-based question rounds. The controller owns the
+    // process-wide listener and its store; a disabled project creates nothing,
+    // so the plugin behaves exactly as before.
     // ---------------------------------------------------------------------
-    return () => {
+    try {
+      const controllerForDiscovery = createDiscoveryController(ctx, {
+        directory,
+        dataDir: resolveDataDir(process.env),
+        assetsDir: join(PACKAGE_ROOT, "discovery-ui", "dist"),
+        version: packageVersion,
+        warn: warnContentFree,
+      })
+      discovery = controllerForDiscovery
+      await controllerForDiscovery.sync()
+      await ctx.session.hook("context", async () => {
+        await discovery?.sync()
+      })
+      const registered = await registerDiscoveryTools(ctx, controllerForDiscovery)
+      if (!registered) {
+        warnContentFree("The Discovery tools are unavailable in this OpenCode build.")
+      }
+    } catch {
+      warnContentFree("Could not set up Discovery.")
+    }
+
+    // ---------------------------------------------------------------------
+    // Plugin cleanup: unregister Discovery, then stop listening for events.
+    // The runtime's scratch directory is deliberately left in place — other
+    // sessions may still be using it — and the startup sweep reclaims
+    // abandoned directories.
+    // ---------------------------------------------------------------------
+    return async () => {
+      await discovery?.dispose()
       controller.abort()
     }
   },

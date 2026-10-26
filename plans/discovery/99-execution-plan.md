@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-26 12:51
-> **Progress**: 35/76 tasks (46%)
+> **Last Updated**: 2026-10-26 13:58
+> **Progress**: 46/76 tasks (61%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -251,23 +251,27 @@ task-size criteria in the make-plan quality checklist)
 **Reference**: 07 ST-39…ST-47 · 03-05 (and §Fallback A when Phase 1 selected it) · AR-1, AR-5, AR-11, AR-13, AR-14, AR-20, AR-23, AR-27, AR-31, AR-40, AR-41, AR-45, AR-46, AR-48, AD-56, AD-57
 **Objective**: The integration contract encoded before implementation.
 
-- [ ] 5.1.1 [spec-author] Write the specification tests for ST-39…ST-47 — `plugin/discovery-plugin.spec.test.mjs`
-- [ ] 5.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification (ST-41's negative checks are expected to pass)
+- [x] 5.1.1 [spec-author] Write the specification tests for ST-39…ST-47 — `plugin/discovery-plugin.spec.test.mjs` ✅ (completed: 2026-10-26 13:08)
+- [x] 5.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification (ST-41's negative checks are expected to pass) ✅ (completed: 2026-10-26 13:08) — one suite fails at import (`ERR_MODULE_NOT_FOUND`); zero cases pass
 
 ### Step 5.2: Implementation
 
-- [ ] 5.2.1 Add the `discovery` object to `schemas/codeops-config.schema.json` per 03-05 §Config schema — ST-39 green
-- [ ] 5.2.2 Create `bin/lib/discovery-tools.mjs` and `.d.mts` with `readDiscoveryConfig` and `createDiscoveryController` (lazy store/runtime on first enable, `sync`, enable/disable, project registration with branch and repository, `dispose`) per 03-05 §Opt-in check — ST-40 green
-- [ ] 5.2.3 Add `registerDiscoveryTools`, the publish handler with `fallbackPort`, and the browser opener per 03-05 §Tools/§Browser opener — ST-43 green
-- [ ] 5.2.4 Add the answers and resolve handlers, including their `runtime.notify` calls, per 03-05 §Tools — ST-44 green
-- [ ] 5.2.5 Add the reachability check, delivery points, one claim-then-prompt per plan with release on failure, the dead-claim sweep, the wake text, and orphaning per 03-05 §Waking and delivery — ST-45 green
-- [ ] 5.2.6 Wire `plugin/index.ts`: the guarded setup block with an early-declared controller, the `context` hook, the `session.deleted` branch, and `dispose()` in the returned cleanup per 03-05 §Code Examples — ST-41, ST-42, ST-46, ST-47 green
-- [ ] 5.2.7 Run the spec tests and verify they pass (green phase); the existing progress suites pass unchanged
+- [x] 5.2.1 Add the `discovery` object to `schemas/codeops-config.schema.json` per 03-05 §Config schema — ST-39 green ✅ (completed: 2026-10-26 13:10)
+- [x] 5.2.2 Create `bin/lib/discovery-tools.mjs` and `.d.mts` with `readDiscoveryConfig` and `createDiscoveryController` (lazy store/runtime on first enable, `sync`, enable/disable, project registration with branch and repository, `dispose`) per 03-05 §Opt-in check — ST-40 green ✅ (completed: 2026-10-26 13:11)
+- [x] 5.2.3 Add `registerDiscoveryTools`, the publish handler with `fallbackPort`, and the browser opener per 03-05 §Tools/§Browser opener — ST-43 green ✅ (completed: 2026-10-26 13:12)
+- [x] 5.2.4 Add the answers and resolve handlers, including their `runtime.notify` calls, per 03-05 §Tools — ST-44 green ✅ (completed: 2026-10-26 13:12)
+- [x] 5.2.5 Add the reachability check, delivery points, one claim-then-prompt per plan with release on failure, the dead-claim sweep, the wake text, and orphaning per 03-05 §Waking and delivery — ST-45 green ✅ (completed: 2026-10-26 13:12)
+- [x] 5.2.6 Wire `plugin/index.ts`: the guarded setup block with an early-declared controller, the `context` hook, the `session.deleted` branch, and `dispose()` in the returned cleanup per 03-05 §Code Examples — ST-41, ST-42, ST-46, ST-47 green ✅ (completed: 2026-10-26 13:12)
+- [x] 5.2.7 Run the spec tests and verify they pass (green phase); the existing progress suites pass unchanged ✅ (completed: 2026-10-26 13:13) — 15/15 plugin spec cases pass
+
+  > Tasks 5.2.1–5.2.6 were one integration write; their marks were written at the end of it.
+  > ST-41, ST-42, ST-46, and ST-47 are exercised through the controller and
+  > `registerDiscoveryTools`, not by importing `plugin/index.ts`.
 
 ### Step 5.3: Implementation tests and hardening
 
-- [ ] 5.3.1 Write the implementation tests — `plugin/discovery-plugin.impl.test.mjs` (transform guard paths, reload on toggle, release on prompt failure)
-- [ ] 5.3.2 Full verification: `npm run verify`
+- [x] 5.3.1 Write the implementation tests — `plugin/discovery-plugin.impl.test.mjs` (transform guard paths, reload on toggle, release on prompt failure) ✅ (completed: 2026-10-26 13:13) — 7/7 pass
+- [x] 5.3.2 Full verification: `npm run verify` ✅ (completed: 2026-10-26 13:15; re-verified 2026-10-26 13:58 after the phase review) — typecheck, 551 tests, version parity pass
 
 **Deliverables**:
 - Opt-in tools, waking, and delivery wired into the plugin behind feature detection

@@ -35,3 +35,12 @@ Findings ledger for the execution quality loop. One row per finding.
 | RV-005 | 4 | MINOR | bin/discovery-server.spec.test.mjs (header/error-code assertions) | fixed |
 | RV-006 | 4 | MINOR | bin/discovery-server.spec.test.mjs (delete-404, hello name, submit-all) | fixed |
 | RV-007 | 4 | MINOR | bin/discovery-server.impl.test.mjs (closeIfIdle with open SSE) | fixed |
+| RV-001 | 5 | MAJOR | plugin/discovery-plugin.spec.test.mjs (submit-to-wake path untested) | fixed |
+| RV-002 | 5 | MINOR | plugin/discovery-plugin.impl.test.mjs / spec (disable close masked) | fixed |
+| RV-003 | 5 | MINOR | bin/lib/discovery-tools.mjs (claim leak before the prompt) | fixed |
+| RV-004 | 5 | MINOR | bin/lib/discovery-tools.mjs (not-found mapped as owned/invalid) | fixed |
+| RV-005 | 5 | MINOR | bin/lib/discovery-tools.mjs (dispose did not remove tools) | fixed |
+| RV-006 | 5 | MINOR | plugin/discovery-plugin.spec.test.mjs (missing-prompt case hollow) | fixed |
+| RV-007 | 5 | MINOR | plugin/discovery-plugin.spec.test.mjs (runtime/impliedBy/dead-pid gaps) | fixed |
+| RV-008 | 5 | MINOR | 03-05 + tools (warn channel and doc pointer) | fixed |
+| RV-009 | 5 | MINOR | plans/discovery/99-execution-plan.md (task note placement) | fixed |
