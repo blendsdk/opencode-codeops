@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+### Features
+
+- discovery: answer CodeOps question rounds in a local Fluent UI page (opt-in)
+
 ## 2.2.1 — 2026-10-10
 
 ### Fixes

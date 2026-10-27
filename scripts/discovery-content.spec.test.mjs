@@ -2,8 +2,9 @@
  * Specification tests for the Discovery protocol content.
  *
  * These cases pin the agent-facing protocol, its adoption by make-plan and
- * preflight, and the analyze-project switch. The files are Markdown, so the
- * assertions are the required phrases and sections rather than rendered HTML.
+ * preflight, the analyze-project switch, and the shipped README/CHANGELOG
+ * documentation. The files are Markdown, so the assertions are the required
+ * phrases and sections rather than rendered HTML.
  *
  * @module discovery-content.spec.test
  */
@@ -91,6 +92,47 @@ describe("preflight adoption", () => {
     }
     assert.match(step, /CRITICAL.*MAJOR.*MINOR.*OBSERVATION/s)
     assert.match(step, /Defer is recorded as \*\*Accepted Risk\*\*/i)
+  })
+})
+
+describe("shipped documentation (ST-61)", () => {
+  it("should document Discovery controls and its local single-user assumption", () => {
+    const readme = read("README.md")
+    const discovery = section(readme, "## Discovery", "\n## ")
+    for (const needle of [
+      "CODEOPS_DISCOVERY_PORT",
+      "npm run build:discovery",
+      "--no-discovery",
+    ]) {
+      assert.ok(discovery.includes(needle), `the Discovery section must mention ${needle}`)
+    }
+    assert.match(
+      discovery,
+      /single[- ]user (?:machine|assumption)/i,
+      "the section must state the single-user-machine assumption",
+    )
+    assert.match(
+      discovery,
+      /any\s+local user can (?:read|open|access)/i,
+      "the assumption must say that any local user can read the page",
+    )
+  })
+
+  it("should carry the Discovery entry in the unreleased section or the document", () => {
+    const changelog = read("CHANGELOG.md")
+    const heading = /^## (?:Unreleased|[0-9]+\.[0-9]+\.[0-9]+[^\n]*)$/m.exec(changelog)
+    assert.ok(heading, "the changelog must open with the unreleased or newest version section")
+
+    const rest = changelog.slice(heading.index)
+    const end = rest.indexOf("\n## ", 1)
+    const top = end === -1 ? rest : rest.slice(0, end)
+    const entry = /^\s*-\s+discovery:/m
+
+    if (/^## Unreleased/.test(top)) {
+      assert.match(top, entry, "the unreleased section must carry the discovery entry")
+    } else {
+      assert.match(changelog, entry, "the document must carry the discovery entry")
+    }
   })
 })
 

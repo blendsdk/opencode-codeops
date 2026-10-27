@@ -9,6 +9,7 @@
  * @module views/QuestionCard
  */
 
+import { useEffect, useRef, useState } from "react"
 import {
   Badge,
   Button,
@@ -42,6 +43,103 @@ function optionLabel(option: OptionView) {
       <Text>{option.label}</Text>
       {option.recommended ? <Badge appearance="tint">Recommended</Badge> : null}
     </span>
+  )
+}
+
+/** Props for {@link DraftText}. */
+interface DraftTextProps {
+  /** Accessible name; the visible question title is rendered by the card. */
+  ariaLabel: string
+  /** The last value saved by the server. */
+  value: string
+  /** Disables the field. */
+  disabled?: boolean
+  /** Renders a multiline textarea instead of a single-line input. */
+  multiline?: boolean
+  /** Placeholder shown while the draft is empty. */
+  placeholder?: string
+  /** Receives the complete draft after every edit. */
+  onChange: (value: string) => void
+  /** Called when focus leaves so a pending debounced save can flush. */
+  onFlush?: () => void
+}
+
+/**
+ * A text-like control that keeps the user's draft locally.
+ *
+ * Saves are debounced, so the saved value comes back a moment after each
+ * keystroke. A purely controlled field therefore shows the old value while the
+ * user types, and browsers that restore controlled inputs aggressively can drop
+ * every character except the last one (Firefox does this). While the field has
+ * focus the local draft is authoritative; when focus leaves, an externally
+ * saved value is adopted only if there is no unflushed edit.
+ */
+function DraftText({
+  ariaLabel,
+  value,
+  disabled = false,
+  multiline = false,
+  placeholder,
+  onChange,
+  onFlush = () => {},
+}: DraftTextProps) {
+  const [draft, setDraft] = useState(value)
+  const focused = useRef(false)
+  const dirty = useRef(false)
+  const draftRef = useRef(draft)
+  draftRef.current = draft
+
+  useEffect(() => {
+    if (!focused.current) {
+      setDraft(value)
+      dirty.current = false
+    } else if (value === draftRef.current) {
+      // The save echo arrived for the text already in the field.
+      dirty.current = false
+    }
+  }, [value])
+
+  const update = (next: string) => {
+    dirty.current = true
+    setDraft(next)
+    onChange(next)
+  }
+
+  const blur = () => {
+    focused.current = false
+    if (!dirty.current) setDraft(value)
+    else if (value === draftRef.current) dirty.current = false
+    onFlush()
+  }
+
+  if (multiline) {
+    return (
+      <Textarea
+        aria-label={ariaLabel}
+        disabled={disabled}
+        placeholder={placeholder}
+        value={draft}
+        onChange={(_, data) => update(data.value)}
+        onFocus={() => {
+          focused.current = true
+        }}
+        onBlur={blur}
+      />
+    )
+  }
+
+  return (
+    <Input
+      aria-label={ariaLabel}
+      disabled={disabled}
+      placeholder={placeholder}
+      value={draft}
+      onChange={(_, data) => update(data.value)}
+      onFocus={() => {
+        focused.current = true
+      }}
+      onBlur={blur}
+    />
   )
 }
 
@@ -111,12 +209,13 @@ export function QuestionCard({
       ) : null}
 
       {question.type === "text" ? (
-        <Textarea
-          aria-label={question.title}
+        <DraftText
+          ariaLabel={question.title}
           disabled={readOnly}
+          multiline
           value={question.text ?? ""}
-          onChange={(_, data) => onPatch({ answer: { text: data.value } })}
-          onBlur={onFlush}
+          onChange={(text) => onPatch({ answer: { text } })}
+          onFlush={onFlush}
         />
       ) : question.type === "multiple" ? (
         <div>
@@ -150,13 +249,13 @@ export function QuestionCard({
             ))}
           </RadioGroup>
           {question.type === "single-other" ? (
-            <Input
-              aria-label={`${question.title} other`}
+            <DraftText
+              ariaLabel={`${question.title} other`}
               disabled={readOnly}
               placeholder="Other"
               value={question.other ?? ""}
-              onChange={(_, data) => onPatch({ answer: { other: data.value } })}
-              onBlur={onFlush}
+              onChange={(other) => onPatch({ answer: { other } })}
+              onFlush={onFlush}
             />
           ) : null}
         </>
@@ -164,12 +263,13 @@ export function QuestionCard({
 
       <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
         <Text size={200}>Notes</Text>
-        <Textarea
-          aria-label={`${question.title} notes`}
+        <DraftText
+          ariaLabel={`${question.title} notes`}
           disabled={readOnly}
+          multiline
           value={question.notes}
-          onChange={(_, data) => onPatch({ notes: data.value })}
-          onBlur={onFlush}
+          onChange={(notes) => onPatch({ notes })}
+          onFlush={onFlush}
         />
         <DeferFields
           defer={question.defer}

@@ -43,6 +43,23 @@ function section(content, heading) {
   return end === -1 ? rest : rest.slice(0, end)
 }
 
+/**
+ * True when a `### Features` block still carries a `- progress:` line.
+ *
+ * The release tool rewrites release sections from commit subjects, so the
+ * feature must be pinned by a feature-shaped line, not by the bare word
+ * `progress`, which also appears in Chores and Fixes entries.
+ *
+ * @param content - The changelog text.
+ * @returns Whether the progress feature is documented in a Features block.
+ */
+function hasProgressFeature(content) {
+  return content
+    .split(/^### /m)
+    .filter((block) => block.startsWith("Features\n"))
+    .some((block) => /^\s*-\s+progress:/m.test(block))
+}
+
 describe("exec-plan reporting protocol (ST-19)", () => {
   const protocol = () => section(read("skills/exec-plan/execution-protocol.md"), "## Progress Reporting")
 
@@ -118,18 +135,29 @@ describe("README and CHANGELOG content (ST-21)", () => {
     const top = end === -1 ? rest : rest.slice(0, end)
 
     if (/^## Unreleased/.test(top)) {
-      // Development state: the hand-written entry carries the feature prose.
-      assert.match(top, /### Added/)
-      assert.match(top, /codeops_progress/)
-      assert.match(top, /sidebar/i)
-      assert.match(top, /`\.\/tui`/, "the tui entry fact is kept")
-      assert.match(top, /v2\.0\.26/, "the verified build fact is kept")
+      // Development state: the section may describe either feature. When the
+      // progress entry is the one under development, pin its hand-written
+      // facts there; another feature's entry leaves the progress facts in the
+      // released history, so they stay pinned across the whole document.
+      assert.match(top, /### (?:Added|Features)/)
+      assert.ok(
+        hasProgressFeature(changelog),
+        "a progress line is kept in a Features block",
+      )
+      if (/codeops_progress|sidebar/i.test(top)) {
+        assert.match(top, /codeops_progress/)
+        assert.match(top, /sidebar/i)
+        assert.match(top, /`\.\/tui`/, "the tui entry fact is kept")
+        assert.match(top, /v2\.0\.26/, "the verified build fact is kept")
+      }
     } else {
       // Released state: the release tool regenerates the newest section from
-      // commits since the previous tag, so the feature is pinned by its
-      // historical release section instead.
-      assert.match(changelog, /### Features/)
-      assert.match(changelog, /progress/i)
+      // commits since the previous tag, so the feature is pinned by a
+      // feature-shaped line in its historical release instead.
+      assert.ok(
+        hasProgressFeature(changelog),
+        "a progress line is kept in a Features block",
+      )
     }
 
     assert.doesNotMatch(

@@ -1,6 +1,6 @@
 /**
  * One plan: header, messages, group sections, retired questions, and the
- * submit-all, archive, and delete actions.
+ * group-submit, submit-all, archive, and delete actions.
  *
  * @module views/PlanPage
  */
@@ -42,9 +42,16 @@ export function PlanPage({
   onArchive,
   onDelete,
 }: PlanPageProps) {
-  const [submitOpen, setSubmitOpen] = useState(false)
+  // `undefined` closes the dialog; `null` confirms every ready group; a string
+  // confirms that one group. Both paths use the same dialog so the user always
+  // sees the project, branch, and plan before answers are sent.
+  const [submitTarget, setSubmitTarget] = useState<string | null | undefined>(undefined)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const { counts } = plan
+  const targetGroup =
+    typeof submitTarget === "string"
+      ? plan.groups.find((group) => group.key === submitTarget)
+      : undefined
 
   return (
     <main>
@@ -82,7 +89,7 @@ export function PlanPage({
         <Button
           appearance="primary"
           disabled={plan.submitAll.ready.length === 0}
-          onClick={() => setSubmitOpen(true)}
+          onClick={() => setSubmitTarget(null)}
         >
           Submit all ready groups
         </Button>
@@ -100,7 +107,7 @@ export function PlanPage({
           group={group}
           onPatch={onPatch}
           onFlush={onFlush}
-          onSubmit={onSubmitGroup}
+          onSubmit={(group) => setSubmitTarget(group)}
         />
       ))}
 
@@ -114,17 +121,19 @@ export function PlanPage({
       ) : null}
 
       <SubmitDialog
-        open={submitOpen}
-        title="Submit answers"
+        open={submitTarget !== undefined}
+        title={targetGroup ? `Submit ${targetGroup.title}` : "Submit answers"}
         intro={`${projectName}${branch ? ` · ${branch}` : ""} · ${plan.title}`}
-        ready={plan.submitAll.ready}
-        skipped={plan.submitAll.skipped}
+        ready={targetGroup ? [targetGroup.key] : plan.submitAll.ready}
+        skipped={targetGroup ? [] : plan.submitAll.skipped}
         confirmLabel="Submit"
         onConfirm={() => {
-          setSubmitOpen(false)
-          onSubmitAll()
+          const target = submitTarget
+          setSubmitTarget(undefined)
+          if (target === null) onSubmitAll()
+          else if (typeof target === "string") onSubmitGroup(target)
         }}
-        onClose={() => setSubmitOpen(false)}
+        onClose={() => setSubmitTarget(undefined)}
       />
       <SubmitDialog
         open={deleteOpen}

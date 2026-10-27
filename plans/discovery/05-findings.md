@@ -74,3 +74,9 @@ Findings ledger for the execution quality loop. One row per finding.
 | SR-004 | 7 | MINOR | skills/analyze-project (managed-line discipline) | fixed |
 | SR-005 | 7 | MINOR | skills/analyze-project (symlink containment) | fixed |
 | SR-006 | 7 | MINOR | content spec (analyze-project literals) | fixed |
+| RV-001 | 8 | MAJOR | views/QuestionCard.tsx (Firefox text inputs kept only the last keystroke) | fixed |
+| RV-002 | 8 | MAJOR | views/PlanPage.tsx (group submit skipped the confirmation) | fixed |
+| RV-003 | 8 | MAJOR | views/DeferFields.tsx (stale draft after the first save) | fixed |
+| RV-004 | 8 | MINOR | views/QuestionCard.tsx (focused external value not adopted) | fixed |
+| RV-005 | 8 | MINOR | spec ST-21 (weak progress-feature pin) | fixed |
+| RV-006 | 8 | MINOR | temp-root cleanup | fixed |

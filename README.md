@@ -162,6 +162,37 @@ when no run is active, when the host lacks the plugin APIs, or when every call f
 Markdown execution plan remains the single progress source of truth; the live view never gates
 execution.
 
+## Discovery
+
+Discovery is an opt-in local web page where the agent publishes a CodeOps question round
+instead of asking every question in chat. Questions, options, recommendations, and dependency
+rules render in the browser; answers are saved there, and Submit wakes the OpenCode session that
+published them so it can continue.
+
+Enable it for a project with `analyze-project --with-discovery`, or add the setting to
+`codeops/codeops.json`:
+
+```json
+{
+  "discovery": { "enabled": true, "chatMaxQuestions": 3 }
+}
+```
+
+Rounds with at most `chatMaxQuestions` (default 3) questions stay in chat. The page is served
+from the plugin at `http://localhost:4747/`; set `CODEOPS_DISCOVERY_PORT` to listen on a
+different port. Discovery data lives in `$CODEOPS_DATA_DIR/discovery`, which defaults to
+`~/.local/share/opencode/codeops/discovery`.
+
+The listener binds to `127.0.0.1` only and has no login. It assumes a single-user machine: any
+local user can read the page and the stored answers. Browsers limit concurrent
+connections per host, so keep only a few plan tabs open at once. The agent continues only while
+OpenCode is running in that project; submissions that arrive while it is not are delivered when
+it starts again.
+
+Pass `--no-discovery` to a skill to skip the page for one run and use chat. Building from a
+checkout with `npm run build:discovery` refreshes the page assets without restarting OpenCode.
+Remote and SSH sessions are not supported.
+
 ## Agent model configuration
 
 All CodeOps subagents inherit the model of the primary agent that invoked them. No provider-specific configuration is required out of the box.

@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-27 07:47
-> **Progress**: 68/76 tasks (89%)
+> **Last Updated**: 2026-10-27 11:58
+> **Progress**: 76/76 tasks (100%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -362,8 +362,8 @@ Executors load the `fluentui` and `fluentui-design` skills before writing view c
 
 ## Phase 8: Docs and live evidence
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill)_
-> **Expected modification set**: `README.md`, `CHANGELOG.md`, `scripts/discovery-content.spec.test.mjs`, `scripts/exec-plan-progress-content.spec.test.mjs` (CHANGELOG assertion only) + this plan's evidence notes (live-run artifacts stay under the temp root) · **Scope mode**: strict
+> **Phase baseline tree**: 76878a296988560d4e9e62356c30bcbe3600e765
+> **Expected modification set**: `README.md`, `CHANGELOG.md`, `scripts/discovery-content.spec.test.mjs`, `scripts/exec-plan-progress-content.spec.test.mjs` (CHANGELOG assertion only), `discovery-ui/src/views/QuestionCard.tsx` (ST-63 correction), + this plan's evidence notes (live-run artifacts stay under the temp root) · **Scope mode**: strict
 > **Reasoning**: medium — documentation plus live evidence with recorded fallbacks
 
 ### Step 8.1: Docs, evidence, and final verification
@@ -371,14 +371,53 @@ Executors load the `fluentui` and `fluentui-design` skills before writing view c
 **Reference**: 07 ST-61…ST-63 · 03-07 §`README.md`/§`CHANGELOG.md` · 03-06 §Manual checklist · AR-33 · Req R16, Acceptance 4–7
 **Objective**: The shipped feature is documented and proven live.
 
-- [ ] 8.1.1 [spec-author] Add the specification test for ST-61 to `scripts/discovery-content.spec.test.mjs`
-- [ ] 8.1.2 Run ST-61 and verify it fails (red phase)
-- [ ] 8.1.3 Amend the `## Unreleased` branch of `scripts/exec-plan-progress-content.spec.test.mjs` so it accepts either feature group and pins the progress facts document-wide; the released branch already reads the whole document
-- [ ] 8.1.4 Add the README section (including the single-user-machine assumption) and the `## Unreleased` CHANGELOG entry per 03-07
-- [ ] 8.1.5 Run ST-61 and the progress content test, and verify they pass (green phase)
-- [ ] 8.1.6 Execute the live end-to-end run ST-62 (packed tarball, isolated config, opted-in scratch project) and record the build, steps, and outcome in a note under this task
-- [ ] 8.1.7 Run the manual checklist ST-63 with the user and record each item's outcome in a note under this task
-- [ ] 8.1.8 Final full verification: `npm run verify` and `npm pack --dry-run`, then review the Success Criteria below
+- [x] 8.1.1 [spec-author] Add the specification test for ST-61 to `scripts/discovery-content.spec.test.mjs` ✅ (completed: 2026-10-27 07:53)
+- [x] 8.1.2 Run ST-61 and verify it fails (red phase) ✅ (completed: 2026-10-27 07:53) — 2/7 cases fail on the missing README section and changelog entry; the other 5 pass
+- [x] 8.1.3 Amend the `## Unreleased` branch of `scripts/exec-plan-progress-content.spec.test.mjs` so it accepts either feature group and pins the progress facts document-wide; the released branch already reads the whole document ✅ (completed: 2026-10-27 07:54) — 7/7 cases pass
+- [x] 8.1.4 Add the README section (including the single-user-machine assumption) and the `## Unreleased` CHANGELOG entry per 03-07 ✅ (completed: 2026-10-27 07:54)
+- [x] 8.1.5 Run ST-61 and the progress content test, and verify they pass (green phase) ✅ (completed: 2026-10-27 07:54) — 14/14 cases pass across both suites
+- [x] 8.1.6 Execute the live end-to-end run ST-62 (packed tarball, isolated config, opted-in scratch project) and record the build, steps, and outcome in a note under this task ✅ (completed: 2026-10-27 08:24)
+
+  > **ST-62 note** _(filled by task 8.1.6)_: **Pass.** OpenCode **2.1.3**, model
+  > `deepseek/deepseek-flash`, packaged `opencode-codeops-2.2.1.tgz` (136 files, 527 KiB).
+  > Isolation: the tarball was installed under a scratch root; `XDG_CONFIG_HOME` and
+  > `CODEOPS_DATA_DIR` pointed there, the isolated service listened on `127.0.0.1:49500`, and
+  > Discovery on `4757`; the user's background service was not touched. The scratch project
+  > (`git init`, `codeops/codeops.json` with `"discovery": {"enabled": true}`) was planned by
+  > `make-plan`, which published **12 questions in 5 groups** (`plans/greeting-cli`, revision 1).
+  > The user answered in the browser and submitted every group (Scope 07:20:46Z; Technical
+  > 07:21:22Z; Behavior 07:21:38Z; Testing 07:21:55Z; Delivery 07:21:56Z). Each submission woke
+  > the owning session with the pointer message ("Discovery: 3 answers submitted for scratch ›
+  > greeting-cli …"); the session called `codeops_discovery_answers`, recorded all twelve answers
+  > in `plans/greeting-cli/00-ambiguity-register.md` with exact text and `DQ-` keys (AR-1…AR-12),
+  > and called `codeops_discovery_resolve`. DQ-4 was submitted with **Needs discussion**; the
+  > session correctly refused the saved option, reopened AR-4, asked in chat, and recorded the
+  > user's confirmation (`stdout-newline`) before the gate passed. Evidence: the scratch register
+  > (✅ GATE PASSED — all 12 items resolved) and the session transcript; the scratch root and
+  > tarball are deleted during final cleanup.
+- [x] 8.1.7 Run the manual checklist ST-63 with the user and record each item's outcome in a note under this task ✅ (completed: 2026-10-27 11:44)
+
+  > **ST-63 note** _(filled by task 8.1.7)_: **Pass** after one MAJOR correction. The user ran
+  > the checklist in Firefox 158.0.1 against the isolated scratch project. Item 1 (navigation,
+  > breadcrumb, back/forward) passed. Item 2 initially failed: the text question accepted only
+  > the last keystroke because the controlled textarea had no local draft; headless Firefox
+  > reproduced `"t"` for `"firefox typing test"`, while Chrome kept the full text. RV-001
+  > (MAJOR) recorded the defect; the fix keeps a local draft while the field is focused
+  > (`views/QuestionCard.tsx`), and the rebuilt bundle saved the full string in headless
+  > Firefox. The user then entered "Testing" for MC-3. All four question types saved, the
+  > MC-5 → MC-6 implication pre-filled and was overridden to `off`, and the hidden MC-7
+  > reappeared with its answer after MC-1 returned to `yes`. Item 3: `types` submitted at
+  > 10:37:56Z and `locked` unlocked; MC-8 was answered and submitted at 10:38:08Z. Item 4
+  > initially passed only for Submit all; the phase review found that Submit group posted
+  > without the confirmation (RV-002). After the fix, the user re-checked
+  > `plans/manual-recheck`: Submit group showed **Submit Check** with `scratch · Manual
+  > recheck`, and Submit all showed the same project · branch · plan line. The review also found
+  > the deferral fields had the same stale-draft defect (RV-003); after the fix, editing a saved
+  > deferral owner stayed visible. Items 5–8 passed (keyboard/focus, dark mode, restart notice
+  > and recovery on reload, no console errors or CSP violations). The isolated service was
+  > restarted during the run (fix deployment and a machine restart); the page recovered on
+  > reload each time. Re-review of the fixes: **No findings.**
+- [x] 8.1.8 Final full verification: `npm run verify` and `npm pack --dry-run`, then review the Success Criteria below ✅ (completed: 2026-10-27 11:47) — typecheck, 577 tests, version parity; the pack lists 136 files, 2 under `discovery-ui/dist`, 0 sources
 
 **Deliverables**:
 - README section and CHANGELOG entry
