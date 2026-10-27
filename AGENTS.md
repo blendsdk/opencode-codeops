@@ -89,7 +89,7 @@ node scripts/release.mjs release --type auto --tag next --dry-run
 - Project specialists: briefs live at `codeops/specialists/<role>.md`; generate with
   `install_agents.py --custom <role>`, index with `--sync-agents-md`, remove with
   `--remove-custom <role> --yes`; the protocol is `_shared/specialist-agents.md`.
-- Specialist coverage: check due — run analyze-agents.
+- Specialist coverage: up to date (2026-10-27).
 - Generated files: never hand-edit `agents/`, `.opencode/agents/`, or `discovery-ui/dist/`; the
   version is owned by `scripts/release.mjs`.
 - CodeOps layout: this repo is flat (no `codeops/.codeops.yml` marker); `codeops/codeops.json`

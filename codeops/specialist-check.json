@@ -1,12 +1,15 @@
 {
-  "checkedAt": "2026-10-09T15:19:52Z",
+  "checkedAt": "2026-10-27T13:39:24Z",
   "plans": [
     "adaptive-reasoning-effort",
     "analyze-agents",
+    "discovery",
     "effort-level-fallback",
     "fix-agent-frontmatter",
     "fix-release-tag-push",
     "fix-shared-reference-install",
+    "live-task-progress",
+    "live-task-sidebar",
     "reasoning-effort-trace",
     "specialist-agents",
     "specialist-awareness"
