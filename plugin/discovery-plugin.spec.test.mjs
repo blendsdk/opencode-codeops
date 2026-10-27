@@ -494,6 +494,9 @@ describe("publish tool", () => {
       dataDir,
       assetsDir,
       version: "9.9.9",
+      // Keep the test hermetic: a real browser tab would hold an event stream
+      // open and delay the listener shutdown.
+      openBrowser: () => true,
     })
     t.after(async () => {
       await controller.dispose()
