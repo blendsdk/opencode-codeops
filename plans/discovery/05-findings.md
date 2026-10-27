@@ -62,3 +62,15 @@ Findings ledger for the execution quality loop. One row per finding.
 | RV-016 | 6 | MINOR | UI dead code | fixed |
 | RV-017 | 6 | MINOR | 03-06 menu wording vs buttons | fixed |
 | RV-018 | 6 | MINOR | views/QuestionCard.tsx (duplicated radio block) | fixed |
+| RV-001 | 7 | MAJOR | skills/analyze-project (minimal config missed discovery) | fixed |
+| RV-002 | 7 | MINOR | _shared/discovery.md (AR id leak) | fixed |
+| RV-003 | 7 | MINOR | _shared/discovery.md (retirement wording) | fixed |
+| RV-004 | 7 | MINOR | skills/make-plan (authoring-time questions) | fixed |
+| RV-005 | 7 | MINOR | content spec ST-57 (unbounded slice) | fixed |
+| RV-006 | 7 | MINOR | content spec ST-59 (weak Discovery path) | fixed |
+| SR-001 | 7 | MAJOR | skills/analyze-project (AR-35 shape and layout) | fixed |
+| SR-002 | 7 | MAJOR | skills/analyze-project (managed line not derived) | fixed |
+| SR-003 | 7 | MAJOR | skills/analyze-project (--without-discovery rules) | fixed |
+| SR-004 | 7 | MINOR | skills/analyze-project (managed-line discipline) | fixed |
+| SR-005 | 7 | MINOR | skills/analyze-project (symlink containment) | fixed |
+| SR-006 | 7 | MINOR | content spec (analyze-project literals) | fixed |

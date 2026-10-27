@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-26 16:05
-> **Progress**: 60/76 tasks (79%)
+> **Last Updated**: 2026-10-27 07:47
+> **Progress**: 68/76 tasks (89%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -325,7 +325,7 @@ Executors load the `fluentui` and `fluentui-design` skills before writing view c
 
 ## Phase 7: Skills protocol
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill)_
+> **Phase baseline tree**: 03bb8a90dc1b18ee27a6d669be316387053f83af
 > **Expected modification set**: `_shared/discovery.md` (new), `_shared/zero-ambiguity-gate.md`, `skills/make-plan/SKILL.md`, `skills/preflight/SKILL.md`, `skills/preflight/report-format.md`, `skills/analyze-project/SKILL.md`, `scripts/discovery-content.spec.test.mjs` (new) · **Scope mode**: strict
 > **Reasoning**: high — protocol text that changes how gate decisions are collected and recorded
 > **Specialist**: `agent-pipeline-reviewer` (required: changes the `AGENTS.md` managed-block contract) — see 00-index §Specialist Agents
@@ -335,20 +335,22 @@ Executors load the `fluentui` and `fluentui-design` skills before writing view c
 **Reference**: 07 ST-56…ST-60 · 03-07 · AR-11, AR-13, AR-20, AR-23, AR-27, AR-35, AR-38, AR-39, AD-62
 **Objective**: The protocol contracts encoded before the text is written.
 
-- [ ] 7.1.1 [spec-author] Write the content specification tests for ST-56…ST-60 — `scripts/discovery-content.spec.test.mjs`
-- [ ] 7.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification
+- [x] 7.1.1 [spec-author] Write the content specification tests for ST-56…ST-60 — `scripts/discovery-content.spec.test.mjs` ✅ (completed: 2026-10-27 00:50)
+- [x] 7.1.2 Run the spec tests and verify they fail (red phase); document any that pass with justification ✅ (completed: 2026-10-27 00:50) — 0/5 pass
 
 ### Step 7.2: Implementation
 
-- [ ] 7.2.1 Write `_shared/discovery.md` per 03-07 §`_shared/discovery.md` — ST-56 green
-- [ ] 7.2.2 Add the Discovery section to `_shared/zero-ambiguity-gate.md` and the Discovery option plus Phase 1.1/1C references to `skills/make-plan/SKILL.md` per 03-07 — ST-57, ST-58 green
-- [ ] 7.2.3 Add the Discovery option to `skills/preflight/SKILL.md` and the Step 5 Discovery path to `skills/preflight/report-format.md` per 03-07 — ST-59 green
-- [ ] 7.2.4 Add the `--with-discovery` / `--without-discovery` step to `skills/analyze-project/SKILL.md` per 03-07 — ST-60 green
-- [ ] 7.2.5 Run the spec tests and verify they pass (green phase)
+- [x] 7.2.1 Write `_shared/discovery.md` per 03-07 §`_shared/discovery.md` — ST-56 green ✅ (completed: 2026-10-27 00:50)
+- [x] 7.2.2 Add the Discovery section to `_shared/zero-ambiguity-gate.md` and the Discovery option plus Phase 1.1/1C references to `skills/make-plan/SKILL.md` per 03-07 — ST-57, ST-58 green ✅ (completed: 2026-10-27 00:50)
+- [x] 7.2.3 Add the Discovery option to `skills/preflight/SKILL.md` and the Step 5 Discovery path to `skills/preflight/report-format.md` per 03-07 — ST-59 green ✅ (completed: 2026-10-27 00:50)
+- [x] 7.2.4 Add the `--with-discovery` / `--without-discovery` step to `skills/analyze-project/SKILL.md` per 03-07 — ST-60 green ✅ (completed: 2026-10-27 00:50)
+- [x] 7.2.5 Run the spec tests and verify they pass (green phase) ✅ (completed: 2026-10-27 00:50) — 5/5 content cases pass
+
+  > Tasks 7.2.1–7.2.4 were one content write; their marks were written together.
 
 ### Step 7.3: Hardening
 
-- [ ] 7.3.1 Full verification: `npm run verify` (content contracts only — the text has no internals to test separately)
+- [x] 7.3.1 Full verification: `npm run verify` (content contracts only — the text has no internals to test separately) ✅ (completed: 2026-10-27 00:50; re-verified 2026-10-27 07:47 after the phase review) — typecheck, 575 tests, version parity
 
 **Deliverables**:
 - The shared protocol and both skill adoptions, plus the `analyze-project` switch

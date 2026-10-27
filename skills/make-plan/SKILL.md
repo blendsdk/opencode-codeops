@@ -34,6 +34,10 @@ than one or an invalid level is an argument error; announce
 [../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. The
 run clears the level before its final summary.
 
+## Discovery option
+
+If `$ARGUMENTS` contains exactly one exact standalone `--no-discovery` token before the first `--` sentinel, remove it before resolving targets, paths, or modes; more than one occurrence is invalid; when present, every question round stays in chat for this run. Read [../../_shared/discovery.md](../../_shared/discovery.md) when Discovery applies.
+
 ## Plan readiness proof
 
 A plan is not ready merely because its documents exist. Before presenting it as executable,
@@ -165,6 +169,8 @@ When a `requirements/` directory exists with `RD-XX-*.md` files (produced by the
 
 Cover at minimum: **Feature scope** (what it does / does NOT do, boundaries), **Technical context** (affected code, existing patterns, constraints), **Dependencies** (prerequisites, external deps), and **Success criteria** (definition of done, required tests, required docs).
 
+When Discovery applies, publish the interview per [../../_shared/discovery.md](../../_shared/discovery.md): groups by category with Scope first, and every question with `why`, `evidence`, and a recommendation. A round within `chatMaxQuestions` stays in chat.
+
 ### 1.2 Analyze current implementation
 
 Read relevant source files; identify affected components; find similar/reference patterns; note technical debt; review project docs and AGENTS.md. If `docs/index.md` exists with `techdocs: true` frontmatter, read the relevant architecture sections first (see the techdocs skill).
@@ -194,7 +200,7 @@ Register is created. No exceptions, no overrides, no "good enough."** Plans buil
 produce code the user did not ask for. Every item in every plan document must trace to an explicit,
 user-confirmed decision.
 
-The mechanism is the **Ambiguity Register** (`00-ambiguity-register.md`): a numbered inventory of every gap, ambiguity, unstated assumption, and open question, hunted systematically across all 12 categories. The full category checklist, register template, gate-enforcement rules, named-deferral policy, traceability requirement, surface-during-authoring rule, and interactions with the grill-me / upgrade-plan skills are in **[zero-ambiguity-gate.md](zero-ambiguity-gate.md)** — **read it now, before Phase 2.**
+The mechanism is the **Ambiguity Register** (`00-ambiguity-register.md`): a numbered inventory of every gap, ambiguity, unstated assumption, and open question, hunted systematically across all 12 categories. When Discovery applies, publish the register review per [../../_shared/discovery.md](../../_shared/discovery.md): one group per register category with Scope first; the register remains the authoritative record. Questions that surface while writing documents stay in chat when the round stays within `chatMaxQuestions`; otherwise add them to a new group on the same plan and republish the full question set. The full category checklist, register template, gate-enforcement rules, named-deferral policy, traceability requirement, surface-during-authoring rule, and interactions with the grill-me / upgrade-plan skills are in **[zero-ambiguity-gate.md](zero-ambiguity-gate.md)** — **read it now, before Phase 2.**
 
 That shared protocol also owns the always-active **Complexity Escalation Gate**. A new layer,
 dependency, harness, framework, infrastructure surface, cross-cutting refactor, or other material

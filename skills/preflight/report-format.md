@@ -121,6 +121,10 @@ Use the severity icons from SKILL.md (red/orange/yellow/blue circles) in the act
    proposal and collect a distinct `Keep`, `Defer`, or `Discard` ruling. In strict scope, optional
    remediations are not reported.
 
+### Discovery path
+
+When Discovery applies, after the challenger has run, publish all findings as a `preflight` plan grouped **CRITICAL**, **MAJOR**, **MINOR**, and **OBSERVATION**. Each finding is `PF-NNN` of type `single-other`: its options plus "Other" for a custom decision or a dismissal with reasoning. A Defer is recorded as **Accepted Risk** with decision, owner, and revisit. Answers come back as `**User Decision:**` lines. The batch pacing rules below apply only to chat presentation; the previous-decisions rule is unchanged.
+
 ### Batch presentation rules
 
 - **<= 5 findings** — present all at once, let the user respond to each.

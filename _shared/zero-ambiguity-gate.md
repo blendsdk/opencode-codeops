@@ -221,6 +221,10 @@ named larger machinery.
 save the register with header `✅ GATE PASSED — 0 ambiguities identified (systematic review
 completed)`. This proves the gate was executed.
 
+## Discovery (optional answer surface)
+
+When a workflow runs with Discovery enabled, the Ambiguity Register stays the **authoritative record** ([discovery.md](discovery.md)). Answers transcribed from the page are exact text with their question key; an implied answer counts as a user decision only when the page showed it and the user submitted it. Deferrals still need decision, owner, and revisit. Complexity escalations stay in **chat**: the STOP packet, the challenger verdict, and the approval are never published to the page.
+
 ## Deferral rules (named deferral only)
 
 A decision may be **explicitly deferred** — the status the whole pipeline shares (grill-me

@@ -26,6 +26,25 @@ description: Analyze the current repository and create or refresh concise CodeOp
 9. Validate every recorded command or mark it explicitly unverified.
 10. Specialist coverage: read `codeops/specialist-check.json` when present and include a `Specialist coverage:` line in the managed section — `up to date (<YYYY-MM-DD>)` (from `checkedAt`) when the recorded plan set matches the current one; `check due — run analyze-agents` otherwise; when the state is absent or corrupt, render `check due — run analyze-agents (never checked)`. The `analyze-agents` skill runs the check (criteria: [../../_shared/specialist-agents.md](../../_shared/specialist-agents.md)); when a specialization signal is strong and no specialist covers it, report the candidate with evidence and recommend the `setup-routing` creation flow; never write agent files here. Preserve the `<!-- CODEOPS-SPECIALISTS:START -->` / `<!-- CODEOPS-SPECIALISTS:END -->` block byte-for-byte when refreshing the managed section.
 
+## Discovery switch
+
+`analyze-project` accepts `--with-discovery` and `--without-discovery`; passing both flags is a usage error. Both flags validate `codeops/codeops.json` against `schemas/codeops-config.schema.json` before changing anything: an invalid file stops the run with its schema errors and writes nothing (never discard malformed quality, routing, or metrics policy). Refuse to write when `codeops/` or `codeops/codeops.json` is a symlink or not a regular file; never write through a link.
+
+- `--with-discovery`: set `discovery.enabled: true`, keeping every other key. When no file exists, create the minimal AR-35 file with the layout resolved from `_shared/layout-convention.md` (`nested` → `codeops`, `flat` → `.`):
+  ```json
+  {
+    "schema": 1,
+    "mode": "strict",
+    "artifacts": { "layout": "flat", "root": "." },
+    "discovery": { "enabled": true }
+  }
+  ```
+  A newly created file always contains the `discovery` object. Preview the config change, then write it.
+- `--without-discovery`: set `discovery.enabled: false`, keeping `chatMaxQuestions` and every other key. When no config exists, change no config; the managed line is simply removed.
+- **Managed block (derived state).** On every run, including runs with neither flag, render this line immediately after `Specialist coverage:` when `discovery.enabled` is true:
+  `- Discovery: enabled — question rounds open in the local Discovery page`
+  Keep exactly one copy and replace it in place. On `--without-discovery` remove it by full-line match, including the em dash. Write with the file's dominant line ending. If the `CODEOPS-PROJECT` markers are missing, duplicated, or reversed, stop without writing and name the manual fix. The `CODEOPS-SPECIALISTS` block stays byte-for-byte.
+
 Keep `AGENTS.md` small. Operational routing belongs in `codeops/codeops.json` or `opencode.json`, not prose.
 
 ---

@@ -43,6 +43,10 @@ as a suggestion only, more than one or an invalid level is an argument error; an
 [../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. The
 run clears the level before its final summary.
 
+## Discovery option
+
+If `$ARGUMENTS` contains exactly one exact standalone `--no-discovery` token before the first `--` sentinel, remove it before resolving targets, paths, or modes; more than one occurrence is invalid; when present, every finding stays in chat for this run. Read [../../_shared/discovery.md](../../_shared/discovery.md) when Discovery applies.
+
 Run a rigorous quality audit of the artifact named in `$ARGUMENTS`, **grounded in the actual
 codebase**. Find every issue, ambiguity, contradiction, gap, and risk; verify every claim and
 assumption against the real code; present each finding with options + a recommendation; iterate
