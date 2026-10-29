@@ -4,7 +4,8 @@
  * A deferral is only valid when decision, owner, and revisit are all filled in.
  * The switch therefore opens a local draft: the parent is told about the
  * deferral only once it is complete, so an in-progress edit is never sent to
- * the server as an invalid patch.
+ * the server as an invalid patch. The partial draft is reported separately as
+ * incomplete work so navigation can reveal the missing fields.
  *
  * @module views/DeferFields
  */
@@ -17,12 +18,19 @@ import type { Defer } from "../../../bin/lib/discovery-rules.mjs"
 export interface DeferFieldsProps {
   defer: Defer | null
   disabled: boolean
+  /** Changes when local drafts are discarded, resetting this control. */
+  resetKey?: string
   onChange: (defer: Defer | null) => void
   onFlush?: () => void
+  /** Reports whether the local deferral still needs input. */
+  onIncomplete?: (incomplete: boolean, reason?: string) => void
 }
 
 /** The empty draft used before a deferral is saved. */
 const EMPTY_DEFER: Defer = { decision: "", owner: "", revisit: "" }
+
+/** The reason shown when the deferral cannot be sent yet. */
+const INCOMPLETE_REASON = "Complete the deferral decision, owner, and revisit fields."
 
 /** True when all three deferral fields carry text. */
 function complete(defer: Defer): boolean {
@@ -34,20 +42,51 @@ function complete(defer: Defer): boolean {
 }
 
 /** Render the deferral switch and its three inputs. */
-export function DeferFields({ defer, disabled, onChange, onFlush = () => {} }: DeferFieldsProps) {
+export function DeferFields({
+  defer,
+  disabled,
+  resetKey = "0",
+  onChange,
+  onFlush = () => {},
+  onIncomplete = () => {},
+}: DeferFieldsProps) {
   const [active, setActive] = useState(defer !== null)
   const [draft, setDraft] = useState<Defer>(defer ?? EMPTY_DEFER)
   const focused = useRef(false)
+  const dirty = useRef(false)
+  const incompleteRef = useRef(onIncomplete)
+  incompleteRef.current = onIncomplete
+  const draftRef = useRef(draft)
+  draftRef.current = draft
 
   useEffect(() => {
     if (defer !== null) setActive(true)
-    if (!focused.current) setDraft(defer ?? EMPTY_DEFER)
+    // A live refresh must not replace a dirty partial deferral. The explicit
+    // discard path changes resetKey and clears it instead.
+    if (!focused.current && !(dirty.current && !complete(draftRef.current))) {
+      setDraft(defer ?? EMPTY_DEFER)
+      if (defer !== null) dirty.current = false
+    }
   }, [defer])
+
+  useEffect(() => {
+    setActive(defer !== null)
+    setDraft(defer ?? EMPTY_DEFER)
+    dirty.current = false
+    focused.current = false
+    incompleteRef.current(false)
+  }, [resetKey])
 
   const update = (field: keyof Defer, value: string) => {
     const next = { ...draft, [field]: value }
+    dirty.current = true
     setDraft(next)
-    if (complete(next)) onChange(next)
+    if (complete(next)) {
+      incompleteRef.current(false)
+      onChange(next)
+    } else {
+      incompleteRef.current(true, INCOMPLETE_REASON)
+    }
   }
 
   const blur = () => {
@@ -55,6 +94,9 @@ export function DeferFields({ defer, disabled, onChange, onFlush = () => {} }: D
     if (complete(draft)) {
       onChange(draft)
       onFlush()
+      incompleteRef.current(false)
+    } else if (active) {
+      incompleteRef.current(true, INCOMPLETE_REASON)
     }
   }
 
@@ -67,8 +109,12 @@ export function DeferFields({ defer, disabled, onChange, onFlush = () => {} }: D
         onChange={(_, data) => {
           setActive(data.checked)
           if (!data.checked) {
-            setDraft({ decision: "", owner: "", revisit: "" })
+            setDraft(EMPTY_DEFER)
+            dirty.current = false
+            incompleteRef.current(false)
             onChange(null)
+          } else {
+            incompleteRef.current(true, INCOMPLETE_REASON)
           }
         }}
       />

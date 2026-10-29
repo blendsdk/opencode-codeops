@@ -28,7 +28,6 @@ export type ApiResult<T> =
   | { ok: true; data: T }
   | { ok: false; kind: ApiErrorKind; status?: number; message: string }
 
-
 /** One registered checkout. */
 export interface ProjectInfo {
   slug: string
@@ -68,6 +67,11 @@ export interface PlanResponse {
   plan: PlanRecordLike
 }
 
+/** A save acknowledgement; the server returns the plan but not the project. */
+export interface SavePlanResponse {
+  plan: PlanRecordLike
+}
+
 export interface SubmitResponse {
   submission: { id: number; groups: string[]; count: number }
   skipped: Array<{ group: string; missing: unknown[] }>
@@ -85,7 +89,7 @@ export interface DiscoveryApi {
     key: string,
     baseRevision: number,
     patch: Record<string, unknown>,
-  ): Promise<ApiResult<PlanResponse>>
+  ): Promise<ApiResult<SavePlanResponse>>
   submit(
     project: string,
     plan: string,

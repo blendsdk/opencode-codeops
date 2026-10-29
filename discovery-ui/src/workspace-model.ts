@@ -9,7 +9,8 @@
  * @module workspace-model
  */
 
-import type { PlanView } from "./view-models.ts"
+import type { PlanView, QuestionView } from "./view-models.ts"
+import type { PlanPatch } from "./plan-editor.ts"
 import type { WorkspaceTarget } from "./route.ts"
 
 /** The outcome of resolving a requested destination. */
@@ -103,4 +104,182 @@ export function nextWorkspace(plan: PlanView, currentKey: string): WorkspaceTarg
     if (group.key !== currentKey) return { kind: "group", key: group.key }
   }
   return { kind: "summary" }
+}
+
+/** One group's display-only progress summary. */
+export interface WorkspaceGroup {
+  key: string
+  title: string
+  locked: boolean
+  complete: boolean
+  empty: boolean
+  ready: boolean
+  pendingCount: number
+  readyCount: number
+}
+
+/** The progress numbers shared by the header, navigation, rail, and summary. */
+export interface WorkspaceView {
+  groups: WorkspaceGroup[]
+  completedGroups: number
+  totalGroups: number
+  answeredQuestions: number
+  visibleQuestions: number
+  /** The next actionable destination, used by the context rail. */
+  next: WorkspaceTarget
+}
+
+/** True when a visible question carries an effective, settled answer. */
+function isAnswered(question: QuestionView): boolean {
+  if (question.changed || question.conflict !== null || question.proposal !== null) return false
+  if (question.statusKey === "submitted" || question.statusKey === "recorded") {
+    return question.storedAnswer !== null
+  }
+  return question.statusKey === "answered"
+}
+
+/**
+ * Derive the display progress for a plan.
+ *
+ * Readiness still comes from the shared rules; this function only turns the
+ * existing group missing reasons and question statuses into counts. It never
+ * parses the human-readable summary.
+ *
+ * @param plan - The plan view, with any display overlay already applied.
+ * @returns Group progress plus the plan-wide answered/visible counts.
+ */
+export function workspaceView(plan: PlanView): WorkspaceView {
+  const groups: WorkspaceGroup[] = plan.groups.map((group) => {
+    const pending = group.questions.filter(
+      (question) => question.statusKey !== "submitted" && question.statusKey !== "recorded",
+    )
+    const blocking = group.missing.filter((entry) => entry.reason !== "nothing-to-submit")
+    return {
+      key: group.key,
+      title: group.title,
+      locked: group.locked,
+      complete:
+        group.questions.length > 0 &&
+        group.questions.every(
+          (question) =>
+            question.statusKey === "submitted" || question.statusKey === "recorded",
+        ),
+      empty: group.questions.length === 0,
+      ready: group.ready,
+      pendingCount: pending.length,
+      readyCount: group.ready
+        ? pending.length
+        : Math.max(0, pending.length - blocking.length),
+    }
+  })
+  const populated = groups.filter((group) => !group.empty)
+  const visibleQuestions = plan.groups.reduce(
+    (total, group) => total + group.questions.length,
+    0,
+  )
+  const answeredQuestions = plan.groups.reduce(
+    (total, group) => total + group.questions.filter(isAnswered).length,
+    0,
+  )
+  return {
+    groups,
+    completedGroups: populated.filter((group) => group.complete).length,
+    totalGroups: populated.length,
+    answeredQuestions,
+    visibleQuestions,
+    next: selectWorkspace(plan).target,
+  }
+}
+
+/** Apply a draft answer to the display fields of one question view. */
+function overlayAnswer(question: QuestionView, answer: NonNullable<PlanPatch["answer"]>): QuestionView {
+  const cleared = {
+    ...question,
+    options: question.options.map((option) => ({ ...option, selected: false })),
+    text: null,
+    other: null,
+  }
+  if (Array.isArray(answer.choices)) {
+    const selected = new Set(answer.choices)
+    return {
+      ...cleared,
+      options: question.options.map((option) => ({
+        ...option,
+        selected: selected.has(option.id),
+      })),
+    }
+  }
+  if (typeof answer.choice === "string") {
+    return {
+      ...cleared,
+      options: question.options.map((option) => ({
+        ...option,
+        selected: option.id === answer.choice,
+      })),
+    }
+  }
+  if (typeof answer.text === "string") {
+    return { ...cleared, text: answer.text }
+  }
+  if (typeof answer.other === "string") {
+    return { ...cleared, other: answer.other }
+  }
+  return cleared
+}
+
+/** Apply one patch to a question view without touching rule-derived fields. */
+function overlayQuestion(
+  question: QuestionView,
+  patch: PlanPatch | undefined,
+  error: string | undefined,
+): QuestionView {
+  if (patch === undefined && error === undefined) return question
+  let next = question
+  if (patch?.answer !== undefined) {
+    next = patch.answer === null
+      ? {
+          ...question,
+          options: question.options.map((option) => ({ ...option, selected: false })),
+          text: null,
+          other: null,
+        }
+      : overlayAnswer(question, patch.answer)
+  }
+  if (patch?.notes !== undefined) next = { ...next, notes: patch.notes }
+  if (patch?.defer !== undefined) next = { ...next, defer: patch.defer }
+  if (patch?.needsDiscussion !== undefined) next = { ...next, needsDiscussion: patch.needsDiscussion }
+  return {
+    ...next,
+    hasDraft: patch !== undefined,
+    error: error ?? next.error,
+  }
+}
+
+/**
+ * Overlay unsaved drafts on a plan for rendering.
+ *
+ * Only display fields change. Visibility, readiness, counts, and submit lists
+ * still come from the accepted server snapshot.
+ *
+ * @param plan - The accepted plan view.
+ * @param drafts - Pending patches keyed by question.
+ * @param errors - Per-question save or validation errors.
+ * @returns A new plan view whose question controls show the drafts.
+ */
+export function applyDrafts(
+  plan: PlanView,
+  drafts: Record<string, PlanPatch>,
+  errors: Record<string, string> = {},
+): PlanView {
+  const apply = (question: QuestionView) =>
+    overlayQuestion(question, drafts[question.key], errors[question.key])
+  return {
+    ...plan,
+    groups: plan.groups.map((group) => ({
+      ...group,
+      questions: group.questions.map(apply),
+    })),
+    retired: plan.retired.map(apply),
+    hidden: plan.hidden.map(apply),
+  }
 }

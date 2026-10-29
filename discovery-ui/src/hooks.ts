@@ -130,6 +130,27 @@ export interface PlanEventsState {
 }
 
 /**
+ * Warn before a tab close or reload while local work is unfinished.
+ *
+ * The listener is effect-scoped and never persists an answer. Browsers decide
+ * whether to show their native confirmation; the app never claims a write
+ * completed after the page is gone.
+ *
+ * @param active - True while drafts, incomplete work, or a recheck remain.
+ */
+export function useUnloadGuard(active: boolean): void {
+  useEffect(() => {
+    if (!active || typeof window === "undefined") return
+    const warn = (event: BeforeUnloadEvent) => {
+      event.preventDefault()
+      event.returnValue = ""
+    }
+    window.addEventListener("beforeunload", warn)
+    return () => window.removeEventListener("beforeunload", warn)
+  }, [active])
+}
+
+/**
  * Subscribe to a plan's server-sent events.
  *
  * `changed` calls `onChanged`; `delivered` calls `onDelivered`. A connection

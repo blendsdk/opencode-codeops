@@ -12,6 +12,8 @@ import {
   DialogContent,
   DialogSurface,
   DialogTitle,
+  MessageBar,
+  MessageBarBody,
   Text,
 } from "@fluentui/react-components"
 
@@ -23,12 +25,27 @@ export interface SubmitDialogProps {
   ready: string[]
   skipped: Array<{ group: string; title: string; label: string }>
   confirmLabel: string
+  /** A submission or action failure shown inside the dialog. */
+  error?: string | null
+  /** Disables both actions while the work is in flight. */
+  busy?: boolean
   onConfirm: () => void
   onClose: () => void
 }
 
 /** Render the confirmation dialog. */
-export function SubmitDialog({ open, title, intro, ready, skipped, confirmLabel, onConfirm, onClose }: SubmitDialogProps) {
+export function SubmitDialog({
+  open,
+  title,
+  intro,
+  ready,
+  skipped,
+  confirmLabel,
+  error = null,
+  busy = false,
+  onConfirm,
+  onClose,
+}: SubmitDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(_, data) => (data.open ? undefined : onClose())}>
       <DialogSurface>
@@ -46,13 +63,18 @@ export function SubmitDialog({ open, title, intro, ready, skipped, confirmLabel,
                 Skipped {entry.title}: {entry.label}
               </Text>
             ))}
+            {error ? (
+              <MessageBar intent="error">
+                <MessageBarBody>{error}</MessageBarBody>
+              </MessageBar>
+            ) : null}
           </DialogContent>
           <DialogActions>
-            <Button appearance="secondary" onClick={onClose}>
+            <Button appearance="secondary" disabled={busy} onClick={onClose}>
               Cancel
             </Button>
-            <Button appearance="primary" onClick={onConfirm}>
-              {confirmLabel}
+            <Button appearance="primary" disabled={busy} onClick={onConfirm}>
+              {busy ? "Working…" : confirmLabel}
             </Button>
           </DialogActions>
         </DialogBody>

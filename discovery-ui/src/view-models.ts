@@ -78,6 +78,7 @@ export interface OptionView {
 /** One question as the page renders it. */
 export interface QuestionView {
   key: string
+  group: string
   title: string
   why: string | null
   evidence: string[]
@@ -85,7 +86,11 @@ export interface QuestionView {
   options: OptionView[]
   text: string | null
   other: string | null
+  /** The answer stored on the server, before any implied answer. */
+  storedAnswer: Answer | null
   implied: { by: string[]; label: string } | null
+  /** True when the user's explicit answer differs from an implied one. */
+  overridesImplied: boolean
   conflict: { sources: string[]; label: string } | null
   changed: boolean
   proposal: { label: string } | null
@@ -96,6 +101,14 @@ export interface QuestionView {
   defer: Defer | null
   needsDiscussion: boolean
   recommendation: string | null
+  /** True when the question is currently hidden by its conditions. */
+  hidden: boolean
+  /** True when a republish removed the question's group. */
+  removedGroup: boolean
+  /** True when the editor holds an unsaved patch for this question. */
+  hasDraft: boolean
+  /** A save or validation error attached to this question. */
+  error: string | null
 }
 
 /** One group as the page renders it. */
@@ -125,6 +138,8 @@ export interface PlanView {
   counts: PlanCounts
   groups: GroupView[]
   retired: QuestionView[]
+  /** Current questions hidden by their conditions, retained for draft review. */
+  hidden: QuestionView[]
   submitAll: {
     ready: string[]
     skipped: Array<{ group: string; title: string; label: string }>
@@ -220,6 +235,7 @@ function questionView(
   question: StoredQuestionLike,
   evaluation: ReturnType<typeof evaluatePlan>,
   entry: EvaluationEntry,
+  flags: { hidden: boolean; removedGroup: boolean },
 ): QuestionView {
   const effective = entry.effective
   const selectedIds = new Set<string>()
@@ -252,6 +268,7 @@ function questionView(
 
   return {
     key: question.key,
+    group: question.group,
     title: question.title,
     why: question.why ?? null,
     evidence: [...(question.evidence ?? [])],
@@ -265,7 +282,9 @@ function questionView(
     })),
     text: effective && typeof effective.text === "string" ? effective.text : null,
     other: effective && typeof effective.other === "string" ? effective.other : null,
+    storedAnswer: question.state.answer ?? null,
     implied,
+    overridesImplied: entry.overridesImplied === true,
     conflict,
     changed: question.state.changed,
     proposal,
@@ -278,6 +297,10 @@ function questionView(
     recommendation: Array.isArray(recommended)
       ? recommended.join(", ")
       : (recommended ?? null),
+    hidden: flags.hidden,
+    removedGroup: flags.removedGroup,
+    hasDraft: false,
+    error: null,
   }
 }
 
@@ -312,23 +335,37 @@ export function planView(record: PlanRecordLike): PlanView {
   const evaluation = evaluatePlan(record, state)
   const counts = planCounts(record, state, evaluation)
   const ordered = orderGroups(record.groups)
+  const groupKeys = new Set(record.groups.map((group) => group.key))
+  const views = new Map<string, QuestionView>()
   const retired: QuestionView[] = []
-  const groups: GroupView[] = []
+  const hidden: QuestionView[] = []
 
+  // Build every question once. Retired and removed-group questions leave the
+  // form but stay inspectable; hidden questions keep their metadata so a
+  // retained draft can be reviewed in the summary.
+  for (const question of record.questions) {
+    const entry = evaluation.questions.get(question.key)
+    if (entry === undefined) continue
+    const removedGroup = !groupKeys.has(question.group)
+    const view = questionView(question, evaluation, entry, {
+      hidden: entry.visible !== true,
+      removedGroup,
+    })
+    views.set(question.key, view)
+    if (question.state.status === "retired" || removedGroup) retired.push(view)
+    else if (entry.visible !== true) hidden.push(view)
+  }
+
+  const groups: GroupView[] = []
   for (const group of ordered) {
     const readiness = groupReadiness(record, state, evaluation, group.key)
     const locked = evaluation.lockedGroups.has(group.key)
-    const questions = []
+    const questions: QuestionView[] = []
     for (const question of record.questions) {
       if (question.group !== group.key) continue
-      const entry = evaluation.questions.get(question.key)
-      if (entry === undefined) continue
-      if (question.state.status === "retired") {
-        retired.push(questionView(question, evaluation, entry))
-        continue
-      }
-      if (entry.visible !== true) continue
-      questions.push(questionView(question, evaluation, entry))
+      const view = views.get(question.key)
+      if (view === undefined || view.hidden) continue
+      questions.push(view)
     }
     const pending = questions.filter(
       (question) => question.statusKey !== "submitted" && question.statusKey !== "recorded",
@@ -381,6 +418,7 @@ export function planView(record: PlanRecordLike): PlanView {
     counts,
     groups,
     retired,
+    hidden,
     submitAll: { ready, skipped },
   }
 }

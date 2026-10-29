@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-29 09:18
-> **Progress**: 8/37 tasks (22%)
+> **Last Updated**: 2026-10-29 09:54
+> **Progress**: 18/37 tasks (49%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -71,37 +71,41 @@ dispatch. Any missing role uses a complete generic packet without weakening revi
 
 ## Phase 2: Reliable editing and navigation
 
-> **Phase baseline tree**: _(record at execution start)_
+> **Phase baseline tree**: `e32940e3092078b90f30f336e9c119b4b598c9a1`
 > **Reasoning**: high — asynchronous writes, live events and navigation must not lose drafts
-> **Expected modification set**: `discovery-ui/src/{plan-editor,navigation,app,hooks,api,view-models,workspace-model}.ts*`, `views/{QuestionCard,DeferFields,GroupSection,PlanPage}.tsx`, editing redesign test suites
+> **Expected modification set**: `discovery-ui/src/{plan-editor,navigation,app,hooks,api,view-models,workspace-model}.ts*`, `views/{QuestionCard,DeferFields,GroupSection,PlanPage,DiscoveryHeader,PlanNavigation,DecisionSummary}.tsx`, `views/workspace-styles.ts`, `main.tsx`, editing redesign test suites
 > **Test split**: Phase 2 owns the pure halves of ST-10–ST-20; the disclosure/summary-link halves of ST-13/ST-20 run in Phase 3
 > **Scope mode**: strict
+>
+> **Shell scaffolding note**: this phase creates the initial shared header, plan navigation, decision summary, workspace styles, and browser shell wiring because the editor must stay mounted and the SSR contract must keep working across group changes. Phase 3 still owns their completion and verification against ST-21–ST-27; the Phase 3 tasks remain authoritative for those components.
 
 ### Step 2.1: Specification tests
 
 **Reference:** 03-02; 07 ST-10–ST-20; AR-3, AR-6, AR-9.
 **Objective:** encode observable save/navigation interleavings before replacing the current handler.
 
-- [ ] 2.1.1 [spec-author] Write the pure halves of ST-10–ST-20 in `scripts/discovery-ui-redesign-editing.spec.test.mjs`, using controlled API promises, Node timers, and the pure navigation gate for ST-13/ST-14
-- [ ] 2.1.2 Run the editing suite red and record the result
+- [x] 2.1.1 [spec-author] Write the pure halves of ST-10–ST-20 in `scripts/discovery-ui-redesign-editing.spec.test.mjs`, using controlled API promises, Node timers, and the pure navigation gate for ST-13/ST-14 ✅ (completed: 2026-10-29 09:54)
+- [x] 2.1.2 Run the editing suite red and record the result ✅ (completed: 2026-10-29 09:54)
 
 ### Step 2.2: Implementation
 
-- [ ] 2.2.1 Add `discovery-ui/src/plan-editor.ts` pending field patches, debounce, serialized writes, acknowledgement tracking, and `discard`/`discardAll` — 03-02 §State and interface / §Editing and acknowledgement
-- [ ] 2.2.2 Implement `SubmitOutcome`, refresh/recheck/retry/submission state, `delivery`/`missing`/`lastError`, and the per-question `incomplete` map in `plan-editor.ts` — 03-02 §Live refresh and concurrency / §Errors and submission
-- [ ] 2.2.3 Wire `PlanRoute` in `app.tsx` to the plan-local editor, correct the save-response type in `api.ts`, and keep the initial-data render contract — 03-02 §State and interface
-- [ ] 2.2.4 Add `navigation.ts` (pure request/commit/cancel gate), the displayed/requested route boundary in `app.tsx`, and `useHashRoute` navigate/replace plus popstate/unload effects in `hooks.ts` — 03-02 §Navigation boundary
-- [ ] 2.2.5 Add `QuestionView.storedAnswer`/`overridesImplied`, the `applyDrafts` display overlay, and wire unfinished drafts/error disclosure through `QuestionCard.tsx`, `DeferFields.tsx`, `GroupSection.tsx`, and `PlanPage.tsx` — 03-02 §Editing and acknowledgement; 03-03 §Questions and details
-- [ ] 2.2.6 Run the pure halves of ST-10–ST-20 green; verify existing API/rules/SSR suites remain green
+- [x] 2.2.1 Add `discovery-ui/src/plan-editor.ts` pending field patches, debounce, serialized writes, acknowledgement tracking, and `discard`/`discardAll` — 03-02 §State and interface / §Editing and acknowledgement ✅ (completed: 2026-10-29 09:54)
+- [x] 2.2.2 Implement `SubmitOutcome`, refresh/recheck/retry/submission state, `delivery`/`missing`/`lastError`, and the per-question `incomplete` map in `plan-editor.ts` — 03-02 §Live refresh and concurrency / §Errors and submission ✅ (completed: 2026-10-29 09:54)
+- [x] 2.2.3 Wire `PlanRoute` in `app.tsx` to the plan-local editor, correct the save-response type in `api.ts`, and keep the initial-data render contract — 03-02 §State and interface ✅ (completed: 2026-10-29 09:54)
+- [x] 2.2.4 Add `navigation.ts` (pure request/commit/cancel gate), the displayed/requested route boundary in `app.tsx`, and `useHashRoute` navigate/replace plus popstate/unload effects in `hooks.ts` — 03-02 §Navigation boundary ✅ (completed: 2026-10-29 09:54)
+- [x] 2.2.5 Add `QuestionView.storedAnswer`/`overridesImplied`, the `applyDrafts` display overlay, and wire unfinished drafts/error disclosure through `QuestionCard.tsx`, `DeferFields.tsx`, `GroupSection.tsx`, and `PlanPage.tsx` — 03-02 §Editing and acknowledgement; 03-03 §Questions and details ✅ (completed: 2026-10-29 09:54)
+- [x] 2.2.6 Run the pure halves of ST-10–ST-20 green; verify existing API/rules/SSR suites remain green ✅ (completed: 2026-10-29 09:54)
 
 ### Step 2.3: Implementation tests and verification
 
-- [ ] 2.3.1 Add `scripts/discovery-ui-redesign-editing.impl.test.mjs` for disposal, timer cleanup, operation ordering, coalesced refresh edges, discard/terminal states, and navigation-gate interleavings
-- [ ] 2.3.2 Full verify and independent correctness/concurrency review; resolve required findings
+- [x] 2.3.1 Add `scripts/discovery-ui-redesign-editing.impl.test.mjs` for disposal, timer cleanup, operation ordering, coalesced refresh edges, discard/terminal states, and navigation-gate interleavings ✅ (completed: 2026-10-29 09:54)
+- [x] 2.3.2 Full verify and independent correctness/concurrency review; resolve required findings ✅ (completed: 2026-10-29 09:54)
 
 **Deliverables:** awaitable saves, honest status, explicit discard/terminal exits, observable submit
 outcomes, guarded navigation and live refresh integration.
 **Verify:** `npm run verify`.
+
+> **Phase 2 evidence**: Red run — the editing suite failed at import because `plan-editor.ts` and `navigation.ts` did not exist. Green run — the editing spec/impl suites pass; the full `npm run verify` passes 651 tests. Independent correctness/concurrency review found four MAJOR defects (recheck could not clear after review; save revision was captured at drain time; the deleted state had no working exit; the unload guard was missing) plus ten MINOR items. All were fixed. The single re-review found two residual MAJOR issues (a save 404 was misread as a deleted plan; a hidden blocked draft had no discard path); both were fixed and covered by new cases before the phase closed. No further review pass was requested.
 
 ## Phase 3: Fluent UI workspace
 

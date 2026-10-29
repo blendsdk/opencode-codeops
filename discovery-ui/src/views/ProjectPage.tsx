@@ -20,7 +20,7 @@ export function ProjectPage({ project, plans }: ProjectPageProps) {
   const [showArchived, setShowArchived] = useState(false)
   const visible = showArchived ? plans : plans.filter((plan) => !plan.archived)
   return (
-    <main>
+    <main id="main-content">
       <h1>{project.name}</h1>
       <Text size={200}>
         {project.slug}

@@ -6,6 +6,10 @@
  * text, so no HTML or Markdown is ever interpreted. Text-like edits report a
  * blur so the parent can flush its debounced save.
  *
+ * Supplementary controls live in a disclosure that keeps its children
+ * mounted. Collapsing it therefore never destroys a partial deferral or a
+ * note draft.
+ *
  * @module views/QuestionCard
  */
 
@@ -26,14 +30,22 @@ import {
 } from "@fluentui/react-components"
 
 import { DeferFields } from "./DeferFields.tsx"
+import { useWorkspaceStyles } from "./workspace-styles.ts"
 import type { OptionView, QuestionView } from "../view-models.ts"
 
 /** Props for {@link QuestionCard}. */
 export interface QuestionCardProps {
   question: QuestionView
   disabled?: boolean
+  /** Changes when local drafts are discarded, resetting uncontrolled fields. */
+  resetKey?: string
   onPatch?: (patch: Record<string, unknown>) => void
   onFlush?: () => void
+  onDiscard?: (key: string) => void
+  onIncomplete?: (key: string, value: boolean, reason?: string) => void
+  onRetry?: (key?: string) => void
+  /** Hides Retry while a recheck requires explicit review. */
+  retryDisabled?: boolean
 }
 
 /** The label of a choice option, with its recommendation badge. */
@@ -50,7 +62,7 @@ function optionLabel(option: OptionView) {
 interface DraftTextProps {
   /** Accessible name; the visible question title is rendered by the card. */
   ariaLabel: string
-  /** The last value saved by the server. */
+  /** The last value saved by the server or the current display overlay. */
   value: string
   /** Disables the field. */
   disabled?: boolean
@@ -58,6 +70,8 @@ interface DraftTextProps {
   multiline?: boolean
   /** Placeholder shown while the draft is empty. */
   placeholder?: string
+  /** Resets the local draft after an explicit discard. */
+  resetKey?: string
   /** Receives the complete draft after every edit. */
   onChange: (value: string) => void
   /** Called when focus leaves so a pending debounced save can flush. */
@@ -80,6 +94,7 @@ function DraftText({
   disabled = false,
   multiline = false,
   placeholder,
+  resetKey = "0",
   onChange,
   onFlush = () => {},
 }: DraftTextProps) {
@@ -98,6 +113,13 @@ function DraftText({
       dirty.current = false
     }
   }, [value])
+
+  useEffect(() => {
+    setDraft(value)
+    draftRef.current = value
+    dirty.current = false
+    focused.current = false
+  }, [resetKey])
 
   const update = (next: string) => {
     dirty.current = true
@@ -147,18 +169,34 @@ function DraftText({
 export function QuestionCard({
   question,
   disabled = false,
+  resetKey = "0",
   onPatch = () => {},
   onFlush = () => {},
+  onDiscard = () => {},
+  onIncomplete = () => {},
+  onRetry = () => {},
+  retryDisabled = false,
 }: QuestionCardProps) {
+  const styles = useWorkspaceStyles()
   const readOnly = disabled || question.readOnly
   const selected = question.options.find((option) => option.selected)?.id
+  const [detailsOpen, setDetailsOpen] = useState(
+    question.defer !== null || question.needsDiscussion || question.error !== null,
+  )
+
+  const hasDefer = question.defer !== null
+  const hasDiscussion = question.needsDiscussion
+  const hasError = question.error !== null
+
+  useEffect(() => {
+    if (hasDefer || hasDiscussion || hasError) setDetailsOpen(true)
+  }, [hasDefer, hasDiscussion, hasError])
+
+  const detailsId = `${question.key}-details`
 
   return (
-    <section
-      aria-label={question.title}
-      style={{ border: "1px solid var(--colorNeutralStroke2)", borderRadius: 8, padding: 12, marginBlock: 8 }}
-    >
-      <header style={{ display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }}>
+    <section className={styles.card} aria-label={question.title}>
+      <header className={styles.groupHeader}>
         <Text weight="semibold">{question.title}</Text>
         <Badge appearance="tint">{question.statusLabel}</Badge>
         {question.implied ? (
@@ -166,6 +204,7 @@ export function QuestionCard({
             Implied
           </Badge>
         ) : null}
+        {question.hasDraft ? <Badge color="warning">Unsaved changes</Badge> : null}
       </header>
       {question.why ? <Text size={200}>{question.why}</Text> : null}
       {question.evidence.length > 0 ? (
@@ -179,9 +218,19 @@ export function QuestionCard({
           {question.implied.label}
         </Text>
       ) : null}
+      {question.overridesImplied ? (
+        <Text size={200} className={styles.muted}>
+          This answer overrides the implied answer.
+        </Text>
+      ) : null}
       {question.conflict ? (
         <MessageBar intent="warning">
           <MessageBarBody>{question.conflict.label}</MessageBarBody>
+        </MessageBar>
+      ) : null}
+      {question.error ? (
+        <MessageBar intent="error">
+          <MessageBarBody>{question.error}</MessageBarBody>
         </MessageBar>
       ) : null}
       {question.changed ? (
@@ -213,6 +262,7 @@ export function QuestionCard({
           ariaLabel={question.title}
           disabled={readOnly}
           multiline
+          resetKey={resetKey}
           value={question.text ?? ""}
           onChange={(text) => onPatch({ answer: { text } })}
           onFlush={onFlush}
@@ -253,6 +303,7 @@ export function QuestionCard({
               ariaLabel={`${question.title} other`}
               disabled={readOnly}
               placeholder="Other"
+              resetKey={resetKey}
               value={question.other ?? ""}
               onChange={(other) => onPatch({ answer: { other } })}
               onFlush={onFlush}
@@ -261,12 +312,40 @@ export function QuestionCard({
         </>
       )}
 
-      <div style={{ display: "grid", gap: 8, marginTop: 12 }}>
+      <div className={styles.actionRow}>
+        <Button
+          appearance="subtle"
+          size="small"
+          aria-expanded={detailsOpen}
+          aria-controls={detailsId}
+          onClick={() => setDetailsOpen((open) => !open)}
+        >
+          Additional details
+        </Button>
+        {!detailsOpen && question.notes ? (
+          <Text size={200} className={styles.muted}>
+            Notes added
+          </Text>
+        ) : null}
+        {question.hasDraft && (readOnly || question.error !== null) ? (
+          <Button appearance="secondary" size="small" onClick={() => onDiscard(question.key)}>
+            Discard unsaved change
+          </Button>
+        ) : null}
+        {question.error !== null && !readOnly && !retryDisabled ? (
+          <Button appearance="primary" size="small" onClick={() => onRetry(question.key)}>
+            Retry
+          </Button>
+        ) : null}
+      </div>
+
+      <div id={detailsId} hidden={!detailsOpen} className={styles.details}>
         <Text size={200}>Notes</Text>
         <DraftText
           ariaLabel={`${question.title} notes`}
           disabled={readOnly}
           multiline
+          resetKey={resetKey}
           value={question.notes}
           onChange={(notes) => onPatch({ notes })}
           onFlush={onFlush}
@@ -274,8 +353,10 @@ export function QuestionCard({
         <DeferFields
           defer={question.defer}
           disabled={readOnly}
+          resetKey={resetKey}
           onChange={(defer) => onPatch({ defer })}
           onFlush={onFlush}
+          onIncomplete={(value, reason) => onIncomplete(question.key, value, reason)}
         />
         <Switch
           checked={question.needsDiscussion}
