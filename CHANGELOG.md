@@ -2,11 +2,11 @@
 
 All notable changes to CodeOps are recorded here.
 
-## Unreleased
+## 2.4.0 — 2026-10-29
 
 ### Features
 
-- discovery: enable Discovery by default for new projects created with setup-codeops
+- setup-codeops: enable Discovery by default for new projects
 
 ## 2.3.0 — 2026-10-29
 
