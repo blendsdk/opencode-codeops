@@ -169,6 +169,28 @@ instead of asking every question in chat. Questions, options, recommendations, a
 rules render in the browser; answers are saved there, and Submit wakes the OpenCode session that
 published them so it can continue.
 
+### Plan workspace
+
+The plan workspace uses a persistent group navigation column and shows one selected group at a
+time. Groups carry ready, pending, and completed cues, and a selected group stays selected while
+you inspect a locked or completed group. The plan URL, group links
+(`#/p/<project>/<plan>/groups/<key>`), and the summary link
+(`#/p/<project>/<plan>/summary`) are stable and work with browser back and forward.
+
+The action bar always shows **Submit group** for the selected group. The **Decision summary**
+lists current answers, their statuses, and links back to each group; **Submit all ready groups**
+sends every ready group from one place. Readiness and completion are labelled separately.
+
+Save state is server-backed. **Saved** appears only after the server acknowledges the write;
+**Unsaved changes** and **Saving…** show pending work, and a failed save keeps the draft with
+**Retry**. Edits survive group changes and live refreshes. A draft that can no longer be saved —
+because the question became read-only, locked, retired, hidden, or its group was removed — stays
+visible under **Unsent drafts** and can be explicitly discarded or left after confirmation.
+
+The shared header carries a real breadcrumb and a **System / Light / Dark** theme control. System
+follows the operating-system setting; an explicit choice is remembered in the browser. If storage
+is unavailable, the choice still applies for the current tab.
+
 Enable it for a project with `analyze-project --with-discovery`, or add the setting to
 `codeops/codeops.json`:
 

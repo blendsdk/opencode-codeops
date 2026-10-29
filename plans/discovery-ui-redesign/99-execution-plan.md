@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-29 10:08
-> **Progress**: 30/37 tasks (81%)
+> **Last Updated**: 2026-10-29 10:31
+> **Progress**: 35/37 tasks (95%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -160,22 +160,28 @@ retired-answer inspection, responsive styling, header identity and breadcrumb.
 **Reference:** 07 ST-28 and B1–B8; AR-9, AR-10.
 **Objective:** document and demonstrate the implemented workflow using the packed application.
 
-- [ ] 4.1.1 [spec-author] Write ST-28 in `scripts/discovery-ui-redesign-content.spec.test.mjs`
-- [ ] 4.1.2 Run ST-28 red and record the missing-documentation failures
+- [x] 4.1.1 [spec-author] Write ST-28 in `scripts/discovery-ui-redesign-content.spec.test.mjs` ✅ (completed: 2026-10-29 10:31)
+- [x] 4.1.2 Run ST-28 red and record the missing-documentation failures ✅ (completed: 2026-10-29 10:31)
 
 ### Step 4.2: Implementation
 
-- [ ] 4.2.1 Update the Discovery README section and Unreleased changelog for the redesign — R10; ST-28
-- [ ] 4.2.2 Run ST-28 and the existing Discovery/progress content suites green
+- [x] 4.2.1 Update the Discovery README section and Unreleased changelog for the redesign — R10; ST-28 ✅ (completed: 2026-10-29 10:31)
+- [x] 4.2.2 Run ST-28 and the existing Discovery/progress content suites green ✅ (completed: 2026-10-29 10:31)
 
 ### Step 4.3: Live acceptance and hardening
 
-- [ ] 4.3.1 Build a tarball and prepare isolated live fixtures covering B1–B8; record host/package identity and the checks to run
-- [ ] 4.3.2 Run B1–B8 with the user and record each outcome; fix accepted findings and recheck affected items
+- [x] 4.3.1 Build a tarball and prepare isolated live fixtures covering B1–B8; record host/package identity and the checks to run ✅ (completed: 2026-10-29 10:31)
+- [!] 4.3.2 Run B1–B8 with the user and record each outcome; fix accepted findings and recheck affected items — Blocked: awaiting the user’s browser acceptance against the prepared fixture.
 - [ ] 4.3.3 Final full verify, build/pack check, independent phase review and success-criteria check; remove owned scratch and sync the roadmap
 
 **Deliverables:** documentation and durable automated/live evidence.
 **Verify:** `npm run verify`; `npm run build:discovery`; `npm pack --dry-run`.
+
+> **ST-28 evidence**: Red run failed both documentation assertions (missing workspace/summary/theme phrases and the redesign changelog entry). Green run passes `discovery-ui-redesign-content.spec.test.mjs` and the existing Discovery content suite (9 tests total).
+
+> **Acceptance fixture (4.3.1)**: Host `Linux 7.0.0-38-generic x86_64`, Node `v24.21.0`. Packed `opencode-codeops@2.2.1` tarball sha256 `c20bfbfdcbd7695a8c594d7df1c6fca614b105565f2ca91817738c1e9e2ab90d` (568.3 kB, 136 files), extracted into the isolated scratch project `/tmp/opencode/codeops-discovery-ui-redesign/live-acceptance/scratch-project`. Discovery data: `/tmp/opencode/codeops-discovery-ui-redesign/live-acceptance/data`, project `scratch-project`, plan `acceptance`. Page: `http://127.0.0.1:39631/#/p/scratch-project/acceptance`. The fixture contains all four question types, a dependency (`Rules` locked until `Scope` submits), implied and hidden questions, a conflict, a proposal, a changed question, submitted/recorded/retired answers, a 200-character label, an empty group, and a pending delivery callback because no agent is attached. The server process is intentionally left running for B1–B8 and must be stopped after acceptance.
+
+> **Pre-acceptance verification**: `npm run verify` passes 675 tests; `npm run build:discovery` and `npm pack --dry-run` pass (136 files, 568.3 kB). The final phase review and roadmap sync stay in 4.3.3 until the user completes B1–B8.
 
 ## Dependencies
 

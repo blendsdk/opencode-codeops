@@ -7,6 +7,7 @@ All notable changes to CodeOps are recorded here.
 ### Features
 
 - discovery: answer CodeOps question rounds in a local Fluent UI page (opt-in)
+- discovery: redesign the plan workspace with group navigation, a decision summary, honest save feedback, and System/Light/Dark themes
 
 ## 2.2.1 — 2026-10-10
 
