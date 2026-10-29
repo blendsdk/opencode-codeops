@@ -2,12 +2,43 @@
 
 All notable changes to CodeOps are recorded here.
 
-## Unreleased
+## 2.3.0 — 2026-10-29
+
+### Fixes
+
+- discovery: close the browser acceptance findings
+- discovery: guard the locked-group selection rule
+
+### Documentation
+
+- discovery: mark browser acceptance as the remaining gate
+- discovery: document the redesigned plan workspace
+- discovery-ui-redesign: add the preflighted implementation plan
+- discovery: add the agent protocol and skill adoption
+- discovery: record the host spike outcomes
+- discovery: add the plan set with preflight fixes applied
 
 ### Features
 
-- discovery: answer CodeOps question rounds in a local Fluent UI page (opt-in)
-- discovery: redesign the plan workspace with group navigation, a decision summary, honest save feedback, and System/Light/Dark themes
+- discovery: complete the Fluent UI workspace
+- discovery: add guarded editing and the workspace shell
+- discovery: add workspace destinations and theme preference
+- discovery: finish the docs, live evidence, and UI fixes
+- discovery: add the Fluent UI app and packaging
+- discovery: wire the opt-in tools and waking
+- discovery: add the listener and HTTP API
+- discovery: add the store
+- discovery: add the rules and model module
+
+### Tests
+
+- discovery: add navigation and theme specification tests
+- discovery: isolate the fallback-port spec test
+
+### Chores
+
+- codeops: refresh the specialist check
+- project: refresh managed guidance
 
 ## 2.2.1 — 2026-10-10
 
