@@ -39,6 +39,8 @@ export interface QuestionCardProps {
   disabled?: boolean
   /** Changes when local drafts are discarded, resetting uncontrolled fields. */
   resetKey?: string
+  /** A local incomplete-control reason, shown beside the fields. */
+  incomplete?: string | null
   onPatch?: (patch: Record<string, unknown>) => void
   onFlush?: () => void
   onDiscard?: (key: string) => void
@@ -170,6 +172,7 @@ export function QuestionCard({
   question,
   disabled = false,
   resetKey = "0",
+  incomplete = null,
   onPatch = () => {},
   onFlush = () => {},
   onDiscard = () => {},
@@ -181,16 +184,20 @@ export function QuestionCard({
   const readOnly = disabled || question.readOnly
   const selected = question.options.find((option) => option.selected)?.id
   const [detailsOpen, setDetailsOpen] = useState(
-    question.defer !== null || question.needsDiscussion || question.error !== null,
+    question.defer !== null ||
+      question.needsDiscussion ||
+      question.error !== null ||
+      incomplete !== null,
   )
 
   const hasDefer = question.defer !== null
   const hasDiscussion = question.needsDiscussion
   const hasError = question.error !== null
+  const hasIncomplete = incomplete !== null
 
   useEffect(() => {
-    if (hasDefer || hasDiscussion || hasError) setDetailsOpen(true)
-  }, [hasDefer, hasDiscussion, hasError])
+    if (hasDefer || hasDiscussion || hasError || hasIncomplete) setDetailsOpen(true)
+  }, [hasDefer, hasDiscussion, hasError, hasIncomplete])
 
   const detailsId = `${question.key}-details`
 
@@ -208,7 +215,7 @@ export function QuestionCard({
       </header>
       {question.why ? <Text size={200}>{question.why}</Text> : null}
       {question.evidence.length > 0 ? (
-        <pre style={{ whiteSpace: "pre-wrap", fontSize: 12, marginBlock: 8 }}>
+        <pre style={{ whiteSpace: "pre-wrap", fontSize: 12, marginBlock: 8, overflowWrap: "anywhere" }}>
           {question.evidence.join("\n")}
         </pre>
       ) : null}
@@ -231,6 +238,11 @@ export function QuestionCard({
       {question.error ? (
         <MessageBar intent="error">
           <MessageBarBody>{question.error}</MessageBarBody>
+        </MessageBar>
+      ) : null}
+      {incomplete ? (
+        <MessageBar intent="warning">
+          <MessageBarBody>{incomplete}</MessageBarBody>
         </MessageBar>
       ) : null}
       {question.changed ? (
@@ -268,7 +280,7 @@ export function QuestionCard({
           onFlush={onFlush}
         />
       ) : question.type === "multiple" ? (
-        <div>
+        <div role="group" aria-label={question.title}>
           {question.options.map((option) => (
             <Checkbox
               key={option.id}

@@ -24,6 +24,7 @@ import { formatRoute } from "../route.ts"
 import type { WorkspaceTarget } from "../route.ts"
 import type { PlanView } from "../view-models.ts"
 import type { WorkspaceView } from "../workspace-model.ts"
+import { answeredLabel, groupsLabel } from "../workspace-model.ts"
 
 /** Props for {@link PlanNavigation}. */
 export interface PlanNavigationProps {
@@ -128,8 +129,7 @@ export function PlanNavigation({
         </Text>
       ) : null}
       <Text block size={200} className={styles.progressText}>
-        {progress.completedGroups} of {progress.totalGroups} groups complete ·{" "}
-        {progress.answeredQuestions} of {progress.visibleQuestions} answered
+        {groupsLabel(progress)} · {answeredLabel(progress)}
       </Text>
     </div>
   )
@@ -147,7 +147,14 @@ export function PlanNavigation({
       </aside>
       <NavDrawer
         open={open}
-        onOpenChange={(_, data) => onOpenChange(data.open)}
+        onOpenChange={(_, data) => {
+          onOpenChange(data.open)
+          if (!data.open && typeof document !== "undefined") {
+            queueMicrotask(() => {
+              document.getElementById("plan-navigation-trigger")?.focus()
+            })
+          }
+        }}
         type="overlay"
       >
         <NavDrawerHeader>

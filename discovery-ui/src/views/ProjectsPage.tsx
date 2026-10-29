@@ -16,7 +16,7 @@ export interface ProjectsPageProps {
 /** Render the projects list. */
 export function ProjectsPage({ view }: ProjectsPageProps) {
   return (
-    <main id="main-content">
+    <main id="main-content" tabIndex={-1}>
       <h1>Projects</h1>
       {view.repositories.length === 0 ? <Text>No opted-in projects yet.</Text> : null}
       {view.repositories.map((repository) => (

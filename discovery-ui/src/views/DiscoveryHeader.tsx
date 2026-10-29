@@ -55,7 +55,14 @@ export function DiscoveryHeader({
 
   return (
     <header className={styles.header}>
-      <a className={styles.skipLink} href="#main-content">
+      <a
+        className={styles.skipLink}
+        href="#main-content"
+        onClick={(event) => {
+          event.preventDefault()
+          document.getElementById("main-content")?.focus()
+        }}
+      >
         Skip to content
       </a>
       <div className={styles.headerInner}>
@@ -63,18 +70,28 @@ export function DiscoveryHeader({
           Discovery
         </a>
         <nav className={styles.breadcrumb} aria-label="Breadcrumb">
-          <a className={styles.breadcrumbLink} href="#/">
+          <a
+            className={styles.breadcrumbLink}
+            href="#/"
+            aria-current={route.view === "projects" ? "page" : undefined}
+          >
             Projects
           </a>
           {projectName !== null ? <span aria-hidden="true">›</span> : null}
           {projectName !== null ? (
-            <a className={styles.breadcrumbLink} href={`#/p/${projectSlug}`}>
+            <a
+              className={styles.breadcrumbLink}
+              href={`#/p/${projectSlug}`}
+              aria-current={planTitle === null ? "page" : undefined}
+            >
               {projectName}
             </a>
           ) : null}
           {planTitle !== null ? <span aria-hidden="true">›</span> : null}
           {planTitle !== null ? (
-            <span className={styles.breadcrumbCurrent}>{planTitle}</span>
+            <span className={styles.breadcrumbCurrent} aria-current="page">
+              {planTitle}
+            </span>
           ) : null}
         </nav>
         <div className={styles.headerActions}>
@@ -90,11 +107,11 @@ export function DiscoveryHeader({
           </RadioGroup>
           {showNavigationTrigger ? (
             <Button
+              id="plan-navigation-trigger"
               className={styles.navTrigger}
               appearance="subtle"
               icon={<NavigationRegular />}
               aria-expanded={navigationOpen}
-              aria-controls="plan-navigation"
               onClick={onToggleNavigation}
             >
               <Text size={200}>Groups</Text>

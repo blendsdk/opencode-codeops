@@ -56,6 +56,7 @@ export const useWorkspaceStyles = makeStyles({
     alignItems: "center",
     gap: tokens.spacingHorizontalXS,
     flexWrap: "wrap",
+    minWidth: 0,
     fontSize: tokens.fontSizeBase200,
     color: tokens.colorNeutralForeground2,
   },
@@ -110,6 +111,7 @@ export const useWorkspaceStyles = makeStyles({
     minWidth: 0,
     display: "grid",
     gap: tokens.spacingVerticalL,
+    paddingBlockEnd: "96px",
   },
   rail: {
     gridArea: "rail",
@@ -134,6 +136,7 @@ export const useWorkspaceStyles = makeStyles({
     margin: 0,
     fontSize: tokens.fontSizeHero700,
     lineHeight: tokens.lineHeightHero700,
+    overflowWrap: "anywhere",
   },
   groupTitle: {
     margin: 0,
@@ -150,6 +153,9 @@ export const useWorkspaceStyles = makeStyles({
     backgroundColor: tokens.colorNeutralBackground1,
     display: "grid",
     gap: tokens.spacingVerticalS,
+    minWidth: 0,
+    overflowWrap: "anywhere",
+    scrollMarginBlockEnd: "96px",
   },
   groupHeader: {
     display: "flex",
@@ -191,6 +197,7 @@ export const useWorkspaceStyles = makeStyles({
   },
   summaryAnswer: {
     fontWeight: tokens.fontWeightSemibold,
+    overflowWrap: "anywhere",
   },
   details: {
     display: "grid",
@@ -202,17 +209,12 @@ export const useWorkspaceStyles = makeStyles({
     alignItems: "center",
     gap: tokens.spacingHorizontalXS,
     width: "100%",
+    minWidth: 0,
     justifyContent: "space-between",
+    overflowWrap: "anywhere",
   },
   progressText: {
     fontSize: tokens.fontSizeBase200,
     color: tokens.colorNeutralForeground3,
-  },
-  drawerHeader: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: tokens.spacingHorizontalS,
-    padding: tokens.spacingHorizontalM,
   },
 })

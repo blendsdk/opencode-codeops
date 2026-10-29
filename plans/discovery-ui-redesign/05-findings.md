@@ -37,3 +37,26 @@
 | RV-029 | 2 | MINOR | refresh recursion bound | fixed |
 | RV-030 | 2 | MINOR | partial initial SSE | fixed |
 | RV-031 | 2 | MINOR | API whitespace | fixed |
+| RV-032 | 3 | MAJOR | skip link routing | fixed |
+| RV-033 | 3 | MAJOR | destination focus and announcement | fixed |
+| RV-034 | 3 | MAJOR | incomplete work surfacing | fixed |
+| RV-035 | 3 | MAJOR | named ST-13-ui/ST-20-ui coverage | fixed |
+| RV-036 | 3 | MINOR | zero-denominator labels | fixed |
+| RV-037 | 3 | MINOR | implied submitted answer count | fixed |
+| RV-038 | 3 | MINOR | locked/removed draft labels | fixed |
+| RV-039 | 3 | MINOR | duplicate headings | fixed |
+| RV-040 | 3 | MINOR | context-rail next group | fixed |
+| RV-041 | 3 | MINOR | long-label overflow | fixed |
+| RV-042 | 3 | MINOR | footer scroll reserve | fixed |
+| RV-043 | 3 | MINOR | multiple-choice group label | fixed |
+| RV-044 | 3 | MINOR | drawer trigger target | fixed |
+| RV-045 | 3 | MINOR | breadcrumb aria-current | fixed |
+| RV-046 | 3 | MINOR | group dialog readiness lists | fixed |
+| RV-047 | 3 | MINOR | stale Continue reset | fixed |
+| RV-048 | 3 | MINOR | count and identity coverage | fixed |
+| RV-049 | 3 | MAJOR | drawer close focus trap | fixed |
+| RV-050 | 3 | MINOR | rail next helper | fixed |
+| RV-051 | 3 | MINOR | retry for a missing question | fixed |
+| RV-052 | 3 | MINOR | incomplete summary assertion | fixed |
+| RV-053 | 3 | MINOR | loading/error skip target | fixed |
+| RV-054 | 3 | MINOR | aria-controls target | fixed |

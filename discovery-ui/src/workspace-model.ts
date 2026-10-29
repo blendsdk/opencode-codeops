@@ -133,7 +133,7 @@ export interface WorkspaceView {
 function isAnswered(question: QuestionView): boolean {
   if (question.changed || question.conflict !== null || question.proposal !== null) return false
   if (question.statusKey === "submitted" || question.statusKey === "recorded") {
-    return question.storedAnswer !== null
+    return question.storedAnswer !== null || question.implied !== null
   }
   return question.statusKey === "answered"
 }
@@ -189,6 +189,20 @@ export function workspaceView(plan: PlanView): WorkspaceView {
     visibleQuestions,
     next: selectWorkspace(plan).target,
   }
+}
+
+/** A human label for the group progress, including the zero-denominator case. */
+export function groupsLabel(progress: WorkspaceView): string {
+  return progress.totalGroups === 0
+    ? "No groups with visible questions"
+    : `${progress.completedGroups} of ${progress.totalGroups} groups complete`
+}
+
+/** A human label for the answered progress, including the empty case. */
+export function answeredLabel(progress: WorkspaceView): string {
+  return progress.visibleQuestions === 0
+    ? "No visible questions"
+    : `${progress.answeredQuestions} of ${progress.visibleQuestions} answered`
 }
 
 /** Apply a draft answer to the display fields of one question view. */

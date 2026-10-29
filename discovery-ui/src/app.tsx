@@ -120,8 +120,20 @@ function ProjectsRoute({
     }
   }, [api, repositories])
 
-  if (error !== null) return <ErrorBar message={error} />
-  if (repositories === null) return <Text>Loading…</Text>
+  if (error !== null) {
+    return (
+      <main id="main-content" tabIndex={-1}>
+        <ErrorBar message={error} />
+      </main>
+    )
+  }
+  if (repositories === null) {
+    return (
+      <main id="main-content" tabIndex={-1}>
+        <Text>Loading…</Text>
+      </main>
+    )
+  }
   return <ProjectsPage view={projectsView(repositories)} />
 }
 
@@ -163,8 +175,20 @@ function ProjectRoute({
     }
   }, [data, onIdentity, route.project])
 
-  if (error !== null) return <ErrorBar message={error} />
-  if (data === null) return <Text>Loading…</Text>
+  if (error !== null) {
+    return (
+      <main id="main-content" tabIndex={-1}>
+        <ErrorBar message={error} />
+      </main>
+    )
+  }
+  if (data === null) {
+    return (
+      <main id="main-content" tabIndex={-1}>
+        <Text>Loading…</Text>
+      </main>
+    )
+  }
   return <ProjectPage project={data.project} plans={data.plans} />
 }
 
@@ -317,7 +341,7 @@ function PlanRoute({
 
   if (snapshot.deleted) {
     return (
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <h1>Plan deleted</h1>
         <Text>This plan no longer exists. Any unsent draft was kept locally until you discard it.</Text>
         <div>
@@ -342,7 +366,7 @@ function PlanRoute({
   if (snapshot.server === null) {
     if (snapshot.lastError !== null) {
       return (
-        <main id="main-content">
+        <main id="main-content" tabIndex={-1}>
           <ErrorBar message={snapshot.lastError} onDismiss={() => setActionError(null)} />
           <Button appearance="primary" onClick={() => void editor.refresh()}>
             Retry
@@ -351,7 +375,7 @@ function PlanRoute({
       )
     }
     return (
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <Text>Loading…</Text>
       </main>
     )
@@ -359,7 +383,7 @@ function PlanRoute({
 
   if (view === null || selection === null) {
     return (
-      <main id="main-content">
+      <main id="main-content" tabIndex={-1}>
         <Text>Loading…</Text>
       </main>
     )
@@ -390,6 +414,7 @@ function PlanRoute({
       onSubmit={(group) => editor.submit(group)}
       onArchive={(archived) => void archive(archived)}
       onDelete={() => void remove()}
+      onAnnounce={announce}
       actionError={actionError}
       onDismissActionError={() => setActionError(null)}
     />
@@ -443,10 +468,11 @@ export function App({ route, api, initial, shell, navigate }: AppProps) {
         if (!settled || pending === null) {
           pendingRouteRef.current = null
           if (!settled) {
-            setNavigationNotice(
-              "Your changes are not saved yet. Retry the save or discard the draft before leaving.",
-            )
+            const message =
+              "Your changes are not saved yet. Retry the save or discard the draft before leaving."
+            setNavigationNotice(message)
             setNavigationDestination(hash)
+            setAnnouncement(message)
           }
           return
         }
@@ -535,7 +561,7 @@ export function App({ route, api, initial, shell, navigate }: AppProps) {
         />
       ) : null}
       {displayedRoute.view === "not-found" ? (
-        <main id="main-content">
+        <main id="main-content" tabIndex={-1}>
           <h1>Not found</h1>
           <Text>
             That page does not exist. <a href="#/">Back to projects</a>

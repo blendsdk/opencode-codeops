@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-29 09:54
-> **Progress**: 18/37 tasks (49%)
+> **Last Updated**: 2026-10-29 10:08
+> **Progress**: 30/37 tasks (81%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -123,28 +123,30 @@ original Discovery UI findings (Phase 6/8) and the approved production contracts
 **Reference:** 03-03; 07 ST-21–ST-27; AR-1–AR-3, AR-7–AR-9.
 **Objective:** render/model contracts for the new composition before changing views.
 
-- [ ] 3.1.1 [spec-author] Write ST-21–ST-27 and the integration halves of ST-9/ST-13/ST-20 in `scripts/discovery-ui-redesign-workspace.spec.test.mjs`, reusing the existing temp esbuild/SSR pattern
-- [ ] 3.1.2 Run the workspace suite red; record existing security/package checks that already pass
+- [x] 3.1.1 [spec-author] Write ST-21–ST-27 and the integration halves of ST-9/ST-13/ST-20 in `scripts/discovery-ui-redesign-workspace.spec.test.mjs`, reusing the existing temp esbuild/SSR pattern ✅ (completed: 2026-10-29 10:08)
+- [x] 3.1.2 Run the workspace suite red; record existing security/package checks that already pass ✅ (completed: 2026-10-29 10:08)
 
 ### Step 3.2: Implementation
 
-- [ ] 3.2.1 Add `views/DiscoveryHeader.tsx` with breadcrumb, identity slot, theme control, nav trigger, and common tokens/layout in `views/workspace-styles.ts` — 03-03 §Layout and components / §Visual reference; 03-01 §Shell coordination
-- [ ] 3.2.2 Add `views/PlanNavigation.tsx` and workspace progress derivations in `workspace-model.ts`; carry the project slug, distinguish Ready from Complete, and apply the `applyDrafts` overlay — 03-03 §Navigation and progress derivations
-- [ ] 3.2.3 Restyle `views/QuestionCard.tsx` / `DeferFields.tsx` with supplementary disclosure that keeps children mounted and a dirty-deferral guard — 03-03 §Questions and details
-- [ ] 3.2.4 Add `views/DecisionSummary.tsx` with answer/status/provenance, stored retired answers, **Unsent drafts**, and owning-group links — 03-03 §Summary and actions
-- [ ] 3.2.5 Compose selected group/summary, header, navigation and rail in `views/PlanPage.tsx`; PlanPage renders the plan heading without a second breadcrumb — 03-03 §Layout and components
-- [ ] 3.2.6 Integrate group/summary footer actions and existing dialogs in `PlanPage.tsx` / `GroupSection.tsx`; always render Submit group, recompute the dialog after flush, add the Delete discard warning, and build links from the project slug — 03-03 §Summary and actions
-- [ ] 3.2.7 Wire the optional shell object/theme/real metadata/breadcrumb in `app.tsx` and `main.tsx`; retain listing functions — 03-03 §Accessibility and states; 03-01 §Shell coordination
-- [ ] 3.2.8 Run ST-21–ST-27 and the integration halves of ST-9/ST-13/ST-20 green; existing UI specification suites unchanged
+- [x] 3.2.1 Add `views/DiscoveryHeader.tsx` with breadcrumb, identity slot, theme control, nav trigger, and common tokens/layout in `views/workspace-styles.ts` — 03-03 §Layout and components / §Visual reference; 03-01 §Shell coordination ✅ (completed: 2026-10-29 10:08)
+- [x] 3.2.2 Add `views/PlanNavigation.tsx` and workspace progress derivations in `workspace-model.ts`; carry the project slug, distinguish Ready from Complete, and apply the `applyDrafts` overlay — 03-03 §Navigation and progress derivations ✅ (completed: 2026-10-29 10:08)
+- [x] 3.2.3 Restyle `views/QuestionCard.tsx` / `DeferFields.tsx` with supplementary disclosure that keeps children mounted and a dirty-deferral guard — 03-03 §Questions and details ✅ (completed: 2026-10-29 10:08)
+- [x] 3.2.4 Add `views/DecisionSummary.tsx` with answer/status/provenance, stored retired answers, **Unsent drafts**, and owning-group links — 03-03 §Summary and actions ✅ (completed: 2026-10-29 10:08)
+- [x] 3.2.5 Compose selected group/summary, header, navigation and rail in `views/PlanPage.tsx`; PlanPage renders the plan heading without a second breadcrumb — 03-03 §Layout and components ✅ (completed: 2026-10-29 10:08)
+- [x] 3.2.6 Integrate group/summary footer actions and existing dialogs in `PlanPage.tsx` / `GroupSection.tsx`; always render Submit group, recompute the dialog after flush, add the Delete discard warning, and build links from the project slug — 03-03 §Summary and actions ✅ (completed: 2026-10-29 10:08)
+- [x] 3.2.7 Wire the optional shell object/theme/real metadata/breadcrumb in `app.tsx` and `main.tsx`; retain listing functions — 03-03 §Accessibility and states; 03-01 §Shell coordination ✅ (completed: 2026-10-29 10:08)
+- [x] 3.2.8 Run ST-21–ST-27 and the integration halves of ST-9/ST-13/ST-20 green; existing UI specification suites unchanged ✅ (completed: 2026-10-29 10:08)
 
 ### Step 3.3: Implementation tests and verification
 
-- [ ] 3.3.1 Add `scripts/discovery-ui-redesign-workspace.impl.test.mjs` for empty groups, follow-up completion changes, long labels, count edges, retired/removed-group answers, and breadcrumb identity
-- [ ] 3.3.2 Full verify, build/package checks and independent phase review; resolve required findings
+- [x] 3.3.1 Add `scripts/discovery-ui-redesign-workspace.impl.test.mjs` for empty groups, follow-up completion changes, long labels, count edges, retired/removed-group answers, and breadcrumb identity ✅ (completed: 2026-10-29 10:08)
+- [x] 3.3.2 Full verify, build/package checks and independent phase review; resolve required findings ✅ (completed: 2026-10-29 10:08)
 
 **Deliverables:** live-data Nav workspace, full question controls, summary with retained-draft and
 retired-answer inspection, responsive styling, header identity and breadcrumb.
 **Verify:** `npm run verify`; `npm run build:discovery`; `npm pack --dry-run`.
+
+> **Phase 3 evidence**: Red run — the workspace suite initially failed the single-choice checked-input assertion and the retained-draft label; the draft label exposed a real summary bug (a retained draft on a read-only/removed question showed the stored answer). Both were fixed before the green run. Green run — the workspace spec and impl suites pass 22 tests; the redesign suites plus the existing UI suites pass 115 tests. Full `npm run verify` passes 673 tests; `npm run build:discovery` passes; `npm pack --dry-run` passes with 136 files and a 567.7 kB package. Independent review found four MAJOR issues (skip link routed through the router; missing destination focus/announcement; incomplete work never surfaced; missing named ST-13-ui/ST-20-ui coverage) and thirteen MINOR items. All were fixed. The single re-review found one residual MAJOR (the drawer close left focus in a hidden nav after `unmountOnClose={false}`); the drawer now restores focus to its trigger. No further review pass was requested.
 
 ## Phase 4: Documentation and live acceptance
 

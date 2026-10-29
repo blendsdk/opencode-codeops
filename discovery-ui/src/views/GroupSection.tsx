@@ -12,10 +12,13 @@ import { Badge, MessageBar, MessageBarBody, Text } from "@fluentui/react-compone
 import { QuestionCard } from "./QuestionCard.tsx"
 import { useWorkspaceStyles } from "./workspace-styles.ts"
 import type { GroupView } from "../view-models.ts"
+import type { IncompleteWork } from "../plan-editor.ts"
 
 /** Props for {@link GroupSection}. */
 export interface GroupSectionProps {
   group: GroupView
+  /** Incomplete local controls keyed by question. */
+  incomplete?: Record<string, IncompleteWork>
   /** Per-question discard counters, used to reset local controls. */
   discardVersions?: Record<string, number>
   /** A plan-wide discard counter, used after "discard all". */
@@ -31,6 +34,7 @@ export interface GroupSectionProps {
 /** Render one group. */
 export function GroupSection({
   group,
+  incomplete = {},
   discardVersions = {},
   discardAllVersion = 0,
   onPatch = () => {},
@@ -44,15 +48,10 @@ export function GroupSection({
   return (
     <section aria-label={group.title}>
       <header className={styles.groupHeader}>
-        <h2 className={styles.groupTitle}>{group.title}</h2>
         <Badge appearance="tint">{group.summary}</Badge>
         {group.ready ? <Badge color="informative">Ready</Badge> : null}
+        {group.locked ? <Badge>Locked</Badge> : null}
       </header>
-      {group.description ? (
-        <Text size={200} className={styles.muted}>
-          {group.description}
-        </Text>
-      ) : null}
       {group.locked ? (
         <MessageBar intent="info">
           <MessageBarBody>{group.lockLabel}</MessageBarBody>
@@ -69,6 +68,7 @@ export function GroupSection({
           question={question}
           disabled={group.locked}
           resetKey={`${discardAllVersion}:${discardVersions[question.key] ?? 0}`}
+          incomplete={incomplete[question.key]?.reason ?? null}
           onPatch={(patch) => onPatch(question.key, patch)}
           onFlush={onFlush}
           onDiscard={onDiscard}

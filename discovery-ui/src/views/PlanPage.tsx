@@ -9,7 +9,7 @@
  * @module views/PlanPage
  */
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   Badge,
   Button,
@@ -26,6 +26,7 @@ import { PlanNavigation } from "./PlanNavigation.tsx"
 import { SubmitDialog } from "./SubmitDialog.tsx"
 import { useWorkspaceStyles } from "./workspace-styles.ts"
 import { applyDrafts, nextWorkspace, workspaceView } from "../workspace-model.ts"
+import { answeredLabel, groupsLabel } from "../workspace-model.ts"
 import { formatRoute } from "../route.ts"
 import type { WorkspaceTarget } from "../route.ts"
 import type { PlanEventsState } from "../hooks.ts"
@@ -59,6 +60,8 @@ export interface PlanPageProps {
   onSubmit: (group: string | null) => Promise<SubmitOutcome>
   onArchive: (archived: boolean) => void
   onDelete: () => void
+  /** Announce a submission result to the polite live region. */
+  onAnnounce?: (message: string) => void
   /** A plan-level action failure such as archive or delete. */
   actionError?: string | null
   onDismissActionError?: () => void
@@ -98,6 +101,7 @@ export function PlanPage({
   onSubmit,
   onArchive,
   onDelete,
+  onAnnounce = () => {},
   actionError = null,
   onDismissActionError = () => {},
 }: PlanPageProps) {
@@ -111,12 +115,33 @@ export function PlanPage({
   const selectedProgress = selectedGroup
     ? progress.groups.find((group) => group.key === selectedGroup.key)
     : undefined
+  const nextTarget = selectedGroup
+    ? nextWorkspace(displayPlan, selectedGroup.key)
+    : progress.next
+  const nextLabel =
+    nextTarget.kind === "summary"
+      ? "Decision summary"
+      : displayPlan.groups.find((group) => group.key === nextTarget.key)?.title ??
+        "Decision summary"
   const [submitTarget, setSubmitTarget] = useState<string | null | undefined>(undefined)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [leaveOpen, setLeaveOpen] = useState(false)
   const [dialogError, setDialogError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [submittedGroup, setSubmittedGroup] = useState<string | null>(null)
+  const headingRef = useRef<HTMLHeadingElement>(null)
+  const footerRef = useRef<HTMLDivElement>(null)
+  const targetKey = target.kind === "group" ? target.key : "summary"
+
+  useEffect(() => {
+    headingRef.current?.focus()
+  }, [targetKey])
+
+  useEffect(() => {
+    if (submittedGroup !== null && selectedProgress?.complete === false) {
+      setSubmittedGroup(null)
+    }
+  }, [selectedProgress?.complete, submittedGroup])
 
   const targetGroup =
     typeof submitTarget === "string"
@@ -140,6 +165,12 @@ export function PlanPage({
     if (outcome.ok) {
       setSubmitTarget(undefined)
       if (typeof previous === "string") setSubmittedGroup(previous)
+      footerRef.current?.focus()
+      onAnnounce(
+        outcome.delivery === "woken"
+          ? "Submitted; the agent was woken."
+          : "Submitted; delivery is pending.",
+      )
       return
     }
     setDialogError(outcome.message ?? "Submission failed.")
@@ -159,7 +190,7 @@ export function PlanPage({
   }
 
   return (
-    <main id="main-content">
+    <main id="main-content" tabIndex={-1}>
       <div className={styles.body}>
         <PlanNavigation
           plan={displayPlan}
@@ -183,15 +214,18 @@ export function PlanPage({
             <div className={styles.groupHeader}>
               <Badge appearance="outline">{displayPlan.kind}</Badge>
               <Text size={200}>
-                {progress.answeredQuestions} of {progress.visibleQuestions} answered ·{" "}
-                {progress.completedGroups} of {progress.totalGroups} groups complete
+                {answeredLabel(progress)} · {groupsLabel(progress)}
               </Text>
               {displayPlan.archived ? <Badge color="subtle">Archived</Badge> : null}
             </div>
             {selectedGroup ? (
-              <h2 className={styles.groupTitle}>{selectedGroup.title}</h2>
+              <h2 ref={headingRef} tabIndex={-1} className={styles.groupTitle}>
+                {selectedGroup.title}
+              </h2>
             ) : (
-              <h2 className={styles.groupTitle}>Decision summary</h2>
+              <h2 ref={headingRef} tabIndex={-1} className={styles.groupTitle}>
+                Decision summary
+              </h2>
             )}
             {selectedGroup?.description ? (
               <Text size={200} className={styles.muted}>
@@ -255,6 +289,7 @@ export function PlanPage({
           {selectedGroup ? (
             <GroupSection
               group={selectedGroup}
+              incomplete={snapshot.incomplete}
               discardVersions={snapshot.discardVersion}
               discardAllVersion={snapshot.discardAllVersion}
               onPatch={onPatch}
@@ -279,7 +314,7 @@ export function PlanPage({
           )}
 
           <footer className={styles.footer}>
-            <div className={styles.footerGrow}>
+            <div ref={footerRef} tabIndex={-1} className={styles.footerGrow}>
               <Text weight="semibold">{saveLabel(snapshot)}</Text>
               {snapshot.unsaved ? (
                 <Text block size={200} className={styles.muted}>
@@ -346,18 +381,27 @@ export function PlanPage({
 
         <aside className={styles.rail} aria-label="Plan progress">
           <Text weight="semibold">Progress</Text>
-          <Text size={200}>
-            {progress.completedGroups} of {progress.totalGroups} groups complete
-          </Text>
-          <Text size={200}>
-            {progress.answeredQuestions} of {progress.visibleQuestions} questions answered
-          </Text>
+          <Text size={200}>{groupsLabel(progress)}</Text>
+          <Text size={200}>{answeredLabel(progress)}</Text>
           <Text size={200} className={styles.muted}>
             {selectedGroup
               ? selectedProgress?.ready
                 ? "This group is ready to submit."
                 : `Missing: ${selectedGroup.missingLabel}`
               : "Choose a group to continue."}
+          </Text>
+          <Text size={200}>
+            Next:{" "}
+            <a
+              href={formatRoute({
+                view: "plan",
+                project: projectSlug,
+                plan: plan.slug,
+                target: nextTarget,
+              })}
+            >
+              {nextLabel}
+            </a>
           </Text>
           {snapshot.delivery ? (
             <Text size={200}>
@@ -374,8 +418,26 @@ export function PlanPage({
         open={submitTarget !== undefined}
         title={targetGroup ? `Submit ${targetGroup.title}` : "Submit answers"}
         intro={`${projectName}${branch ? ` · ${branch}` : ""} · ${displayPlan.title}`}
-        ready={targetGroup ? [targetGroup.key] : displayPlan.submitAll.ready}
-        skipped={targetGroup ? [] : displayPlan.submitAll.skipped}
+        ready={
+          targetGroup
+            ? targetGroup.ready
+              ? [targetGroup.key]
+              : []
+            : displayPlan.submitAll.ready
+        }
+        skipped={
+          targetGroup
+            ? targetGroup.ready
+              ? []
+              : [
+                  {
+                    group: targetGroup.key,
+                    title: targetGroup.title,
+                    label: targetGroup.missingLabel,
+                  },
+                ]
+            : displayPlan.submitAll.skipped
+        }
         confirmLabel="Submit"
         error={dialogError}
         busy={busy}

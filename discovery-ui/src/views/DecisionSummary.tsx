@@ -16,6 +16,7 @@ import { formatRoute } from "../route.ts"
 import type { PlanPatch, IncompleteWork } from "../plan-editor.ts"
 import type { PlanView, QuestionView } from "../view-models.ts"
 import type { WorkspaceView } from "../workspace-model.ts"
+import { answeredLabel, groupsLabel } from "../workspace-model.ts"
 
 /** Props for {@link DecisionSummary}. */
 export interface DecisionSummaryProps {
@@ -58,12 +59,8 @@ function storedAnswerLabel(question: QuestionView): string | null {
   return null
 }
 
-/** A short answer label for one question. */
-function answerLabel(question: QuestionView): string {
-  if (question.readOnly || question.removedGroup) {
-    const stored = storedAnswerLabel(question)
-    if (stored !== null) return stored
-  }
+/** A short answer label for the displayed fields, including a draft overlay. */
+function currentAnswerLabel(question: QuestionView): string {
   const selected = question.options.filter((option) => option.selected)
   if (selected.length > 0) {
     const labels = selected.map((option) => option.label).join(", ")
@@ -78,11 +75,22 @@ function answerLabel(question: QuestionView): string {
   return "Unanswered"
 }
 
+/** A short answer label for one question. */
+function answerLabel(question: QuestionView): string {
+  if (question.readOnly || question.removedGroup) {
+    const stored = storedAnswerLabel(question)
+    if (stored !== null) return stored
+  }
+  return currentAnswerLabel(question)
+}
+
 /** The reason a draft cannot be edited in place. */
-function retentionLabel(question: QuestionView): string | null {
+function retentionLabel(question: QuestionView, plan: PlanView): string | null {
   if (question.removedGroup) return "group removed"
   if (question.hidden) return "hidden"
   if (question.readOnly) return "read-only"
+  const group = plan.groups.find((candidate) => candidate.key === question.group)
+  if (group?.locked) return "locked"
   return null
 }
 
@@ -151,13 +159,8 @@ export function DecisionSummary({
   return (
     <div>
       <div className={styles.groupHeader}>
-        <Text weight="semibold">Decision summary</Text>
-        <Badge appearance="tint">
-          {progress.answeredQuestions} of {progress.visibleQuestions} answered
-        </Badge>
-        <Badge appearance="outline">
-          {progress.completedGroups} of {progress.totalGroups} groups complete
-        </Badge>
+        <Badge appearance="tint">{answeredLabel(progress)}</Badge>
+        <Badge appearance="outline">{groupsLabel(progress)}</Badge>
       </div>
 
       {plan.groups.map((group) => {
@@ -195,8 +198,8 @@ export function DecisionSummary({
           {plan.retired.map((question) => (
             <div key={question.key} className={styles.summaryQuestion}>
               <Text weight="semibold">{question.title}</Text>
-              {retentionLabel(question) ? (
-                <Badge size="small">{retentionLabel(question)}</Badge>
+              {retentionLabel(question, plan) ? (
+                <Badge size="small">{retentionLabel(question, plan)}</Badge>
               ) : null}
               <Text>{answerLabel(question)}</Text>
               <Text size={200} className={styles.muted}>
@@ -216,7 +219,11 @@ export function DecisionSummary({
         ) : (
           draftKeys.map((key) => {
             const question = questions.get(key)
-            const label = question ? retentionLabel(question) : "no longer available"
+            const label = question ? retentionLabel(question, plan) : "no longer available"
+            const notesOnly =
+              drafts[key]?.notes !== undefined &&
+              drafts[key]?.answer === undefined &&
+              incomplete[key] === undefined
             const group = question
               ? plan.groups.find((candidate) => candidate.key === question.group)
               : undefined
@@ -238,7 +245,16 @@ export function DecisionSummary({
                 <Text weight="semibold">
                   {question?.title ?? key} {label ? <Badge size="small">{label}</Badge> : null}
                 </Text>
-                <Text size={200}>{question ? answerLabel(question) : "Draft retained"}</Text>
+                <Text size={200}>
+                  {notesOnly
+                    ? "Notes draft"
+                    : question
+                      ? currentAnswerLabel(question)
+                      : "Draft retained"}
+                </Text>
+                {incomplete[key] ? (
+                  <Text size={200}>{incomplete[key].reason}</Text>
+                ) : null}
                 {errors[key] ? (
                   <MessageBar intent="error">
                     <MessageBarBody>{errors[key]}</MessageBarBody>
@@ -246,7 +262,12 @@ export function DecisionSummary({
                 ) : null}
                 <div className={styles.actionRow}>
                   <a href={href}>Open group</a>
-                  {errors[key] && !question?.readOnly && !retryDisabled ? (
+                  {errors[key] &&
+                  question !== undefined &&
+                  !retryDisabled &&
+                  !question?.readOnly &&
+                  label !== "locked" &&
+                  label !== "group removed" ? (
                     <Button size="small" onClick={() => onRetry(key)}>
                       Retry
                     </Button>
