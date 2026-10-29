@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-29 09:04
-> **Progress**: 0/37 tasks (0%)
+> **Last Updated**: 2026-10-29 09:13
+> **Progress**: 2/37 tasks (5%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -38,7 +38,7 @@ dispatch. Any missing role uses a complete generic packet without weakening revi
 
 ## Phase 1: Navigation and theme foundations
 
-> **Phase baseline tree**: _(record at execution start)_
+> **Phase baseline tree**: `8cb5a71c8d6eaad7d0b1cffbd6ea1f736813ffdc`
 > **Reasoning**: high — route compatibility and preference failure states
 > **Expected modification set**: `discovery-ui/src/{route,workspace-model,theme,hooks}.ts`, navigation/theme redesign test suites
 > **Test split**: Phase 1 owns the pure halves of ST-1–ST-9; the control/reload/focus half of ST-9 runs in Phase 3
@@ -49,8 +49,8 @@ dispatch. Any missing role uses a complete generic packet without weakening revi
 **Reference:** 03-01; 07 ST-1–ST-9; AR-4, AR-5, AR-8, AR-9.
 **Objective:** establish the route, selection and theme oracle first.
 
-- [ ] 1.1.1 [spec-author] Write the pure halves of ST-1–ST-9 in `scripts/discovery-ui-redesign-{navigation,theme}.spec.test.mjs` (ST-1–ST-6 navigation, ST-7–ST-9 theme)
-- [ ] 1.1.2 Run those suites red; record failing cases, include empty-segment route cases, and justify any compatibility cases already green
+- [x] 1.1.1 [spec-author] Write the pure halves of ST-1–ST-9 in `scripts/discovery-ui-redesign-{navigation,theme}.spec.test.mjs` (ST-1–ST-6 navigation, ST-7–ST-9 theme) ✅ (completed: 2026-10-29 09:13)
+- [x] 1.1.2 Run those suites red; record failing cases, include empty-segment route cases, and justify any compatibility cases already green ✅ (completed: 2026-10-29 09:13)
 
 ### Step 1.2: Implementation
 
