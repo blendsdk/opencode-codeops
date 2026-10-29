@@ -18,6 +18,7 @@ import { nextWorkspace, selectWorkspace } from "../discovery-ui/src/workspace-mo
 
 /** Build one stored question with the documented defaults. */
 function question(key, group, extra = {}) {
+  const { state, ...rest } = extra
   return {
     key,
     group,
@@ -34,9 +35,9 @@ function question(key, group, extra = {}) {
       status: "open",
       changed: false,
       recordedAs: null,
-      ...extra.state,
+      ...state,
     },
-    ...extra,
+    ...rest,
   }
 }
 
@@ -173,8 +174,24 @@ describe("initial workspace selection (ST-4)", () => {
   it("should fall back to the summary when no unlocked group is pending", () => {
     const plan = planView(
       planRecord({
-        groups: [{ key: "Done", title: "Done", dependsOn: [], submittedAt: "2026-01-01" }],
-        questions: [question("done-1", "Done", { state: { status: "recorded" } })],
+        groups: [
+          { key: "Hidden", title: "Hidden", dependsOn: [], submittedAt: null },
+          { key: "Locked", title: "Locked", dependsOn: ["Hidden"], submittedAt: null },
+        ],
+        questions: [
+          {
+            ...question("hidden-1", "Hidden"),
+            showIf: [{ question: "locked-1", anyOf: ["yes"] }],
+          },
+          {
+            ...question("locked-1", "Locked"),
+            type: "single",
+            options: [
+              { id: "yes", label: "Yes" },
+              { id: "no", label: "No" },
+            ],
+          },
+        ],
       }),
     )
     assert.deepEqual(selectWorkspace(plan), {
@@ -249,6 +266,34 @@ describe("history intent and Continue (ST-6)", () => {
       }),
     )
     assert.deepEqual(nextWorkspace(plan, "A"), { kind: "group", key: "B" })
+  })
+
+  it("should skip a locked group when choosing Continue", () => {
+    const plan = planView(
+      planRecord({
+        groups: [
+          { key: "Start", title: "Start", dependsOn: [], submittedAt: null },
+          { key: "Locked", title: "Locked", dependsOn: ["Start"], submittedAt: null },
+          { key: "Ready", title: "Ready", dependsOn: [], submittedAt: null },
+        ],
+        questions: [
+          {
+            ...question("start-1", "Start"),
+            showIf: [{ question: "locked-1", anyOf: ["yes"] }],
+          },
+          {
+            ...question("locked-1", "Locked"),
+            type: "single",
+            options: [
+              { id: "yes", label: "Yes" },
+              { id: "no", label: "No" },
+            ],
+          },
+          question("ready-1", "Ready"),
+        ],
+      }),
+    )
+    assert.deepEqual(nextWorkspace(plan, "Start"), { kind: "group", key: "Ready" })
   })
 
   it("should fall back to the summary when no other group qualifies", () => {

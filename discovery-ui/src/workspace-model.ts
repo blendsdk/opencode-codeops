@@ -47,6 +47,10 @@ function isActionable(group: PlanView["groups"][number]): boolean {
  * @param plan - The current plan view.
  * @param target - The destination parsed from the route, when present.
  * @returns The destination, the history intent, and an optional notice.
+ *
+ * The walk relies on `plan.groups` being in dependency order, which
+ * {@link planView} guarantees. A hand-built or unordered view would change
+ * which group counts as "first".
  */
 export function selectWorkspace(
   plan: PlanView,
@@ -85,6 +89,9 @@ export function selectWorkspace(
  * @param plan - The current plan view.
  * @param currentKey - The group currently displayed.
  * @returns The next destination; never the current group.
+ *
+ * The walk relies on `plan.groups` being in dependency order, which
+ * {@link planView} guarantees.
  */
 export function nextWorkspace(plan: PlanView, currentKey: string): WorkspaceTarget {
   const eligible = plan.groups.filter(isActionable)

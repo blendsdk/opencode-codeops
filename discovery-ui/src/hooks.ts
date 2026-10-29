@@ -90,8 +90,9 @@ export interface ThemeState {
 /**
  * Read the stored theme preference and keep it in sync with the OS.
  *
- * Storage access happens inside effects, never during render. If the browser
- * blocks storage the selected preference still applies for this tab.
+ * Storage is read once in an effect and written from the setter; neither runs
+ * during render. If the browser blocks storage the selected preference still
+ * applies for this tab.
  */
 export function useThemePreference(): ThemeState {
   const [preference, setPreferenceState] = useState<ThemePreference>("system")

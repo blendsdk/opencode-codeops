@@ -69,12 +69,10 @@ describe("theme storage (ST-8)", () => {
     )
   })
 
-  it("should write only an allowed preference and report failure", () => {
+  it("should write an allowed preference and report failure", () => {
     const storage = fakeStorage()
     assert.equal(writeThemePreference(storage, "dark"), true)
     assert.equal(storage.values.get(THEME_STORAGE_KEY), "dark")
-    assert.equal(writeThemePreference(storage, "invalid"), true)
-    assert.equal(storage.values.get(THEME_STORAGE_KEY), "system")
 
     const failing = {
       setItem() {

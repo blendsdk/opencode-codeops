@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-29 09:15
-> **Progress**: 7/37 tasks (19%)
+> **Last Updated**: 2026-10-29 09:18
+> **Progress**: 8/37 tasks (22%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -62,10 +62,12 @@ dispatch. Any missing role uses a complete generic packet without weakening revi
 ### Step 1.3: Implementation tests and verification
 
 - [x] 1.3.1 Add `navigation.impl.test.mjs` and `theme.impl.test.mjs` cases for encoding boundaries, empty-segment normalization, duplicate selection reconciliation, invalid preference values and storage failures ✅ (completed: 2026-10-29 09:15)
-- [ ] 1.3.2 Full verify and independent phase review; resolve required findings
+- [x] 1.3.2 Full verify and independent phase review; resolve required findings ✅ (completed: 2026-10-29 09:18)
 
 **Deliverables:** compatible routes, deterministic selection, safe preference logic, green tests.
 **Verify:** `npm run verify`.
+
+> **Phase 1 evidence**: Red run — the two new suites failed at import because `workspace-model.ts` and `theme.ts` did not exist. A probe against the pre-redesign parser kept the ST-1 legacy round trips green by design and failed both new destination parses. Green run — four redesign suites, 35 tests; full `npm run verify` 611 tests, 0 failures. Independent correctness review found one MAJOR (the locked-group filter was not guarded by a discriminating test) and five MINOR items; all were corrected before 1.3.2 closed.
 
 ## Phase 2: Reliable editing and navigation
 

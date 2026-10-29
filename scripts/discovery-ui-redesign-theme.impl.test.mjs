@@ -62,8 +62,10 @@ describe("storage seam edges", () => {
 
   it("should write one normalized value and report unavailable storage", () => {
     const storage = recordingStorage()
+    assert.equal(writeThemePreference(storage, "dark"), true)
+    assert.deepEqual(storage.calls, [["set", "codeops.discovery.theme", "dark"]])
     assert.equal(writeThemePreference(storage, "DARK"), true)
-    assert.deepEqual(storage.calls, [["set", "codeops.discovery.theme", "system"]])
+    assert.deepEqual(storage.calls[1], ["set", "codeops.discovery.theme", "system"])
     assert.equal(writeThemePreference(null, "dark"), false)
     assert.equal(writeThemePreference(undefined, "dark"), false)
   })
