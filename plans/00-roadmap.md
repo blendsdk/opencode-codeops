@@ -28,4 +28,5 @@
 | REQ-LIVE-TASK-SIDEBAR | Live CodeOps task progress in the sidebar — foundation slices 0–1 (counting fix + TUI spike) | — | [live-task-sidebar](live-task-sidebar/00-index.md) | Done | ✅ | 2026-10-10 | — |
 | REQ-LIVE-TASK-PROGRESS | Live CodeOps task progress in the sidebar — the full feature (slice 2: progress tool, live state, sidebar view, exec-plan reporting) | — | [live-task-progress](live-task-progress/00-index.md) | Done | ✅ | 2026-10-10 20:39 | — |
 | REQ-DISCOVERY | Discovery — answer CodeOps question rounds in a local Fluent UI page; Submit wakes the agent (opt-in; make-plan + preflight) | — | [discovery](discovery/00-index.md) | Done | ✅ | 2026-10-27 11:58 | — |
-| REQ-DISCOVERY-UI-REDESIGN | Discovery plan workspace — group navigation, focused questions, decision summary, and theme preference | — | [discovery-ui-redesign](discovery-ui-redesign/00-index.md) | Executing | 🔄 | 2026-10-29 09:12 | REQ-DISCOVERY |
+| REQ-DISCOVERY-UI-REDESIGN | Discovery plan workspace — group navigation, focused questions, decision summary, and theme preference | — | [discovery-ui-redesign](discovery-ui-redesign/00-index.md) | Blocked | ⛔ | 2026-10-29 10:33 | B1–B8 |
+| ↳ DEF-1 | Browser acceptance B1–B8 awaits the user against the packed fixture | — | — | Blocked | ⛔ | 2026-10-29 10:33 | User browser check |
