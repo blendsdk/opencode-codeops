@@ -60,3 +60,13 @@
 | RV-052 | 3 | MINOR | incomplete summary assertion | fixed |
 | RV-053 | 3 | MINOR | loading/error skip target | fixed |
 | RV-054 | 3 | MINOR | aria-controls target | fixed |
+| RV-055 | 4 | MAJOR | summary horizontal overflow | fixed |
+| RV-056 | 4 | MINOR | reopened-group Continue reset | fixed |
+| RV-057 | 4 | MINOR | release-safe changelog assertion | fixed |
+| RV-058 | 4 | MINOR | favicon console filter | fixed |
+| RV-059 | 4 | MINOR | fixture identity and expected set | fixed |
+| RV-060 | 4 | MINOR | Continue after submit | fixed |
+| RV-061 | 4 | MINOR | notice persistence after group removal | fixed |
+| RV-062 | 4 | MINOR | favicon console 404 | fixed |
+| RV-063 | 4 | MINOR | B1–B8 evidence table | fixed |
+| RV-064 | 4 | MINOR | expected deleted-plan 404 | fixed |

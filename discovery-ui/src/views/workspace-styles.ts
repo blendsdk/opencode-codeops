@@ -110,6 +110,7 @@ export const useWorkspaceStyles = makeStyles({
     gridArea: "content",
     minWidth: 0,
     display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr)",
     gap: tokens.spacingVerticalL,
     paddingBlockEnd: "96px",
   },
@@ -189,11 +190,15 @@ export const useWorkspaceStyles = makeStyles({
     gap: tokens.spacingVerticalS,
     paddingBlock: tokens.spacingVerticalM,
     borderBottom: `1px solid ${tokens.colorNeutralStroke2}`,
+    minWidth: 0,
+    overflowWrap: "anywhere",
   },
   summaryQuestion: {
     display: "grid",
     gap: tokens.spacingVerticalXXS,
     paddingBlock: tokens.spacingVerticalXS,
+    minWidth: 0,
+    overflowWrap: "anywhere",
   },
   summaryAnswer: {
     fontWeight: tokens.fontWeightSemibold,

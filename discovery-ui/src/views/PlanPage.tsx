@@ -129,6 +129,7 @@ export function PlanPage({
   const [dialogError, setDialogError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [submittedGroup, setSubmittedGroup] = useState<string | null>(null)
+  const submittedRevisionRef = useRef<number | null>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const footerRef = useRef<HTMLDivElement>(null)
   const targetKey = target.kind === "group" ? target.key : "summary"
@@ -138,10 +139,24 @@ export function PlanPage({
   }, [targetKey])
 
   useEffect(() => {
-    if (submittedGroup !== null && selectedProgress?.complete === false) {
+    // Continue belongs to the group just submitted. Leaving the destination
+    // clears it; staying keeps the explicit next action.
+    setSubmittedGroup(null)
+  }, [targetKey])
+
+  useEffect(() => {
+    // A later republish that reopens the same group also clears Continue.
+    if (submittedGroup === null) return
+    const revision = snapshot.server?.plan.revision
+    if (
+      revision !== undefined &&
+      submittedRevisionRef.current !== null &&
+      revision !== submittedRevisionRef.current &&
+      selectedProgress?.complete === false
+    ) {
       setSubmittedGroup(null)
     }
-  }, [selectedProgress?.complete, submittedGroup])
+  }, [snapshot.server?.plan.revision, selectedProgress?.complete, submittedGroup])
 
   const targetGroup =
     typeof submitTarget === "string"
@@ -164,7 +179,10 @@ export function PlanPage({
     setBusy(false)
     if (outcome.ok) {
       setSubmitTarget(undefined)
-      if (typeof previous === "string") setSubmittedGroup(previous)
+      if (typeof previous === "string") {
+        submittedRevisionRef.current = snapshot.server?.plan.revision ?? null
+        setSubmittedGroup(previous)
+      }
       footerRef.current?.focus()
       onAnnounce(
         outcome.delivery === "woken"

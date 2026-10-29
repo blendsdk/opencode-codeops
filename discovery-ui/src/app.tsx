@@ -244,6 +244,7 @@ function PlanRoute({
     })
   })
   const [snapshot, setSnapshot] = useState<EditorSnapshot>(() => editor.snapshot())
+  const [routeNotice, setRouteNotice] = useState<string | null>(null)
   snapshotRef.current = setSnapshot
   useUnloadGuard(shouldWarnBeforeUnload(snapshot))
 
@@ -294,6 +295,16 @@ function PlanRoute({
         ? `group:${route.target.key}`
         : "summary"
   const normalizedRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    if (selection?.notice) setRouteNotice(selection.notice)
+  }, [selection?.notice])
+
+  useEffect(() => {
+    if (selection?.target.kind === "group" && selection.notice === null) {
+      setRouteNotice(null)
+    }
+  }, [selection?.notice, selection?.target.kind])
 
   useEffect(() => {
     if (view === null || selection === null || !selection.replace) return
@@ -397,7 +408,7 @@ function PlanRoute({
       branch={snapshot.server.project.branch ?? null}
       connection={events.status}
       target={selection.target}
-      notice={selection.notice}
+      notice={selection.notice ?? routeNotice}
       navigationNotice={navigationNotice}
       navigationDestination={navigationDestination}
       onDismissNavigationNotice={onDismissNavigationNotice}

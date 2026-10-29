@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-29 10:31
-> **Progress**: 35/37 tasks (95%)
+> **Last Updated**: 2026-10-29 14:56
+> **Progress**: 37/37 tasks (100%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -150,9 +150,9 @@ retired-answer inspection, responsive styling, header identity and breadcrumb.
 
 ## Phase 4: Documentation and live acceptance
 
-> **Phase baseline tree**: _(record at execution start)_
+> **Phase baseline tree**: `8d40caeb1a6e1ed7bea74de35c80ed280368b89b`
 > **Reasoning**: medium — shipped documentation and real-browser acceptance evidence
-> **Expected modification set**: `README.md`, `CHANGELOG.md`, `scripts/discovery-ui-redesign-content.spec.test.mjs`, this plan's evidence/findings, `plans/00-roadmap.md`; live fixtures remain in the temp root
+> **Expected modification set**: `README.md`, `CHANGELOG.md`, `scripts/discovery-ui-redesign-content.spec.test.mjs`, `discovery-ui/index.html`, `discovery-ui/src/{app.tsx,views/PlanPage.tsx,views/workspace-styles.ts}`, this plan's evidence/findings, `plans/00-roadmap.md`; live fixtures remain in the temp root
 > **Scope mode**: strict
 
 ### Step 4.1: Specification tests
@@ -171,17 +171,32 @@ retired-answer inspection, responsive styling, header identity and breadcrumb.
 ### Step 4.3: Live acceptance and hardening
 
 - [x] 4.3.1 Build a tarball and prepare isolated live fixtures covering B1–B8; record host/package identity and the checks to run ✅ (completed: 2026-10-29 10:31)
-- [!] 4.3.2 Run B1–B8 with the user and record each outcome; fix accepted findings and recheck affected items — Blocked: awaiting the user’s browser acceptance against the prepared fixture.
-- [ ] 4.3.3 Final full verify, build/pack check, independent phase review and success-criteria check; remove owned scratch and sync the roadmap
+- [x] 4.3.2 Run B1–B8 with the user and record each outcome; fix accepted findings and recheck affected items ✅ (completed: 2026-10-29 14:56)
+- [x] 4.3.3 Final full verify, build/pack check, independent phase review and success-criteria check; remove owned scratch and sync the roadmap ✅ (completed: 2026-10-29 14:56)
 
 **Deliverables:** documentation and durable automated/live evidence.
 **Verify:** `npm run verify`; `npm run build:discovery`; `npm pack --dry-run`.
 
 > **ST-28 evidence**: Red run failed both documentation assertions (missing workspace/summary/theme phrases and the redesign changelog entry). Green run passes `discovery-ui-redesign-content.spec.test.mjs` and the existing Discovery content suite (9 tests total).
 
-> **Acceptance fixture (4.3.1)**: Host `Linux 7.0.0-38-generic x86_64`, Node `v24.21.0`. Packed `opencode-codeops@2.2.1` tarball sha256 `c20bfbfdcbd7695a8c594d7df1c6fca614b105565f2ca91817738c1e9e2ab90d` (568.3 kB, 136 files), extracted into the isolated scratch project `/tmp/opencode/codeops-discovery-ui-redesign/live-acceptance/scratch-project`. Discovery data: `/tmp/opencode/codeops-discovery-ui-redesign/live-acceptance/data`, project `scratch-project`, plan `acceptance`. Page: `http://127.0.0.1:39631/#/p/scratch-project/acceptance`. The fixture contains all four question types, a dependency (`Rules` locked until `Scope` submits), implied and hidden questions, a conflict, a proposal, a changed question, submitted/recorded/retired answers, a removed-group question, a 200-character label, an empty group, and a pending delivery callback because no agent is attached. The server process is intentionally left running for B1–B8 and must be stopped after acceptance.
+> **Acceptance fixture (4.3.1)**: Host `Linux 7.0.0-38-generic x86_64`, Node `v24.21.0`. Final packed `opencode-codeops@2.2.1` tarball sha256 `66e7c203d8bd5cfb7bc241ab470dd8a9ae608c60a9313bd98d88459b8a8ab501` (568.6 kB, 136 files), extracted into the isolated scratch project `/tmp/opencode/codeops-discovery-ui-redesign/live-acceptance/scratch-project`. Discovery data: `/tmp/opencode/codeops-discovery-ui-redesign/live-acceptance/data`, project `scratch-project`, plan `acceptance`. Page: `http://127.0.0.1:39041/#/p/scratch-project/acceptance`. The fixture contains all four question types, a dependency (`Rules` locked until `Scope` submits), implied and hidden questions, a conflict, a proposal, a changed question, submitted/recorded/retired answers, a removed-group question, a 200-character label, an empty group, a second `delete-me` plan for the delete confirmation, and a pending delivery callback because no agent is attached.
 
-> **Pre-acceptance verification**: `npm run verify` passes 675 tests; `npm run build:discovery` and `npm pack --dry-run` pass (136 files, 568.3 kB). The final phase review and roadmap sync stay in 4.3.3 until the user completes B1–B8.
+> **B1–B8 acceptance (4.3.2)**: Real installed browsers, automated through Chrome DevTools and WebDriver: Chrome `156.0.8078.47` and Firefox `158.0.1` on `Linux 7.0.0-38-generic x86_64`, Node `v24.21.0`.
+>
+> | Item | Outcome | Evidence |
+> | --- | --- | --- |
+> | B1 | Pass | Legacy link, group switching, back/forward, group and summary links, listing return, and draft survival across groups |
+> | B2 | Pass | Text/Other/notes/multiple, saved-deferral edit, hide/show, implied label plus explicit override, proposal, changed question, disclosure collapse/reopen, escaped text; Firefox text and choice |
+> | B3 | Pass | Offline blocked navigation, Retry save, same destination retried, unload guard, no answer persistence |
+> | B4 | Pass | Group dialog cancel/confirm, pending-delivery copy, explicit Continue, all-ready dialog; `woken`/agent recording not exercised because no agent is attached |
+> | B5 | Pass | Retired/removed-group answers, Unsent drafts, live republish removing the selected group with the summary notice, retained draft, and explicit discard |
+> | B6 | Pass | Skip link, destination heading focus, dialog focus return, drawer Escape/backdrop/focus return, keyboard disclosure in Firefox |
+> | B7 | Pass | System follows OS across reloads, explicit theme persists, 390/720 widths and the summary have no horizontal overflow; Firefox theme/reload/narrow |
+> | B8 | Pass | Empty/long states, archive/unarchive, delete cancel and delete confirm on the scratch plan, orphan/unorphan banners, restart reload, no unexpected console/CSP errors |
+>
+> **Acceptance limitations**: delivery is `pending` because the fixture has no attached agent, so the live `woken` and agent-pointer/recording paths were not exercised; B5's republish used a temporary control endpoint that emits the same `changed` SSE event, not a full Discovery publish round; B8 logs one expected 404 for the deleted `delete-me` scratch plan; both browsers ran headless. The user authorized proceeding with automated acceptance instead of a manual click-through.
+
+> **Final verification**: `npm run verify` passes 675 tests; `npm run build:discovery` passes; `npm pack --dry-run` passes with 136 files and a 568.6 kB package. Independent Phase 4 review found one MAJOR summary-overflow defect plus evidence/record gaps; the overflow, Continue invalidation, release-safe changelog assertion, and evidence gaps were fixed and rechecked before closure.
 
 ## Dependencies
 

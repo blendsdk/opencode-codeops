@@ -65,8 +65,11 @@ describe("Discovery redesign documentation (ST-28)", () => {
 
   it("should record the redesign in the newest changelog section", () => {
     const changelog = read("CHANGELOG.md")
-    const firstRelease = changelog.indexOf("\n## ", changelog.indexOf("## Unreleased") + 1)
-    const newest = changelog.slice(0, firstRelease === -1 ? changelog.length : firstRelease)
+    const unreleased = changelog.indexOf("## Unreleased")
+    const start = unreleased >= 0 ? unreleased : changelog.indexOf("\n## ")
+    assert.ok(start >= 0, "the changelog must have a release heading")
+    const next = changelog.indexOf("\n## ", start + 1)
+    const newest = changelog.slice(start, next === -1 ? changelog.length : next)
     const entries = newest
       .split("\n")
       .filter((line) => line.startsWith("- discovery:"))
