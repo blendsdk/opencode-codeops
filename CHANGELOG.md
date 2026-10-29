@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+### Features
+
+- discovery: enable Discovery by default for new projects created with setup-codeops
+
 ## 2.3.0 — 2026-10-29
 
 ### Fixes
@@ -20,6 +26,7 @@ All notable changes to CodeOps are recorded here.
 
 ### Features
 
+- discovery: redesign the plan workspace with group navigation, a decision summary, honest save feedback, and System/Light/Dark themes
 - discovery: complete the Fluent UI workspace
 - discovery: add guarded editing and the workspace shell
 - discovery: add workspace destinations and theme preference

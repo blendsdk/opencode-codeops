@@ -3,9 +3,9 @@
 > **CodeOps Artifact Schema**: 1
 
 Discovery moves large question rounds out of the chat scroll and into a local
-browser page. It is opt-in per project and never replaces the Ambiguity
-Register. Use it only when this file's conditions hold; otherwise ask in chat
-exactly as before.
+browser page. New projects created with `setup-codeops` enable it by default;
+existing projects opt in. It never replaces the Ambiguity Register. Use it only
+when this file's conditions hold; otherwise ask in chat exactly as before.
 
 ## When it applies
 

@@ -157,3 +157,27 @@ describe("analyze-project adoption", () => {
     )
   })
 })
+
+describe("setup-codeops default", () => {
+  it("should enable Discovery for fresh projects and explain the existing-project path", () => {
+    const scaffold = read("skills/setup-codeops/scaffold.md")
+    assert.ok(
+      scaffold.includes('"discovery": {"enabled": true, "chatMaxQuestions": 3}'),
+      "the fresh scaffold must enable Discovery",
+    )
+    assert.ok(
+      scaffold.includes("including Discovery enabled by default"),
+      "the scaffold step must state the default",
+    )
+
+    const skill = read("skills/setup-codeops/SKILL.md")
+    assert.match(skill, /fresh scaffold enables Discovery by default/i)
+    assert.match(skill, /analyze-project --with-discovery/i)
+
+    const readme = section(read("README.md"), "## Discovery", "\n## ")
+    assert.match(readme, /New projects created with `setup-codeops` start with Discovery enabled/i)
+
+    const protocol = read("_shared/discovery.md")
+    assert.match(protocol, /New projects created with `setup-codeops` enable it by default/i)
+  })
+})

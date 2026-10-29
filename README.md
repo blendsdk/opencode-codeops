@@ -164,7 +164,7 @@ execution.
 
 ## Discovery
 
-Discovery is an opt-in local web page where the agent publishes a CodeOps question round
+Discovery is a local web page where the agent publishes a CodeOps question round
 instead of asking every question in chat. Questions, options, recommendations, and dependency
 rules render in the browser; answers are saved there, and Submit wakes the OpenCode session that
 published them so it can continue.
@@ -191,8 +191,8 @@ The shared header carries a real breadcrumb and a **System / Light / Dark** them
 follows the operating-system setting; an explicit choice is remembered in the browser. If storage
 is unavailable, the choice still applies for the current tab.
 
-Enable it for a project with `analyze-project --with-discovery`, or add the setting to
-`codeops/codeops.json`:
+New projects created with `setup-codeops` start with Discovery enabled. For an existing project,
+run `analyze-project --with-discovery`, or add the setting to `codeops/codeops.json`:
 
 ```json
 {

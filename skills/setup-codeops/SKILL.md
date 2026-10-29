@@ -20,6 +20,9 @@ it is the single source of truth for the layout. Do not re-encode paths here.
 - **Per-repo only.** One git repo at a time; no cross-repo or portfolio-of-projects work.
 - This skill sets up the *structure*. It never authors requirements, plans, or roadmaps — that is
   `make-requirements` / `make-plan` / `roadmap`, which then resolve paths via the convention doc.
+- A fresh scaffold enables Discovery by default (`discovery.enabled: true`,
+  `chatMaxQuestions: 3`). Existing projects keep their current setting; enable it with
+  `analyze-project --with-discovery` or by adding the setting manually.
 
 ## Dispatch — detect repo state, then branch
 

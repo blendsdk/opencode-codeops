@@ -23,7 +23,7 @@ front. Those appear lazily when the first RD, plan, or task is authored (AR #5).
 1. Confirm the repo is a git repo (suggest `git init` if not).
 2. Create `codeops/features/` (the empty features dir).
 3. Write `codeops/.codeops.yml` (the marker — `setup-codeops` is its sole writer).
-4. Write `codeops/codeops.json` with the strict defaults below.
+4. Write `codeops/codeops.json` with the strict defaults below, including Discovery enabled by default.
 5. Write `codeops/00-roadmap.md` (empty portfolio — see the portfolio template in the `roadmap`
    skill; seed it with zero features and an empty Archived section).
 6. Confirm the marker, policy, portfolio, and empty feature directory exist; report setup state
@@ -38,6 +38,7 @@ front. Those appear lazily when the first RD, plan, or task is authored (AR #5).
   "schema": 1,
   "mode": "strict",
   "artifacts": {"layout": "nested", "root": "codeops"},
+  "discovery": {"enabled": true, "chatMaxQuestions": 3},
   "quality": {
     "independentReview": true,
     "minimumReviewers": 1,
