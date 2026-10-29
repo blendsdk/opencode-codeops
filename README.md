@@ -191,8 +191,16 @@ The shared header carries a real breadcrumb and a **System / Light / Dark** them
 follows the operating-system setting; an explicit choice is remembered in the browser. If storage
 is unavailable, the choice still applies for the current tab.
 
-New projects created with `setup-codeops` start with Discovery enabled. For an existing project,
-run `analyze-project --with-discovery`, or add the setting to `codeops/codeops.json`:
+New projects created with `setup-codeops` start with Discovery enabled. Existing projects can
+toggle it without re-scaffolding:
+
+```text
+/setup-codeops --enable-discovery
+/setup-codeops --disable-discovery
+```
+
+`analyze-project --with-discovery` remains available for the same config change. The setting lives
+in `codeops/codeops.json`:
 
 ```json
 {

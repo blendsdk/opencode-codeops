@@ -172,10 +172,15 @@ describe("setup-codeops default", () => {
 
     const skill = read("skills/setup-codeops/SKILL.md")
     assert.match(skill, /fresh scaffold enables Discovery by default/i)
+    assert.match(skill, /--enable-discovery/)
+    assert.match(skill, /--disable-discovery/)
+    assert.match(skill, /scripts\/discovery-toggle\.mjs/)
     assert.match(skill, /analyze-project --with-discovery/i)
 
     const readme = section(read("README.md"), "## Discovery", "\n## ")
     assert.match(readme, /New projects created with `setup-codeops` start with Discovery enabled/i)
+    assert.match(readme, /setup-codeops --enable-discovery/)
+    assert.match(readme, /setup-codeops --disable-discovery/)
 
     const protocol = read("_shared/discovery.md")
     assert.match(protocol, /New projects created with `setup-codeops` enable it by default/i)

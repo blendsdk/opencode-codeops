@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+### Features
+
+- discovery: add --enable-discovery and --disable-discovery for existing projects via setup-codeops
+
 ## 2.4.0 — 2026-10-29
 
 ### Features

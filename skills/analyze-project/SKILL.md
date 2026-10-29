@@ -28,7 +28,7 @@ description: Analyze the current repository and create or refresh concise CodeOp
 
 ## Discovery switch
 
-`analyze-project` accepts `--with-discovery` and `--without-discovery`; passing both flags is a usage error. Both flags validate `codeops/codeops.json` against `schemas/codeops-config.schema.json` before changing anything: an invalid file stops the run with its schema errors and writes nothing (never discard malformed quality, routing, or metrics policy). Refuse to write when `codeops/` or `codeops/codeops.json` is a symlink or not a regular file; never write through a link.
+`analyze-project` accepts `--with-discovery` and `--without-discovery`; passing both flags is a usage error. Existing projects can also use `setup-codeops --enable-discovery` / `--disable-discovery` for the config-only toggle. Both flags validate `codeops/codeops.json` against `schemas/codeops-config.schema.json` before changing anything: an invalid file stops the run with its schema errors and writes nothing (never discard malformed quality, routing, or metrics policy). Refuse to write when `codeops/` or `codeops/codeops.json` is a symlink or not a regular file; never write through a link.
 
 - `--with-discovery`: set `discovery.enabled: true`, keeping every other key. When no file exists, create the minimal AR-35 file with the layout resolved from `_shared/layout-convention.md` (`nested` → `codeops`, `flat` → `.`):
   ```json

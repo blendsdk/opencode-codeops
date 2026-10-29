@@ -1,7 +1,7 @@
 ---
 name: setup-codeops
 description: >-
-  Sets up or upgrades CodeOps in the current git repo. It scaffolds a fresh nested codeops/ layout, auto-migrates a flat requirements/ + plans/ layout, and detects obsolete traceability.json workflow-state graphs in an existing nested project. Use when the user says "setup-codeops", "/setup-codeops", "set up codeops", "initialize codeops", "upgrade existing codeops", "migrate to the nested layout", or "scaffold the codeops structure". Supports --dry-run and unattended --yes. Every migration previews deterministically, refuses unsafe or ambiguous apply, requires clean Git state for writes, and is idempotent. setup-codeops is the SOLE writer of the layout marker.
+  Sets up or upgrades CodeOps in the current git repo. It scaffolds a fresh nested codeops/ layout, auto-migrates a flat requirements/ + plans/ layout, and detects obsolete traceability.json workflow-state graphs in an existing nested project. Use when the user says "setup-codeops", "/setup-codeops", "set up codeops", "initialize codeops", "upgrade existing codeops", "migrate to the nested layout", or "scaffold the codeops structure". Supports --dry-run, unattended --yes, and --enable-discovery/--disable-discovery for existing projects. Every migration previews deterministically, refuses unsafe or ambiguous apply, requires clean Git state for writes, and is idempotent. setup-codeops is the SOLE writer of the layout marker.
 ---
 
 # CodeOps Layout Setup (`setup-codeops`)
@@ -21,8 +21,9 @@ it is the single source of truth for the layout. Do not re-encode paths here.
 - This skill sets up the *structure*. It never authors requirements, plans, or roadmaps — that is
   `make-requirements` / `make-plan` / `roadmap`, which then resolve paths via the convention doc.
 - A fresh scaffold enables Discovery by default (`discovery.enabled: true`,
-  `chatMaxQuestions: 3`). Existing projects keep their current setting; enable it with
-  `analyze-project --with-discovery` or by adding the setting manually.
+  `chatMaxQuestions: 3`). Existing projects can toggle it with
+  `setup-codeops --enable-discovery` / `--disable-discovery`; `analyze-project --with-discovery`
+  remains available for the same config change with guidance refresh.
 
 ## Dispatch — detect repo state, then branch
 
@@ -59,6 +60,31 @@ fresh scaffold should live in version control) and suggest `git init` first.
 | *(none)* | Interactive: scaffold creates the skeleton; either migration previews then asks for one confirmation before applying. |
 | `--dry-run` | Preview only — compute and show what would happen; change **nothing**. |
 | `--yes` | Apply an unblocked migration without confirmation, then verify it. Safety refusals still apply. |
+| `--enable-discovery` | Enable Discovery in an existing project without re-scaffolding. Preserves every other config key. |
+| `--disable-discovery` | Disable Discovery, keeping `chatMaxQuestions` and every other config key. |
+
+`--enable-discovery` and `--disable-discovery` are mutually exclusive. Validate that before the
+layout branch so a usage error never changes the repository.
+
+## Discovery toggle
+
+After the layout branch (no-op, migration, or fresh scaffold), apply exactly one discovery flag
+when present:
+
+```bash
+node "${CODEOPS_PLUGIN_ROOT}/scripts/discovery-toggle.mjs" --root . --enable-discovery
+node "${CODEOPS_PLUGIN_ROOT}/scripts/discovery-toggle.mjs" --root . --disable-discovery
+```
+
+Add `--dry-run` to preview. The script validates the JSON, refuses symlinked `codeops/` or
+`codeops/codeops.json`, preserves unrelated policy, and adds or removes the managed line
+`- Discovery: enabled — question rounds open in the local Discovery page` when the
+`CODEOPS-PROJECT` block exists. If `AGENTS.md` is absent or has no managed block, the config still
+changes; report that guidance should be refreshed with `analyze-project`.
+
+A fresh scaffold starts enabled. Passing `--disable-discovery` during scaffold turns it off; passing
+`--enable-discovery` is idempotent. Without either flag, an existing project keeps its current
+setting and a fresh scaffold stays enabled.
 
 ## Migration engines (delegation — do not re-implement)
 
@@ -86,6 +112,7 @@ deletion, and idempotency.
 
 - [scaffold.md](scaffold.md) — the minimal fresh-repo skeleton.
 - [migration.md](migration.md) — flat-layout and legacy workflow-state migration UX.
+- `scripts/discovery-toggle.mjs` — deterministic config and managed-line toggle.
 - [_shared/layout-convention.md](../../_shared/layout-convention.md) — the layout/path/ID/marker source of truth.
 
 ## Grounded Options & Recommendations

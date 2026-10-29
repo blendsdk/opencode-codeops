@@ -4,7 +4,8 @@
 
 Discovery moves large question rounds out of the chat scroll and into a local
 browser page. New projects created with `setup-codeops` enable it by default;
-existing projects opt in. It never replaces the Ambiguity Register. Use it only
+existing projects toggle it with `setup-codeops --enable-discovery` or
+`--disable-discovery`. It never replaces the Ambiguity Register. Use it only
 when this file's conditions hold; otherwise ask in chat exactly as before.
 
 ## When it applies
