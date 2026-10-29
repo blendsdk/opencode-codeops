@@ -15,17 +15,17 @@ import { FluentProvider, webDarkTheme, webLightTheme } from "@fluentui/react-com
 
 import { App } from "./app.tsx"
 import { createApi } from "./api.ts"
-import { useHashRoute, useSystemTheme } from "./hooks.ts"
+import { useHashRoute, useThemePreference } from "./hooks.ts"
 import { createAppRenderer } from "./renderer.ts"
 import { parseRoute } from "./route.ts"
 
 /** The mounted application. */
 function Root() {
-  const hash = useHashRoute()
-  const theme = useSystemTheme()
+  const { hash } = useHashRoute()
+  const theme = useThemePreference()
   const api = useMemo(() => createApi(window.location.origin), [])
   return (
-    <FluentProvider theme={theme === "dark" ? webDarkTheme : webLightTheme}>
+    <FluentProvider theme={theme.resolved === "dark" ? webDarkTheme : webLightTheme}>
       <App route={parseRoute(hash)} api={api} />
     </FluentProvider>
   )

@@ -8,24 +8,64 @@
  * @module hooks
  */
 
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
+
+import {
+  readThemePreference,
+  resolveTheme,
+  writeThemePreference,
+} from "./theme.ts"
+import type { ResolvedTheme, ThemePreference } from "./theme.ts"
+
+/** The current hash plus the two ways the app may change it. */
+export interface HashRouteState {
+  /** The current location hash, always starting with `#`. */
+  hash: string
+  /**
+   * Move to another hash.
+   *
+   * @param hash - The destination, with or without `#`.
+   * @param options - `replace` rewrites the current history entry.
+   */
+  navigate(hash: string, options?: { replace?: boolean }): void
+}
 
 /** Read and subscribe to the location hash. */
-export function useHashRoute(): string {
+export function useHashRoute(): HashRouteState {
   const [hash, setHash] = useState(() =>
     typeof window === "undefined" ? "#/" : window.location.hash || "#/",
   )
+
   useEffect(() => {
-    const onChange = () => setHash(window.location.hash || "#/")
-    window.addEventListener("hashchange", onChange)
-    return () => window.removeEventListener("hashchange", onChange)
+    if (typeof window === "undefined") return
+    const read = () => setHash(window.location.hash || "#/")
+    // A history traversal can fire both events for one move. Reading the
+    // location and letting React drop the identical value keeps one update.
+    window.addEventListener("popstate", read)
+    window.addEventListener("hashchange", read)
+    return () => {
+      window.removeEventListener("popstate", read)
+      window.removeEventListener("hashchange", read)
+    }
   }, [])
-  return hash
+
+  const navigate = useCallback((next: string, options?: { replace?: boolean }) => {
+    if (typeof window === "undefined") return
+    const target = next.startsWith("#") ? next : `#${next}`
+    if (options?.replace === true) {
+      window.history.replaceState(null, "", target)
+    } else {
+      window.location.hash = target
+    }
+    setHash(target)
+  }, [])
+
+  return { hash, navigate }
 }
 
 /** The OS colour scheme, read from inside an effect. */
-export function useSystemTheme(): "light" | "dark" {
-  const [theme, setTheme] = useState<"light" | "dark">("light")
+export function useSystemTheme(): ResolvedTheme {
+  const [theme, setTheme] = useState<ResolvedTheme>("light")
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") return
     const query = window.matchMedia("(prefers-color-scheme: dark)")
@@ -35,6 +75,52 @@ export function useSystemTheme(): "light" | "dark" {
     return () => query.removeEventListener?.("change", apply)
   }, [])
   return theme
+}
+
+/** The selected preference, its resolved theme, and the setter. */
+export interface ThemeState {
+  /** System, Light, or Dark as chosen by the user. */
+  preference: ThemePreference
+  /** The concrete theme currently applied. */
+  resolved: ResolvedTheme
+  /** Select and persist a preference, remembering it in memory on failure. */
+  setPreference(preference: ThemePreference): void
+}
+
+/**
+ * Read the stored theme preference and keep it in sync with the OS.
+ *
+ * Storage access happens inside effects, never during render. If the browser
+ * blocks storage the selected preference still applies for this tab.
+ */
+export function useThemePreference(): ThemeState {
+  const [preference, setPreferenceState] = useState<ThemePreference>("system")
+  const systemTheme = useSystemTheme()
+
+  useEffect(() => {
+    if (typeof window === "undefined") return
+    let storage: Storage | null = null
+    try {
+      storage = window.localStorage
+    } catch {
+      storage = null
+    }
+    setPreferenceState(readThemePreference(storage))
+  }, [])
+
+  const setPreference = useCallback((next: ThemePreference) => {
+    setPreferenceState(next)
+    if (typeof window === "undefined") return
+    let storage: Storage | null = null
+    try {
+      storage = window.localStorage
+    } catch {
+      storage = null
+    }
+    writeThemePreference(storage, next)
+  }, [])
+
+  return { preference, resolved: resolveTheme(preference, systemTheme), setPreference }
 }
 
 /** The connection state shown by the banner. */

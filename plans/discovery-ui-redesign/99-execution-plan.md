@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-10-29 09:13
-> **Progress**: 2/37 tasks (5%)
+> **Last Updated**: 2026-10-29 09:15
+> **Progress**: 7/37 tasks (19%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -54,14 +54,14 @@ dispatch. Any missing role uses a complete generic packet without weakening revi
 
 ### Step 1.2: Implementation
 
-- [ ] 1.2.1 Extend `discovery-ui/src/route.ts` parse/format contracts — 03-01 §Routes; ST-1–ST-3
-- [ ] 1.2.2 Add `discovery-ui/src/workspace-model.ts` selection and Continue derivations; Continue excludes the current group and falls back to summary — 03-01 §Workspace selection; ST-4–ST-6
-- [ ] 1.2.3 Add `discovery-ui/src/theme.ts` (including the pure storage seam) and theme effect integration in `hooks.ts` — 03-01 §Theme preference; ST-7–ST-9
-- [ ] 1.2.4 Run navigation/theme spec suites green; retain the existing route suite unchanged
+- [x] 1.2.1 Extend `discovery-ui/src/route.ts` parse/format contracts — 03-01 §Routes; ST-1–ST-3 ✅ (completed: 2026-10-29 09:15)
+- [x] 1.2.2 Add `discovery-ui/src/workspace-model.ts` selection and Continue derivations; Continue excludes the current group and falls back to summary — 03-01 §Workspace selection; ST-4–ST-6 ✅ (completed: 2026-10-29 09:15)
+- [x] 1.2.3 Add `discovery-ui/src/theme.ts` (including the pure storage seam) and theme effect integration in `hooks.ts` — 03-01 §Theme preference; ST-7–ST-9 ✅ (completed: 2026-10-29 09:15)
+- [x] 1.2.4 Run navigation/theme spec suites green; retain the existing route suite unchanged ✅ (completed: 2026-10-29 09:15)
 
 ### Step 1.3: Implementation tests and verification
 
-- [ ] 1.3.1 Add `navigation.impl.test.mjs` and `theme.impl.test.mjs` cases for encoding boundaries, empty-segment normalization, duplicate selection reconciliation, invalid preference values and storage failures
+- [x] 1.3.1 Add `navigation.impl.test.mjs` and `theme.impl.test.mjs` cases for encoding boundaries, empty-segment normalization, duplicate selection reconciliation, invalid preference values and storage failures ✅ (completed: 2026-10-29 09:15)
 - [ ] 1.3.2 Full verify and independent phase review; resolve required findings
 
 **Deliverables:** compatible routes, deterministic selection, safe preference logic, green tests.
