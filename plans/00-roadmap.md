@@ -3,7 +3,7 @@
 > **Feature-Set**: opencode-codeops
 > **Status**: In Progress
 > **Created**: 2026-10-04
-> **Last Updated**: 2026-10-27
+> **Last Updated**: 2026-10-29 09:04
 > **Progress**: n/a
 > **CodeOps Artifact Schema**: 1
 
@@ -28,3 +28,4 @@
 | REQ-LIVE-TASK-SIDEBAR | Live CodeOps task progress in the sidebar — foundation slices 0–1 (counting fix + TUI spike) | — | [live-task-sidebar](live-task-sidebar/00-index.md) | Done | ✅ | 2026-10-10 | — |
 | REQ-LIVE-TASK-PROGRESS | Live CodeOps task progress in the sidebar — the full feature (slice 2: progress tool, live state, sidebar view, exec-plan reporting) | — | [live-task-progress](live-task-progress/00-index.md) | Done | ✅ | 2026-10-10 20:39 | — |
 | REQ-DISCOVERY | Discovery — answer CodeOps question rounds in a local Fluent UI page; Submit wakes the agent (opt-in; make-plan + preflight) | — | [discovery](discovery/00-index.md) | Done | ✅ | 2026-10-27 11:58 | — |
+| REQ-DISCOVERY-UI-REDESIGN | Discovery plan workspace — group navigation, focused questions, decision summary, and theme preference | — | [discovery-ui-redesign](discovery-ui-redesign/00-index.md) | Plan Preflighted | 🔬 | 2026-10-29 09:04 | REQ-DISCOVERY |
