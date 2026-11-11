@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-12 01:05
-> **Progress**: 22/86 tasks (26%)
+> **Last Updated**: 2026-11-12 01:20
+> **Progress**: 32/86 tasks (37%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -107,27 +107,27 @@ Deliver the opt-in test-impact layer in eight phases. Phase 1 is the lightweight
 
 ## Phase 3: Selector Core
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill at phase start)_
+> **Phase baseline tree**: 35e5726b440da1a12f1eccef56425ccf8ae2553a
 > **Reasoning**: high — the selection algorithm is the correctness core; a miss can hide tests.
 
 ### Step 3.1: Specification Tests
 
-- [ ] 3.1.1 Write spec tests for change detection, glob matching, direct/dependent/always-run selection, gate tiers, budget, threshold, and fallbacks — `bin/test-selection.spec.test.mjs` (ST-11..ST-25, ST-55, ST-56, ST-59, ST-60, ST-61)
-- [ ] 3.1.2 Run the new spec tests and confirm red; record the failure — `node --test bin/test-selection.spec.test.mjs`
+- [x] 3.1.1 Write spec tests for change detection, glob matching, direct/dependent/always-run selection, gate tiers, budget, threshold, and fallbacks — `bin/test-selection.spec.test.mjs` (ST-11..ST-25, ST-55, ST-56, ST-59, ST-60, ST-61) ✅ (completed: 2026-11-12 01:20)
+- [x] 3.1.2 Run the new spec tests and confirm red; record the failure — `node --test bin/test-selection.spec.test.mjs` ✅ (completed: 2026-11-12 01:20)
 
 ### Step 3.2: Implementation
 
-- [ ] 3.2.1 Implement the minimal glob-to-regex matcher, path normalization, and Windows separator handling — `bin/lib/test-selection-glob.mjs`
-- [ ] 3.2.2 Implement change collection, explicit baseline resolution, last-full marker/ancestry, rename/delete/untracked handling, and repo containment — `bin/lib/test-selection-changes.mjs`
-- [ ] 3.2.3 Implement direct matching, `--include` spec paths, reverse closure, always-run, PR smoke, gate filter, budget, threshold, full-set `{tests}` expansion, fallback reasons, and result shape — `bin/lib/test-selection.mjs`
-- [ ] 3.2.4 Implement human/JSON explanation formatting — `bin/lib/test-selection-explain.mjs`
-- [ ] 3.2.5 Add public type declarations for glob, changes, and selection APIs — `bin/lib/test-selection-glob.d.mts`, `bin/lib/test-selection-changes.d.mts`, `bin/lib/test-selection.d.mts`
+- [x] 3.2.1 Implement the minimal glob-to-regex matcher, path normalization, and Windows separator handling — `bin/lib/test-selection-glob.mjs` ✅ (completed: 2026-11-12 01:20)
+- [x] 3.2.2 Implement change collection, explicit baseline resolution, last-full marker/ancestry, rename/delete/untracked handling, and repo containment — `bin/lib/test-selection-changes.mjs` ✅ (completed: 2026-11-12 01:20)
+- [x] 3.2.3 Implement direct matching, `--include` spec paths, reverse closure, always-run, PR smoke, gate filter, budget, threshold, full-set `{tests}` expansion, fallback reasons, and result shape — `bin/lib/test-selection.mjs` ✅ (completed: 2026-11-12 01:20)
+- [x] 3.2.4 Implement human/JSON explanation formatting — `bin/lib/test-selection-explain.mjs` ✅ (completed: 2026-11-12 01:20)
+- [x] 3.2.5 Add public type declarations for glob, changes, and selection APIs — `bin/lib/test-selection-glob.d.mts`, `bin/lib/test-selection-changes.d.mts`, `bin/lib/test-selection.d.mts` ✅ (completed: 2026-11-12 01:20)
 
 ### Step 3.3: Implementation Tests and Hardening
 
-- [ ] 3.3.1 Write impl tests for rename/delete/untracked, docs-only, shared support, unknown path, path escape, dependency direction, budget/no-drop, determinism, and a 1,000-path performance fixture — `bin/test-selection.impl.test.mjs`
-- [ ] 3.3.2 Run targeted selector tests and fix failures — `node --test bin/test-selection.spec.test.mjs bin/test-selection.impl.test.mjs`
-- [ ] 3.3.3 Full verification: `npm run verify`; record PASS and test count — `npm run verify`
+- [x] 3.3.1 Write impl tests for rename/delete/untracked, docs-only, shared support, unknown path, path escape, dependency direction, budget/no-drop, determinism, and a 1,000-path performance fixture — `bin/test-selection.impl.test.mjs` ✅ (completed: 2026-11-12 01:20)
+- [x] 3.3.2 Run targeted selector tests and fix failures — `node --test bin/test-selection.spec.test.mjs bin/test-selection.impl.test.mjs` ✅ (completed: 2026-11-12 01:20)
+- [x] 3.3.3 Full verification: `npm run verify`; record PASS and test count — `npm run verify` ✅ (completed: 2026-11-12 01:20)
 
 **Verify**: `node --test bin/test-selection.spec.test.mjs bin/test-selection.impl.test.mjs`
 
