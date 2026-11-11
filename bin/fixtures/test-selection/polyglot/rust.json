@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "domain": "compiler",
+  "owner": "team-compiler",
+  "groups": [
+    {
+      "id": "codegen.unit",
+      "slice": "codegen",
+      "tier": "task",
+      "sources": [
+        "crates/codegen/**"
+      ],
+      "run": {
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "codegen",
+          "--lib"
+        ]
+      }
+    },
+    {
+      "id": "codegen.e2e",
+      "slice": "codegen",
+      "tier": "release",
+      "sources": [
+        "crates/codegen/**"
+      ],
+      "tests": [
+        "tests/corpus/**/*.rs"
+      ],
+      "run": {
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "codegen",
+          "--test",
+          "corpus"
+        ]
+      }
+    }
+  ]
+}

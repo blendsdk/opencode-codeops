@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "policy": {
+    "schema": 1,
+    "full": [
+      [
+        "cargo",
+        "test",
+        "--workspace"
+      ]
+    ],
+    "budgets": {
+      "taskTargetSeconds": 120,
+      "taskAcceptableSeconds": 180
+    },
+    "ignorePaths": [
+      {
+        "glob": "docs/**",
+        "reason": "documentation"
+      }
+    ],
+    "fullOnPaths": [
+      "package.json",
+      "package-lock.json"
+    ],
+    "prSmoke": [
+      "shared.auth.contract"
+    ],
+    "requirements": {
+      "db": {
+        "check": [
+          "pg_isready"
+        ]
+      }
+    },
+    "caseSensitive": true
+  },
+  "groups": [
+    {
+      "id": "codegen.x86.unit",
+      "slice": "codegen.x86",
+      "tier": "task",
+      "sources": [
+        "crates/codegen-x86/src/**"
+      ],
+      "run": {
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "codegen-x86",
+          "--lib",
+          "--tests"
+        ]
+      }
+    },
+    {
+      "id": "assembler.unit",
+      "slice": "assembler",
+      "tier": "task",
+      "sources": [
+        "crates/assembler/src/**"
+      ],
+      "dependsOn": [
+        "codegen.x86.unit"
+      ],
+      "run": {
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "assembler",
+          "--lib",
+          "--tests"
+        ]
+      }
+    },
+    {
+      "id": "compiler.e2e",
+      "slice": "compiler.e2e",
+      "tier": "release",
+      "sources": [
+        "crates/**",
+        "tests/corpus/**"
+      ],
+      "dependsOn": [
+        "assembler.unit"
+      ],
+      "run": {
+        "command": [
+          "cargo",
+          "test",
+          "-p",
+          "compiler-e2e",
+          "--test",
+          "corpus"
+        ]
+      }
+    }
+  ]
+}

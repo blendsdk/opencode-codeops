@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "policy": {
+    "schema": 1,
+    "full": [
+      "npm",
+      "run",
+      "verify"
+    ]
+  },
+  "groups": [
+    {
+      "id": "a.unit",
+      "slice": "a",
+      "tier": "task",
+      "sources": [
+        "a/**"
+      ],
+      "tests": [
+        "a/**/*.test.js"
+      ],
+      "dependsOn": [
+        "b.unit"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      }
+    },
+    {
+      "id": "b.unit",
+      "slice": "b",
+      "tier": "task",
+      "sources": [
+        "b/**"
+      ],
+      "tests": [
+        "b/**/*.test.js"
+      ],
+      "dependsOn": [
+        "a.unit"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      }
+    }
+  ]
+}

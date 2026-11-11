@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-12 00:55
-> **Progress**: 12/86 tasks (14%)
+> **Last Updated**: 2026-11-12 01:05
+> **Progress**: 22/86 tasks (26%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -79,27 +79,27 @@ Deliver the opt-in test-impact layer in eight phases. Phase 1 is the lightweight
 
 ## Phase 2: Test Map Model and Validation
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill at phase start)_
+> **Phase baseline tree**: e682787b2eee093fae8ccb8d524cbc07eb51068e
 > **Reasoning**: high — schema, merge, ownership, and validation define the safety boundary.
 
 ### Step 2.1: Specification Tests
 
-- [ ] 2.1.1 Write spec tests for map loading, single-file/directory/fragment merge, validation error codes, and canonical hash — `bin/test-map.spec.test.mjs` (ST-1..ST-10, ST-57, ST-63, ST-64, ST-65)
-- [ ] 2.1.2 Run the new spec tests and confirm red; record the failure — `node --test bin/test-map.spec.test.mjs`
+- [x] 2.1.1 Write spec tests for map loading, single-file/directory/fragment merge, validation error codes, and canonical hash — `bin/test-map.spec.test.mjs` (ST-1..ST-10, ST-57, ST-63, ST-64, ST-65) ✅ (completed: 2026-11-12 01:05)
+- [x] 2.1.2 Run the new spec tests and confirm red; record the failure — `node --test bin/test-map.spec.test.mjs` ✅ (completed: 2026-11-12 01:05)
 
 ### Step 2.2: Implementation
 
-- [ ] 2.2.1 Add the JSON Schema contract for policy, fragments, groups, branches, budgets, acceptance, `full` argv, `prSmoke`, `requirements`, per-slice `acceptance`, and `caseSensitive` — `schemas/test-map.schema.json`
-- [ ] 2.2.2 Implement map path resolution, policy loading, fragment merge, and canonicalization — `bin/lib/test-map.mjs`
-- [ ] 2.2.3 Implement validation, ownership/slice health checks, default severity/exit codes, target-based exemptions, `requirements` probes, and strict mode — `bin/lib/test-map-validate.mjs`
-- [ ] 2.2.4 Add Node, Rust (including an inline-only crate), custom, polyglot, and invalid fixtures — `bin/fixtures/test-selection/**`
-- [ ] 2.2.5 Add public type declarations for the model API — `bin/lib/test-map.d.mts`, `bin/lib/test-map-validate.d.mts`
+- [x] 2.2.1 Add the JSON Schema contract for policy, fragments, groups, branches, budgets, acceptance, `full` argv, `prSmoke`, `requirements`, per-slice `acceptance`, and `caseSensitive` — `schemas/test-map.schema.json` ✅ (completed: 2026-11-12 01:05)
+- [x] 2.2.2 Implement map path resolution, policy loading, fragment merge, and canonicalization — `bin/lib/test-map.mjs` ✅ (completed: 2026-11-12 01:05)
+- [x] 2.2.3 Implement validation, ownership/slice health checks, default severity/exit codes, target-based exemptions, `requirements` probes, and strict mode — `bin/lib/test-map-validate.mjs` ✅ (completed: 2026-11-12 01:05)
+- [x] 2.2.4 Add Node, Rust (including an inline-only crate), custom, polyglot, and invalid fixtures — `bin/fixtures/test-selection/**` ✅ (completed: 2026-11-12 01:05)
+- [x] 2.2.5 Add public type declarations for the model API — `bin/lib/test-map.d.mts`, `bin/lib/test-map-validate.d.mts` ✅ (completed: 2026-11-12 01:05)
 
 ### Step 2.3: Implementation Tests and Hardening
 
-- [ ] 2.3.1 Write impl tests for duplicate IDs, cycles, path traversal, empty groups, target-based exemptions, overlap, orphan tests, slice contract, `full` argv, `prSmoke`, `requirements`, per-slice acceptance, severity/exit codes, and hash determinism — `bin/test-map.impl.test.mjs`
-- [ ] 2.3.2 Run targeted map tests and strict validation fixtures; fix failures — `node --test bin/test-map.spec.test.mjs bin/test-map.impl.test.mjs`
-- [ ] 2.3.3 Full verification: `npm run verify`; record PASS and test count — `npm run verify`
+- [x] 2.3.1 Write impl tests for duplicate IDs, cycles, path traversal, empty groups, target-based exemptions, overlap, orphan tests, slice contract, `full` argv, `prSmoke`, `requirements`, per-slice acceptance, severity/exit codes, and hash determinism — `bin/test-map.impl.test.mjs` ✅ (completed: 2026-11-12 01:05)
+- [x] 2.3.2 Run targeted map tests and strict validation fixtures; fix failures — `node --test bin/test-map.spec.test.mjs bin/test-map.impl.test.mjs` ✅ (completed: 2026-11-12 01:05)
+- [x] 2.3.3 Full verification: `npm run verify`; record PASS and test count — `npm run verify` ✅ (completed: 2026-11-12 01:05)
 
 **Verify**: `node --test bin/test-map.spec.test.mjs bin/test-map.impl.test.mjs`
 

@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "policy": {
+    "schema": 1,
+    "full": [
+      "npm",
+      "run",
+      "verify"
+    ]
+  },
+  "groups": [
+    {
+      "id": "a.unit",
+      "slice": "a",
+      "tier": "task",
+      "sources": [
+        "../outside/**"
+      ],
+      "tests": [
+        "a/**/*.test.js"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      }
+    }
+  ]
+}

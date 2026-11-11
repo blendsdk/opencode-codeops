@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "domain": "shared",
+  "owner": "platform",
+  "groups": [
+    {
+      "id": "shared.auth.contract",
+      "slice": "shared.auth",
+      "tier": "task",
+      "sources": [
+        "shared/auth/**"
+      ],
+      "tests": [
+        "shared/auth/**/*.test.ts"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      },
+      "durationSec": 8
+    }
+  ]
+}

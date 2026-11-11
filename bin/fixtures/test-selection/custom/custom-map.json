@@ -1,0 +1,68 @@
+{
+  "schema": 1,
+  "policy": {
+    "schema": 1,
+    "full": [
+      "./scripts/full-check.sh"
+    ],
+    "budgets": {
+      "taskTargetSeconds": 120,
+      "taskAcceptableSeconds": 180
+    },
+    "ignorePaths": [
+      {
+        "glob": "docs/**",
+        "reason": "documentation"
+      }
+    ],
+    "fullOnPaths": [
+      "package.json",
+      "package-lock.json"
+    ],
+    "prSmoke": [],
+    "requirements": {
+      "db": {
+        "check": [
+          "pg_isready"
+        ]
+      }
+    },
+    "caseSensitive": true
+  },
+  "groups": [
+    {
+      "id": "custom.pipeline.unit",
+      "slice": "custom.pipeline",
+      "tier": "task",
+      "sources": [
+        "pipelines/**"
+      ],
+      "tests": [
+        "pipelines/**/*.check"
+      ],
+      "run": {
+        "command": [
+          "./scripts/check.sh",
+          "{tests}"
+        ]
+      }
+    },
+    {
+      "id": "custom.pipeline.release",
+      "slice": "custom.pipeline",
+      "tier": "release",
+      "sources": [
+        "pipelines/**"
+      ],
+      "tests": [
+        "pipelines/**/*.accept"
+      ],
+      "run": {
+        "command": [
+          "./scripts/accept.sh",
+          "{tests}"
+        ]
+      }
+    }
+  ]
+}

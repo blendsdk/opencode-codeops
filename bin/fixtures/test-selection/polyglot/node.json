@@ -1,0 +1,46 @@
+{
+  "schema": 1,
+  "domain": "billing",
+  "owner": "team-billing",
+  "groups": [
+    {
+      "id": "billing.unit",
+      "slice": "billing",
+      "tier": "task",
+      "sources": [
+        "web/billing/**"
+      ],
+      "tests": [
+        "web/billing/**/*.test.ts"
+      ],
+      "dependsOn": [
+        "shared.auth.contract"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      }
+    },
+    {
+      "id": "billing.e2e",
+      "slice": "billing",
+      "tier": "release",
+      "sources": [
+        "web/billing/**"
+      ],
+      "tests": [
+        "tests/e2e/billing/**/*.spec.ts"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      }
+    }
+  ]
+}

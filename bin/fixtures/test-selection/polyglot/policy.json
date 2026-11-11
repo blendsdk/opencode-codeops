@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "full": [
+    "npm",
+    "run",
+    "verify"
+  ],
+  "budgets": {
+    "taskTargetSeconds": 120,
+    "taskAcceptableSeconds": 180
+  },
+  "ignorePaths": [
+    {
+      "glob": "docs/**",
+      "reason": "documentation"
+    }
+  ],
+  "fullOnPaths": [
+    "package.json",
+    "package-lock.json"
+  ],
+  "prSmoke": [
+    "shared.auth.contract"
+  ],
+  "requirements": {
+    "db": {
+      "check": [
+        "pg_isready"
+      ]
+    }
+  },
+  "caseSensitive": true
+}

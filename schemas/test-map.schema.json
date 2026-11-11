@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/blendsdk/opencode-codeops/schemas/test-map.schema.json",
+  "title": "CodeOps test-impact map",
+  "description": "A single-file map, a policy file, or one group fragment. The loader combines a policy file with fragments.",
+  "oneOf": [
+    { "$ref": "#/$defs/singleMap" },
+    { "$ref": "#/$defs/policyFile" },
+    { "$ref": "#/$defs/fragment" }
+  ],
+  "$defs": {
+    "path": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$))(?!.*\\u0000).*$"
+    },
+    "argv": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "full": {
+      "oneOf": [
+        { "$ref": "#/$defs/argv" },
+        {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/argv" }
+        }
+      ]
+    },
+    "ignoreEntry": {
+      "type": "object",
+      "required": ["glob", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "glob": { "$ref": "#/$defs/path" },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "branches": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "integration": { "type": "array", "items": { "type": "string" } },
+        "feature": { "type": "array", "items": { "type": "string" } },
+        "release": { "type": "array", "items": { "type": "string" } },
+        "acceptance": { "type": "array", "items": { "type": "string" } },
+        "releaseTags": { "type": "array", "items": { "type": "string" } },
+        "unknown": { "enum": ["integration", "feature", "release", "acceptance"] }
+      }
+    },
+    "policy": {
+      "type": "object",
+      "required": ["schema", "full"],
+      "additionalProperties": true,
+      "properties": {
+        "schema": { "const": 1 },
+        "full": { "$ref": "#/$defs/full" },
+        "budgets": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "taskTargetSeconds": { "type": "number", "minimum": 0 },
+            "taskAcceptableSeconds": { "type": "number", "minimum": 0 }
+          }
+        },
+        "branches": { "$ref": "#/$defs/branches" },
+        "ignorePaths": { "type": "array", "items": { "$ref": "#/$defs/ignoreEntry" } },
+        "fullOnPaths": { "type": "array", "items": { "$ref": "#/$defs/path" } },
+        "acceptance": {
+          "type": "object",
+          "required": ["mode"],
+          "additionalProperties": false,
+          "properties": {
+            "mode": { "enum": ["automated", "manual", "external"] },
+            "groups": { "type": "array", "items": { "type": "string" } },
+            "checklist": { "type": ["string", "null"] }
+          }
+        },
+        "testRoots": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "array", "items": { "$ref": "#/$defs/path" } }
+          ]
+        },
+        "fullThreshold": { "type": "number", "minimum": 0, "maximum": 1 },
+        "prSmoke": { "type": "array", "items": { "type": "string" } },
+        "requirements": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["check"],
+            "additionalProperties": false,
+            "properties": { "check": { "$ref": "#/$defs/argv" } }
+          }
+        },
+        "caseSensitive": { "type": "boolean" }
+      }
+    },
+    "sliceAcceptance": {
+      "type": "object",
+      "required": ["mode", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "mode": { "enum": ["manual", "external", "na"] },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    },
+    "group": {
+      "type": "object",
+      "required": ["id", "slice", "tier", "sources", "run"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "slice": { "type": "string", "minLength": 1 },
+        "tier": { "enum": ["task", "phase", "release", "acceptance"] },
+        "sources": { "type": "array", "items": { "$ref": "#/$defs/path" } },
+        "tests": { "type": "array", "items": { "$ref": "#/$defs/path" } },
+        "dependsOn": { "type": "array", "items": { "type": "string" } },
+        "alwaysRun": { "type": "boolean" },
+        "durationSec": { "type": "number", "minimum": 0 },
+        "parallelSafe": { "type": "boolean" },
+        "requires": { "type": "array", "items": { "type": "string" } },
+        "owner": { "type": "string" },
+        "description": { "type": "string" },
+        "acceptance": { "$ref": "#/$defs/sliceAcceptance" },
+        "run": {
+          "type": "object",
+          "required": ["command"],
+          "additionalProperties": false,
+          "properties": {
+            "command": { "$ref": "#/$defs/argv" },
+            "cwd": { "$ref": "#/$defs/path" }
+          }
+        }
+      }
+    },
+    "singleMap": {
+      "type": "object",
+      "required": ["schema", "policy", "groups"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": { "const": 1 },
+        "policy": { "$ref": "#/$defs/policy" },
+        "groups": { "type": "array", "items": { "$ref": "#/$defs/group" } }
+      }
+    },
+    "policyFile": {
+      "$ref": "#/$defs/policy"
+    },
+    "fragment": {
+      "type": "object",
+      "required": ["schema", "groups"],
+      "additionalProperties": false,
+      "properties": {
+        "schema": { "const": 1 },
+        "domain": { "type": "string" },
+        "owner": { "type": "string" },
+        "groups": { "type": "array", "items": { "$ref": "#/$defs/group" } }
+      }
+    }
+  }
+}

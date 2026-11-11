@@ -1,0 +1,102 @@
+{
+  "schema": 1,
+  "policy": {
+    "schema": 1,
+    "full": [
+      "npm",
+      "run",
+      "verify"
+    ],
+    "budgets": {
+      "taskTargetSeconds": 120,
+      "taskAcceptableSeconds": 180
+    },
+    "ignorePaths": [
+      {
+        "glob": "docs/**",
+        "reason": "documentation"
+      }
+    ],
+    "fullOnPaths": [
+      "package.json",
+      "package-lock.json"
+    ],
+    "prSmoke": [
+      "shared.auth.contract"
+    ],
+    "requirements": {
+      "db": {
+        "check": [
+          "pg_isready"
+        ]
+      }
+    },
+    "caseSensitive": true
+  },
+  "groups": [
+    {
+      "id": "billing.invoice-dialog.unit",
+      "slice": "billing.invoice-dialog",
+      "tier": "task",
+      "sources": [
+        "web/billing/invoice-dialog/**",
+        "api/billing/invoice/**"
+      ],
+      "tests": [
+        "web/billing/invoice-dialog/**/*.test.ts",
+        "api/billing/invoice/**/*.test.ts"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      },
+      "durationSec": 45,
+      "parallelSafe": true
+    },
+    {
+      "id": "billing.invoice-dialog.e2e",
+      "slice": "billing.invoice-dialog",
+      "tier": "release",
+      "sources": [
+        "web/billing/invoice-dialog/**"
+      ],
+      "tests": [
+        "tests/e2e/billing/invoice-dialog/**/*.spec.ts"
+      ],
+      "dependsOn": [
+        "billing.invoice-dialog.unit"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      },
+      "durationSec": 240
+    },
+    {
+      "id": "shared.auth.contract",
+      "slice": "shared.auth",
+      "tier": "task",
+      "alwaysRun": true,
+      "sources": [
+        "shared/auth/**"
+      ],
+      "tests": [
+        "shared/auth/**/*.test.ts"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      },
+      "durationSec": 8
+    }
+  ]
+}
