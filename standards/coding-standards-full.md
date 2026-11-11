@@ -71,6 +71,34 @@ These apply to all code I write unless this project's `AGENTS.md` overrides a sp
 
 # Testing standards
 
+## Prime directives for verification
+
+1. **Test-first is unchanged.** Specification tests are written before implementation and run
+   red, then green. Selection never changes this.
+2. **The inner loop runs the smallest safe verification slice.** With a valid map, a task runs the
+   selected feature-slice `task` groups plus fast static checks. Without a map, a plan's
+   `**Task verify**` command may provide the same scoped behavior; otherwise the full verify runs
+   as today.
+3. **The outer gate is always full.** The full verify runs at phase/plan completion, before
+   push/release, at acceptance, and in CI. A green slice is not a release signal.
+4. **Selection fails closed.** Unknown paths, shared infrastructure, manifests/lockfiles,
+   test-runner/config changes, CI changes, stale/invalid maps, and selector errors select the
+   full suite. No silent skips.
+5. **Spec tests are never skipped.** The feature's spec test file always runs, even if the map
+   would not select its group. The executor passes the plan's declared spec file(s) with
+   `--include`; the selector adds the owning group, or falls back to full if the spec file is
+   unowned.
+6. **Evidence is explicit.** Verification names the groups or scoped command used, what was
+   deferred, and the baseline. CI remains authoritative.
+
+**Conditional wording.** Run the project's full verify command before completing any task or
+committing, unless the project has a valid `codeops/test-map.json` or `codeops/test-map/`
+directory, or the plan records a validated `**Task verify**` scoped command. With either opt-in,
+the task-level verify may run the selected test groups plus the project's fast static checks, or
+the plan-scoped command. The full verify still runs at phase/plan completion, before push/merge,
+at acceptance, and in CI. Any selection error, unknown path, shared change, or stale map falls
+back to the full verify. The canonical protocol is `_shared/test-selection.md`.
+
 - **Run the project's verify command (build + test) before completing any task or committing.** No code is "done" while any test fails.
 - **Targeted vs. full:** iterate with targeted tests, but run the **full** verify before declaring completion.
 - **Maximum, granular coverage:** happy path, edge/boundary cases, error/invalid inputs, and integration — each test focused on one thing with a clear failure message.

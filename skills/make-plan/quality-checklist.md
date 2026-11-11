@@ -44,6 +44,10 @@ Run this before finalizing the plan documents. The **Specification-First Testing
 - [ ] Spec test tasks reference ST-cases from `07-testing-strategy.md`
 - [ ] Spec test and impl test files use separate naming conventions (`*.spec.test.*` and `*.impl.test.*`)
 - [ ] A red-phase verification task exists in the execution plan (verify spec tests fail before implementation)
+- [ ] `07-testing-strategy.md` carries the optional `Test slices` table, or records `N/A — full verify only`
+- [ ] Every ST-case maps to a test slice or a validated scoped command
+- [ ] Every slice has a task-tier test and a release/acceptance group or recorded acceptance reason
+- [ ] The full gate command is recorded; a `**Task verify**` command, when present, proved a nonzero test count
 
 ## ✅ No Dead Code
 - [ ] No unused parameters (except interface contracts, overrides, and framework-required signatures)

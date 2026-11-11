@@ -312,6 +312,21 @@ With no RD upstream, `01-requirements.md` IS the owning requirements doc:
 - Adjust targets per project in `01-requirements.md` (an AR-referenced decision) — never
   silently.
 
+## Test Slices & Groups (optional)
+
+> Fill this table when the project has a test map (`codeops/test-map.json` or
+> `codeops/test-map/`) or when the plan records a validated `**Task verify**` scoped command.
+> For a map-less project with no scoped command, write `N/A — full verify only` and keep the
+> existing plan shape.
+
+| Slice | Tier | Test Files | Sources | Depends On | Gate |
+| ----- | ---- | ---------- | ------- | ---------- | ---- |
+| [slice] | task | [paths] | [paths] | [slice/group] | task |
+| [slice] | release | [paths] | [paths] | [task group] | release |
+
+Every slice needs a task-tier test. Every slice needs a release or acceptance group, or a
+recorded manual/external/N/A acceptance reason.
+
 ## 🚨 Specification Test Cases (MANDATORY — NON-NEGOTIABLE)
 
 > These test cases are derived EXCLUSIVELY from requirements (`01-requirements.md`),
@@ -478,7 +493,10 @@ task-size criteria in [quality-checklist.md](quality-checklist.md))
 - [ ] Deliverable 1
 - [ ] All verification passing
 
-**Verify**: [Project's verify command from AGENTS.md / detected conventions]
+**Test slices**: [optional — slice/tier summary, or `N/A — full verify only`]
+**Task verify**: [optional validated scoped command and observed test count, or omit]
+**Verify (gate)**: [full project verify command from AGENTS.md / detected conventions]
+**Verify**: [legacy alias — same as the gate command when only one line is used]
 
 ---
 

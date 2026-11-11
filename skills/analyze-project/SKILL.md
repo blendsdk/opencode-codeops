@@ -21,6 +21,13 @@ description: Analyze the current repository and create or refresh concise CodeOp
 
 5. Include project type, principal languages/frameworks, authoritative build/test/verify commands, high-level structure, generated-file warnings, and CodeOps artifact/config locations.
 6. If the managed section exists, replace only its contents. Preserve all other text byte-for-byte.
+6b. **Testing block.** Detect `codeops/test-map.json` or `codeops/test-map/` and the project's
+   `full` command. The `<!-- CODEOPS-TESTING:START -->` / `<!-- CODEOPS-TESTING:END -->` block
+   inside the managed section is owned by the `organize-tests` skill: preserve it byte-for-byte,
+   never render or overwrite it, and warn when it is missing or stale. With no map and no block,
+   report that no map is present and do not create a block; an existing no-map block is preserved
+   as-is. Warn (advisory only) when CI has no full gate on a release/acceptance branch. The block
+   contract is in [_shared/test-selection.md](../../_shared/test-selection.md).
 7. On a non-integration branch, preview changes to repository-wide guidance and ask before writing unless repository policy explicitly permits branch-local updates.
 8. In compact mode, remove duplication and stale generated detail from the managed section only. Flag suspected hand-authored bloat; never silently rewrite it.
 9. Validate every recorded command or mark it explicitly unverified.

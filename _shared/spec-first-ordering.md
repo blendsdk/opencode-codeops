@@ -72,8 +72,12 @@ Step N.1: [Feature Name]
   N.1.3  Implement feature
   N.1.4  Verify spec tests pass (green phase)
   N.1.5  Write implementation tests
-  N.1.6  Full verification
+  N.1.6  Phase/plan gate verification
 ```
 
 The order `spec tests → red phase → implement → green phase → impl tests → verify` is NEVER
-negotiable, regardless of feature size.
+negotiable, regardless of feature size. The red phase runs only the declared spec file(s). The
+final verification is the phase/plan gate: the full project verify, or the map's release gate.
+Per-task verification may use the selected task groups or a validated `**Task verify**` command;
+the gate rules, fallback behavior, and evidence contract live in
+[test-selection.md](test-selection.md).

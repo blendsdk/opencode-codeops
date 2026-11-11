@@ -233,9 +233,16 @@ decisions remain user-owned.
 3b. Every addition accepted through scope exploration must also carry its owning `SE-*`
     back-reference. `Defer`, `Discard`, and `Superseded` entries never produce plan tasks.
 4. `07-testing-strategy.md` must contain concrete **Specification Test Cases (ST-*)** with input→expected-output pairs, each traced to a requirement / spec doc / AR entry. Expectations come from the SPEC, never from imagined implementation behavior.
-4b. **Confirm the verify command once.** The command that fills every Verify line comes from the
-   project's AGENTS.md or manifests — state what you detected and have the user confirm it (an AR
-   entry like any decision). If nothing is detectable, ask — **never invent a command**.
+4b. **Confirm the verify commands once.** The gate command that fills every `**Verify**` /
+   `**Verify (gate)**` line comes from the project's AGENTS.md or manifests — state what you
+   detected and have the user confirm it (an AR entry like any decision). If nothing is
+   detectable, ask — **never invent a command**. Optionally record a `**Task verify**` scoped
+   command for task/commit verification. Run the task command once during authoring, record the
+   observed test count as `**Task verify evidence**: <N> tests observed, <date>`, and reject a
+   command that runs zero tests. Record the plan's declared spec file(s) so exec-plan can
+   pass them with `--include`. With no map and no scoped command, generate exactly today's plan
+   (one `**Verify**` line). The canonical gate ladder is
+   [../../_shared/test-selection.md](../../_shared/test-selection.md).
 5. `99-execution-plan.md` must structure every feature phase with the mandatory three-session ordering (Spec Tests → Implementation → Impl Tests & Hardening), carrying each phase's tasks as a **single checkbox list** — the plan's single source of truth for progress; a task line appears exactly once in the document. The full ordering rules are in [templates.md](templates.md).
 6. If you discover a NEW ambiguity while writing, STOP immediately and add it to the register.
    In normal mode get the user's decision; with active auto-design resolve an eligible technical

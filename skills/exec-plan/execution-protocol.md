@@ -50,6 +50,11 @@ Suggestion only — the user may proceed without upgrading.
 
 ### Phase start
 
+Record the phase's expected modification set from its task target paths and deliverables. The set
+drives the fallback rule: a task-time change outside it, or a shared/configuration/test-infrastructure
+change, runs the full gate. For an old plan, the rule is unchanged: a single `**Verify**` line is the gate
+command; with a map, derive the task command, otherwise use the same line for tasks.
+
 Before a phase's first task (and before a T-NN mini-plan's first task), snapshot the complete
 non-ignored worktree—including staged, unstaged, and untracked files—into a temporary Git tree,
 without changing the real index:
@@ -102,8 +107,15 @@ complete. For each task, in order:
    and update the Progress header. Do this before running verification or anything else — if the
    session crashes now, the implementation progress is preserved and the resume session knows the
    task still needs verification.
-4. Run verification (your project's verify command — from the project's AGENTS.md, or detected
-   project conventions), with output captured per the **Verify-output capture rule** below.
+4. Run verification, with output captured per the **Verify-output capture rule** below. Use the
+   task command for a normal task: the plan's validated `**Task verify**` line, or the map's
+   `task` gate with `--baseline <phase-baseline-tree>` and `--include <declared-spec-file>` for
+   every plan-declared specification test file. If neither exists, use the project's full verify
+   command (from AGENTS.md or detected conventions). Run the full gate at phase exit, plan
+   completion, before push/release, and whenever a changed path falls outside the phase's
+   expected modification set or touches shared/configuration/test infrastructure. A single
+   `**Verify**` line is the gate command; a map may derive the task command from it, otherwise
+   that line serves both.
    - **PASS** → before promoting, run the **documentation-standard self-check** below on the files
      this task changed. Missing documentation and leaked plan references are invisible to
      build+test, so a green verify is NOT sufficient — the self-check is a hard part of the

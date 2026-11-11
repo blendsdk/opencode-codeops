@@ -145,7 +145,9 @@ summary template. The essentials:
 
 ### Step 1 — Load the plan
 
-1. Read `plans/$ARGUMENTS/99-execution-plan.md`.
+1. Read `plans/$ARGUMENTS/99-execution-plan.md`. An old plan with a single `**Verify**` line
+   uses that line as the gate command; with a map, derive the task command, otherwise it serves
+   both.
 2. Find incomplete tasks — both `[ ]` and implemented-but-unverified `[~]`; read supporting specs
    in `plans/$ARGUMENTS/`.
 3. Determine the starting point: a `[~]` task is resumed first (re-verify, then promote or keep
@@ -177,12 +179,16 @@ For each task, in order:
      points in [execution-protocol.md](execution-protocol.md) §Progress Reporting; a failed or
      missing report never blocks any step.
 
-3. **Verify** — run your project's verify command (from the project's AGENTS.md, or detected
-   project conventions), output captured per the protocol's **Verify-output capture rule**
-   (PASS one-liner; on failure the last 50 log lines + log path). Pass → promote `[~]` → `[x]`;
-   fail → fix and re-verify (mark stays `[~]`). Immediately after every `[x]` promotion, run the
-   protocol's read-only progress-bar command for the selected plan and show its exact output in the
-   next commentary update. Only `[x]` contributes to the displayed completion count.
+3. **Verify** — run the task command: the plan's `**Task verify**` line, or the map's `task`
+   gate with `--baseline <phase-tree>` and `--include <spec-file>` for the plan's declared spec
+   file(s). With neither, run the project's full verify (from AGENTS.md or detected conventions),
+   output captured per the protocol's **Verify-output capture rule** (PASS one-liner; on failure
+   the last 50 log lines + log path). A changed path outside the phase's expected modification
+   set, or a shared/config/test-infrastructure change, forces the full gate. Pass → promote `[~]`
+   → `[x]`; fail → fix and re-verify (mark stays `[~]`). Immediately after every `[x]` promotion,
+   run the protocol's read-only progress-bar command for the selected plan and show its exact
+   output in the next commentary update. Only `[x]` contributes to the displayed completion
+   count.
 4. **Commit** per the active commit mode (see [commit-modes.md](commit-modes.md)) — the commit
    gate keys off `[x]`.
 5. **Techdocs check (after each phase):** if the phase introduced architectural changes and
@@ -215,7 +221,8 @@ For each task, in order:
 
 1. Finish the current task before stopping.
 2. **🚨 First, update `99-execution-plan.md`** with all completed tasks (before anything else).
-3. Run the verify command.
+3. Run the task command when the plan is not complete and the session stops inside a phase;
+   run the full gate at plan completion or a phase boundary.
 4. Handle the commit per the active commit mode.
 5. Report a session summary (must state `Execution Plan Updated: ✅`). Template in
    [execution-protocol.md](execution-protocol.md).
