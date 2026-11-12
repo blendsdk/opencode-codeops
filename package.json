@@ -1,7 +1,7 @@
 {
   "name": "opencode-codeops",
   "version": "2.5.0",
-  "description": "Specification-first engineering for complex systems — CodeOps plugin for OpenCode",
+  "description": "Specification-first engineering for complex systems \u2014 CodeOps plugin for OpenCode",
   "type": "module",
   "engines": {
     "node": ">=18",
@@ -14,7 +14,8 @@
     "./tui": "./plugin/tui.js"
   },
   "bin": {
-    "opencode-codeops": "bin/index.mjs"
+    "opencode-codeops": "bin/index.mjs",
+    "codeops-test": "bin/codeops-test.mjs"
   },
   "scripts": {
     "test": "node --test",
@@ -39,6 +40,7 @@
     "!scripts/*.test.mjs",
     "!scripts/*.spec.test.mjs",
     "bin/",
+    "!bin/fixtures/",
     "!bin/*.test.mjs",
     "!bin/*.spec.test.mjs",
     "references/",

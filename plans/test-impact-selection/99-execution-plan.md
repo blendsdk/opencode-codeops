@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-12 01:20
-> **Progress**: 32/86 tasks (37%)
+> **Last Updated**: 2026-11-12 01:38
+> **Progress**: 42/86 tasks (49%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -135,27 +135,27 @@ Deliver the opt-in test-impact layer in eight phases. Phase 1 is the lightweight
 
 ## Phase 4: CLI and Runner
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill at phase start)_
+> **Phase baseline tree**: d6d3e069869b3740dd0fb7c232c7feea75f044a2
 > **Reasoning**: high — executes project commands; argv/path safety is non-negotiable.
 
 ### Step 4.1: Specification Tests
 
-- [ ] 4.1.1 Write CLI spec tests for `select`, `run`, `check`, `shadow`, options, JSON output, and exit codes — `bin/codeops-test.spec.test.mjs` (ST-26..ST-35, ST-56, ST-58)
-- [ ] 4.1.2 Run the new spec tests and confirm red; record the failure — `node --test bin/codeops-test.spec.test.mjs`
+- [x] 4.1.1 Write CLI spec tests for `select`, `run`, `check`, `shadow`, options, JSON output, and exit codes — `bin/codeops-test.spec.test.mjs` (ST-26..ST-35, ST-56, ST-58) ✅ (completed: 2026-11-12 01:38)
+- [x] 4.1.2 Run the new spec tests and confirm red; record the failure — `node --test bin/codeops-test.spec.test.mjs` ✅ (completed: 2026-11-12 01:38)
 
 ### Step 4.2: Implementation
 
-- [ ] 4.2.1 Implement argv-safe command execution with cwd containment, `--full-command`, `requirements` probes, timeout, concurrency, failure-log retention, and temp hygiene — `bin/lib/test-runner.mjs`
-- [ ] 4.2.2 Implement the CLI entry point and `select`/`run`/`check` commands, including `--last-full-sha`, `--full-command`, `--no-fallback`, `--keep-logs`, `--metrics`, and the full `provenance` input flags — `bin/codeops-test.mjs`
-- [ ] 4.2.3 Implement `shadow` (selected + full comparison, escaped-failure report) — `bin/codeops-test.mjs`, `bin/lib/test-runner.mjs`
-- [ ] 4.2.4 Register the `codeops-test` binary, include it in the package payload, and exclude `bin/fixtures/` — `package.json`
-- [ ] 4.2.5 Add the public runner declaration — `bin/lib/test-runner.d.mts`
+- [x] 4.2.1 Implement argv-safe command execution with cwd containment, `--full-command`, `requirements` probes, timeout, concurrency, failure-log retention, and temp hygiene — `bin/lib/test-runner.mjs` ✅ (completed: 2026-11-12 01:38)
+- [x] 4.2.2 Implement the CLI entry point and `select`/`run`/`check` commands, including `--last-full-sha`, `--full-command`, `--no-fallback`, `--keep-logs`, `--metrics`, and the full `provenance` input flags — `bin/codeops-test.mjs` ✅ (completed: 2026-11-12 01:38)
+- [x] 4.2.3 Implement `shadow` (selected + full comparison, escaped-failure report) — `bin/codeops-test.mjs`, `bin/lib/test-runner.mjs` ✅ (completed: 2026-11-12 01:38)
+- [x] 4.2.4 Register the `codeops-test` binary, include it in the package payload, and exclude `bin/fixtures/` — `package.json` ✅ (completed: 2026-11-12 01:38)
+- [x] 4.2.5 Add the public runner declaration — `bin/lib/test-runner.d.mts` ✅ (completed: 2026-11-12 01:38)
 
 ### Step 4.3: Implementation Tests and Hardening
 
-- [ ] 4.3.1 Write impl tests for spaces/metacharacters in paths, cwd/symlink escape, fail-fast/no-fail-fast, timeout, parallelSafe gating, log location/cleanup, and shadow outcomes — `bin/codeops-test.impl.test.mjs`
-- [ ] 4.3.2 Run targeted CLI tests and fix failures — `node --test bin/codeops-test.spec.test.mjs bin/codeops-test.impl.test.mjs`
-- [ ] 4.3.3 Full verification: `npm run verify`; record PASS and test count — `npm run verify`
+- [x] 4.3.1 Write impl tests for spaces/metacharacters in paths, cwd/symlink escape, fail-fast/no-fail-fast, timeout, parallelSafe gating, log location/cleanup, and shadow outcomes — `bin/codeops-test.impl.test.mjs` ✅ (completed: 2026-11-12 01:38)
+- [x] 4.3.2 Run targeted CLI tests and fix failures — `node --test bin/codeops-test.spec.test.mjs bin/codeops-test.impl.test.mjs` ✅ (completed: 2026-11-12 01:38)
+- [x] 4.3.3 Full verification: `npm run verify`; record PASS and test count — `npm run verify` ✅ (completed: 2026-11-12 01:38)
 
 **Verify**: `node --test bin/codeops-test.spec.test.mjs bin/codeops-test.impl.test.mjs`
 
