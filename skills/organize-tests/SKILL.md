@@ -137,8 +137,10 @@ gate), and the wrapper guidance are in
   every diff and never remove a job.
 - Never use `pull_request_target` with fork code or expose secrets to fork PRs.
 
-Advisory CI and wrapper templates are provided separately. They are previewed
-like every other change and are never applied automatically.
+The advisory templates are in
+[references/ci-github-actions.md](references/ci-github-actions.md) and
+[references/project-wrapper.md](references/project-wrapper.md). They are
+previewed like every other change and are never applied automatically.
 
 ## Safety rules
 

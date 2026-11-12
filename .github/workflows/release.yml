@@ -40,9 +40,13 @@ jobs:
           echo "Use the 'next' or 'beta' tag for other branches."
           exit 1
 
+  verify:
+    name: Verify Full
+    uses: ./.github/workflows/verify-full.yml
+
   release:
     name: Version & Publish
-    needs: [validate]
+    needs: [validate, verify]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -65,9 +69,6 @@ jobs:
 
       - name: Install dependencies
         run: npm ci --ignore-scripts
-
-      - name: Verify
-        run: npm run verify
 
       - name: Configure git
         run: |

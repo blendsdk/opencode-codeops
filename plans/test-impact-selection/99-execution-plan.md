@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-12 02:15
-> **Progress**: 64/86 tasks (74%)
+> **Last Updated**: 2026-11-12 02:32
+> **Progress**: 74/86 tasks (86%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -221,27 +221,27 @@ Deliver the opt-in test-impact layer in eight phases. Phase 1 is the lightweight
 
 ## Phase 7: CI and Release Integration
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill at phase start)_
+> **Phase baseline tree**: 90183b3895a382742dddfd96fadf2147db9b60ea
 > **Reasoning**: high — CI gate changes can silently weaken the release gate; preview and content tests are mandatory.
 
 ### Step 7.1: Specification Tests
 
-- [ ] 7.1.1 Write content spec tests for the reusable full gate, affected plan modes/matrix, stable aggregator, `check --strict` job, nightly marker input/update, source-commit provenance, CODEOWNERS, and fork-PR safety — `scripts/ci-workflows-content.spec.test.mjs` (ST-53..ST-54, ST-58, ST-67, ST-68)
-- [ ] 7.1.2 Run the new content tests and confirm red; record the failure — `node --test scripts/ci-workflows-content.spec.test.mjs`
+- [x] 7.1.1 Write content spec tests for the reusable full gate, affected plan modes/matrix, stable aggregator, `check --strict` job, nightly marker input/update, source-commit provenance, CODEOWNERS, and fork-PR safety — `scripts/ci-workflows-content.spec.test.mjs` (ST-53..ST-54, ST-58, ST-67, ST-68) ✅ (completed: 2026-11-12 02:32)
+- [x] 7.1.2 Run the new content tests and confirm red; record the failure — `node --test scripts/ci-workflows-content.spec.test.mjs` ✅ (completed: 2026-11-12 02:32)
 
 ### Step 7.2: Implementation
 
-- [ ] 7.2.1 Add the reusable full-gate workflow with full verify and pack check — `.github/workflows/verify-full.yml`
-- [ ] 7.2.2 Refactor CI to call the reusable full gate without changing behavior — `.github/workflows/ci.yml`
-- [ ] 7.2.3 Refactor release to call the reusable full gate before publish — `.github/workflows/release.yml`
-- [ ] 7.2.4 Write the advisory GitHub Actions template reference (affected shards, full path, aggregator, `check --strict`, nightly marker, provenance, acceptance, promotion, CODEOWNERS) — `skills/organize-tests/references/ci-github-actions.md`
-- [ ] 7.2.5 Add the project wrapper/npm-script guidance for the selector — `skills/organize-tests/references/project-wrapper.md`
+- [x] 7.2.1 Add the reusable full-gate workflow with full verify and pack check — `.github/workflows/verify-full.yml` ✅ (completed: 2026-11-12 02:32)
+- [x] 7.2.2 Refactor CI to call the reusable full gate without changing behavior — `.github/workflows/ci.yml` ✅ (completed: 2026-11-12 02:32)
+- [x] 7.2.3 Refactor release to call the reusable full gate before publish — `.github/workflows/release.yml` ✅ (completed: 2026-11-12 02:32)
+- [x] 7.2.4 Write the advisory GitHub Actions template reference (affected shards, full path, aggregator, `check --strict`, nightly marker, provenance, acceptance, promotion, CODEOWNERS) — `skills/organize-tests/references/ci-github-actions.md` ✅ (completed: 2026-11-12 02:32)
+- [x] 7.2.5 Add the project wrapper/npm-script guidance for the selector — `skills/organize-tests/references/project-wrapper.md` ✅ (completed: 2026-11-12 02:32)
 
 ### Step 7.3: Implementation Tests and Hardening
 
-- [ ] 7.3.1 Write impl/structure tests for workflow triggers, full-gate presence, all four plan modes, additive jobs, no `pull_request_target`, marker input/update, and template links — `scripts/ci-workflows-content.impl.test.mjs`
-- [ ] 7.3.2 Run targeted workflow/content tests; run `actionlint` when available; fix failures — `node --test scripts/ci-workflows-content.spec.test.mjs scripts/ci-workflows-content.impl.test.mjs`
-- [ ] 7.3.3 Full verification plus package payload: `npm run verify` and `npm pack --dry-run`; record results — `npm run verify`, `npm pack --dry-run`
+- [x] 7.3.1 Write impl/structure tests for workflow triggers, full-gate presence, all four plan modes, additive jobs, no `pull_request_target`, marker input/update, and template links — `scripts/ci-workflows-content.impl.test.mjs` ✅ (completed: 2026-11-12 02:32)
+- [x] 7.3.2 Run targeted workflow/content tests; run `actionlint` when available; fix failures — `node --test scripts/ci-workflows-content.spec.test.mjs scripts/ci-workflows-content.impl.test.mjs` ✅ (completed: 2026-11-12 02:32)
+- [x] 7.3.3 Full verification plus package payload: `npm run verify` and `npm pack --dry-run`; record results — `npm run verify`, `npm pack --dry-run` ✅ (completed: 2026-11-12 02:32)
 
 **Verify**: `node --test scripts/ci-workflows-content.spec.test.mjs scripts/ci-workflows-content.impl.test.mjs`
 
