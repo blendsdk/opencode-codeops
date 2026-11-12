@@ -16,11 +16,13 @@ import { spawnSync } from "node:child_process"
 import { existsSync, readFileSync, writeFileSync } from "node:fs"
 import { resolve } from "node:path"
 
+import { classifyRef, buildPlan, nightlyDecision } from "./lib/test-branch-policy.mjs"
 import { loadMap, MapLoadError, normalizeRepoPath } from "./lib/test-map.mjs"
 import { exitCodeFor, validateMap } from "./lib/test-map-validate.mjs"
 import { formatSelection, formatSelectionJson } from "./lib/test-selection-explain.mjs"
 import { selectTests, ALL_GATES } from "./lib/test-selection.mjs"
 import { collectChanges, SelectionError } from "./lib/test-selection-changes.mjs"
+import { createProvenanceRecord, verifyProvenance } from "./lib/test-provenance.mjs"
 import {
   DEFAULT_FULL_TIMEOUT_SECONDS,
   probeRequirement,
@@ -133,6 +135,11 @@ function parseArgs(argv) {
   for (let index = 1; index < argv.length; index += 1) {
     const token = argv[index]
 
+    if (command === "provenance" && index === 1 && (token === "write" || token === "verify")) {
+      options.action = token
+      continue
+    }
+
     if (token === "--full-command") {
       const tokens = []
       const isKnownOption = (value) => VALUE_OPTIONS.has(value) || BOOLEAN_OPTIONS.has(value) || value === "--full-command"
@@ -171,8 +178,8 @@ function parseArgs(argv) {
   if (options.gate && !ALL_GATES.includes(options.gate)) {
     throw new UsageError(`unknown gate: ${options.gate}`)
   }
-  if (options.command === "provenance") {
-    throw new UsageError("provenance support is added with the release-evidence phase")
+  if (options.command === "provenance" && !["write", "verify"].includes(options.action)) {
+    throw new UsageError("provenance needs a write or verify action")
   }
   return options
 }
@@ -237,12 +244,7 @@ function currentBranch(root) {
  * @returns {string} Gate name.
  */
 function defaultGate(branch) {
-  if (/^v\d/.test(branch) || branch.startsWith("release/") || branch.startsWith("release-") || branch.startsWith("hotfix/") || branch.startsWith("hotfix-")) {
-    return "release"
-  }
-  if (branch.startsWith("acceptance/") || branch.startsWith("acceptance-")) return "acceptance"
-  if (branch === "main" || branch === "master") return "pr"
-  return "task"
+  return classifyRef(branch).gate
 }
 
 /**
@@ -604,30 +606,34 @@ function commandCheck(options) {
  * @returns {number} Exit code.
  */
 function commandPlan(options) {
-  const { result, map } = computeSelection(options)
-  const total = map?.groups.length ?? 0
-  const matrix =
-    result.mode === "groups"
-      ? {
-          include: result.commands.map((command) => ({
-            group: command.id,
-            command: command.argv,
-            cwd: command.cwd,
-          })),
-        }
-      : { include: [] }
-  const plan = {
-    schema: 1,
-    gate: result.gate,
-    mode: result.mode,
-    full: result.mode === "full" || result.gate === "release" || result.gate === "acceptance",
-    selected: result.selected.length,
-    total,
-    mapHash: result.mapHash,
-    matrix,
-    fullCommand: result.fullCommand,
-    reason: result.reason,
+  const computed = computeSelection(options)
+  let result = computed.result
+  const marker = options.lastFullSha ?? process.env.CODEOPS_LAST_FULL_SHA ?? null
+
+  if (result.gate === "nightly") {
+    const decision = nightlyDecision({ changed: result.changed, map: computed.map, marker })
+    if (decision.mode === "skip") {
+      result = {
+        ...result,
+        mode: "skip",
+        selected: [],
+        deferred: [],
+        commands: [],
+        reason: "no-relevant-change",
+        budget: { estimatedSec: 0, status: "not-applicable" },
+      }
+    } else if (decision.mode === "full" && result.mode !== "full") {
+      result = fallbackResult({
+        reason: "nightly.no-marker",
+        gate: result.gate,
+        policy: computed.map?.policy ?? null,
+        mapHash: computed.mapHash,
+        changed: result.changed,
+      })
+    }
   }
+
+  const plan = buildPlan({ selection: result, gate: result.gate, total: computed.map?.groups.length ?? 0 })
   process.stdout.write(options.json ? `${JSON.stringify(plan, null, 2)}\n` : `${formatSelection(result)}\n`)
   if (options.noFallback && result.mode === "full" && result.reason !== "forced") return 5
   return 0
@@ -714,6 +720,91 @@ async function commandShadow(options) {
 }
 
 /**
+ * Execute the `provenance` command.
+ *
+ * @param {object} options Parsed options.
+ * @returns {number} Exit code.
+ */
+function commandProvenance(options) {
+  const root = resolveRoot(options.root)
+  if (!options.record) {
+    process.stderr.write("provenance needs --record <file>\n")
+    return 2
+  }
+  const recordPath = resolve(root, options.record)
+
+  if (options.action === "write") {
+    const commit = options.sourceCommit ?? spawnSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).stdout.trim()
+    let mapHash = null
+    let groups = []
+    try {
+      const loaded = loadMap({ root, mapPath: options.map })
+      if (loaded.mode === "map") {
+        mapHash = loaded.mapHash
+        groups = loaded.map.groups.map((group) => group.id)
+      }
+    } catch (error) {
+      if (!(error instanceof MapLoadError)) throw error
+      process.stderr.write(`${error.code}: ${error.message}\n`)
+      return 3
+    }
+
+    const readJsonOption = (value) => {
+      if (!value) return null
+      try {
+        return JSON.parse(readFileSync(resolve(root, value), "utf8"))
+      } catch (error) {
+        throw new UsageError(`cannot read ${value}: ${error.message}`)
+      }
+    }
+
+    const record = createProvenanceRecord({
+      commit,
+      gate: options.gate ?? "release",
+      mapHash,
+      groups,
+      fullRunId: options.fullRunId ?? process.env.GITHUB_RUN_ID ?? null,
+      artifactPath: options.artifact ? resolve(root, options.artifact) : null,
+      sourceCommit: options.sourceCommit ?? commit,
+      reproducible: true,
+      coverage: readJsonOption(options.coverage),
+      acceptance: readJsonOption(options.acceptance),
+    })
+    writeFileSync(recordPath, `${JSON.stringify(record, null, 2)}\n`)
+    process.stdout.write(options.json ? `${JSON.stringify(record, null, 2)}\n` : `provenance written: ${recordPath}\n`)
+    return 0
+  }
+
+  let record
+  try {
+    record = JSON.parse(readFileSync(recordPath, "utf8"))
+  } catch (error) {
+    process.stderr.write(`cannot read provenance record: ${error.message}\n`)
+    return 2
+  }
+
+  let expectedMapHash = null
+  try {
+    const loaded = loadMap({ root, mapPath: options.map })
+    if (loaded.mode === "map" && record.mapHash !== null) expectedMapHash = loaded.mapHash
+  } catch (error) {
+    if (!(error instanceof MapLoadError)) throw error
+  }
+
+  const result = verifyProvenance(record, {
+    commit: options.commit,
+    mapHash: expectedMapHash,
+    artifactPath: options.artifact ? resolve(root, options.artifact) : undefined,
+  })
+  if (options.json) process.stdout.write(`${JSON.stringify(result, null, 2)}\n`)
+  else if (result.ok) process.stdout.write("provenance verified\n")
+  else {
+    for (const error of result.errors) process.stdout.write(`${error.field}: ${error.message}\n`)
+  }
+  return result.ok ? 0 : 1
+}
+
+/**
  * Run the CLI.
  *
  * @param {string[]} argv Raw arguments.
@@ -736,6 +827,8 @@ async function main(argv) {
       return commandPlan(options)
     case "shadow":
       return commandShadow(options)
+    case "provenance":
+      return commandProvenance(options)
     default:
       throw new UsageError(`unknown command: ${options.command}`)
   }

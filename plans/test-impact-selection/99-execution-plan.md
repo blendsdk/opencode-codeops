@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-12 01:38
-> **Progress**: 42/86 tasks (49%)
+> **Last Updated**: 2026-11-12 01:58
+> **Progress**: 51/86 tasks (59%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -163,26 +163,26 @@ Deliver the opt-in test-impact layer in eight phases. Phase 1 is the lightweight
 
 ## Phase 5: Branch Policy, Plan, and Provenance
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill at phase start)_
+> **Phase baseline tree**: ba4635af50d8224472636765026a57a3045889a2
 > **Reasoning**: high — branch classification and provenance decide when the full gate runs.
 
 ### Step 5.1: Specification Tests
 
-- [ ] 5.1.1 Write spec tests for branch patterns/precedence, gate mapping, plan matrix, nightly skip, map hash, provenance, and artifact promotion — `bin/test-branch-policy.spec.test.mjs`, `bin/test-provenance.spec.test.mjs` (ST-36..ST-42, ST-62, ST-67, ST-69)
-- [ ] 5.1.2 Run the new spec tests and confirm red; record the failure — `node --test bin/test-branch-policy.spec.test.mjs bin/test-provenance.spec.test.mjs`
+- [x] 5.1.1 Write spec tests for branch patterns/precedence, gate mapping, plan matrix, nightly skip, map hash, provenance, and artifact promotion — `bin/test-branch-policy.spec.test.mjs`, `bin/test-provenance.spec.test.mjs` (ST-36..ST-42, ST-62, ST-67, ST-69) ✅ (completed: 2026-11-12 01:58)
+- [x] 5.1.2 Run the new spec tests and confirm red; record the failure — `node --test bin/test-branch-policy.spec.test.mjs bin/test-provenance.spec.test.mjs` ✅ (completed: 2026-11-12 01:58)
 
 ### Step 5.2: Implementation
 
-- [ ] 5.2.1 Implement branch/tag classification (including `feature`), precedence, unknown-branch warning, and gate mapping — `bin/lib/test-branch-policy.mjs`
-- [ ] 5.2.2 Implement canonical map hashing, provenance write/verify, tested source commit, artifact digest, and reproducible-rebuild checks — `bin/lib/test-provenance.mjs`
-- [ ] 5.2.3 Integrate `plan` (all four modes, always-present matrix) and `provenance` commands into the CLI — `bin/codeops-test.mjs`
-- [ ] 5.2.4 Add public declarations for branch policy and provenance — `bin/lib/test-branch-policy.d.mts`, `bin/lib/test-provenance.d.mts`
+- [x] 5.2.1 Implement branch/tag classification (including `feature`), precedence, unknown-branch warning, and gate mapping — `bin/lib/test-branch-policy.mjs` ✅ (completed: 2026-11-12 01:58)
+- [x] 5.2.2 Implement canonical map hashing, provenance write/verify, tested source commit, artifact digest, and reproducible-rebuild checks — `bin/lib/test-provenance.mjs` ✅ (completed: 2026-11-12 01:58)
+- [x] 5.2.3 Integrate `plan` (all four modes, always-present matrix) and `provenance` commands into the CLI — `bin/codeops-test.mjs` ✅ (completed: 2026-11-12 01:58)
+- [x] 5.2.4 Add public declarations for branch policy and provenance — `bin/lib/test-branch-policy.d.mts`, `bin/lib/test-provenance.d.mts` ✅ (completed: 2026-11-12 01:58)
 
 ### Step 5.3: Implementation Tests and Hardening
 
-- [ ] 5.3.1 Write impl tests for tags, precedence, missing marker, docs-only nightly skip, matrix shape, commit/digest/hash mismatch, and same-vs-rebuilt artifact promotion — `bin/test-branch-policy.impl.test.mjs`, `bin/test-provenance.impl.test.mjs`
-- [ ] 5.3.2 Run targeted branch/provenance tests and fix failures — `node --test bin/test-branch-policy.spec.test.mjs bin/test-branch-policy.impl.test.mjs bin/test-provenance.spec.test.mjs bin/test-provenance.impl.test.mjs`
-- [ ] 5.3.3 Full verification: `npm run verify`; record PASS and test count — `npm run verify`
+- [x] 5.3.1 Write impl tests for tags, precedence, missing marker, docs-only nightly skip, matrix shape, commit/digest/hash mismatch, and same-vs-rebuilt artifact promotion — `bin/test-branch-policy.impl.test.mjs`, `bin/test-provenance.impl.test.mjs` ✅ (completed: 2026-11-12 01:58)
+- [x] 5.3.2 Run targeted branch/provenance tests and fix failures — `node --test bin/test-branch-policy.spec.test.mjs bin/test-branch-policy.impl.test.mjs bin/test-provenance.spec.test.mjs bin/test-provenance.impl.test.mjs` ✅ (completed: 2026-11-12 01:58)
+- [x] 5.3.3 Full verification: `npm run verify`; record PASS and test count — `npm run verify` ✅ (completed: 2026-11-12 01:58)
 
 **Verify**: `node --test bin/test-branch-policy.spec.test.mjs bin/test-branch-policy.impl.test.mjs bin/test-provenance.spec.test.mjs bin/test-provenance.impl.test.mjs`
 
