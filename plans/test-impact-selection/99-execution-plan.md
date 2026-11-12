@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-12 01:58
-> **Progress**: 51/86 tasks (59%)
+> **Last Updated**: 2026-11-12 02:15
+> **Progress**: 64/86 tasks (74%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -190,30 +190,30 @@ Deliver the opt-in test-impact layer in eight phases. Phase 1 is the lightweight
 
 ## Phase 6: Organize Tests Skill and Adoption
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill at phase start)_
+> **Phase baseline tree**: 6933589bf65933569f9c80dbd8214159a4283b28
 > **Reasoning**: high — the skill edits agent behavior and managed AGENTS.md content; containment and non-destruction matter.
 
 ### Step 6.1: Specification Tests
 
-- [ ] 6.1.1 Write content spec tests for skill frontmatter, modes, protocol steps, language adapters, shadow refusal, safety rules, hygiene link, per-slice acceptance, staging/rollback, metrics/table, and reference links — `scripts/organize-tests-content.spec.test.mjs` (ST-43..ST-50, ST-66, ST-68)
-- [ ] 6.1.2 Run the new content tests and confirm red; record the failure — `node --test scripts/organize-tests-content.spec.test.mjs`
+- [x] 6.1.1 Write content spec tests for skill frontmatter, modes, protocol steps, language adapters, shadow refusal, safety rules, hygiene link, per-slice acceptance, staging/rollback, metrics/table, and reference links — `scripts/organize-tests-content.spec.test.mjs` (ST-43..ST-50, ST-66, ST-68) ✅ (completed: 2026-11-12 02:15)
+- [x] 6.1.2 Run the new content tests and confirm red; record the failure — `node --test scripts/organize-tests-content.spec.test.mjs` ✅ (completed: 2026-11-12 02:15)
 
 ### Step 6.2: Implementation
 
-- [ ] 6.2.1 Write the skill entry point with modes, protocol, safety, `_shared/workspace-hygiene.md` link, staging/rollback, and output contract — `skills/organize-tests/SKILL.md`
-- [ ] 6.2.2 Write the analysis/inventory protocol and slice proposal guidance — `skills/organize-tests/references/analysis-protocol.md`
-- [ ] 6.2.3 Write the language adapter recipes (Node, Rust, Python, Go, JVM, .NET, C/C++, custom) — `skills/organize-tests/references/language-adapters.md`
-- [ ] 6.2.4 Write the shadow adoption protocol and evidence shape — `skills/organize-tests/references/shadow-mode.md`
-- [ ] 6.2.5 Write the map health/audit guidance (orphans, overlaps, slow groups, never-selected, flaky) — `skills/organize-tests/references/map-health.md`
-- [ ] 6.2.6 Write the AGENTS testing-block (including the optional `Test slices` table), ownership, and wrapper guidance — `skills/organize-tests/references/agents-testing-block.md`
-- [ ] 6.2.7 Update analyze-project to detect/preserve the `CODEOPS-TESTING` block and warn on drift; never render it — `skills/analyze-project/SKILL.md`
-- [ ] 6.2.8 Add the skill's package/discovery checks (frontmatter, no leaks) to content tests — `scripts/organize-tests-content.spec.test.mjs`
+- [x] 6.2.1 Write the skill entry point with modes, protocol, safety, `_shared/workspace-hygiene.md` link, staging/rollback, and output contract — `skills/organize-tests/SKILL.md` ✅ (completed: 2026-11-12 02:15)
+- [x] 6.2.2 Write the analysis/inventory protocol and slice proposal guidance — `skills/organize-tests/references/analysis-protocol.md` ✅ (completed: 2026-11-12 02:15)
+- [x] 6.2.3 Write the language adapter recipes (Node, Rust, Python, Go, JVM, .NET, C/C++, custom) — `skills/organize-tests/references/language-adapters.md` ✅ (completed: 2026-11-12 02:15)
+- [x] 6.2.4 Write the shadow adoption protocol and evidence shape — `skills/organize-tests/references/shadow-mode.md` ✅ (completed: 2026-11-12 02:15)
+- [x] 6.2.5 Write the map health/audit guidance (orphans, overlaps, slow groups, never-selected, flaky) — `skills/organize-tests/references/map-health.md` ✅ (completed: 2026-11-12 02:15)
+- [x] 6.2.6 Write the AGENTS testing-block (including the optional `Test slices` table), ownership, and wrapper guidance — `skills/organize-tests/references/agents-testing-block.md` ✅ (completed: 2026-11-12 02:15)
+- [x] 6.2.7 Update analyze-project to detect/preserve the `CODEOPS-TESTING` block and warn on drift; never render it — `skills/analyze-project/SKILL.md` ✅ (completed: 2026-11-12 02:15)
+- [x] 6.2.8 Add the skill's package/discovery checks (frontmatter, no leaks) to content tests — `scripts/organize-tests-content.spec.test.mjs` ✅ (completed: 2026-11-12 02:15)
 
 ### Step 6.3: Implementation Tests and Hardening
 
-- [ ] 6.3.1 Write impl/content tests for reference existence, no `${PLUGIN_ROOT}`/`.codex/`, block preservation/ownership, hygiene link, staging/rollback, metrics/table, CI patch additivity, CODEOWNERS guidance, and no test-edit wording — `scripts/organize-tests-content.impl.test.mjs`
-- [ ] 6.3.2 Run targeted skill/content tests and fix failures — `node --test scripts/organize-tests-content.spec.test.mjs scripts/organize-tests-content.impl.test.mjs`
-- [ ] 6.3.3 Full verification: `npm run verify`; record PASS and test count — `npm run verify`
+- [x] 6.3.1 Write impl/content tests for reference existence, no `${PLUGIN_ROOT}`/`.codex/`, block preservation/ownership, hygiene link, staging/rollback, metrics/table, CI patch additivity, CODEOWNERS guidance, and no test-edit wording — `scripts/organize-tests-content.impl.test.mjs` ✅ (completed: 2026-11-12 02:15)
+- [x] 6.3.2 Run targeted skill/content tests and fix failures — `node --test scripts/organize-tests-content.spec.test.mjs scripts/organize-tests-content.impl.test.mjs` ✅ (completed: 2026-11-12 02:15)
+- [x] 6.3.3 Full verification: `npm run verify`; record PASS and test count — `npm run verify` ✅ (completed: 2026-11-12 02:15)
 
 **Verify**: `node --test scripts/organize-tests-content.spec.test.mjs scripts/organize-tests-content.impl.test.mjs`
 
