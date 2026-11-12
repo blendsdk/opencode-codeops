@@ -1,7 +1,7 @@
 {
   "name": "opencode-codeops",
-  "version": "2.5.0",
-  "description": "Specification-first engineering for complex systems \u2014 CodeOps plugin for OpenCode",
+  "version": "2.6.0",
+  "description": "Specification-first engineering for complex systems — CodeOps plugin for OpenCode",
   "type": "module",
   "engines": {
     "node": ">=18",

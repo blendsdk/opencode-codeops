@@ -2,11 +2,18 @@
 
 All notable changes to CodeOps are recorded here.
 
-## Unreleased
+## 2.6.0 — 2026-11-12
 
 ### Features
 
-- test-selection: add opt-in test-impact selection with task, phase, PR, release, acceptance, and nightly gates
+- test-selection: document, pilot, and verify the impact gates
+- ci: add the reusable full gate and selection templates
+- organize-tests: add the test-map adoption skill
+- test-selection: add branch policy, CI plans, and provenance
+- test-selection: add the codeops-test CLI and argv-safe runner
+- test-selection: add change detection and the selector core
+- test-map: add map loading, validation, and canonical hashing
+- test-selection: add scoped task verification guidance
 
 ## 2.5.0 — 2026-10-29
 
