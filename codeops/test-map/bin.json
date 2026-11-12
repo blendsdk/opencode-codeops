@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "domain": "bin",
+  "owner": "platform",
+  "groups": [
+    {
+      "id": "bin.runtime",
+      "slice": "bin.runtime",
+      "tier": "task",
+      "sources": [
+        "bin/**"
+      ],
+      "tests": [
+        "bin/**/*.test.mjs"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      },
+      "durationSec": 60,
+      "acceptance": {
+        "mode": "na",
+        "reason": "pilot shadow evidence; the full gate remains the release check"
+      }
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "schema": 1,
+  "domain": "scripts",
+  "owner": "platform",
+  "groups": [
+    {
+      "id": "scripts.tooling",
+      "slice": "scripts.tooling",
+      "tier": "task",
+      "sources": [
+        "scripts/**",
+        "install.sh"
+      ],
+      "tests": [
+        "scripts/**/*.test.mjs"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      },
+      "durationSec": 90,
+      "acceptance": {
+        "mode": "na",
+        "reason": "pilot shadow evidence; the full gate remains the release check"
+      }
+    }
+  ]
+}

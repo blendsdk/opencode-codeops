@@ -181,8 +181,9 @@ For each task, in order:
 
 3. **Verify** — run the task command: the plan's `**Task verify**` line, or the map's `task`
    gate with `--baseline <phase-tree>` and `--include <spec-file>` for the plan's declared spec
-   file(s). With neither, run the project's full verify (from AGENTS.md or detected conventions),
-   output captured per the protocol's **Verify-output capture rule** (PASS one-liner; on failure
+   file(s). With neither, run the plan's `**Verify (gate)**` command, or the project's full verify
+   (from AGENTS.md or detected conventions), output captured per the protocol's
+   **Verify-output capture rule** (PASS one-liner; on failure
    the last 50 log lines + log path). A changed path outside the phase's expected modification
    set, or a shared/config/test-infrastructure change, forces the full gate. Pass → promote `[~]`
    → `[x]`; fail → fix and re-verify (mark stays `[~]`). Immediately after every `[x]` promotion,

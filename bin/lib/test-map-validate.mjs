@@ -18,6 +18,8 @@
  * @module lib/test-map-validate
  */
 
+import { basename } from "node:path"
+
 import { isSafeRepoPath, normalizePolicy, normalizeRepoPath } from "./test-map.mjs"
 import {
   globsIntersect,
@@ -55,6 +57,15 @@ export const WARNING_CODES = Object.freeze([
 
 /** Conventional test roots used when the policy does not override them. */
 const CONVENTIONAL_TEST_ROOTS = ["test/", "tests/", "spec/", "__tests__/"]
+
+/**
+ * File-name shapes that identify a test even when no group claims it.
+ *
+ * A test root is a directory, so every file below it looks like a candidate.
+ * Requiring a test-like name keeps ordinary sources and fixtures from being
+ * reported as orphan tests.
+ */
+const TEST_FILE_NAME = /(\.test\.|\.spec\.|_test\.|^test_.*\.(py|js|ts|tsx|jsx)$|Tests?\.(java|kt|cs|php)$|\.rs$)/
 
 /**
  * Build one diagnostic entry.
@@ -542,7 +553,11 @@ function validateHealth(groups, policy, files, add) {
   const normalized = files.map(normalizeRepoPath)
   const options = { caseSensitive: policy.caseSensitive !== false }
   const testRoots = deriveTestRoots(groups, policy)
-  const isTestFile = (file) => testRoots.some((root) => file.startsWith(root))
+  const inTestArea = (file) => testRoots.some((root) => file.startsWith(root))
+  const looksLikeTest = (file) => TEST_FILE_NAME.test(basename(file))
+  const isTestFile = (file) =>
+    groups.some((group) => Array.isArray(group.tests) && matchesAnyGlob(file, group.tests, options)) ||
+    (inTestArea(file) && looksLikeTest(file))
 
   for (const group of groups) {
     if (Array.isArray(group.tests) && group.tests.length > 0) {
@@ -574,7 +589,7 @@ function validateHealth(groups, policy, files, add) {
   const fullOn = Array.isArray(policy.fullOnPaths) ? policy.fullOnPaths : []
   const ignores = Array.isArray(policy.ignorePaths) ? policy.ignorePaths.map((entry) => entry.glob) : []
   for (const file of normalized) {
-    if (isTestFile(file)) continue
+    if (inTestArea(file) || isTestFile(file)) continue
     const owned = groups.some((group) => matchesAnyGlob(file, group.sources ?? [], options))
     if (owned) continue
     if (matchesAnyGlob(file, fullOn, options)) continue

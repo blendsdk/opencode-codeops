@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-12 02:32
-> **Progress**: 74/86 tasks (86%)
+> **Last Updated**: 2026-11-12 03:05
+> **Progress**: 86/86 tasks (100%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -249,28 +249,43 @@ Deliver the opt-in test-impact layer in eight phases. Phase 1 is the lightweight
 
 ## Phase 8: Documentation, Pilot, and Final Verification
 
-> **Phase baseline tree**: _(recorded by the exec-plan skill at phase start)_
+> **Phase baseline tree**: 4dcd5faf18b877a0225004fe455fd57b5eaaeae3
 > **Reasoning**: high — the pilot proves shadow safety and the final gate proves no regression.
 
 ### Step 8.1: Specification Tests
 
-- [ ] 8.1.1 Write content checks for README opt-in usage, CHANGELOG entry, AGENTS testing block, and pilot map validity — `scripts/test-selection-docs.spec.test.mjs` (ST-52, ST-54, ST-67)
-- [ ] 8.1.2 Run the new content checks and confirm red; record the failure — `node --test scripts/test-selection-docs.spec.test.mjs`
+- [x] 8.1.1 Write content checks for README opt-in usage, CHANGELOG entry, AGENTS testing block, and pilot map validity — `scripts/test-selection-docs.spec.test.mjs` (ST-52, ST-54, ST-67) ✅ (completed: 2026-11-12 03:05)
+- [x] 8.1.2 Run the new content checks and confirm red; record the failure — `node --test scripts/test-selection-docs.spec.test.mjs` ✅ (completed: 2026-11-12 03:05)
 
 ### Step 8.2: Implementation
 
-- [ ] 8.2.1 Document installation, opt-in adoption, commands, branch policy, and non-disruption/rollback — `README.md`
-- [ ] 8.2.2 Add the feature changelog entry without hand-editing the version — `CHANGELOG.md`
-- [ ] 8.2.3 Create the pilot policy, shared groups, and `.github/CODEOWNERS` entry for this repository in shadow mode — `codeops/test-map/policy.json`, `codeops/test-map/shared.json`, `.github/CODEOWNERS`
-- [ ] 8.2.4 Create the pilot `bin` and `plugin` feature-slice groups — `codeops/test-map/bin.json`, `codeops/test-map/plugin.json`
-- [ ] 8.2.5 Create the pilot `scripts`, `discovery-ui`, and content groups — `codeops/test-map/scripts.json`, `codeops/test-map/discovery-ui.json`, `codeops/test-map/content.json`
-- [ ] 8.2.6 Run `check --strict` and `shadow --baseline <phase-tree>` on the pilot map; record zero-missed/escaped evidence in the phase evidence — `node bin/codeops-test.mjs check --strict`, `node bin/codeops-test.mjs shadow --baseline <phase-tree>`
-- [ ] 8.2.7 Refresh `AGENTS.md` through the update path so the `CODEOPS-TESTING` block reflects the pilot map — `AGENTS.md`
-- [ ] 8.2.8 Add the final docs/pilot content impl tests (including CODEOWNERS, marker, no-map command, and fixture-exclusion) and fix failures — `scripts/test-selection-docs.impl.test.mjs`
-- [ ] 8.2.9 Run the full final verification suite: `npm run verify`, `npm pack --dry-run` (fixtures excluded), frontmatter check, and the no-leak checks; record exact results — `npm run verify`, `npm pack --dry-run`
-- [ ] 8.2.10 Dispatch `agent-pipeline-reviewer` on the skill/AGENTS/CI diff; record the verdict and fix required findings — review packet
+- [x] 8.2.1 Document installation, opt-in adoption, commands, branch policy, and non-disruption/rollback — `README.md` ✅ (completed: 2026-11-12 03:05)
+- [x] 8.2.2 Add the feature changelog entry without hand-editing the version — `CHANGELOG.md` ✅ (completed: 2026-11-12 03:05)
+- [x] 8.2.3 Create the pilot policy, shared groups, and `.github/CODEOWNERS` entry for this repository in shadow mode — `codeops/test-map/policy.json`, `codeops/test-map/shared.json`, `.github/CODEOWNERS` ✅ (completed: 2026-11-12 03:05)
+- [x] 8.2.4 Create the pilot `bin` and `plugin` feature-slice groups — `codeops/test-map/bin.json`, `codeops/test-map/plugin.json` ✅ (completed: 2026-11-12 03:05)
+- [x] 8.2.5 Create the pilot `scripts`, `discovery-ui`, and content groups — `codeops/test-map/scripts.json`, `codeops/test-map/discovery-ui.json`, `codeops/test-map/content.json` ✅ (completed: 2026-11-12 03:05)
+- [x] 8.2.6 Run `check --strict` and `shadow --baseline <phase-tree>` on the pilot map; record zero-missed/escaped evidence in the phase evidence — `node bin/codeops-test.mjs check --strict`, `node bin/codeops-test.mjs shadow --baseline <phase-tree>` ✅ (completed: 2026-11-12 03:05)
+- [x] 8.2.7 Refresh `AGENTS.md` through the update path so the `CODEOPS-TESTING` block reflects the pilot map — `AGENTS.md` ✅ (completed: 2026-11-12 03:05)
+- [x] 8.2.8 Add the final docs/pilot content impl tests (including CODEOWNERS, marker, no-map command, and fixture-exclusion) and fix failures — `scripts/test-selection-docs.impl.test.mjs` ✅ (completed: 2026-11-12 03:05)
+- [x] 8.2.9 Run the full final verification suite: `npm run verify`, `npm pack --dry-run` (fixtures excluded), frontmatter check, and the no-leak checks; record exact results — `npm run verify`, `npm pack --dry-run` ✅ (completed: 2026-11-12 03:05)
+- [x] 8.2.10 Dispatch `agent-pipeline-reviewer` on the skill/AGENTS/CI diff; record the verdict and fix required findings — review packet ✅ (completed: 2026-11-12 03:05)
 
 **Verify**: `node --test scripts/test-selection-docs.spec.test.mjs scripts/test-selection-docs.impl.test.mjs`
+
+---
+
+## Phase 8 Evidence
+
+| Check | Result |
+| --- | --- |
+| `node bin/codeops-test.mjs check --strict` | `map ok`, exit 0 |
+| `shadow --baseline 4dcd5faf18b877a0225004fe455fd57b5eaaeae3` | verdict `zero-missed`; selected and full both passed; `enabled: false` |
+| Pilot map hash | `9f4ed93fb6633fb16b91d1532381673bd6bea4697c230d19fe8500741db26596` |
+| `npm run verify` | 923 tests, 0 failed; version parity `2.5.0` |
+| `npm pack --dry-run --ignore-scripts` | 163 files; 433.9 kB; tests and `bin/fixtures/` excluded |
+| Skill frontmatter check | all `skills/*/SKILL.md` have `name:`; no missing files |
+| Leak checks | no `${PLUGIN_ROOT}`, `.codex/`, or `codex` CLI leak |
+| `agent-pipeline-reviewer` | initial review: 1 critical, 1 major, 9 minor — all fixed; one further test-line correction applied on re-review |
 
 ---
 

@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+### Features
+
+- test-selection: add opt-in test-impact selection with task, phase, PR, release, acceptance, and nightly gates
+
 ## 2.5.0 — 2026-10-29
 
 ### Features

@@ -1,0 +1,28 @@
+{
+  "schema": 1,
+  "domain": "shared",
+  "owner": "platform",
+  "groups": [
+    {
+      "id": "shared.schemas",
+      "slice": "shared.schemas",
+      "tier": "task",
+      "sources": [
+        "schemas/**"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "bin/test-map.spec.test.mjs",
+          "bin/test-map.impl.test.mjs"
+        ]
+      },
+      "durationSec": 20,
+      "acceptance": {
+        "mode": "na",
+        "reason": "schemas are covered by the map tests and the full gate"
+      }
+    }
+  ]
+}

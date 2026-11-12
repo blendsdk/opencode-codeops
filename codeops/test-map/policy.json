@@ -1,0 +1,77 @@
+{
+  "schema": 1,
+  "full": [
+    "npm",
+    "run",
+    "verify"
+  ],
+  "budgets": {
+    "taskTargetSeconds": 120,
+    "taskAcceptableSeconds": 180
+  },
+  "branches": {
+    "integration": [
+      "main",
+      "master"
+    ],
+    "feature": [
+      "feature/**"
+    ],
+    "release": [
+      "release/**",
+      "release*",
+      "hotfix/**",
+      "hotfix*"
+    ],
+    "acceptance": [
+      "acceptance/**",
+      "acceptance*"
+    ],
+    "releaseTags": [
+      "v*"
+    ],
+    "unknown": "integration"
+  },
+  "ignorePaths": [
+    {
+      "glob": "plans/**",
+      "reason": "planning documentation"
+    },
+    {
+      "glob": "docs/**",
+      "reason": "documentation"
+    },
+    {
+      "glob": "README.md",
+      "reason": "documentation"
+    },
+    {
+      "glob": "CHANGELOG.md",
+      "reason": "release notes"
+    },
+    {
+      "glob": "LICENSE",
+      "reason": "legal text"
+    }
+  ],
+  "fullOnPaths": [
+    "package.json",
+    "package-lock.json",
+    "tsconfig*.json",
+    "requirements-dev.txt",
+    ".gitignore",
+    "AGENTS.md",
+    ".github/**",
+    "codeops/test-map/**"
+  ],
+  "acceptance": {
+    "mode": "automated",
+    "groups": [],
+    "checklist": null
+  },
+  "prSmoke": [
+    "shared.schemas"
+  ],
+  "requirements": {},
+  "caseSensitive": true
+}

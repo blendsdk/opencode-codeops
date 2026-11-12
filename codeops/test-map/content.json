@@ -1,0 +1,45 @@
+{
+  "schema": 1,
+  "domain": "content",
+  "owner": "platform",
+  "groups": [
+    {
+      "id": "content.guidance",
+      "slice": "content.guidance",
+      "tier": "task",
+      "sources": [
+        "skills/**",
+        "_shared/**",
+        "standards/**",
+        "agents/**",
+        "agent-templates/**",
+        "references/**",
+        "codeops/**",
+        ".opencode/**"
+      ],
+      "dependsOn": [
+        "shared.schemas"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "scripts/hygiene-content.spec.test.mjs",
+          "scripts/specialist-content.spec.test.mjs",
+          "scripts/discovery-content.spec.test.mjs",
+          "scripts/test-selection-content.spec.test.mjs",
+          "scripts/test-selection-content.impl.test.mjs",
+          "scripts/organize-tests-content.spec.test.mjs",
+          "scripts/organize-tests-content.impl.test.mjs",
+          "scripts/ci-workflows-content.spec.test.mjs",
+          "scripts/ci-workflows-content.impl.test.mjs"
+        ]
+      },
+      "durationSec": 40,
+      "acceptance": {
+        "mode": "na",
+        "reason": "content checks run in the full gate"
+      }
+    }
+  ]
+}

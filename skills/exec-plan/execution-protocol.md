@@ -110,8 +110,9 @@ complete. For each task, in order:
 4. Run verification, with output captured per the **Verify-output capture rule** below. Use the
    task command for a normal task: the plan's validated `**Task verify**` line, or the map's
    `task` gate with `--baseline <phase-baseline-tree>` and `--include <declared-spec-file>` for
-   every plan-declared specification test file. If neither exists, use the project's full verify
-   command (from AGENTS.md or detected conventions). Run the full gate at phase exit, plan
+   every plan-declared specification test file. If neither exists, use the plan's
+   `**Verify (gate)**` command, or the project's full verify command (from AGENTS.md or detected
+   conventions). Run the full gate at phase exit, plan
    completion, before push/release, and whenever a changed path falls outside the phase's
    expected modification set or touches shared/configuration/test infrastructure. A single
    `**Verify**` line is the gate command; a map may derive the task command from it, otherwise

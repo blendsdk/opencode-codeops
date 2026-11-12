@@ -94,6 +94,15 @@ node scripts/release.mjs release --type auto --tag next --dry-run
   version is owned by `scripts/release.mjs`.
 - CodeOps layout: this repo is flat (no `codeops/.codeops.yml` marker); `codeops/codeops.json`
   is not committed here.
+<!-- CODEOPS-TESTING:START -->
+- Test map: `codeops/test-map/` (6 groups, 6 slices)
+- Task verify: `node bin/codeops-test.mjs run --gate task --baseline HEAD`
+- Phase verify: `node bin/codeops-test.mjs run --gate phase --baseline HEAD`
+- Gate verify: `npm run verify` (full suite; release/acceptance/CI)
+- Map check: `node bin/codeops-test.mjs check --strict`
+- Last map check: 2026-11-12 02:45
+<!-- CODEOPS-TESTING:END -->
+
 <!-- CODEOPS-PROJECT:END -->
 
 <!-- CODEOPS-SPECIALISTS:START -->

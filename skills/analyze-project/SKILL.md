@@ -20,7 +20,7 @@ description: Analyze the current repository and create or refresh concise CodeOp
 ```
 
 5. Include project type, principal languages/frameworks, authoritative build/test/verify commands, high-level structure, generated-file warnings, and CodeOps artifact/config locations.
-6. If the managed section exists, replace only its contents. Preserve all other text byte-for-byte.
+6. If the managed section exists, replace only its generated contents outside the `CODEOPS-TESTING` block. Preserve all other text byte-for-byte.
 6b. **Testing block.** Detect `codeops/test-map.json` or `codeops/test-map/` and the project's
    `full` command. The `<!-- CODEOPS-TESTING:START -->` / `<!-- CODEOPS-TESTING:END -->` block
    inside the managed section is owned by the `organize-tests` skill: preserve it byte-for-byte,

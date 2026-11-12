@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "domain": "discovery-ui",
+  "owner": "platform",
+  "groups": [
+    {
+      "id": "discovery.ui",
+      "slice": "discovery.ui",
+      "tier": "task",
+      "sources": [
+        "discovery-ui/**"
+      ],
+      "dependsOn": [
+        "plugin.runtime"
+      ],
+      "run": {
+        "command": [
+          "npm",
+          "run",
+          "build:discovery"
+        ]
+      },
+      "durationSec": 40,
+      "acceptance": {
+        "mode": "na",
+        "reason": "build check only; the full gate remains the release check"
+      }
+    }
+  ]
+}

@@ -115,6 +115,8 @@ describe("references", () => {
       "references/shadow-mode.md",
       "references/map-health.md",
       "references/agents-testing-block.md",
+      "references/ci-github-actions.md",
+      "references/project-wrapper.md",
     ]) {
       const text = readFileSync(join(SKILL_DIR, name), "utf8")
       assert.ok(!text.includes("${PLUGIN_ROOT}"), `${name} leaks \${PLUGIN_ROOT}`)

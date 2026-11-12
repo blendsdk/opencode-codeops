@@ -9,7 +9,7 @@ ownership defects that make selection quietly less useful.
 
 | Finding | Meaning | Action |
 | --- | --- | --- |
-| `map.orphan-test` | A test under a test root belongs to no group | Add it to an owning group or remove the stale test |
+| `map.orphan-test` | A test under a test root belongs to no group | Add it to an owning group, or record an explicit ignore/acceptance decision; the skill never deletes a test |
 | `map.overlap` | A test belongs to more than one group | Give it exactly one owner |
 | `map.unknown-source` | A source path is owned, full-on, or ignored by nothing | Add ownership, a full-on rule, or a documented ignore |
 | `map.slice-no-task` | A slice has no fast task tier | Add a task group or split the slice |
@@ -18,6 +18,10 @@ ownership defects that make selection quietly less useful.
 | `map.empty-group` | A file-based group matches no tracked test | Fix the glob or remove the group |
 | never selected | A group has never run in recorded evidence | Check its sources and dependency edges |
 | flaky candidate | A group fails intermittently | Stabilize the test; do not hide it in a higher tier |
+
+A file is a test candidate when a group's `tests` glob claims it or its name follows a
+test convention (`.test.`, `.spec.`, `_test.`, `test_*`, `*Test`, or a `.rs` file under a
+test root). Fixtures and helpers under a test root are not orphan tests.
 
 ## Strict mode
 

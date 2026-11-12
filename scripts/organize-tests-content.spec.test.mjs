@@ -180,6 +180,8 @@ describe("ST-68 safety and containment", () => {
       "references/shadow-mode.md",
       "references/map-health.md",
       "references/agents-testing-block.md",
+      "references/ci-github-actions.md",
+      "references/project-wrapper.md",
     ]) {
       assert.ok(text.includes(reference), `skill must link ${reference}`)
     }

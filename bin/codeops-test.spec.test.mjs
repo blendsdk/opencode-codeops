@@ -136,7 +136,7 @@ function runCli(root, args, { env = {} } = {}) {
   return spawnSync(process.execPath, [CLI, ...args], {
     cwd: root,
     encoding: "utf8",
-    env: { ...process.env, ...env },
+    env: { ...process.env, CODEOPS_TMPDIR: join(root, "tmp"), ...env },
   })
 }
 

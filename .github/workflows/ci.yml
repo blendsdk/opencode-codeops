@@ -13,6 +13,7 @@ jobs:
   verify:
     name: Verify
     needs: [full]
+    if: always()
     runs-on: ubuntu-latest
     steps:
       - name: Confirm the full gate

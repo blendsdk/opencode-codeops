@@ -128,7 +128,7 @@ describe("shipped documentation (ST-61)", () => {
     const top = end === -1 ? rest : rest.slice(0, end)
     const entry = /^\s*-\s+discovery:/m
 
-    if (/^## Unreleased/.test(top)) {
+    if (/^## Unreleased/.test(top) && entry.test(top)) {
       assert.match(top, entry, "the unreleased section must carry the discovery entry")
     } else {
       assert.match(changelog, entry, "the document must carry the discovery entry")

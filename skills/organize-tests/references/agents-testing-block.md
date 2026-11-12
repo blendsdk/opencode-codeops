@@ -9,7 +9,7 @@ owned by one writer.
 ## Ownership
 
 `organize-tests` is the **sole writer** of the block. `analyze-project` detects
-the block and preserves it byte-for-byte on every refresh; it never render(s) or
+the block and preserves it byte-for-byte on every refresh; it never renders or
 overwrites it, and it warns when the block is missing or stale. A project that
 has no map is not given a block by `analyze-project`.
 
@@ -69,6 +69,7 @@ no-map block untouched.
 - Keep exactly one block; stop on duplicate or reversed markers and name the
   manual fix.
 - Update `Last map check` only after a successful `check`.
+- Write with the file's dominant line ending; keep exactly one block; fail without writing on duplicate or reversed markers.
 - Never put secrets, absolute machine paths, or test output in the block.
 
 ## Wrapper guidance

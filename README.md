@@ -16,6 +16,7 @@ Turn an idea or existing system into ambiguity-free requirements, grounded speci
 | `exec-plan` | Execute a plan — implement → verify → commit loop with quality reviews |
 | `roadmap` | Live feature-set roadmap — make, update, review, archive |
 | `analyze-project` | Analyze repo and create/refresh CodeOps-aware `AGENTS.md` guidance |
+| `organize-tests` | Build or refresh a test-impact map; additive map, AGENTS block, and CI patch |
 | `analyze-agents` | Run the project-level specialist check on demand — proposals or a recorded None, with check state |
 | `setup-codeops` | Set up or migrate CodeOps in a git repo |
 | `setup-routing` | Configure per-role subagent model and policy routing |
@@ -25,6 +26,44 @@ Turn an idea or existing system into ambiguity-free requirements, grounded speci
 | `clean-comments` | Audit and clean source comments without changing behavior |
 | `git-commit` | Guarded commit — verify, stage deliberately, Conventional Commit message |
 | `outcome-review` | Review local opt-in outcome metrics (requires `metrics.enabled: true`) |
+
+## Test-impact selection (opt-in)
+
+Large suites do not have to run in full for every small change. CodeOps can use
+a committed test map to run the affected feature-slice groups during task, phase,
+and pull-request work while the **full verify** stays the release, acceptance,
+and CI gate.
+
+The feature is opt-in:
+
+- No `codeops/test-map.json` and no `codeops/test-map/` directory: behavior is
+  exactly today's full verify.
+- With a map: `codeops-test select|run|check|plan|shadow|provenance` selects and
+  runs only the affected groups. The release and acceptance gates still run the
+  full suite.
+- Set `CODEOPS_FULL_TESTS=1` to force the full suite at any gate.
+- To roll back, **delete the map** (or remove the testing block). The project
+  returns to the full verify with no other change.
+
+```bash
+# Inspect the selection for a change
+node bin/codeops-test.mjs select --gate task --baseline <tree> --explain
+
+# Run the selected groups
+node bin/codeops-test.mjs run --gate task --baseline <tree>
+
+# Validate the map and its test ownership
+node bin/codeops-test.mjs check --strict
+
+# CI plan for a pull request
+node bin/codeops-test.mjs plan --gate pr --json
+```
+
+Adoption is additive and reversible. The `organize-tests` skill inventories the
+suite, proposes feature slices, previews the map/AGENTS/CI changes, proves the
+selection in shadow mode with zero missed failures, and never edits tests or
+weakens the full gate. This repository ships its own pilot map under
+`codeops/test-map/`; the full verify remains the gate for releases.
 
 ## Installation
 

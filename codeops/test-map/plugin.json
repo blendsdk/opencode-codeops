@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "domain": "plugin",
+  "owner": "platform",
+  "groups": [
+    {
+      "id": "plugin.runtime",
+      "slice": "plugin.runtime",
+      "tier": "task",
+      "sources": [
+        "plugin/**"
+      ],
+      "tests": [
+        "plugin/**/*.test.mjs"
+      ],
+      "dependsOn": [
+        "bin.runtime"
+      ],
+      "run": {
+        "command": [
+          "node",
+          "--test",
+          "{tests}"
+        ]
+      },
+      "durationSec": 50,
+      "acceptance": {
+        "mode": "na",
+        "reason": "pilot shadow evidence; the full gate remains the release check"
+      }
+    }
+  ]
+}

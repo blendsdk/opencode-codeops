@@ -52,7 +52,7 @@ describe("ST-53 reusable full gate", () => {
 
   it("keeps a stable required verify check", () => {
     const ci = read(".github/workflows/ci.yml")
-    containsAll(ci, ["verify:", "name: Verify", "needs:"], "ci.yml")
+    containsAll(ci, ["verify:", "name: Verify", "needs:", "if: always()"], "ci.yml")
   })
 })
 

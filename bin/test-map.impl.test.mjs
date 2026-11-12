@@ -202,6 +202,22 @@ describe("health classification", () => {
     assert.ok(!codes(report).includes("map.unknown-source"))
   })
 
+  it("distinguishes test-named files from fixtures under a test root", () => {
+    const legacy = validateMap(mapWith(group()), { files: ["tests/legacy/old.test.ts"] })
+    assert.ok(codes(legacy).includes("map.orphan-test"))
+
+    const fixture = validateMap(mapWith(group()), {
+      files: ["web/billing/dialog.test.ts", "tests/fixtures/data.json"],
+    })
+    assert.ok(!codes(fixture).includes("map.orphan-test"))
+    assert.ok(!codes(fixture).includes("map.unknown-source"))
+  })
+
+  it("treats a Rust integration test file as a test candidate", () => {
+    const report = validateMap(mapWith(group()), { files: ["tests/foo.rs"] })
+    assert.ok(codes(report).includes("map.orphan-test"))
+  })
+
   it("derives test roots from the tests glob when no conventional root matches", () => {
     const report = validateMap(
       mapWith(group({ tests: ["checks/**/*.check"] }), { testRoots: null }),
