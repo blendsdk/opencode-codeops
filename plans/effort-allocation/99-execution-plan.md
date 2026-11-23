@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-24 00:58
-> **Progress**: 1/39 tasks (3%)
+> **Last Updated**: 2026-11-24 00:59
+> **Progress**: 2/39 tasks (5%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -53,7 +53,7 @@ verification. Each behavior phase follows spec tests → red → implementation 
 **Objective**: Make the test map own/ignore requirements documentation so the task gate is usable.
 
 - [x] 1.1.1 Add `requirements/**` to `codeops/test-map/policy.json` `ignorePaths` with reason “requirements documentation” — `codeops/test-map/policy.json` ✅ (completed: 2026-11-24 00:58)
-- [ ] 1.1.2 Run `node bin/codeops-test.mjs check --strict` and `node --test scripts/test-selection-docs.spec.test.mjs`; confirm pass — ST-26, AR-9
+- [x] 1.1.2 Run `node bin/codeops-test.mjs check --strict` and `node --test scripts/test-selection-docs.spec.test.mjs`; confirm pass — ST-26, AR-9 ✅ (completed: 2026-11-24 00:59)
 
 ### Step 1.2: Specification tests
 
