@@ -6,7 +6,7 @@
  */
 
 /** A level from the four-level suggestion vocabulary. */
-export type EffortLevel = "low" | "medium" | "high" | "max"
+export type EffortLevel = "low" | "medium" | "high" | "xhigh" | "max"
 
 /** A reasoning value accepted by `routing.roles.<agent>.reasoning`. */
 export type RoutingReasoning =

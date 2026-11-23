@@ -31,7 +31,7 @@ import { ensureSessionTmpDir, sessionTmpDir } from "./tmp-hygiene.mjs"
  * plan suggestions. Routing policy is project configuration and may name the
  * wider provider enum instead.
  */
-export const EFFORT_LEVELS = Object.freeze(["low", "medium", "high", "max"])
+export const EFFORT_LEVELS = Object.freeze(["low", "medium", "high", "xhigh", "max"])
 
 /**
  * The reasoning values accepted by `routing.roles.<agent>.reasoning` in the
@@ -67,7 +67,7 @@ const MAX_STATE_FILE_BYTES = 4096
  * directive. Whitespace inside the brackets is tolerated; text before or after
  * is not.
  */
-const MARKER_PATTERN = /^\[codeops-effort:\s*(low|medium|high|max)\]\s*$/
+const MARKER_PATTERN = /^\[codeops-effort:\s*(low|medium|high|xhigh|max)\]\s*$/
 
 /**
  * Check whether a value is one of the four suggestion levels.
