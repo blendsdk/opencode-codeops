@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-24 00:32
-> **Progress**: 0/39 tasks (0%)
+> **Last Updated**: 2026-11-24 00:58
+> **Progress**: 1/39 tasks (3%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -44,7 +44,7 @@ verification. Each behavior phase follows spec tests → red → implementation 
 
 ## Phase 1: Vocabulary and Flags
 
-> **Phase baseline tree**: _(recorded by exec-plan at phase start)_
+> **Phase baseline tree**: 5891062963ac43317c6547a2cc7825d34125c568
 > **Reasoning**: high — changes the canonical vocabulary, helper, type declarations, and shared contract
 
 ### Step 1.1: Test-map correction (AR-9)
@@ -52,7 +52,7 @@ verification. Each behavior phase follows spec tests → red → implementation 
 **Reference**: AR-9 · 03-01 §Scope
 **Objective**: Make the test map own/ignore requirements documentation so the task gate is usable.
 
-- [ ] 1.1.1 Add `requirements/**` to `codeops/test-map/policy.json` `ignorePaths` with reason “requirements documentation” — `codeops/test-map/policy.json`
+- [x] 1.1.1 Add `requirements/**` to `codeops/test-map/policy.json` `ignorePaths` with reason “requirements documentation” — `codeops/test-map/policy.json` ✅ (completed: 2026-11-24 00:58)
 - [ ] 1.1.2 Run `node bin/codeops-test.mjs check --strict` and `node --test scripts/test-selection-docs.spec.test.mjs`; confirm pass — ST-26, AR-9
 
 ### Step 1.2: Specification tests

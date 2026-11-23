@@ -38,6 +38,10 @@
       "reason": "planning documentation"
     },
     {
+      "glob": "requirements/**",
+      "reason": "requirements documentation"
+    },
+    {
       "glob": "docs/**",
       "reason": "documentation"
     },
