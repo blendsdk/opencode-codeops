@@ -87,6 +87,17 @@ describe("codeops_effort.py set", () => {
     assert.equal(state.reasoning, "high")
     assert.deepEqual(readdirSync(dir), ["reasoning-effort.json"])
   })
+
+  it("should accept xhigh as a first-class level", () => {
+    const base = makeBase()
+    const dir = makeSessionDir(base, "ses_xhigh")
+
+    const result = runCli(base, ["set", "--dir", dir, "--reasoning", "xhigh"])
+
+    assert.equal(result.status, 0, result.stderr)
+    const state = JSON.parse(readFileSync(join(dir, "reasoning-effort.json"), "utf8"))
+    assert.deepEqual(state, { schema: 1, reasoning: "xhigh" })
+  })
 })
 
 describe("codeops_effort.py status and clear", () => {
@@ -119,7 +130,7 @@ describe("codeops_effort.py validation", () => {
     const result = runCli(base, ["set", "--dir", dir, "--reasoning", "extreme"])
 
     assert.equal(result.status, 2)
-    for (const level of ["low", "medium", "high", "max"]) {
+    for (const level of ["low", "medium", "high", "xhigh", "max"]) {
       assert.match(result.stderr, new RegExp(level), `error must name allowed level ${level}`)
     }
     assert.equal(existsSync(join(dir, "reasoning-effort.json")), false)

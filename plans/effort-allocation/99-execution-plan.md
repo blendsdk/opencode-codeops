@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-11-24 00:59
-> **Progress**: 2/39 tasks (5%)
+> **Progress**: 5/39 tasks (13%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -60,9 +60,9 @@ verification. Each behavior phase follows spec tests → red → implementation 
 **Reference**: 07 §ST-1–ST-6 · 03-01
 **Objective**: Write the vocabulary, marker, helper, and parity specs and confirm red.
 
-- [ ] 1.2.1 [spec-author] Write spec tests for five levels, marker, existing four, and parity — `bin/effort-vocabulary.spec.test.mjs` (ST-1–ST-6)
-- [ ] 1.2.2 [spec-author] Extend helper tests for `xhigh`, invalid level, and state file — `scripts/effort.spec.test.mjs` (ST-4, ST-5)
-- [ ] 1.2.3 Run the new specs and record the red-phase failure — `node --test bin/effort-vocabulary.spec.test.mjs scripts/effort.spec.test.mjs`
+- [x] 1.2.1 [spec-author] Write spec tests for five levels, marker, existing four, and parity — `bin/effort-vocabulary.spec.test.mjs` (ST-1–ST-6) ✅ (completed: 2026-11-24 00:59)
+- [x] 1.2.2 [spec-author] Extend helper tests for `xhigh`, invalid level, and state file — `scripts/effort.spec.test.mjs` (ST-4, ST-5) ✅ (completed: 2026-11-24 00:59)
+- [x] 1.2.3 Run the new specs and record the red-phase failure — `node --test bin/effort-vocabulary.spec.test.mjs scripts/effort.spec.test.mjs` ✅ (completed: 2026-11-24 00:59)
 
 ### Step 1.3: Implementation
 
