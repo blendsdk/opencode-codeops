@@ -2,6 +2,12 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 2.8.1 — 2026-11-24
+
+### Fixes
+
+- installer: run Windows .cmd shims through the command processor
+
 ## 2.8.0 — 2026-11-24
 
 ### Features
