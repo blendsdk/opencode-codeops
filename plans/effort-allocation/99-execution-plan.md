@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-11-24 01:01
-> **Progress**: 11/39 tasks (28%)
+> **Progress**: 12/39 tasks (31%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -81,7 +81,7 @@ verification. Each behavior phase follows spec tests → red → implementation 
 
 - [x] 1.4.1 Write impl tests for invalid markers, helper failure, and parity drift — `bin/effort-vocabulary.impl.test.mjs`, `scripts/effort.spec.test.mjs` ✅ (completed: 2026-11-24 01:01)
 - [x] 1.4.2 Extend content tests for the five-level contract and skill text — `scripts/reasoning-effort-content.spec.test.mjs` ✅ (completed: 2026-11-24 01:01)
-- [ ] 1.4.3 Run task verify and the full phase gate — `npm run verify`
+- [x] 1.4.3 Run task verify and the full phase gate — `npm run verify` ✅ (completed: 2026-11-24 01:01)
 
 **Deliverables**:
 - [ ] Five levels accepted in JS, Python, types, and skill text
