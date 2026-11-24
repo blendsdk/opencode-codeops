@@ -32,7 +32,8 @@
           "scripts/organize-tests-content.spec.test.mjs",
           "scripts/organize-tests-content.impl.test.mjs",
           "scripts/ci-workflows-content.spec.test.mjs",
-          "scripts/ci-workflows-content.impl.test.mjs"
+          "scripts/ci-workflows-content.impl.test.mjs",
+          "scripts/right-sized-verification-content.spec.test.mjs"
         ]
       },
       "durationSec": 40,

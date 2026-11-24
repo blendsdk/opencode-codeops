@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-25 00:05
-> **Progress**: 0/31 tasks (0%)
+> **Last Updated**: 2026-11-25 00:24
+> **Progress**: 4/31 tasks (13%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -61,7 +61,8 @@ the property (PF-030).
 
 ## Phase 1: Specification tests (red)
 
-> **Phase baseline tree**: _(recorded by exec-plan)_
+> **Phase baseline tree**: cc8324732766ae285c862145bc6aba24984b93a1
+> **Review**: reviewed 2026-11-25 00:24 — correctness review + one re-review; RV-001..RV-007 fixed (05-findings.md)
 > **Reasoning**: high — the oracle for every later phase
 
 ### Step 1.1: Write, register, and red-check all spec tests
@@ -69,13 +70,13 @@ the property (PF-030).
 **Reference**: 07 (all ST-cases, §Conventions) · AR-24 · AR-27
 **Objective**: The full oracle exists, is mapped, and fails before any implementation.
 
-- [ ] 1.1.1 [spec-author] Write `scripts/right-sized-verification-content.spec.test.mjs` from 07 ST-1..ST-16 and ST-23..ST-24, one flat `it("ST-<n> — …")` per case
-- [ ] 1.1.2 [spec-author] Write `plugin/compaction-note.spec.test.mjs` from 07 ST-17..ST-22 (imports `buildCompactionNote` from `bin/lib/codeops-progress.mjs`)
-- [ ] 1.1.3 Add the content spec file to the `content.guidance` run list in `codeops/test-map/content.json`; `node bin/codeops-test.mjs check --strict` passes
-- [ ] 1.1.4 Red check: run both spec files and record the result on this line — every case fails except ST-3 (the order statement already exists; the test guards it)
+- [x] 1.1.1 [spec-author] Write `scripts/right-sized-verification-content.spec.test.mjs` from 07 ST-1..ST-16 and ST-23..ST-24, one flat `it("ST-<n> — …")` per case ✅ (completed: 2026-11-25 00:13)
+- [x] 1.1.2 [spec-author] Write `plugin/compaction-note.spec.test.mjs` from 07 ST-17..ST-22 (imports `buildCompactionNote` from `bin/lib/codeops-progress.mjs`) ✅ (completed: 2026-11-25 00:12)
+- [x] 1.1.3 Add the content spec file to the `content.guidance` run list in `codeops/test-map/content.json`; `node bin/codeops-test.mjs check --strict` passes ✅ (completed: 2026-11-25 00:12)
+- [x] 1.1.4 Red check: run both spec files and record the result on this line — every case fails except ST-3 (the order statement already exists; the test guards it) ✅ (completed: 2026-11-25 00:12) — result: 23 fail (each on a missing token or export), ST-3 pass as expected
 
 **Deliverables**:
-- [ ] Two spec files, mapped; red result recorded
+- [x] Two spec files, mapped; red result recorded
 
 **Task verify**: `node --test scripts/right-sized-verification-content.spec.test.mjs plugin/compaction-note.spec.test.mjs` (expected RED except ST-3)
 **Verify (gate)**: `npm run verify` — expected red: ST-1, ST-2, ST-4..ST-24 only
