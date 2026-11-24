@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-24 01:01
-> **Progress**: 12/39 tasks (31%)
+> **Last Updated**: 2026-11-24 01:09
+> **Progress**: 15/39 tasks (38%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -97,7 +97,7 @@ verification. Each behavior phase follows spec tests → red → implementation 
 
 ## Phase 2: Provider Resolution and Capability Line
 
-> **Phase baseline tree**: _(recorded by exec-plan at phase start)_
+> **Phase baseline tree**: `340abbdb817bbee2b685a89111fdc7fd736f06ba`
 > **Reasoning**: high — semantic resolver, max guard, and prompt-bound disclosure
 
 ### Step 2.1: Specification tests
@@ -105,9 +105,9 @@ verification. Each behavior phase follows spec tests → red → implementation 
 **Reference**: 07 §ST-7–ST-19 · 03-02
 **Objective**: Write provider fixtures, max-guard, no-variant, and capability-line specs; confirm red.
 
-- [ ] 2.1.1 [spec-author] Write provider fixtures for OpenAI/Anthropic/DeepSeek and fail-open sets — `bin/effort-provider.spec.test.mjs` (ST-7–ST-15)
-- [ ] 2.1.2 [spec-author] Write max-guard, no-variant, capability-line, dedupe, and sanitization specs — `bin/effort-provider.impl.test.mjs`, `plugin/effort-capability.spec.test.mjs` (ST-11–ST-19)
-- [ ] 2.1.3 Run the new specs and record the red-phase failure — `node --test bin/effort-provider.spec.test.mjs bin/effort-provider.impl.test.mjs plugin/effort-capability.spec.test.mjs`
+- [x] 2.1.1 [spec-author] Write provider fixtures for OpenAI/Anthropic/DeepSeek and fail-open sets — `bin/effort-provider.spec.test.mjs` (ST-7–ST-15) ✅ (completed: 2026-11-24 01:09)
+- [x] 2.1.2 [spec-author] Write max-guard, no-variant, capability-line, dedupe, and sanitization specs — `bin/effort-provider.impl.test.mjs`, `plugin/effort-capability.spec.test.mjs` (ST-11–ST-19) ✅ (completed: 2026-11-24 01:09)
+- [x] 2.1.3 Run the new specs and record the red-phase failure — `node --test bin/effort-provider.spec.test.mjs bin/effort-provider.impl.test.mjs plugin/effort-capability.spec.test.mjs` ✅ (completed: 2026-11-24 01:09)
 
 ### Step 2.2: Implementation
 

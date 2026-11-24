@@ -158,7 +158,11 @@ describe("variant selection", () => {
     const model = { variants: { low: {}, high: {}, max: {} } }
     assert.equal(selectEffortVariant("low", model), "low")
     assert.equal(selectEffortVariant("medium", model), "high")
-    assert.equal(selectEffortVariant("xhigh", model), "max")
+    assert.equal(
+      selectEffortVariant("xhigh", model),
+      undefined,
+      "a generic nearest step must never produce max for a lower request"
+    )
     assert.equal(selectEffortVariant("none", model), undefined)
     assert.equal(selectEffortVariant("extreme", model), undefined)
     assert.equal(selectEffortVariant("medium", null), undefined)
@@ -260,10 +264,11 @@ describe("provider option application", () => {
         max: { reasoningEffort: "max" },
       },
     }
-    assert.deepEqual(applyEffort(options, "xhigh", lowHighMax), {
-      topP: 0.3,
-      reasoningEffort: "max",
-    })
+    assert.equal(
+      applyEffort(options, "xhigh", lowHighMax),
+      options,
+      "the max guard leaves a lower request unchanged"
+    )
     assert.deepEqual(applyEffort(options, "minimal", lowHighMax), {
       topP: 0.3,
       reasoningEffort: "low",
@@ -327,12 +332,11 @@ describe("provider option application", () => {
     assert.equal(applyEffort(options, "extreme", model), options)
   })
 
-  it("should add the documented passthrough key when no variants record exists", () => {
+  it("should leave options unchanged when no variants record exists", () => {
     const options = { topP: 0.8 }
     const applied = applyEffort(options, "low", { capabilities: { reasoning: true } })
-    assert.notEqual(applied, options)
-    assert.equal(applied.reasoningEffort, "low")
-    assert.equal(applied.topP, 0.8)
+    assert.equal(applied, options)
+    assert.equal("reasoningEffort" in applied, false)
     assert.deepEqual(options, { topP: 0.8 })
   })
 
