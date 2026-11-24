@@ -3,7 +3,7 @@
 > **CodeOps Artifact Schema**: 1
 
 This shared protocol keeps optional product additions separate from the work the user actually
-authorized. It is used by `make-plan`, `preflight`, and `exec-plan`. Each workflow links here
+authorized. It is used by `make-requirements`, `make-plan`, `preflight`, and `exec-plan`. Each workflow links here
 instead of defining its own scope-expansion semantics.
 
 ## Activation

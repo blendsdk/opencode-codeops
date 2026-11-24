@@ -231,7 +231,14 @@ If external integrations exist:
 | [System] | [REST/OIDC/SMTP/etc.] | [Inbound/Outbound/Both] | RD-XX |
 ```
 
-After Phase 2 is complete, proceed to the **Zero-Ambiguity Gate**
+### 2.6 Coverage Hunt Handoff
+
+After the integration map, run the coverage hunt described in SKILL.md §Phase 2A. It owns four
+default clusters (or twelve `--thorough` single-category clusters), merges candidates into the
+Ambiguity Register, and writes the `## Coverage Map` section. Run it after this structuring phase
+and before the Phase 2B **Zero-Ambiguity Gate**; the gate's authority is unchanged.
+
+After Phase 2 and the coverage hunt are complete, proceed to the **Zero-Ambiguity Gate**
 (`zero-ambiguity-gate.md`) before authoring any RD.
 
 ---

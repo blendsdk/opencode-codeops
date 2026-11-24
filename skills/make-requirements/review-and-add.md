@@ -27,27 +27,41 @@ Triggered by "add_requirement", "add a feature/RD", "I also need …" when a
    - Add it to the document index.
    - Update the dependency graph.
    - Update implementation phases if affected.
-9. Run cross-reference validation against the existing RDs (see SKILL.md Phase 4.1).
-10. Sync the roadmap if one exists (SKILL.md Phase 4.4).
+9. Mark an existing `## Coverage Map` in `requirements/00-ambiguity-register.md` stale: replace
+   its freshness line with `> **Freshness**: STALE — requirements changed by add_requirement on
+   <date>; re-run the coverage hunt.` `add_requirement` does not run the coverage hunt in this
+   version; the existing Zero-Ambiguity Gate still applies.
+10. Run cross-reference validation against the existing RDs (see SKILL.md Phase 4.1).
+11. Sync the roadmap if one exists (SKILL.md Phase 4.4).
+
+Compatibility: existing registers without a coverage map remain valid; the map is added on the
+next full-discovery or health-check run. No new schema stamp, artifact, or migration is introduced.
 
 ---
 
 ## review_requirements Protocol
 
 Triggered by "review_requirements", "check my requirements", "what's
-missing/inconsistent" when a `requirements/` set exists. Produces a diagnostic
-report — it does NOT modify the RDs unless the user then asks.
+missing/inconsistent" when a `requirements/` set exists. The Health Check runs the coverage hunt by
+default. It produces a diagnostic report — it does NOT modify the RDs unless the user then asks.
 
 1. Read all documents in `requirements/`.
 2. Run these checks:
    - **Completeness** — every "Must Have" has acceptance criteria (and they meet the specificity rules in `templates.md` §3.4B).
    - **Consistency** — no contradictions between RDs.
-   - **Coverage** — run the "Did You Consider…" checklist (`templates.md`).
+   - **Coverage Hunt** — run the coverage hunt from SKILL.md §Phase 2A against the existing set
+     (four default clusters, or twelve with `--thorough`; `--no-coverage-hunt` disables it). This
+     is the "what is missing?" pass and uses the RD-01 packet and result contract.
+   - **Coverage checklist** — run the "Did You Consider…" checklist (`templates.md`).
    - **Dependencies** — no circular dependencies; all references valid.
    - **Scope creep** — "Should Have" items that should be "Won't Have".
    - **Orphans** — features mentioned but not owned by any RD.
    - **Traceability** — decisions in RDs back-reference AR # entries; the register exists and is fully resolved.
-3. Produce a diagnostic report:
+3. Write the consolidated coverage map to `requirements/00-ambiguity-register.md` under a
+   `## Coverage Map` heading, after the register table and before the resolution notes. The map is
+   diagnostic evidence; it does not add open register rows or reopen the gate unless the user asks
+   to act on a finding.
+4. Produce a diagnostic report:
 
 ```markdown
 ## Requirements Health Check: [Project Name]
@@ -66,8 +80,25 @@ report — it does NOT modify the RDs unless the user then asks.
 
 ### Suggestions
 - [Improvement opportunity]
+
+### Coverage
+
+> **Coverage**: <completed>/<total> clusters · <examined>/12 categories · <N> candidates · <M> limits · Effort: <requested→applied> · Independence: <mixed-model|mixed-effort|uniform-effort>
+> **Freshness**: Coverage as of <date>; artifacts <list>
+
+| Cluster | Area | Examined | Not examined / limit | Candidates | Notes / limit | Confidence |
+|---------|------|----------|----------------------|------------|---------------|------------|
+| ... | ... | ... | ... | ... | ... | ... |
+
+**Material candidates:** CV-001 … CV-00N (short titles)
+**Source note:** merged `CV-*` IDs and `DQ-*` keys
+**Optional candidates:** `CV-*` with `Classification: optional`
+**Complexity candidates:** routed to the Complexity Escalation Gate
 ```
 
-After presenting the report, offer to fix the issues found — e.g. via
-add_requirement for missing coverage, or by revising specific RDs (each revision
-that introduces a new decision must go through the Zero-Ambiguity Gate).
+The health check is diagnostic: it writes the map and reports candidates, but it does not add open
+register rows or rewrite RDs. After presenting the report, offer to fix the issues found — e.g. via
+add_requirement for missing coverage, or by revising specific RDs (each revision that introduces a
+new decision must go through the Zero-Ambiguity Gate). When the user asks to act on a material
+candidate, add it as an open register row and reopen the gate until it is resolved or explicitly
+deferred.

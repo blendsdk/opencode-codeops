@@ -18,9 +18,78 @@ EVENTS = {
     "task-verified", "verification-run", "review-completed", "finding-escaped",
     "rework-cycle", "scope-drift", "assumption-invalidated", "runtime-ambiguity",
     "recovery-attempt",
+    "coverage_hunt.completed", "coverage_hunt.accepted", "coverage_hunt.fallback",
+    "coverage_hunt.independence", "coverage_hunt.effort",
 }
 STAGES = {"requirements", "specification", "planning", "execution", "verification", "review", "recovery"}
 RESULTS = {"pass", "fail", "resolved", "blocked", "accurate", "inaccurate"}
+
+#: Coverage-hunt events are defined by the shared protocol. They may only be
+#: recorded at the requirements or planning stage, and their payload is a
+#: fixed, content-free allowlist rather than free-form text.
+COVERAGE_EVENTS = {
+    "coverage_hunt.completed", "coverage_hunt.accepted", "coverage_hunt.fallback",
+    "coverage_hunt.independence", "coverage_hunt.effort",
+}
+COVERAGE_STAGES = {"requirements", "planning"}
+COVERAGE_LEVELS = {"low", "medium", "high", "xhigh", "max"}
+COVERAGE_MAPPINGS = {"exact", "alias", "nearest", "fail-open"}
+COVERAGE_REASONS = {
+    "subagents-unavailable", "dispatch-failed", "model-unavailable", "none",
+}
+COVERAGE_STATUSES = {"mixed-model", "mixed-effort", "uniform-effort"}
+PROVIDER_BOUNDARIES = {"same-provider", "cross-provider"}
+COUNT_FIELDS = {
+    "clusters", "candidates", "limits", "material", "accepted", "optional", "complexity",
+}
+
+
+def validate_coverage_data(raw: str) -> dict[str, int | str]:
+    """Validate a coverage-hunt payload against the content-free allowlist.
+
+    Args:
+        raw: JSON object supplied through `--data`.
+
+    Returns:
+        The validated object.
+
+    Raises:
+        ValueError: When the payload is not an object, names an unknown field,
+            carries a non-scalar or negative count, or uses a value outside
+            its fixed vocabulary.
+    """
+    try:
+        value = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise ValueError("--data must be a JSON object.") from exc
+    if not isinstance(value, dict):
+        raise ValueError("--data must be a JSON object.")
+
+    validated: dict[str, int | str] = {}
+    for key, item in value.items():
+        if key in COUNT_FIELDS:
+            if isinstance(item, bool) or not isinstance(item, int) or item < 0:
+                raise ValueError(f"data field {key!r} must be a non-negative integer.")
+        elif key == "status":
+            if item not in COVERAGE_STATUSES:
+                raise ValueError("data field 'status' is outside its fixed vocabulary.")
+        elif key == "provider_boundary":
+            if item not in PROVIDER_BOUNDARIES:
+                raise ValueError("data field 'provider_boundary' is outside its fixed vocabulary.")
+        elif key == "mapping":
+            if item not in COVERAGE_MAPPINGS:
+                raise ValueError("data field 'mapping' is outside its fixed vocabulary.")
+        elif key in {"requested", "applied"}:
+            allowed = COVERAGE_LEVELS | ({"unavailable"} if key == "applied" else set())
+            if item not in allowed:
+                raise ValueError(f"data field {key!r} is outside its fixed vocabulary.")
+        elif key in {"reason", "fallback_reason"}:
+            if item not in COVERAGE_REASONS:
+                raise ValueError(f"data field {key!r} is outside its fixed vocabulary.")
+        else:
+            raise ValueError(f"data field {key!r} is not allowed.")
+        validated[key] = item
+    return validated
 
 
 def config_for(root: Path) -> dict[str, Any]:
@@ -62,6 +131,19 @@ def emit(args: argparse.Namespace) -> int:
     if args.event not in EVENTS or args.stage not in STAGES or args.result not in RESULTS:
         print("Invalid event, stage, or result enum.", file=sys.stderr)
         return 2
+    if args.event in COVERAGE_EVENTS and args.stage not in COVERAGE_STAGES:
+        print("Coverage-hunt events require stage=requirements or stage=planning.", file=sys.stderr)
+        return 2
+    data = None
+    if args.data is not None:
+        if args.event not in COVERAGE_EVENTS:
+            print("--data is only accepted for coverage-hunt events.", file=sys.stderr)
+            return 2
+        try:
+            data = validate_coverage_data(args.data)
+        except ValueError as exc:
+            print(f"Invalid coverage-hunt data: {exc}", file=sys.stderr)
+            return 2
     event = {
         "schema": 1,
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -73,6 +155,8 @@ def emit(args: argparse.Namespace) -> int:
     }
     if args.duration_ms is not None:
         event["duration_ms"] = args.duration_ms
+    if data is not None:
+        event["data"] = data
     store = Path(args.store).expanduser()
     store.parent.mkdir(parents=True, exist_ok=True)
     with store.open("a", encoding="utf-8") as handle:
@@ -134,6 +218,10 @@ def parse_args() -> argparse.Namespace:
     emit_parser.add_argument("--result", required=True, choices=sorted(RESULTS))
     emit_parser.add_argument("--count", type=int, default=1)
     emit_parser.add_argument("--duration-ms", type=int)
+    emit_parser.add_argument(
+        "--data",
+        help="JSON object of content-free coverage-hunt fields (allowlisted)",
+    )
     report_parser = sub.add_parser("report")
     report_parser.add_argument("--root", default=".")
     report_parser.add_argument("--store", default=str(default_store()))
