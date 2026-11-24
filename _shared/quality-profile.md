@@ -75,15 +75,21 @@ SR (domain-specialist-reviewer), each numbered `XX-NNN`. Every finding-producing
 
 | Condition | Effect |
 |-----------|--------|
-| No structured profile | Strict defaults: one correctness review for every non-trivial executed phase |
+| No structured profile | Strict defaults: every non-trivial executed phase's diff gets one correctness review, at the time its plan's verification tier sets (below) |
 | `quality.independentReview: false` | Allowed only outside strict mode; announce that routine independent review is disabled. This never disables a required Complexity Escalation Gate challenger after an escalation is detected. |
-| Independent review on | Post-phase quality review runs for **all executed phases and task mini-plans** (whole-task diff); trivial tasks are never reviewed |
-| Docs-only diff | Phase reviewer still runs; security/perf auditors skip — the skip is logged, never silent |
+| Independent review on | Post-phase quality review covers **all executed phases and task mini-plans** (whole-task diff), at the time the verification tier sets; trivial tasks are never reviewed |
+| Docs-only diff | Phase reviewer still runs (immediately, or in the completion review when the phase is carried forward); security/perf auditors skip — the skip is logged, never silent |
+| `critical` tier (also: no tier line, or an unknown value) | Every non-trivial phase is reviewed when it ends |
+| `standard` tier | A phase is reviewed when it ends if it is risk-tagged or changes 150 or more product lines (added + deleted, counted per the verification-balance classification in exec-plan's post-phase step); otherwise it is marked `carried forward`. At plan completion — before the plan is reported done, finally pushed, or released — the completion review covers every carried-forward phase as one cumulative diff |
 | Security risk tags active | Security auditor dispatches once per phase with the union of applicable checklists and supersedes the reviewer's security lens |
 | Performance-critical tag + code diff | Performance auditor dispatches and supersedes the reviewer's performance lens |
 
 Supersession exists so the same ground is never reviewed twice at different depths: a dedicated
 agent replaces the reviewer's matching add-on lens for that phase.
+
+The verification tier changes **when** a diff is reviewed, never **whether** it is reviewed: the
+completion review satisfies the strict defaults for every carried-forward phase. The tier table
+lives in [spec-first-ordering.md](spec-first-ordering.md) §Verification tiers.
 
 ## Dispatch packets & header
 

@@ -171,7 +171,9 @@ complete. For each task, in order:
    introduced architectural changes (new components, data entities, API endpoints, integrations,
    or infrastructure), perform an incremental techdocs update via the techdocs skill.
 8. Continue until all tasks are complete. OpenCode auto-compacts context, so there is no
-   manual context-threshold handling — just keep going.
+   manual context-threshold handling — just keep going. Before reporting the plan done, making the
+   final push, or handing off for release, run the **completion review** (below) for every phase
+   still marked `carried forward`.
 
 ### Post-phase quality step (profile-gated)
 
@@ -179,9 +181,16 @@ Runs after a phase's last task verifies — and after a T-NN mini-plan's work ve
 whole-task diff. Activation rules, packets, supersession, and caps are defined in
 `_shared/quality-profile.md`; this section owns the order of operations:
 
-1. **Determine activation.** Strict defaults review every non-trivial phase. Adaptive mode may
-   explicitly disable independent review; announce that choice. Trivial tasks are never reviewed.
-   A docs-only diff → phase-reviewer only, and the auditor skip is logged — never silent.
+1. **Determine activation and timing.** Strict defaults review every non-trivial phase's diff, at
+   the time the plan's verification tier sets. Adaptive mode may explicitly disable independent
+   review; announce that choice. Trivial tasks are never reviewed. A docs-only diff →
+   phase-reviewer only, and the auditor skip is logged — never silent.
+   - Read the tier from the `> **Verification tier**:` line in `00-index.md`. A plan with no tier
+     line, or with an unknown value, is `critical`; say so once in the run summary.
+   - `critical`: review the phase now.
+   - `standard`: review the phase now when it is risk-tagged or changes 150 or more product lines
+     (added + deleted lines, classified as in the verification balance below). Otherwise write
+     `> **Review**: carried forward` in its phase header and skip steps 2–6 for this phase.
 2. **Dispatch in parallel:** the correctness reviewer, every risk-selected auditor (security,
    financial integrity, concurrency, performance, semantics, or migration), and any specialist
    reviewer listed in the plan's `## Specialist Agents` table, each with the dispatch header on
@@ -227,11 +236,22 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
    fix was applied, dispatch ONE re-review scoped to the fix diff — never a third pass. A fix
    the re-review still rejects is reported. Normal mode returns the ruling to the user; active
    auto-design may select one eligible technical correction, but cannot waive the finding.
-6. **Record review evidence** in the plan or its review report, optionally record a content-free
-   review outcome, then proceed to the next phase.
+6. **Record review evidence** in the plan or its review report, and write
+   `> **Review**: reviewed <YYYY-MM-DD HH:MM>` in the header of every phase this review covered
+   (after the rulings and any re-review). Optionally record a content-free review outcome, then
+   proceed to the next phase.
 
 A dispatch that fails or dies mid-loop is reported — the phase completes UNreviewed only on the
 user's explicit say-so.
+
+**Completion review.** At plan completion — before reporting the plan done, making the final push,
+or handing off for release — run steps 2–6 once on a cumulative diff that covers every phase still
+marked `carried forward`, starting from the earliest such phase's baseline tree, then mark each
+covered phase `reviewed`. This applies whatever the size or triviality of the last phase. Per-task
+pushes (`--auto-commit`, or ask-commit "commit and push") do not trigger it. If the earliest
+baseline object no longer exists, start from the earliest carried-forward baseline that still
+exists and report the gap. A run that stops early names every phase still `carried forward` in its
+session summary.
 
 ### Outcome evidence (opt-in)
 
@@ -309,7 +329,8 @@ match materially improves the result:
    context, different capability/effort, or isolation from the decision conversation is useful.
 3. **Parallelize only independent work.** Read-heavy reconnaissance and independent reviews are
    preferred candidates. Parallel writes require disjoint ownership and an explicit merge plan.
-4. **Select reviewers by risk.** Every non-trivial phase gets correctness review; add security,
+4. **Select reviewers by risk.** Every non-trivial phase's diff gets correctness review, at the
+   time the plan's verification tier sets; add security,
    financial-integrity, concurrency, performance, semantics, or migration reviewers from tags.
 
 **The phase packet.** When a phase IS dispatched, the parent composes the packet; the executor
@@ -517,6 +538,7 @@ the tool never blocks, delays, or changes any step.
 - [ ] Phase X, Task X.X.X: [description]
 - [ ] Phase Y: [phase description]
 
+**Carried forward:** [phases still awaiting the completion review | none]
 **Execution Plan Updated:** ✅ `99-execution-plan.md` reflects all completed work
 **Verification:** [Status — e.g., "All tests passing", "Build successful"]
 **Commit Mode:** [ask-commit | no-commit | auto-commit]

@@ -166,9 +166,32 @@ These rules are universal. For build/test/verify commands, package manager, stru
 ## Hard rules for every generated plan
 
 - **No raw git commands in plan documents.** Plans must not contain `git add/commit/push` or bash blocks running git. When a plan needs to commit, it references the **git-commit skill** (commit) or **git-commit skill in push mode** (commit + push) command. Execution commit behavior is owned by the exec-plan skill.
-- **Specification-first testing ordering is non-negotiable** (see Phase 2 and [templates.md](templates.md)): spec tests → red phase → implement → green phase → impl tests → verify.
+- **Specification-first testing ordering is non-negotiable** (see Phase 2 and [templates.md](templates.md)): spec tests → red phase → implement → green phase → impl tests → verify. The plan's verification tier (below) decides only which of these steps are separate tasks.
 - **Zero-Ambiguity Gate (Phase 1C) must pass before any plan document except its incrementally
   persisted `00-ambiguity-register.md` is written.** No other exceptions.
+
+## Verification tier
+
+Every full plan carries one verification tier, `standard` or `critical`, that sizes its test
+ceremony and review timing. The tier table and its rules live in
+[../../_shared/spec-first-ordering.md](../../_shared/spec-first-ordering.md) §Verification tiers.
+Mini-plans and trivial tasks have no tier.
+
+1. **Proposal.** When `quality.verificationTier` in `codeops/codeops.json` is `standard` or
+   `critical`, that value is the proposal. Otherwise (`derived`, the default, or absent), derive
+   it: the tier is `critical` when the financial-system lens, a security risk tag or
+   `security_profile`, the distributed-and-concurrent lens, or a migration or backfill of persisted
+   data applies; otherwise it is `standard`. Format or compatibility evolution alone does not make a
+   plan critical — the data-and-migration lens still adds its questions.
+2. **Timing.** State the provisional tier and its reason during scope confirmation (Phase 1.3).
+   Re-derive the final tier after re-running lens selection (see §What you produce). If the final
+   tier differs from the provisional one, raise it as a new Ambiguity Register row before writing the plan documents.
+3. **Override.** The user may override the proposal. The recorded reason says why; when the
+   configured tier differs from the derivation, the reason names both, for example
+   `standard — config override (derived critical: security tag)`.
+4. **Record.** Write the final tier into `00-index.md` as
+   `> **Verification tier**: <standard|critical> — <one-line reason>`. exec-plan reads only this
+   line; a plan without it is executed as `critical`.
 
 ## Optional input: requirements documents
 
@@ -193,6 +216,7 @@ Read relevant source files; identify affected components; find similar/reference
 ### 1.3 Confirm scope
 
 Present a scope confirmation (feature, IN scope, OUT of scope, key decisions needed) and ask the user to confirm or adjust. While doing this, start compiling the **Ambiguity Register** — finalized and enforced in Phase 1C.
+Include the provisional verification tier and its reason (see [Verification tier](#verification-tier)).
 This confirmation is the authorized scope baseline. Do not place optional suggestions in IN scope,
 OUT of scope, or the Ambiguity Register in strict mode. With active scope exploration, collect them
 separately in the Scope Expansion Register and wait for `Keep`, `Defer`, or `Discard` rulings.
@@ -404,7 +428,7 @@ decisions remain user-owned.
 ## Phase 2 — Create Plan Documents
 
 1. Create the plan folder (`plans/<feature-name>/` flat, or `codeops/features/<f>/plans/<plan>/` nested — resolve via the convention doc).
-2. Write each document using the templates in **[templates.md](templates.md)** — including its **Reference, don't restate** rule (one owning doc per fact; everything else cites ST-# / 03-doc § / AR-# with at most a one-line gloss). Stamp `00-index.md` and `99-execution-plan.md` with `> **CodeOps Artifact Schema**: 1`. After Phase 1C, copy the `## Coverage Map` section from the register into `00-index.md` under `## Planning Coverage`, after the overview and before the document index.
+2. Write each document using the templates in **[templates.md](templates.md)** — including its **Reference, don't restate** rule (one owning doc per fact; everything else cites ST-# / 03-doc § / AR-# with at most a one-line gloss). Stamp `00-index.md` and `99-execution-plan.md` with `> **CodeOps Artifact Schema**: 1`. After Phase 1C, copy the `## Coverage Map` section from the register into `00-index.md` under `## Planning Coverage`, after the overview and before the document index. Fill the `> **Verification tier**:` line of `00-index.md` with the final tier (see [Verification tier](#verification-tier)).
 3. Every design decision, scope decision, and error-handling strategy must carry an `AR #` back-reference to the register (only exceptions: universally obvious facts and zero-semantic-impact formatting).
 3b. Every addition accepted through scope exploration must also carry its owning `SE-*`
     back-reference. `Defer`, `Discard`, and `Superseded` entries never produce plan tasks.
@@ -419,7 +443,7 @@ decisions remain user-owned.
    pass them with `--include`. With no map and no scoped command, generate exactly today's plan
    (one `**Verify**` line). The canonical gate ladder is
    [../../_shared/test-selection.md](../../_shared/test-selection.md).
-5. `99-execution-plan.md` must structure every feature phase with the mandatory three-session ordering (Spec Tests → Implementation → Impl Tests & Hardening), carrying each phase's tasks as a **single checkbox list** — the plan's single source of truth for progress; a task line appears exactly once in the document. The full ordering rules are in [templates.md](templates.md).
+5. `99-execution-plan.md` must structure every feature phase with the mandatory specification-first ordering, sized by the plan's verification tier (`critical`: the three steps Spec Tests → Implementation → Impl Tests & Hardening with a distinct red-phase task; `standard`: the red check inside the spec-test task and implementation tests only for named error paths and edge cases), carrying each phase's tasks as a **single checkbox list** — the plan's single source of truth for progress; a task line appears exactly once in the document. The full ordering rules are in [templates.md](templates.md).
 6. If you discover a NEW ambiguity while writing, STOP immediately and add it to the register.
    In normal mode get the user's decision; with active auto-design resolve an eligible technical
    item under the shared policy or escalate a reserved item. Only then resume

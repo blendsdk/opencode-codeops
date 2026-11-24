@@ -51,8 +51,13 @@ Re-evaluate each plan document against the make-plan skill's current standards.
 
 ### `07-testing-strategy.md` (if it exists)
 - [ ] Follows current testing standards — your project's testing standards (AGENTS.md)?
-- [ ] Coverage-goals table present?
+- [ ] Coverage goals present? (Every ST-case and acceptance criterion has at least one test; never add percentage targets to an existing plan.)
 - [ ] Test categories clearly defined?
+
+### Verification tier (existing plans)
+- [ ] Never derive a verification tier for an existing plan: a plan without a tier line already
+      executes as `critical`. If the upgrade adds the line, write
+      `> **Verification tier**: critical — pre-tier plan` in `00-index.md`.
 
 ### `99-execution-plan.md`
 - [ ] Version stamp present? → Add `> **CodeOps Artifact Schema**: 1` if missing.

@@ -47,6 +47,7 @@ excerpt at dispatch time — excerpting for a handoff packet is not restatement)
 > **Status**: Planning Complete
 > **Created**: [Date]
 > **Implements**: RD-NN, RD-NN   (one or more RD identifiers; feature-qualify in nested layout)
+> **Verification tier**: [standard|critical] — [one-line reason; see `../../_shared/spec-first-ordering.md` §Verification tiers]
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -315,17 +316,12 @@ With no RD upstream, `01-requirements.md` IS the owning requirements doc:
 
 ### Coverage Goals
 
-| Code type | Target |
-| --------- | ------ |
-| Core business logic | 90% |
-| Supporting modules / services | 80% |
-| UI / glue / configuration | 60% |
-
+- Every ST-case and acceptance criterion has at least one test. Do not set percentage coverage
+  targets by default; at the `critical` tier a plan may record percentage targets as an AR
+  decision.
 - Test names state behavior: `should [expected behavior] when [condition]`.
 - Integration tests cover key workflows when applicable. E2E tests cover complete feature behavior
   when feasible; otherwise record `N/A` and the concrete reason instead of building a new harness.
-- Adjust targets per project in `01-requirements.md` (an AR-referenced decision) — never
-  silently.
 
 ## Test Slices & Groups (optional)
 
@@ -419,7 +415,7 @@ recorded manual/external/N/A acceptance reason.
 - [ ] Specification tests written BEFORE implementation
 - [ ] Specification tests verified to FAIL before implementation (red phase)
 - [ ] All specification tests pass after implementation (green phase)
-- [ ] Implementation tests written for edge cases and internals
+- [ ] Implementation tests written (at the `standard` tier: only the error paths and edge cases the specification names)
 - [ ] All unit / integration / E2E tests pass
 - [ ] No regressions in existing tests
 - [ ] Test coverage meets goals
@@ -486,6 +482,7 @@ task-size criteria in [quality-checklist.md](quality-checklist.md))
 
 > **Phase baseline tree**: _(recorded by the exec-plan skill from a temporary-index snapshot of
 > committed, staged, unstaged, and untracked phase-start state)_
+> **Review**: _(recorded by the exec-plan skill: `reviewed <YYYY-MM-DD HH:MM>` or `carried forward`)_
 > **Lenses**: [add-on lenses — include this line only when the target repo carries a quality
 > profile; informational: activation stays profile-driven]
 > **Reasoning**: [advisory level — `low`, `medium`, `high`, `xhigh`, or `max`, with a one-line
@@ -549,13 +546,14 @@ Phase 2
 
 ## Specification-First Task Ordering (NON-NEGOTIABLE)
 
-Every feature implementation phase in `99-execution-plan.md` MUST follow the three-step
-specification-first ordering — `spec tests → red phase → implement → green phase → impl tests →
-verify` — defined ONCE in **[../../_shared/spec-first-ordering.md](../../_shared/spec-first-ordering.md)**.
-Read it before authoring the execution plan; it carries the full step structure, the compressed
-small-feature form, the prohibited/required lists, and the immutable-oracle rule. Generated plans
-must reference `07-testing-strategy.md` ST-cases in spec-test tasks and include a distinct
-red-phase verification task.
+Every feature implementation phase in `99-execution-plan.md` MUST follow the specification-first
+ordering — `spec tests → red phase → implement → green phase → impl tests → verify` — defined ONCE
+in **[../../_shared/spec-first-ordering.md](../../_shared/spec-first-ordering.md)**. Read it before
+authoring the execution plan; it carries the step structure, the verification tiers, the
+compressed small-feature form, the prohibited/required lists, and the immutable-oracle rule.
+Generated plans must reference `07-testing-strategy.md` ST-cases in spec-test tasks. The red phase
+is a distinct verification task at the `critical` tier; at the `standard` tier it runs inside the
+spec-test task.
 
 ---
 

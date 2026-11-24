@@ -6,9 +6,11 @@ The **single canonical definition** of CodeOps' specification-first ordering. `m
 it when generating `99-execution-plan.md`; `exec-plan` enforces it while executing one. Both link
 here; neither carries its own copy.
 
-Every feature implementation phase follows this three-step structure. It prevents tautological
-testing — tests that mirror the implementation instead of independently verifying it against the
-specification.
+Every feature implementation phase keeps the same order — specification tests first, then the
+implementation, then implementation tests. The order prevents tautological testing — tests that
+mirror the implementation instead of independently verifying it against the specification. The
+plan's verification tier (below) decides how many of these steps are separate tasks. At the
+`critical` tier every feature phase uses this three-step structure:
 
 ```
 Phase N: [Feature Name]
@@ -33,6 +35,25 @@ Phase N: [Feature Name]
     N.3.2  Full verification (the project's verify command)
 ```
 
+## Verification tiers
+
+A full plan records its tier in `00-index.md` as `> **Verification tier**: <tier> — <reason>`.
+The tier sizes the ceremony and the review timing to the work; it never changes the order.
+
+| Aspect | `standard` | `critical` |
+|---|---|---|
+| Spec tests first | Yes — from the ST-cases, before implementation | Yes |
+| Red check | Inside the spec-test task: run the declared spec file and confirm it fails; no separate task | A distinct red-phase task |
+| Implementation tests | Only for the error paths and edge cases named in the ST-cases or the component specifications | Edge cases, internals, and error paths |
+| Coverage goal | Every ST-case and acceptance criterion has at least one test; no percentage targets | The same rule; percentage targets only when the plan records them as a decision |
+| Independent review | A phase is reviewed when it is risk-tagged or changes 150 or more product lines; otherwise its review is carried forward to the completion review | Every non-trivial phase |
+
+- A plan without a tier line is `critical`, and so is a plan whose tier line has an unknown value.
+- The tier changes **when** a diff is reviewed, never **whether** it is reviewed. The review rules
+  live in [quality-profile.md](quality-profile.md).
+- Mini-plans keep their own lightweight path; tiers apply to full plans only.
+- The immutable-oracle rule below applies at both tiers.
+
 ## Why this ordering
 
 | Step | What it prevents |
@@ -51,10 +72,12 @@ Phase N: [Feature Name]
 - ❌ Combining spec tests and implementation in one task, or writing them simultaneously
 - ❌ Generating a plan where implementation tasks precede spec-test tasks for the same feature
 
-**✅ REQUIRED in every generated `99-execution-plan.md`:** the three-step ordering per feature
-phase; explicit `[feature].spec.test.[ext]` and `[feature].impl.test.[ext]` file references;
-references to the ST-cases from `07-testing-strategy.md` in spec-test tasks; a distinct
-red-phase verification task.
+**✅ REQUIRED in every generated `99-execution-plan.md`:** the specification-first order per
+feature phase; explicit `[feature].spec.test.[ext]` file references, plus
+`[feature].impl.test.[ext]` references wherever implementation tests are planned; references to
+the ST-cases from `07-testing-strategy.md` in spec-test tasks; and a red check before
+implementation — a distinct red-phase verification task at the `critical` tier, inside the
+spec-test task at the `standard` tier.
 
 **Immutable-oracle rule:** if the implementation does not match a spec test, the implementation
 is wrong — not the test. Never modify a spec test's expectations to match code. (This rule binds
@@ -63,7 +86,10 @@ never edits the test.)
 
 ## Small features (compressed form)
 
-You MAY compress into a single step, but the ordering is still mandatory:
+You MAY compress into a single step, but the ordering is still mandatory. The red phase stays its own task
+(N.1.2) at the `critical` tier. At the `standard` tier N.1.1 and N.1.2 are one task —
+write the specification tests, then run the declared spec file and confirm it fails — and N.1.5
+covers only the error paths and edge cases the specification names:
 
 ```
 Step N.1: [Feature Name]
@@ -75,8 +101,9 @@ Step N.1: [Feature Name]
   N.1.6  Phase/plan gate verification
 ```
 
-The order `spec tests → red phase → implement → green phase → impl tests → verify` is NEVER
-negotiable, regardless of feature size. The red phase runs only the declared spec file(s). The
+The order `spec tests → red phase → implement → green phase → impl tests → verify` is never
+negotiable, whatever the tier or feature size; the tier decides only which steps are separate
+tasks. The red phase runs only the declared spec file(s). The
 final verification is the phase/plan gate: the full project verify, or the map's release gate.
 Per-task verification may use the selected task groups or a validated `**Task verify**` command;
 the gate rules, fallback behavior, and evidence contract live in

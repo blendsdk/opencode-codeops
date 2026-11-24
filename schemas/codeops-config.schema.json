@@ -23,7 +23,8 @@
       "properties": {
         "independentReview": {"type": "boolean"},
         "minimumReviewers": {"type": "integer", "minimum": 1},
-        "stopOnMajorFinding": {"type": "boolean"}
+        "stopOnMajorFinding": {"type": "boolean"},
+        "verificationTier": {"type": "string", "enum": ["derived", "standard", "critical"]}
       }
     },
     "routing": {

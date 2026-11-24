@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-25 00:24
-> **Progress**: 4/31 tasks (13%)
+> **Last Updated**: 2026-11-25 00:32
+> **Progress**: 12/31 tasks (39%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -85,7 +85,8 @@ the property (PF-030).
 
 ## Phase 2: Verification tiers
 
-> **Phase baseline tree**: _(recorded by exec-plan)_
+> **Phase baseline tree**: c190a513ddcfa321e70790157b988a1a70bd54b9
+> **Review**: reviewed 2026-11-25 00:32 — correctness review + one re-review; RV-001..RV-003 fixed (05-findings.md)
 > **Reasoning**: high — changes the core planning contract
 
 ### Step 2.1: Tier definition, authoring, and review timing
@@ -93,17 +94,17 @@ the property (PF-030).
 **Reference**: 03-01 · AR-11..AR-15, AR-29, AR-30
 **Objective**: Plans carry a tier that sizes ceremony and review timing.
 
-- [ ] 2.1.1 `_shared/spec-first-ordering.md`: `## Verification tiers` section, reworded order sentence, tier-aware REQUIRED list and compressed form (03-01 §Text changes)
-- [ ] 2.1.2 `skills/make-plan/SKILL.md`: hard rule `:169`, provisional/final tier, derivation and override (03-01 §Derivation)
-- [ ] 2.1.3 `skills/make-plan/templates.md` (tier line, `Review` line, 07 coverage rule, spec-first paragraph `:551-558`) and `skills/make-plan/quality-checklist.md` (`:41`, `:51`) (03-01 §Text changes)
-- [ ] 2.1.4 `schemas/codeops-config.schema.json`: `quality.verificationTier` (03-01 §Schema)
-- [ ] 2.1.5 `_shared/quality-profile.md`: activation rows `:78`, `:80`, `:81` and the standard trigger row (03-01 §Tier set)
-- [ ] 2.1.6 `skills/exec-plan/execution-protocol.md` post-phase step 1, `Review` line, completion review, `:182`, `:312`; `skills/exec-plan/SKILL.md` `:236-238` (03-01 §Review status line, §Error Handling)
-- [ ] 2.1.7 `skills/upgrade-plan/upgrade-checklists.md`: never derive a tier for an existing plan (03-01 §Derivation step 6)
-- [ ] 2.1.8 Green check: `node --test --test-name-pattern "^ST-[1-9]\b" scripts/right-sized-verification-content.spec.test.mjs` passes
+- [x] 2.1.1 `_shared/spec-first-ordering.md`: `## Verification tiers` section, reworded order sentence, tier-aware REQUIRED list and compressed form (03-01 §Text changes) ✅ (completed: 2026-11-25 00:25)
+- [x] 2.1.2 `skills/make-plan/SKILL.md`: hard rule `:169`, provisional/final tier, derivation and override (03-01 §Derivation) ✅ (completed: 2026-11-25 00:25)
+- [x] 2.1.3 `skills/make-plan/templates.md` (tier line, `Review` line, 07 coverage rule, spec-first paragraph `:551-558`) and `skills/make-plan/quality-checklist.md` (`:41`, `:51`) (03-01 §Text changes) ✅ (completed: 2026-11-25 00:26)
+- [x] 2.1.4 `schemas/codeops-config.schema.json`: `quality.verificationTier` (03-01 §Schema) ✅ (completed: 2026-11-25 00:26)
+- [x] 2.1.5 `_shared/quality-profile.md`: activation rows `:78`, `:80`, `:81` and the standard trigger row (03-01 §Tier set) ✅ (completed: 2026-11-25 00:26)
+- [x] 2.1.6 `skills/exec-plan/execution-protocol.md` post-phase step 1, `Review` line, completion review, `:182`, `:312`; `skills/exec-plan/SKILL.md` `:236-238` (03-01 §Review status line, §Error Handling) ✅ (completed: 2026-11-25 00:27)
+- [x] 2.1.7 `skills/upgrade-plan/upgrade-checklists.md`: never derive a tier for an existing plan (03-01 §Derivation step 6) ✅ (completed: 2026-11-25 00:27)
+- [x] 2.1.8 Green check: `node --test --test-name-pattern "^ST-[1-9]\b" scripts/right-sized-verification-content.spec.test.mjs` passes ✅ (completed: 2026-11-25 00:28)
 
 **Deliverables**:
-- [ ] ST-1..ST-9 green
+- [x] ST-1..ST-9 green
 
 **Task verify**: `node --test --test-name-pattern "^ST-[1-9]\b" scripts/right-sized-verification-content.spec.test.mjs` (this and earlier phases' ST cases, all green) and `node bin/codeops-test.mjs run --gate task --baseline HEAD`, whose only allowed failures are the expected-red ST cases named on the gate line and, until Phase 5, `plugin/compaction-note.spec.test.mjs` as a whole file (its import fails at file level)
 **Verify (gate)**: `npm run verify` — expected red: ST-10..ST-24 only

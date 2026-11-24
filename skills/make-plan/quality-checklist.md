@@ -38,17 +38,18 @@ Run this before finalizing the plan documents. The **Specification-First Testing
 - [ ] Every component has test requirements
 - [ ] E2E tests are planned when feasible and applicable; otherwise the plan records `N/A` with a
       concrete reason and does not create a new harness only to satisfy the template
-- [ ] Test coverage goals defined
+- [ ] Every ST-case and acceptance criterion has at least one planned test
 
 ## ✅ Specification-First Testing — 🚨 NON-NEGOTIABLE
 - [ ] `07-testing-strategy.md` contains the `🚨 Specification Test Cases` section with concrete ST-cases
 - [ ] Every ST-case has concrete input → expected output pairs (not just test names/descriptions)
 - [ ] Every ST-case traces to a requirement, spec document, RFC, or AR entry
 - [ ] ST-case expectations are derived from specification documents, NOT from imagined implementation behavior
-- [ ] `99-execution-plan.md` follows the three-phase task ordering: spec tests → implementation → impl tests
+- [ ] `00-index.md` records the verification tier (`> **Verification tier**: <standard|critical> — <reason>`)
+- [ ] `99-execution-plan.md` follows the specification-first order for its tier: spec tests → implementation → impl tests
 - [ ] Spec test tasks reference ST-cases from `07-testing-strategy.md`
 - [ ] Spec test and impl test files use separate naming conventions (`*.spec.test.*` and `*.impl.test.*`)
-- [ ] A red-phase verification task exists in the execution plan (verify spec tests fail before implementation)
+- [ ] A red check exists before implementation — a separate red-phase task at `critical`, inside the spec-test task at `standard`
 - [ ] `07-testing-strategy.md` carries the optional `Test slices` table, or records `N/A — full verify only`
 - [ ] Every ST-case maps to a test slice or a validated scoped command
 - [ ] Every slice has a task-tier test and a release/acceptance group or recorded acceptance reason

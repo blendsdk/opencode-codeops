@@ -233,8 +233,11 @@ source of truth and tells the skill where to pick up.
 
 ## Quality loop (profile-gated)
 
-Every non-trivial executed phase (and task mini-plan) ends with a post-phase quality review under
-strict defaults unless an allowed adaptive-mode policy explicitly disables it. Activation rules,
+Every non-trivial executed phase (and task mini-plan) gets a post-phase quality review under
+strict defaults unless an allowed adaptive-mode policy explicitly disables it. The plan's
+verification tier sets when: at `critical` (and for plans without a tier line) every phase is
+reviewed as it ends; at `standard` a small, untagged phase is carried forward to the completion
+review that runs before the plan is reported done. Activation rules,
 lenses, supersession, dispatch packets, and budget caps are defined
 once in **[../../_shared/quality-profile.md](../../_shared/quality-profile.md)** — this skill
 links to them, never restates them.
@@ -278,12 +281,15 @@ Brief rules for verification failure, plan deviation, and mid-task interruption 
 
 ## Post-completion hooks (all tasks done)
 
-1. Handle the end-of-plan commit per the active commit mode (see [commit-modes.md](commit-modes.md)).
-2. **Techdocs:** if techdocs exist, do a comprehensive update via the techdocs skill; otherwise
+1. **Completion review:** run [execution-protocol.md](execution-protocol.md) §Completion review for
+   every phase still marked `carried forward` — before the end-of-plan commit or push, the roadmap
+   `Done`, or a release hand-off.
+2. Handle the end-of-plan commit per the active commit mode (see [commit-modes.md](commit-modes.md)).
+3. **Techdocs:** if techdocs exist, do a comprehensive update via the techdocs skill; otherwise
    ask whether to create them.
-3. **Re-analyze:** ask whether to re-analyze the project and update the project's AGENTS.md via
+4. **Re-analyze:** ask whether to re-analyze the project and update the project's AGENTS.md via
    the `analyze-project` skill.
-4. **Roadmap:** set the RD row to `Done` via the roadmap skill if a roadmap exists.
+5. **Roadmap:** set the RD row to `Done` via the roadmap skill if a roadmap exists.
 
 ## Conventions
 
