@@ -14,9 +14,10 @@ contract consumed by the plugin and the skills. It is advisory by design and nev
 | `low` | Mechanical, fully specified, deterministic verification | Docs and formatting edits, renames, config updates |
 | `medium` | Ordinary bounded feature work with known patterns | Standard implementation phases, recon, single-file reviews |
 | `high` | Correctness- or security-sensitive, cross-cutting, or planning/review work | Requirements, planning, correctness/security review, ambiguous implementation |
-| `max` | Adversarial or high-risk analysis where a missed detail is costly | Thorough preflight, complex or sensitive phases |
+| `xhigh` | Adversarial or high-risk analysis | Thorough preflight, complex or sensitive phases, challenger |
+| `max` | Explicit critical only | Explicit user request; never a default |
 
-The four levels are the complete suggestion vocabulary. A level is applied through the model's
+The five levels are the complete suggestion vocabulary. A level is applied through the model's
 own variant options: the exact variant when it exists, otherwise the nearest exposed level on the
 provider scale, with ties resolving to the higher level. On OpenCode 2 the plugin reads those
 options from the registered model's `variants` collection and merges the chosen entry's settings
@@ -39,7 +40,7 @@ A dispatch marker is one standalone line in a dispatch message:
 [codeops-effort: <level>]
 ```
 
-- The whole trimmed line must match `^\[codeops-effort:\s*(low|medium|high|max)\]\s*$`.
+- The whole trimmed line must match `^\[codeops-effort:\s*(low|medium|high|xhigh|max)\]\s*$`.
 - The level is exactly lower-case. Unknown or malformed markers are ignored, never errors.
 - Only user-role text parts of a message are scanned; tool output, diffs, and quoted documents
   are never scanned.

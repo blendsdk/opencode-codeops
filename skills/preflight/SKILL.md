@@ -38,7 +38,8 @@ as separate `SE-*` proposals; finding resolution never chooses `Keep`.
 If `$ARGUMENTS` contains exactly one exact standalone `--auto-effort` or `--auto-effort=<level>`
 token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero
 occurrences means this skill's recommended level (`high`, or `max` with `--thorough`) is printed
-as a suggestion only, more than one or an invalid level is an argument error; announce
+as a suggestion only, more than one or an invalid level is an argument error. The accepted levels
+are `low`, `medium`, `high`, `xhigh`, and `max`. Announce
 `Auto-effort active — reasoning <level> applied for this run`; then read and apply
 [../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. The
 run clears the level before its final summary.

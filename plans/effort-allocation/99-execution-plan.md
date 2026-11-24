@@ -3,7 +3,7 @@
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
 > **Last Updated**: 2026-11-24 01:00
-> **Progress**: 7/39 tasks (18%)
+> **Progress**: 9/39 tasks (23%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -71,8 +71,8 @@ verification. Each behavior phase follows spec tests → red → implementation 
 
 - [x] 1.3.1 Expand `EFFORT_LEVELS`, marker regex, `isEffortLevel`, and `EffortLevel` — `bin/lib/reasoning-effort.mjs`, `bin/lib/reasoning-effort.d.mts` ✅ (completed: 2026-11-24 00:59)
 - [x] 1.3.2 Accept `xhigh` in the Python session helper — `scripts/codeops_effort.py` ✅ (completed: 2026-11-24 01:00)
-- [ ] 1.3.3 Update the level table, marker grammar, and flag examples in the shared contract; leave the skill/plan tables to Phase 3 — `_shared/reasoning-effort.md`
-- [ ] 1.3.4 Update skill `--auto-effort` flag text to list five levels — `skills/preflight/SKILL.md`, `skills/make-plan/SKILL.md`, `skills/exec-plan/SKILL.md`
+- [x] 1.3.3 Update the level table, marker grammar, and flag examples in the shared contract; leave the skill/plan tables to Phase 3 — `_shared/reasoning-effort.md` ✅ (completed: 2026-11-24 01:00)
+- [x] 1.3.4 Update skill `--auto-effort` flag text to list five levels — `skills/preflight/SKILL.md`, `skills/make-plan/SKILL.md`, `skills/exec-plan/SKILL.md` ✅ (completed: 2026-11-24 01:00)
 
 ### Step 1.4: Impl tests and phase gate
 

@@ -41,8 +41,8 @@ update.
 If `$ARGUMENTS` contains exactly one exact standalone `--auto-effort` or `--auto-effort=<level>`
 token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero
 occurrences means each phase's `Reasoning:` level is printed as a suggestion only, more than one
-or an invalid level is an argument error; announce
-`Auto-effort active — reasoning <level> applied for this run`; then read and apply
+or an invalid level is an argument error. The accepted levels are `low`, `medium`, `high`,
+`xhigh`, and `max`. Announce `Auto-effort active — reasoning <level> applied for this run`; then read and apply
 [../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. A bare
 flag follows each phase's suggestion; `--auto-effort=<level>` forces that level for the whole run,
 including every dispatch marker composed during it. The run clears the level before its final
