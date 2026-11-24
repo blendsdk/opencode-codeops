@@ -20,7 +20,7 @@ from pathlib import Path
 
 
 #: The only levels a session flag may record.
-EFFORT_LEVELS = ("low", "medium", "high", "max")
+EFFORT_LEVELS = ("low", "medium", "high", "xhigh", "max")
 
 #: Name of the state file the plugin reads.
 STATE_FILE_NAME = "reasoning-effort.json"

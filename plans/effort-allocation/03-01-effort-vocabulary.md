@@ -42,7 +42,8 @@ Unknown or malformed markers remain ignored, never errors. The first valid marke
 - `EFFORT_LEVELS` becomes `("low", "medium", "high", "xhigh", "max")`.
 - `set --reasoning xhigh` writes the existing state file and exits 0.
 - An unknown value exits 2 with the existing invalid-level message.
-- The state file schema stays `{"schema":1,"reasoning":"<level>"}`.
+- The state file keeps its existing fields: `{"schema":1,"reasoning":"<level>","setAt":"<timestamp>"}`.
+  The plan changes only the accepted level set, not the state shape.
 
 ### Type declarations
 

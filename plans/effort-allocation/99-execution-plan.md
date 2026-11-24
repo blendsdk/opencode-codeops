@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-24 00:59
-> **Progress**: 6/39 tasks (15%)
+> **Last Updated**: 2026-11-24 01:00
+> **Progress**: 7/39 tasks (18%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -70,7 +70,7 @@ verification. Each behavior phase follows spec tests → red → implementation 
 **Objective**: Implement the five-level vocabulary and helper.
 
 - [x] 1.3.1 Expand `EFFORT_LEVELS`, marker regex, `isEffortLevel`, and `EffortLevel` — `bin/lib/reasoning-effort.mjs`, `bin/lib/reasoning-effort.d.mts` ✅ (completed: 2026-11-24 00:59)
-- [ ] 1.3.2 Accept `xhigh` in the Python session helper — `scripts/codeops_effort.py`
+- [x] 1.3.2 Accept `xhigh` in the Python session helper — `scripts/codeops_effort.py` ✅ (completed: 2026-11-24 01:00)
 - [ ] 1.3.3 Update the level table, marker grammar, and flag examples in the shared contract; leave the skill/plan tables to Phase 3 — `_shared/reasoning-effort.md`
 - [ ] 1.3.4 Update skill `--auto-effort` flag text to list five levels — `skills/preflight/SKILL.md`, `skills/make-plan/SKILL.md`, `skills/exec-plan/SKILL.md`
 

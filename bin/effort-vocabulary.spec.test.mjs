@@ -141,7 +141,9 @@ describe("session helper", () => {
     assert.equal(result.status, 0, result.stderr)
     assert.equal(existsSync(join(dir, "reasoning-effort.json")), true)
     const state = JSON.parse(readFileSync(join(dir, "reasoning-effort.json"), "utf8"))
-    assert.deepEqual(state, { schema: 1, reasoning: "xhigh" })
+    assert.equal(state.schema, 1)
+    assert.equal(state.reasoning, "xhigh")
+    assert.equal(typeof state.setAt, "string")
   })
 
   it("should reject default with exit 2 and name the five levels", () => {
