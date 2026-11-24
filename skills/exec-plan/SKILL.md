@@ -249,8 +249,10 @@ ruling is recorded in the plan's findings ledger (`05-findings.md`). Specialist 
 the plan's `## Specialist Agents` table dispatch per `_shared/quality-profile.md`; an unavailable
 specialist falls back to a generic packet and the fallback is reported.
 
-> **🚨 Finding gate (load-bearing).** In normal mode, 🔴 CRITICAL and 🟠 MAJOR findings PAUSE
-> execution for the user's ruling in ALL commit modes. With active auto-design, select and record
+> **🚨 Finding gate (load-bearing).** Findings are calibrated and every 🔴/🟠 finding gets one
+> refute pass first (see [execution-protocol.md](execution-protocol.md)). In normal mode,
+> `Confirmed` 🔴 CRITICAL and 🟠 MAJOR findings, and findings downgraded to 🟠, PAUSE execution for
+> the user's ruling in ALL commit modes; refuted findings are listed and can be reinstated. With active auto-design, select and record
 > an eligible technical fix, but never waive or dismiss a finding; reserved decisions still pause
 > for the user. Auto-commit never bypasses the applicable authority gate. 🟡 MINOR findings are
 > report-only. Accepted fixes are implemented, verified, follow-up-committed per the commit mode,

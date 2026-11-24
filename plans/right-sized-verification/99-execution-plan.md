@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-25 00:32
-> **Progress**: 12/31 tasks (39%)
+> **Last Updated**: 2026-11-25 00:43
+> **Progress**: 18/31 tasks (58%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -113,7 +113,8 @@ the property (PF-030).
 
 ## Phase 3: Review calibration & refuter
 
-> **Phase baseline tree**: _(recorded by exec-plan)_
+> **Phase baseline tree**: 28237bf6bfd6c92f7a0dc8468d135bd971f5b4ed
+> **Review**: reviewed 2026-11-25 00:43 — correctness review + agent-pipeline-reviewer + one re-review; RV-001..RV-004, RV-006, SR-001 fixed; RV-005 deferred to Phase 6 (05-findings.md)
 > **Reasoning**: high — changes reviewer behavior
 > **Specialist reviewer**: agent-pipeline-reviewer (00-index §Specialist Agents)
 
@@ -122,15 +123,15 @@ the property (PF-030).
 **Reference**: 03-02 · AR-6, AR-18..AR-20, AR-28
 **Objective**: Fewer, challenged findings; no finding silently dismissed.
 
-- [ ] 3.1.1 `_shared/quality-profile.md`: `## Finding calibration`, calibration in the named reviewer packet rows (not `preflight-auditor`), `refute` packet row (03-02 §Calibration rules, §Refute mode)
-- [ ] 3.1.2 `agent-templates/phase-reviewer.md`: `Mode: refute` bullet with output contract and insufficiency rule; calibration reference (03-02 §Template and agent)
-- [ ] 3.1.3 Regenerate: `python3 scripts/install_agents.py --project . --roles correctness-reviewer`, copy `.opencode/agents/correctness-reviewer.md` to `agents/correctness-reviewer.md`, then `--check` (03-02 §Template and agent)
-- [ ] 3.1.4 `skills/exec-plan/execution-protocol.md` steps 3–4: calibration at merge, refute step, outcomes, ledger vocabulary, "dismissed silently" rewording (03-02 §Refute mode, §Error Handling)
-- [ ] 3.1.5 `skills/exec-plan/SKILL.md` finding gate `:249-254` and `skills/exec-plan/commit-modes.md` `:35-37`, `:86-87`: "Confirmed 🔴/🟠" (03-02 §Refute mode)
-- [ ] 3.1.6 Green check: `node --test --test-name-pattern "^ST-1[0-4]\b" scripts/right-sized-verification-content.spec.test.mjs` passes
+- [x] 3.1.1 `_shared/quality-profile.md`: `## Finding calibration`, calibration in the named reviewer packet rows (not `preflight-auditor`), `refute` packet row (03-02 §Calibration rules, §Refute mode) ✅ (completed: 2026-11-25 00:33)
+- [x] 3.1.2 `agent-templates/phase-reviewer.md`: `Mode: refute` bullet with output contract and insufficiency rule; calibration reference (03-02 §Template and agent) ✅ (completed: 2026-11-25 00:34)
+- [x] 3.1.3 Regenerate: `python3 scripts/install_agents.py --project . --roles correctness-reviewer`, copy `.opencode/agents/correctness-reviewer.md` to `agents/correctness-reviewer.md`, then `--check` (03-02 §Template and agent) ✅ (completed: 2026-11-25 00:34) — run with `CODEOPS_PLUGIN_ROOT=$(pwd)`: the session's variable points at the installed package, whose older template the generator would otherwise use
+- [x] 3.1.4 `skills/exec-plan/execution-protocol.md` steps 3–4: calibration at merge, refute step, outcomes, ledger vocabulary, "dismissed silently" rewording (03-02 §Refute mode, §Error Handling) ✅ (completed: 2026-11-25 00:35)
+- [x] 3.1.5 `skills/exec-plan/SKILL.md` finding gate `:249-254` and `skills/exec-plan/commit-modes.md` `:35-37`, `:86-87`: "Confirmed 🔴/🟠" (03-02 §Refute mode) ✅ (completed: 2026-11-25 00:35)
+- [x] 3.1.6 Green check: `node --test --test-name-pattern "^ST-1[0-4]\b" scripts/right-sized-verification-content.spec.test.mjs` passes ✅ (completed: 2026-11-25 00:35)
 
 **Deliverables**:
-- [ ] ST-10..ST-14 green; packaged agent matches the template (hygiene spec test)
+- [x] ST-10..ST-14 green; packaged agent matches the template (hygiene spec test)
 
 **Task verify**: `node --test --test-name-pattern "^ST-([1-9]|1[0-4])\b" scripts/right-sized-verification-content.spec.test.mjs` (this and earlier phases' ST cases, all green) and `node bin/codeops-test.mjs run --gate task --baseline HEAD`, whose only allowed failures are the expected-red ST cases named on the gate line and, until Phase 5, `plugin/compaction-note.spec.test.mjs` as a whole file (its import fails at file level)
 **Verify (gate)**: `npm run verify` — expected red: ST-15..ST-24 only

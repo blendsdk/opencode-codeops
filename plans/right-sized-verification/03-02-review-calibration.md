@@ -57,8 +57,9 @@ with a one-line note, and severities are adjusted under rule 1. No other agent t
   - `Refuted` → not a stop. Listed to the user under "Refuted" with its evidence, recorded in
     `05-findings.md` with ruling `refuted`; the user may reinstate it at any time, and a
     reinstated finding is handled as `Confirmed` (AR-28).
-- **Ledger (PF-016):** the Ruling vocabulary gains `refuted`; a downgraded finding is recorded at
-  its new severity with ruling `downgraded`.
+- **Ledger (PF-016):** the Ruling vocabulary gains `refuted` and `downgraded`; `downgraded` is used
+  only for a downgrade to 🟡; a downgrade to 🟠 is recorded at its new severity with the user's
+  ruling.
 - **Rule reconciliation (AR-28):** exec-plan's "a critical/major finding may never be dismissed
   automatically" becomes "never dismissed silently: a refuted finding is reported, ledgered, and
   reinstatable". `skills/exec-plan/SKILL.md` "Finding gate" (`:249-254`) and
@@ -71,9 +72,9 @@ with a one-line note, and severities are adjusted under rule 1. No other agent t
 - `agent-templates/phase-reviewer.md`: add the `Mode: refute` bullet with its output contract and
   the reference to `## Finding calibration`.
 - Regenerate the packaged agent (PF-028): run
-  `python3 scripts/install_agents.py --project . --roles correctness-reviewer`, copy
+  `CODEOPS_PLUGIN_ROOT=$(pwd) python3 scripts/install_agents.py --project . --roles correctness-reviewer` (the session variable otherwise points at the installed package and its older template), copy
   `.opencode/agents/correctness-reviewer.md` to `agents/correctness-reviewer.md`, then
-  `python3 scripts/install_agents.py --project . --check`. The existing hygiene spec test
+  `CODEOPS_PLUGIN_ROOT=$(pwd) python3 scripts/install_agents.py --project . --check`. The existing hygiene spec test
   (`scripts/hygiene-content.spec.test.mjs:139`) proves the packaged body matches the template.
 
 ## Error Handling

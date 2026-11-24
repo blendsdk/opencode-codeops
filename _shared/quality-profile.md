@@ -91,6 +91,29 @@ The verification tier changes **when** a diff is reviewed, never **whether** it 
 completion review satisfies the strict defaults for every carried-forward phase. The tier table
 lives in [spec-first-ordering.md](spec-first-ordering.md) §Verification tiers.
 
+## Finding calibration
+
+These rules apply to every finding raised in exec-plan's post-phase review — by the correctness
+reviewer, every auditor, and every specialist reviewer — at every verification tier. Preflight
+audits keep their own rules. exec-plan applies this section again when it merges findings.
+
+1. **Test-gap severity.** A missing or thin test is 🟡 MINOR — unless an ST-case or acceptance
+   criterion has no test at all, which is 🟠 MAJOR.
+2. **Not findings.** Report none of these:
+   - an issue in code outside the changed lines and the code that directly calls, or is called
+     by, them;
+   - anything the project's linter, formatter, or type checker reports;
+   - a guard for a hypothetical scenario that neither the requirements nor an active security or
+     risk checklist covers;
+   - a test that re-proves behavior an existing test already proves;
+   - a style preference that no written rule states.
+3. **Quoted rule.** A `standards` finding quotes the text of the written rule it relies on.
+   Without a quote it is not a `standards` finding.
+4. **Machinery routing.** A remedy that would add a test harness, validator, gate, guard
+   framework, or other verification support code is not a fix task. Raise it as a complexity
+   escalation under the Complexity Escalation Gate in
+   [zero-ambiguity-gate.md](zero-ambiguity-gate.md).
+
 ## Dispatch packets & header
 
 **Line 1 of every quality-agent dispatch prompt** is a compact scope header:
@@ -112,11 +135,12 @@ or response content.
 
 | Agent | Packet contents (the agent receives nothing else and must need nothing else) |
 |-------|------------------------------------------------------------------------------|
-| phase-reviewer, security-auditor, perf-auditor | Phase diff (`git diff <phase-start-ref>..HEAD`), original goal + smallest viable design, relevant approved complexity AR/PF/RV excerpts, the phase's task + Deliverable lines, active lenses, scope mode (`strict` or `explore`), confirmed scope baseline, profile excerpt, verify command + last result |
+| phase-reviewer, security-auditor, perf-auditor | Phase diff (`git diff <phase-start-ref>..HEAD`), original goal + smallest viable design, relevant approved complexity AR/PF/RV excerpts, the phase's task + Deliverable lines, active lenses, scope mode (`strict` or `explore`), confirmed scope baseline, profile excerpt, the `Finding calibration` section, verify command + last result |
+| phase-reviewer in `Mode: refute` | `Mode: refute` as the first packet-body line after the header; the phase diff; the 🔴/🟠 findings to challenge, verbatim; the ST-cases and requirements they cite (when any are cited); the `Finding calibration` section; the refute output contract (one row per finding: `<ID> — Confirmed \| Downgraded → <severity> \| Refuted — <evidence file:line>`) |
 | plan-task-executor, plan-task-executor-opus | Phase task + Deliverable + Verify lines, governing spec/ST/AR excerpts, original goal + smallest viable design, relevant approved complexity PF/RV excerpts, target paths, scope mode (`strict` or `explore`), confirmed scope baseline, verify command |
 | spec-test-author | Spec excerpts + test cases, planned interface signatures from the plan documents, test framework/conventions, the FORBIDDEN implementation-file list, verify command (expected RED) |
 | preflight-auditor | The artifact under audit + ONE assigned cluster — a dimension cluster in `preflight-audit` mode or a category cluster in `coverage-hunt` mode — + original goal + smallest viable design + relevant approved complexity AR/PF/RV excerpts + scope mode (`strict` or `explore`) + confirmed scope baseline |
-| domain-specialist-reviewer | Line-1 dispatch header; phase diff; original goal + smallest viable design; phase task + Deliverable lines; active lenses plus the brief's domain checklist; scope mode + confirmed baseline; verify command + last result; the specialist brief excerpt |
+| domain-specialist-reviewer | Line-1 dispatch header; phase diff; original goal + smallest viable design; phase task + Deliverable lines; active lenses plus the brief's domain checklist; scope mode + confirmed baseline; the `Finding calibration` section; verify command + last result; the specialist brief excerpt |
 | domain-specialist-executor | Phase task + Deliverable + Verify lines; governing spec/ST/AR excerpts; original goal + smallest viable design; target paths; scope mode + confirmed baseline; verify command; the specialist brief excerpt |
 | design-challenger | Problem + candidate options, **without** the parent's preferred choice (per `_shared/recommendation-hardening.md`) |
 | codebase-scout | The factual questions, search hints, and the facts-only contract |

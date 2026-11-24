@@ -204,23 +204,38 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
 
    This includes committed, staged, unstaged, and newly created files while excluding changes that
    existed at phase start.
-3. **Merge findings** (RV/SA/PE/SR) and present them in severity-grouped batches (reuse the
-   preflight skill's batch pacing). In normal mode, 🔴 CRITICAL / 🟠 MAJOR findings PAUSE
-   execution for the user's ruling in ALL commit modes. With active auto-design, an eligible
-   technical fix may be selected and recorded, but risk may never be waived and a critical/major
-   finding may never be dismissed automatically; reserved decisions pause for the user. 🟡 MINOR
-   findings are report-only.
-   Before merging, apply `_shared/scope-expansion-control.md`: a necessary correction or blocking
-   uncertainty remains a finding, while an optional remediation is omitted in strict scope or
-   moved to a separate `SE-*` proposal in exploration mode. A finding ruling never chooses `Keep`.
-   For escaped complexity, first dispatch the blind design challenger and then use the complete
-   visible packet from `_shared/zero-ambiguity-gate.md`. Explicit approval of the named larger
-   machinery resolves the finding without a code change. Choosing the smaller design, revision, or
-   deferral stays blocked until the code changes and passes re-review.
-   For a T-NN mini-plan, stop before presenting or accepting a complexity decision: mark the task
-   `[!]`, preserve the diff without marking it verified, and switch to the full standalone-plan
-   path. The new `00-ambiguity-register.md` owns the packet and decision. Resume only after that
-   plan's gates pass.
+3. **Merge, calibrate, and refute findings** (RV/SA/PE/SR).
+   - **Scope.** Before merging, apply `_shared/scope-expansion-control.md`: a necessary correction
+     or blocking uncertainty remains a finding, while an optional remediation is omitted in strict
+     scope or moved to a separate `SE-*` proposal in exploration mode. A finding ruling never
+     chooses `Keep`.
+   - **Calibrate.** Apply the `Finding calibration` section of `_shared/quality-profile.md`: drop
+     every finding it lists as not a finding, with a one-line note each, and adjust test-gap
+     severities.
+   - **Refute.** If any 🔴 CRITICAL / 🟠 MAJOR finding remains — of any prefix, at every tier —
+     dispatch one refute pass per phase: a fresh correctness reviewer in `Mode: refute` with the
+     packet from `_shared/quality-profile.md`, on a different model than the finding reviewers when
+     routing offers one. Each finding comes back `Confirmed`, `Downgraded → <severity>`, or
+     `Refuted`. If the refute dispatch fails, or a finding gets no row, that finding counts as
+     `Confirmed`; a reply with no rows at all is reported as "refuter out of date or failed". The
+     refuter raises no new findings, and a refutation is never itself refuted.
+   - **Present** the findings in severity-grouped batches (reuse the preflight skill's batch
+     pacing). In normal mode, `Confirmed` 🔴 CRITICAL / 🟠 MAJOR findings — and findings
+     downgraded to 🟠 — PAUSE execution for the user's ruling in ALL commit modes; a finding
+     downgraded to 🟡 is report-only. `Refuted` findings do not pause: list them under "Refuted"
+     with the refuter's evidence. The user may reinstate any refuted finding at any time; a
+     reinstated finding is handled as `Confirmed`. With active auto-design, an eligible technical
+     fix may be selected and recorded, but risk may never be waived and a critical/major finding is
+     never dismissed silently; reserved decisions pause for the user. 🟡 MINOR findings are
+     report-only.
+   - **Escaped complexity.** First dispatch the blind design challenger and then use the complete
+     visible packet from `_shared/zero-ambiguity-gate.md`. Explicit approval of the named larger
+     machinery resolves the finding without a code change. Choosing the smaller design, revision,
+     or deferral stays blocked until the code changes and passes re-review. For a T-NN mini-plan,
+     stop before presenting or accepting a complexity decision: mark the task `[!]`, preserve the
+     diff without marking it verified, and switch to the full standalone-plan path. The new
+     `00-ambiguity-register.md` owns the packet and decision. Resume only after that plan's gates
+     pass.
 4. **Record decisions durably** in the plan's findings ledger after each ruling batch. The ledger
    is `plans/<plan>/05-findings.md` (flat) or
    `codeops/features/<f>/plans/<plan>/05-findings.md` (nested), created lazily on first use, with a
@@ -228,7 +243,9 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
    `| Finding | Phase | Severity | Area | Ruling |` — finding ids use the review prefixes
    `RV-`/`SA-`/`PE-`/`SR-` (for example `RV-001`), followed by the phase number,
    `CRITICAL`/`MAJOR`/`MINOR`, a path or domain token, and
-   `fixed`/`accepted`/`deferred`/`dismissed`; identifiers and area tokens only, never prose. Task
+   `fixed`/`accepted`/`deferred`/`dismissed`/`refuted`/`downgraded` — `downgraded` only for a
+   finding the refute pass downgraded to 🟡; a finding downgraded to 🟠 is recorded at its new
+   severity with the user's ruling; identifiers and area tokens only, never prose. Task
    mini-plans keep their ledger in their own plan folder. When the user approves larger machinery,
    also append a `Technical (complexity escalation)` runtime AR with every approval-evidence field
    required by the shared gate; the RV finding references that AR.
