@@ -3,7 +3,7 @@
 > **Feature-Set**: opencode-codeops
 > **Status**: In Progress
 > **Created**: 2026-10-04
-> **Last Updated**: 2026-11-24 09:14
+> **Last Updated**: 2026-11-25 00:05
 > **Progress**: 5 / 5 (100%)
 > **CodeOps Artifact Schema**: 1
 
@@ -28,6 +28,8 @@
 | REQ-LIVE-TASK-SIDEBAR | Live CodeOps task progress in the sidebar — foundation slices 0–1 (counting fix + TUI spike) | — | [live-task-sidebar](live-task-sidebar/00-index.md) | Done | ✅ | 2026-10-10 | — |
 | REQ-LIVE-TASK-PROGRESS | Live CodeOps task progress in the sidebar — the full feature (slice 2: progress tool, live state, sidebar view, exec-plan reporting) | — | [live-task-progress](live-task-progress/00-index.md) | Done | ✅ | 2026-10-10 20:39 | — |
 | REQ-DISCOVERY | Discovery — answer CodeOps question rounds in a local Fluent UI page; Submit wakes the agent (opt-in; make-plan + preflight) | — | [discovery](discovery/00-index.md) | Done | ✅ | 2026-10-27 11:58 | — |
+| REQ-RIGHT-SIZED-VERIFICATION | Right-sized verification (Wave 1): tiers, verification balance, review calibration + refuter, skill descriptions, compaction note | — | [right-sized-verification](right-sized-verification/00-index.md) | Plan Preflighted | 🔬 | 2026-11-25 00:05 | — |
+| REQ-WAVE2-ENTRY-AND-FLOWS | Wave 2: router + status CLI, lightweight change path, bug flow, converge pass | — | — | Backlog | ⬜ | 2026-11-24 23:52 | REQ-RIGHT-SIZED-VERIFICATION |
 | REQ-DISCOVERY-UI-REDESIGN | Discovery plan workspace — group navigation, focused questions, decision summary, and theme preference | — | [discovery-ui-redesign](discovery-ui-redesign/00-index.md) | Done | ✅ | 2026-10-29 14:56 | REQ-DISCOVERY |
 | REQ-TEST-IMPACT-SELECTION | Opt-in, language-neutral test-impact selection — affected feature-slice gates locally/PR, full suite at release/acceptance | — | [test-impact-selection](test-impact-selection/00-index.md) | Done | ✅ | 2026-11-12 03:05 | — |
 | RD-03 | Independence and Effort Allocation | [RD-03](../requirements/RD-03-independence-and-effort.md) | [effort-allocation](effort-allocation/00-index.md) | Done | ✅ | 2026-11-24 01:23 | — |
