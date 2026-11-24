@@ -2,32 +2,47 @@
 
 All notable changes to CodeOps are recorded here.
 
-## Unreleased
+## 2.7.0 — 2026-11-24
+
+### Fixes
+
+- coverage-hunt: close RD-05 review findings
+- coverage-hunt: close RD-04 review findings
+- coverage-hunt: close RD-02 specialist review findings
+- effort: close phase 3 specialist review findings
+- effort: close phase 1 review findings
 
 ### Features
 
-- effort: add `xhigh` to the suggestion vocabulary, dispatch markers, `--auto-effort`, and the
-  session helper
-- effort: resolve variants through a small verified provider table, with a deduplicated and
-  sanitized capability line
-- effort: disclose requested→applied effort and independence in preflight reports and exec-plan
-  summaries
-- specialists: default new generated agents to `xhigh` with a post-frontmatter format marker
-- coverage-hunt: add the shared protocol, the coverage-auditor mode, and the requirements/plan
-  integrations
-- coverage-hunt: add `--no-coverage-hunt` and `--thorough` to `make-requirements` and `make-plan`
-- metrics: record five content-free coverage-hunt events at the requirements and planning stages
+- coverage-hunt: integrate the hunt into planning
+- coverage-hunt: integrate the hunt into requirements
+- coverage-hunt: add the coverage auditor mode
+- coverage-hunt: add the coverage hunt protocol
+- effort: disclose effort and independence across workflows
+- effort: disclose the applied capability once per tuple
+- effort: resolve variants through the verified provider table
+- effort: accept xhigh in the session helper
+- effort: accept xhigh in the suggestion vocabulary
 
-### Changes
+### Chores
 
-- effort: add a max guard so a lower request is never over-powered
-- effort: fail open when the nearest mapping is more than one canonical step away, instead of
-  selecting a distant variant
-- effort: remove the raw `reasoningEffort` passthrough when a model exposes no usable variants
-- preflight: `--thorough` recommends a uniform `xhigh`, not `max`
-- specialists: accept pre-marker `max` agents as `LEGACY`; a versioned `max` agent is `STALE`
-- coverage-hunt: mark existing coverage maps stale after `add_requirement` or `upgrade-plan`;
-  `add_requirement` itself does not run the hunt
+- effort: complete RD-03 and close the plan
+- effort: close phase 1 verification
+- test-map: ignore requirements documentation
+
+### Documentation
+
+- effort: publish the five-level behavior
+- effort: document the five-level vocabulary
+- requirements: add effort allocation requirements and plan
+
+### Tests
+
+- effort: cover provider guards and capability edges
+- effort: specify provider resolution and capability line
+- effort: cover vocabulary internals and content
+- effort: add five-level vocabulary specs
+- test-map: verify requirements documentation ignore
 
 ## 2.6.0 — 2026-11-12
 
