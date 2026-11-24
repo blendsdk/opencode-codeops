@@ -14,7 +14,9 @@ import assert from "node:assert/strict"
 import { describe, it } from "node:test"
 
 import {
+  buildInvocation,
   buildPluginArgs,
+  describeRunFailure,
   detectPluginDialect,
   parseOpenCodeMajor,
   readConfiguredPlugin,
@@ -57,6 +59,72 @@ describe("parseOpenCodeMajor", () => {
   it("returns undefined when no semver is present", () => {
     assert.equal(parseOpenCodeMajor("not a version"), undefined)
     assert.equal(parseOpenCodeMajor(undefined), undefined)
+  })
+})
+
+describe("buildInvocation", () => {
+  it("spawns the command directly outside Windows", () => {
+    assert.deepEqual(buildInvocation("npm", ["install", "--global"], { platform: "linux" }), {
+      file: "npm",
+      args: ["install", "--global"],
+      options: {},
+    })
+  })
+
+  it("routes Windows commands through the command processor", () => {
+    assert.deepEqual(
+      buildInvocation("opencode", ["plugin", "remove", "opencode-codeops@2.6.0"], {
+        platform: "win32",
+        env: { ComSpec: "C:\\Windows\\System32\\cmd.exe" },
+      }),
+      {
+        file: "C:\\Windows\\System32\\cmd.exe",
+        args: ["/d", "/s", "/c", "opencode plugin remove opencode-codeops@2.6.0"],
+        options: { windowsVerbatimArguments: true },
+      }
+    )
+  })
+
+  it("quotes Windows arguments that contain spaces", () => {
+    const invocation = buildInvocation(
+      "npm",
+      ["install", "--prefix", "C:\\Program Files\\tool"],
+      { platform: "win32", env: {} }
+    )
+
+    assert.equal(invocation.args[3], 'npm install --prefix "C:\\Program Files\\tool"')
+  })
+
+  it("rejects characters the Windows shell would expand", () => {
+    assert.throws(
+      () => buildInvocation("npm", ["install", "100%"], { platform: "win32", env: {} }),
+      /unsupported character/
+    )
+  })
+})
+
+describe("describeRunFailure", () => {
+  it("reports the spawn error when the command never starts", () => {
+    assert.equal(
+      describeRunFailure({
+        status: 1,
+        stdout: "",
+        stderr: "",
+        error: { code: "EINVAL", message: "spawn npm EINVAL" },
+      }),
+      "EINVAL: spawn npm EINVAL"
+    )
+  })
+
+  it("prefers the last stderr line from a command that ran", () => {
+    assert.equal(
+      describeRunFailure({ status: 1, stdout: "", stderr: "first line\nfinal failure" }),
+      "final failure"
+    )
+  })
+
+  it("falls back to a stable message when nothing else is available", () => {
+    assert.equal(describeRunFailure({ status: 1, stdout: "", stderr: "" }), "unknown error")
   })
 })
 

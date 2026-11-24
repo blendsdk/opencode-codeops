@@ -176,6 +176,27 @@ describe("failure boundaries", () => {
     assert.equal(actions(calls).length, 1)
   })
 
+  it("surfaces the spawn error code when npm cannot start", () => {
+    const cwd = makeDir(true)
+    const { run } = makeRun({ gitRoot: cwd })
+    const spawnFailingRun = (command, args, options) =>
+      command === "npm"
+        ? {
+            status: 1,
+            stdout: "",
+            stderr: "",
+            error: { code: "EINVAL", message: "spawn npm EINVAL" },
+          }
+        : run(command, args, options)
+    const { log } = makeLog()
+
+    const result = upgrade({ cwd, version: "latest", run: spawnFailingRun, log })
+
+    assert.notEqual(result.code, 0)
+    assert.match(result.message, /EINVAL/)
+    assert.doesNotMatch(result.message, /unknown error/)
+  })
+
   it("rejects an unsafe version token before running a command", () => {
     const cwd = makeDir(true)
     const { calls, run } = makeRun({ gitRoot: cwd })

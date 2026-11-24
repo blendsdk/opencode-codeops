@@ -20,7 +20,12 @@
 import { existsSync } from "node:fs"
 import { join } from "node:path"
 
-import { defaultRun, PLUGIN_NAME, readConfiguredPlugin } from "./opencode-plugin.mjs"
+import {
+  defaultRun,
+  describeRunFailure,
+  PLUGIN_NAME,
+  readConfiguredPlugin,
+} from "./opencode-plugin.mjs"
 
 /**
  * Reject a version or dist-tag that could change the meaning of a package
@@ -86,10 +91,9 @@ export function upgrade({
   log(`Installing ${spec} globally...`)
   const installed = run("npm", ["install", "--global", spec], { cwd })
   if (installed.status !== 0) {
-    const detail = (installed.stderr || installed.stdout || "").trim().split("\n").pop()
     return {
       code: 1,
-      message: `npm install failed: ${detail || "unknown error"}. ` +
+      message: `npm install failed: ${describeRunFailure(installed)}. ` +
         `Retry with: npm install --global ${spec}`,
     }
   }
@@ -118,10 +122,9 @@ export function upgrade({
   log("Installing global skills, agents, and plugin...")
   const global = run("npx", ["-y", spec, "install", "--global"], { cwd })
   if (global.status !== 0) {
-    const detail = (global.stderr || global.stdout || "").trim().split("\n").pop()
     return {
       code: 1,
-      message: `global installer failed: ${detail || "unknown error"}. ` +
+      message: `global installer failed: ${describeRunFailure(global)}. ` +
         `Retry with: npx -y ${spec} install --global`,
     }
   }
@@ -130,10 +133,9 @@ export function upgrade({
     log("Installing project skills and agents...")
     const local = run("npx", ["-y", spec, "install", "--project", "--no-plugin"], { cwd })
     if (local.status !== 0) {
-      const detail = (local.stderr || local.stdout || "").trim().split("\n").pop()
       return {
         code: 1,
-        message: `project installer failed: ${detail || "unknown error"}. ` +
+        message: `project installer failed: ${describeRunFailure(local)}. ` +
           `Retry with: npx -y ${spec} install --project --no-plugin`,
       }
     }
