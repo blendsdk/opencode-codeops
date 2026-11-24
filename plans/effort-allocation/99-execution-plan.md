@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-24 01:15
-> **Progress**: 32/39 tasks (82%)
+> **Last Updated**: 2026-11-24 01:17
+> **Progress**: 38/39 tasks (97%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -198,19 +198,19 @@ verification. Each behavior phase follows spec tests → red → implementation 
 **Reference**: 03-03 §Documentation · RD-03 FR-18
 **Objective**: Publish the user-facing documentation and changelog.
 
-- [ ] 4.1.1 Update README with five levels, max guard, provider table, optional diversity, and specialist default — `README.md`
-- [ ] 4.1.2 Add the behavior change to CHANGELOG — `CHANGELOG.md`
-- [ ] 4.1.3 Run `install_agents.py --check`; confirm legacy `max` is accepted and no hand-authored file changes — `scripts/install_agents.py`
+- [x] 4.1.1 Update README with five levels, max guard, provider table, optional diversity, and specialist default — `README.md` ✅ (completed: 2026-11-24 01:17)
+- [x] 4.1.2 Add the behavior change to CHANGELOG — `CHANGELOG.md` ✅ (completed: 2026-11-24 01:17)
+- [x] 4.1.3 Run `install_agents.py --check`; confirm legacy `max` is accepted and no hand-authored file changes — `scripts/install_agents.py` ✅ (completed: 2026-11-24 01:17)
 
 ### Step 4.2: Final verification
 
 **Reference**: 07 §Verify commands · 03-03 §Acceptance
 **Objective**: Run the full gate and confirm the plan is complete.
 
-- [ ] 4.2.1 Run `npm run verify` — full typecheck, tests, and version parity
-- [ ] 4.2.2 Run `node bin/codeops-test.mjs check --strict` and `node bin/codeops-test.mjs run --gate phase --baseline HEAD`
-- [ ] 4.2.3 Review changed docs for stale four-level statements and confirm ST-27 — `README.md`, `_shared/reasoning-effort.md`, `skills/setup-routing/routing.md`
-- [ ] 4.2.4 Clean up verify logs and scratch; report `Cleanup: done` — `$CODEOPS_TMPDIR`
+- [x] 4.2.1 Run `npm run verify` — full typecheck, tests, and version parity ✅ (completed: 2026-11-24 01:17)
+- [x] 4.2.2 Run `node bin/codeops-test.mjs check --strict` and `node bin/codeops-test.mjs run --gate phase --baseline HEAD` ✅ (completed: 2026-11-24 01:17)
+- [x] 4.2.3 Review changed docs for stale four-level statements and confirm ST-27 — `README.md`, `_shared/reasoning-effort.md`, `skills/setup-routing/routing.md` ✅ (completed: 2026-11-24 01:17)
+- [~] 4.2.4 Clean up verify logs and scratch; report `Cleanup: done` — `$CODEOPS_TMPDIR` ⏳ (implemented: 2026-11-24 01:17)
 
 **Deliverables**:
 - [ ] README and CHANGELOG updated

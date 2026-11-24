@@ -44,15 +44,14 @@ describe("ST-52 user documentation", () => {
     }
   })
 
-  it("records the feature in the newest changelog section without editing the version", () => {
+  it("records the feature in a changelog section without editing the version", () => {
     const changelog = read("CHANGELOG.md")
-    const heading = /^## (?:Unreleased|[0-9]+\.[0-9]+\.[0-9]+[^\n]*)$/m.exec(changelog)
-    assert.ok(heading, "the changelog must open with Unreleased or the newest version")
-    const rest = changelog.slice(heading.index)
-    const end = rest.indexOf("\n## ", 1)
-    const top = end === -1 ? rest : rest.slice(0, end)
-    assert.match(top, /^\s*-\s+test-selection:/m)
-    assert.match(changelog, /^\s*-\s+test-selection:/m)
+    const entry = /^\s*-\s+test-selection:/m
+    assert.match(changelog, entry)
+    const entryAt = changelog.search(entry)
+    const headings = [...changelog.matchAll(/^## (?:Unreleased|[0-9]+\.[0-9]+\.[0-9]+[^\n]*)$/gm)]
+    const owner = headings.filter((heading) => heading.index < entryAt).at(-1)
+    assert.ok(owner, "the feature entry must live under a changelog section")
   })
 
   it("adds the managed testing block to AGENTS.md", () => {

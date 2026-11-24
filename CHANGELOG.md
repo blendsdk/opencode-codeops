@@ -2,6 +2,27 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+### Features
+
+- effort: add `xhigh` to the suggestion vocabulary, dispatch markers, `--auto-effort`, and the
+  session helper
+- effort: resolve variants through a small verified provider table, with a deduplicated and
+  sanitized capability line
+- effort: disclose requested→applied effort and independence in preflight reports and exec-plan
+  summaries
+- specialists: default new generated agents to `xhigh` with a post-frontmatter format marker
+
+### Changes
+
+- effort: add a max guard so a lower request is never over-powered
+- effort: fail open when the nearest mapping is more than one canonical step away, instead of
+  selecting a distant variant
+- effort: remove the raw `reasoningEffort` passthrough when a model exposes no usable variants
+- preflight: `--thorough` recommends a uniform `xhigh`, not `max`
+- specialists: accept pre-marker `max` agents as `LEGACY`; a versioned `max` agent is `STALE`
+
 ## 2.6.0 — 2026-11-12
 
 ### Features

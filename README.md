@@ -266,6 +266,9 @@ Remote and SSH sessions are not supported.
 
 All CodeOps subagents inherit the model of the primary agent that invoked them. No provider-specific configuration is required out of the box.
 
+Model pins are optional. Cross-provider model diversity is an optional, explicitly approved choice;
+effort allocation alone already provides an independence axis on the inherited model.
+
 To pin specific models per role, use the `setup-routing` skill or add overrides directly in
 `opencode.jsonc`:
 
@@ -284,17 +287,23 @@ CodeOps can pick a reasoning level per dispatch instead of always inheriting the
 variant. A dispatch packet may carry one standalone marker line:
 
 ```text
-[codeops-effort: medium]
+[codeops-effort: xhigh]
 ```
 
 Reasoning-heavy skills also accept `--auto-effort` (use the skill's recommended level) or
 `--auto-effort=high` (explicit level), announce it, and clear it before the final run summary.
 Resolution order: dispatch marker, then session `--auto-effort`, then
 `routing.roles.<agent>.reasoning` in `codeops/codeops.json`, then the inherited parent variant.
-A level the active model does not expose resolves to the nearest exposed variant (`medium`
-becomes `high` on a `low`/`high`/`max` model). The levels are suggestions: no permission,
-verification step, or review gate ever reads them. The full contract is in
-`_shared/reasoning-effort.md`.
+
+The five levels are `low`, `medium`, `high`, `xhigh`, and `max`. `xhigh` is the ceiling for
+adversarial or high-risk work; `max` is explicit-only. Runtime variants are authoritative: an
+exact match wins, then a small verified provider table maps DeepSeek `medium→high` and
+`xhigh→max`, then a nearest canonical variant may apply only within one step. A max guard refuses
+`max` for any lower request. An unknown provider, a distant nearest match, or a model without
+usable variants fails open — the request is unchanged, and no raw `reasoningEffort` is sent. A
+content-free capability line reports the model, variants, requested level, applied variant, and
+mapping when that tuple changes. The levels are suggestions: no permission, verification step, or
+review gate ever reads them. The full contract is in `_shared/reasoning-effort.md`.
 
 ## Project specialists
 
@@ -314,14 +323,16 @@ only with your explicit approval — the `--auto-design` mode cannot approve the
 - **Route** — a plan's `## Specialist Agents` table maps roles to phases. During `exec-plan`,
   listed specialists are dispatched as **additional** reviewers or executors: they never replace a
   required reviewer or gate, reviewer findings use the `SR-NNN` prefix, and the generated agent
-  defaults to `reasoningEffort: max` (override it with `routing.roles.<role>.reasoning`).
+  defaults to `reasoningEffort: xhigh` (override it with `routing.roles.<role>.reasoning`).
+  Pre-marker generated agents that embed `max` remain valid as a legacy exception.
 - **Fallback** — a specialist is available as soon as its generated agent exists; OpenCode's
   discovery timing is whatever your build provides. If it is missing, invalid, or a dispatch fails,
   dispatch falls back to a generic subagent carrying the brief excerpt and reports the fallback.
   No review depends on a specialist existing.
 
-Lifecycle checks: `--check` reports `INVALID`, `MISSING`, `STALE`, `ORPHAN`, `HAND-AUTHORED`, and
-`AGENTS.md` states; `--remove-custom <role> --yes` deletes the generated agent and its brief and
+Lifecycle checks: `--check` reports `INVALID`, `MISSING`, `STALE`, `LEGACY`, `ORPHAN`,
+`HAND-AUTHORED`, and `AGENTS.md` states; `LEGACY` is a note for a pre-marker `max` agent and does
+not fail the check. `--remove-custom <role> --yes` deletes the generated agent and its brief and
 updates the index.
 
 > **Upgrading:** specialist agents embed the generic template contract. When a newer plugin changes
