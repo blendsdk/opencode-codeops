@@ -3,8 +3,8 @@
 > **Feature-Set**: opencode-codeops
 > **Status**: In Progress
 > **Created**: 2026-10-04
-> **Last Updated**: 2026-11-24 01:20
-> **Progress**: 1 / 5 (20%)
+> **Last Updated**: 2026-11-24 01:23
+> **Progress**: 2 / 5 (40%)
 > **CodeOps Artifact Schema**: 1
 
 ## Legend
@@ -30,7 +30,7 @@
 | REQ-DISCOVERY | Discovery — answer CodeOps question rounds in a local Fluent UI page; Submit wakes the agent (opt-in; make-plan + preflight) | — | [discovery](discovery/00-index.md) | Done | ✅ | 2026-10-27 11:58 | — |
 | REQ-DISCOVERY-UI-REDESIGN | Discovery plan workspace — group navigation, focused questions, decision summary, and theme preference | — | [discovery-ui-redesign](discovery-ui-redesign/00-index.md) | Done | ✅ | 2026-10-29 14:56 | REQ-DISCOVERY |
 | REQ-TEST-IMPACT-SELECTION | Opt-in, language-neutral test-impact selection — affected feature-slice gates locally/PR, full suite at release/acceptance | — | [test-impact-selection](test-impact-selection/00-index.md) | Done | ✅ | 2026-11-12 03:05 | — |
-| RD-03 | Independence and Effort Allocation | [RD-03](../requirements/RD-03-independence-and-effort.md) | [effort-allocation](effort-allocation/00-index.md) | Plan Created | 📋 | 2026-11-24 00:32 | — |
+| RD-03 | Independence and Effort Allocation | [RD-03](../requirements/RD-03-independence-and-effort.md) | [effort-allocation](effort-allocation/00-index.md) | Done | ✅ | 2026-11-24 01:23 | — |
 | RD-01 | Coverage Hunt Protocol | [RD-01](../requirements/RD-01-coverage-hunt-protocol.md) | — | Done | ✅ | 2026-11-24 01:20 | depends on RD-03 |
 | RD-02 | Coverage Auditor Mode | [RD-02](../requirements/RD-02-coverage-auditor-mode.md) | — | RD Preflighted | 🔎 | 2026-11-24 00:22 | depends on RD-01 |
 | RD-04 | Requirements-Stage Integration | [RD-04](../requirements/RD-04-requirements-stage.md) | — | RD Preflighted | 🔎 | 2026-11-24 00:22 | depends on RD-01, RD-02, RD-03 |
