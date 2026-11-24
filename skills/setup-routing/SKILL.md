@@ -59,6 +59,13 @@ Present:
 
 Model names are implementation choices, not policy names. Default to the current OpenCode model guidance and environment availability. A project override may pin a model, but every role must remain operable without the pin.
 
+Reasoning effort uses the canonical five levels (`low`, `medium`, `high`, `xhigh`, `max`). `xhigh`
+is the ceiling for adversarial or high-risk work; a max guard keeps `max` explicit-only. Runtime
+variants win, backed by the small verified provider table and a one-step nearest rule; an
+unmappable level fails open. New generated specialists default to `xhigh` (pre-marker `max` agents
+remain a legacy exception). Model diversity is optional and needs project approval: every workflow
+works on the inherited current model with effort allocation alone.
+
 ## Structured policy
 
 Store CodeOps policy in `codeops/codeops.json`, not in `AGENTS.md`. When project specialists exist, `AGENTS.md` additionally carries the managed `<!-- CODEOPS-SPECIALISTS:START -->` … `<!-- CODEOPS-SPECIALISTS:END -->` index rendered by `install_agents.py --sync-agents-md`; this skill is its only writer, and material ambiguity and verification gates may not be bypassed.

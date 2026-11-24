@@ -37,7 +37,7 @@ as separate `SE-*` proposals; finding resolution never chooses `Keep`.
 
 If `$ARGUMENTS` contains exactly one exact standalone `--auto-effort` or `--auto-effort=<level>`
 token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero
-occurrences means this skill's recommended level (`high`, or `max` with `--thorough`) is printed
+occurrences means this skill's recommended level (`high`, or `xhigh` with `--thorough`) is printed
 as a suggestion only, more than one or an invalid level is an argument error. The accepted levels
 are `low`, `medium`, `high`, `xhigh`, and `max`. Announce
 `Auto-effort active — reasoning <level> applied for this run`; then read and apply
@@ -220,10 +220,11 @@ Save the report as a permanent file alongside the artifact:
 | Single plan document | `plans/<feature-name>/00-preflight-report-<document-stem>.md` |
 | Ad-hoc | `<artifact-directory>/preflight-report.md` |
 
-The report header must record the exact audit target and its git blob or content hash. Per-document
-report names prevent a narrow pass from masquerading as a set-wide pass or overwriting another
-document's evidence. The report is separate from the Ambiguity Register (decisions made during
-creation) — see [report-format.md](report-format.md) for the relationship and cross-referencing.
+The report header must record the exact audit target and its git blob or content hash, the
+independence status, and the requested→applied effort when a level is active. Per-document report
+names prevent a narrow pass from masquerading as a set-wide pass or overwriting another document's
+evidence. The report is separate from the Ambiguity Register (decisions made during creation) —
+see [report-format.md](report-format.md) for the relationship and cross-referencing.
 
 ## Parallelizing the scan (clustered fan-out)
 
@@ -232,8 +233,9 @@ preflight-auditor dispatches** — one per dimension cluster, an exact partition
 **[../../_shared/quality-profile.md](../../_shared/quality-profile.md)** (① document soundness ·
 ② grounding · ③ delivery · ④ risk · ⑤ fit). Each dispatch carries the header + packet from that
 doc (the artifact, ONE cluster, and the codebase context its dimensions need). `--thorough`
-expands the fan-out to one dispatch per dimension. Recon reads may still go to read-only explore
-agents, and the codebase-scout may ground individual claim-checks (≤3 scout dispatches per run).
+expands the fan-out to one dispatch per dimension and recommends a uniform `xhigh` for the scan —
+not `max`. Recon reads may still go to read-only explore agents, and the codebase-scout may ground
+individual claim-checks (≤3 scout dispatches per run).
 
 The lead context always merges the returned PA-NNN findings into the single `PF-NNN` sequence
 (dedupe across clusters, renumber, keep severities honest), runs the verdict synthesis, and owns

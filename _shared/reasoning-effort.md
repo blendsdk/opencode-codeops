@@ -17,14 +17,24 @@ contract consumed by the plugin and the skills. It is advisory by design and nev
 | `xhigh` | Adversarial or high-risk analysis | Thorough preflight, complex or sensitive phases, challenger |
 | `max` | Explicit critical only | Explicit user request; never a default |
 
-The five levels are the complete suggestion vocabulary. A level is applied through the model's
-own variant options: the exact variant when it exists, otherwise the nearest exposed level on the
-provider scale, with ties resolving to the higher level. On OpenCode 2 the plugin reads those
-options from the registered model's `variants` collection and merges the chosen entry's settings
-into the request. `none` stays exact-match only, because mapping it to a reasoning level would
-enable reasoning the caller disabled. When no variant can be chosen — the model exposes no
-matching variant — the request is left unchanged, and it never raises a provider error. Routing
-policy is project configuration, not a suggestion:
+The five levels are the complete suggestion vocabulary. `xhigh` is the default ceiling for
+adversarial and high-risk work; `max` is explicit-only. The one exception is the verified DeepSeek
+mapping `xhigh→max`.
+
+A level is applied through the model's own variant options. Runtime variants are authoritative:
+an exact canonical variant wins. When the model does not expose the request, a small verified
+provider table supplies the alias:
+
+| Provider | Verified mapping |
+| -------- | ---------------- |
+| `openai`, `anthropic` | identity for `low`, `medium`, `high`, `xhigh`, `max` |
+| `deepseek` | `medium→high`, `xhigh→max`, `none→none` |
+
+Otherwise the nearest exposed canonical variant applies only when it is at most one step away.
+A nearest `max` is never selected for a lower request, and `none` stays exact-match only: mapping
+it to a reasoning level would enable reasoning the caller disabled. Every other case fails open —
+the request is unchanged and the disclosure reports `mapping=fail-open`. `default` is never a
+level. Routing policy is project configuration, not a suggestion:
 `routing.roles.<agent>.reasoning` may name any value from the provider enum (`none`, `minimal`,
 `low`, `medium`, `high`, `xhigh`, `max`).
 
@@ -70,6 +80,19 @@ dispatch marker  >  session auto-effort  >  routing.roles[<agent>].reasoning  > 
 | Routing role default | Project policy for one agent name | `codeops/codeops.json` → `routing.roles.<agent>.reasoning` |
 | Inherit | Everything else | The child keeps the parent model and variant |
 
+## Disclosure
+
+When the resolved level or mapping changes, the plugin injects one content-free line:
+
+```text
+CodeOps effort: model=<provider>/<id>; variants=<a,b,c>; context=<limit>; requested=<level>; applied=<variant|unavailable>; mapping=<exact|alias|nearest|fail-open>
+```
+
+Identifiers are sanitized and length-capped. The line is deduplicated per session, contains no
+prompt or file content, and is cleared when the session ends. Artifacts (the coverage map, the
+preflight report, and the exec-plan summary) state `Effort: <requested>→<applied> (<mapping>)` and
+the independence status. When no level is active, omit the effort field — never invent `default`.
+
 Routing lookup applies only when the dispatching agent's name has an explicit `routing.roles`
 entry. There are no built-in catalog defaults, hand-authored agents are untouched, and
 generated specialists keep their embedded value unless the project adds a routing entry.
@@ -82,7 +105,7 @@ Used for suggestions and for a bare `--auto-effort`:
 | ----- | ----------------- | ----- |
 | `make-requirements` | `high` | Structured discovery and gap expansion |
 | `make-plan` | `high` | Decomposition plus the Zero-Ambiguity Gate |
-| `preflight` | `high`; `max` with `--thorough` | Adversarial multi-dimension audit |
+| `preflight` | `high`; `xhigh` with `--thorough` | Adversarial multi-dimension audit |
 | `grill-me` | `high` | Branch-by-branch disambiguation |
 | `exec-plan` | current phase's `Reasoning:` level | Bare flag follows the phase; `=<level>` forces a constant |
 | `retro-requirements` | `high` | Nine-phase archaeology |
@@ -102,13 +125,14 @@ already records:
 
 | Signal | Suggested level |
 | ------ | --------------- |
-| Phase carries a complexity escalation approval, or a complex/sensitive tag | `max` |
+| Phase carries a complexity escalation approval, or a complex/adversarial tag | `xhigh` |
 | Phase carries a security, financial-integrity, concurrency, performance-critical, compiler-semantics, or migration lens/risk tag | `high` |
 | Docs/config/rename-only phase with deterministic verification | `low` |
 | Any other non-trivial phase | `medium` |
 
-The runtime maps a missing level to the nearest exposed variant, so the four levels remain valid
-suggestions on every reasoning-capable model.
+Canonical `max` is never derived: it requires an explicit user choice. The runtime applies the
+verified provider table and the one-step rule above, so the five levels remain valid suggestions
+on every reasoning-capable model; an unmappable level fails open.
 
 The line is written as `> **Reasoning**: <level> — <one-line reason>`. It is a suggestion: the
 user may edit or delete it, and `exec-plan` never blocks on it. A plan without the line keeps
@@ -151,8 +175,8 @@ forces that level for the whole run, including every dispatch marker composed du
 Set `CODEOPS_EFFORT_TRACE=1` (or `true`) in the environment that starts OpenCode to record what
 the plugin does. One content-free JSON line is appended per marker capture and per request to
 `reasoning-effort-trace.jsonl` inside the runtime's scratch directory. Lines carry only a
-timestamp, session id, event name, message id, agent name, level, source, chosen variant, and
-applied flag — never prompt text or file content. The trace lives with the rest of the runtime
+timestamp, session id, event name, message id, agent name, level, source, chosen variant,
+mapping source, and applied flag — never prompt text or file content. The trace lives with the rest of the runtime
 scratch and is removed with it. Tracing is off by default and never affects a request.
 
 ## Suggestion-only guarantee

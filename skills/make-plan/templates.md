@@ -473,8 +473,9 @@ task-size criteria in [quality-checklist.md](quality-checklist.md))
 > committed, staged, unstaged, and untracked phase-start state)_
 > **Lenses**: [add-on lenses — include this line only when the target repo carries a quality
 > profile; informational: activation stays profile-driven]
-> **Reasoning**: [advisory level — `low`, `medium`, `high`, or `max`, with a one-line reason;
-> derivation in `../../_shared/reasoning-effort.md` §Plan suggestion derivation]
+> **Reasoning**: [advisory level — `low`, `medium`, `high`, `xhigh`, or `max`, with a one-line
+> reason; adversarial or high-risk phases suggest `xhigh`, and `max` is explicit-only; derivation
+> in `../../_shared/reasoning-effort.md` §Plan suggestion derivation]
 
 ### Step 1.1: [Step Objective]
 

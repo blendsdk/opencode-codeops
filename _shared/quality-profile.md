@@ -90,9 +90,17 @@ agent replaces the reviewer's matching add-on lens for that phase.
 **Line 1 of every quality-agent dispatch prompt** is a compact scope header:
 
 ```
-[codeops-dispatch agent=<name> feature=<slug> phase=<id>]
+[codeops-dispatch agent=<name> feature=<slug> phase=<id> unit=<id> model=<pin|inherited> effort=<requested> independence=<mixed-model|mixed-effort|uniform-effort>]
 ```
 
+- `unit=` carries the dispatched unit: a task id, or the cluster id for a coverage-hunt dispatch.
+- `model=` records `inherited` when no model pin applies.
+- `effort=` is the requested canonical level. Omit `effort=` entirely when no level is active
+  (inherit); never write `default`.
+- `independence=` is one of the three canonical values. `same-model` is a model-axis fact, never
+  an independence status.
+
+This is the only dispatch-header definition. RD-01 and RD-02 link here rather than restating it.
 The header makes parallel results attributable and auditable. Outcome metrics never parse prompt
 or response content.
 
@@ -101,7 +109,7 @@ or response content.
 | phase-reviewer, security-auditor, perf-auditor | Phase diff (`git diff <phase-start-ref>..HEAD`), original goal + smallest viable design, relevant approved complexity AR/PF/RV excerpts, the phase's task + Deliverable lines, active lenses, scope mode (`strict` or `explore`), confirmed scope baseline, profile excerpt, verify command + last result |
 | plan-task-executor, plan-task-executor-opus | Phase task + Deliverable + Verify lines, governing spec/ST/AR excerpts, original goal + smallest viable design, relevant approved complexity PF/RV excerpts, target paths, scope mode (`strict` or `explore`), confirmed scope baseline, verify command |
 | spec-test-author | Spec excerpts + test cases, planned interface signatures from the plan documents, test framework/conventions, the FORBIDDEN implementation-file list, verify command (expected RED) |
-| preflight-auditor | The artifact under audit + ONE assigned dimension cluster + original goal + smallest viable design + relevant approved complexity AR/PF/RV excerpts + scope mode (`strict` or `explore`) + confirmed scope baseline |
+| preflight-auditor | The artifact under audit + ONE assigned cluster — a dimension cluster in `preflight-audit` mode or a category cluster in `coverage-hunt` mode — + original goal + smallest viable design + relevant approved complexity AR/PF/RV excerpts + scope mode (`strict` or `explore`) + confirmed scope baseline |
 | domain-specialist-reviewer | Line-1 dispatch header; phase diff; original goal + smallest viable design; phase task + Deliverable lines; active lenses plus the brief's domain checklist; scope mode + confirmed baseline; verify command + last result; the specialist brief excerpt |
 | domain-specialist-executor | Phase task + Deliverable + Verify lines; governing spec/ST/AR excerpts; original goal + smallest viable design; target paths; scope mode + confirmed baseline; verify command; the specialist brief excerpt |
 | design-challenger | Problem + candidate options, **without** the parent's preferred choice (per `_shared/recommendation-hardening.md`) |
@@ -116,7 +124,8 @@ is still in flight.
 
 A project may define specialist roles on top of the catalog (see `_shared/specialist-agents.md`).
 Specialists resolve like any project agent; routing policy may pin model, effort, sandbox, and
-reasoning, and a generated agent embeds `reasoningEffort` (default `max`). Dispatch only roles
+reasoning, and a generated agent embeds `reasoningEffort` (default `xhigh`). Pre-marker generated
+agents that embed `max` remain valid as a documented legacy exception. Dispatch only roles
 listed in the plan's `## Specialist Agents` table, as **additional** reviewers or executors — a
 specialist never replaces a required reviewer or gate, and an unavailable or invalid-brief
 specialist falls back to a complete dynamic packet with the fallback reported.

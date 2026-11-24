@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-24 01:10
-> **Progress**: 21/39 tasks (54%)
+> **Last Updated**: 2026-11-24 01:15
+> **Progress**: 32/39 tasks (82%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -151,35 +151,35 @@ verification. Each behavior phase follows spec tests → red → implementation 
 **Reference**: 07 §ST-20–ST-25 · 03-03
 **Objective**: Write content and installer specs; confirm red.
 
-- [ ] 3.1.1 [spec-author] Write content tests for the single header, preflight report, exec summary, templates, and setup-routing text — `scripts/effort-disclosure-content.spec.test.mjs` (ST-20–ST-22, ST-28)
-- [ ] 3.1.2 [spec-author] Extend installer tests for `xhigh` default, version marker, legacy `max`, and versioned stale — `scripts/install_agents.spec.test.mjs` (ST-23–ST-25)
-- [ ] 3.1.3 Run the new specs and record the red-phase failure — `node --test scripts/effort-disclosure-content.spec.test.mjs scripts/install_agents.spec.test.mjs`
+- [x] 3.1.1 [spec-author] Write content tests for the single header, preflight report, exec summary, templates, and setup-routing text — `scripts/effort-disclosure-content.spec.test.mjs` (ST-20–ST-22, ST-28) ✅ (completed: 2026-11-24 01:13)
+- [x] 3.1.2 [spec-author] Extend installer tests for `xhigh` default, version marker, legacy `max`, and versioned stale — `scripts/install_agents.spec.test.mjs` (ST-23–ST-25) ✅ (completed: 2026-11-24 01:13)
+- [x] 3.1.3 Run the new specs and record the red-phase failure — `node --test scripts/effort-disclosure-content.spec.test.mjs scripts/install_agents.spec.test.mjs` ✅ (completed: 2026-11-24 01:13)
 
 ### Step 3.2: Implementation
 
 **Reference**: 03-03 §Dispatch header, §Preflight disclosure, §Specialist default · AR-2, AR-19, AR-22, AR-24
 **Objective**: Implement disclosure and the specialist default.
 
-- [ ] 3.2.1 Update the single dispatch header and mode-aware preflight-auditor packet — `_shared/quality-profile.md`
-- [ ] 3.2.2 Update the shared skill/plan tables, preflight `--thorough` text, and report disclosure lines — `_shared/reasoning-effort.md`, `skills/preflight/SKILL.md`, `skills/preflight/report-format.md`
-- [ ] 3.2.3 Update exec-plan session summary disclosure — `skills/exec-plan/execution-protocol.md`
-- [ ] 3.2.4 Update make-plan Reasoning template and effort checklist item — `skills/make-plan/templates.md`, `skills/make-plan/quality-checklist.md`
-- [ ] 3.2.5 Update setup-routing effort/diversity/specialist text — `skills/setup-routing/SKILL.md`, `skills/setup-routing/routing.md`
-- [ ] 3.2.6 Implement the `xhigh` default, the post-frontmatter version marker, and the legacy `max` check — `scripts/install_agents.py`
+- [x] 3.2.1 Update the single dispatch header and mode-aware preflight-auditor packet — `_shared/quality-profile.md` ✅ (completed: 2026-11-24 01:14)
+- [x] 3.2.2 Update the shared skill/plan tables, preflight `--thorough` text, and report disclosure lines — `_shared/reasoning-effort.md`, `skills/preflight/SKILL.md`, `skills/preflight/report-format.md` ✅ (completed: 2026-11-24 01:14)
+- [x] 3.2.3 Update exec-plan session summary disclosure — `skills/exec-plan/execution-protocol.md` ✅ (completed: 2026-11-24 01:14)
+- [x] 3.2.4 Update make-plan Reasoning template and effort checklist item — `skills/make-plan/templates.md`, `skills/make-plan/quality-checklist.md` ✅ (completed: 2026-11-24 01:14)
+- [x] 3.2.5 Update setup-routing effort/diversity/specialist text — `skills/setup-routing/SKILL.md`, `skills/setup-routing/routing.md` ✅ (completed: 2026-11-24 01:14)
+- [x] 3.2.6 Implement the `xhigh` default, the post-frontmatter version marker, and the legacy `max` check — `scripts/install_agents.py` ✅ (completed: 2026-11-24 01:14)
 
 ### Step 3.3: Impl tests and phase gate
 
 **Reference**: 07 §ST-20–ST-25 · 03-03 §Error handling
 **Objective**: Cover disclosure and installer edge cases; run the phase gate.
 
-- [ ] 3.3.1 Write impl tests for disclosure omission, legacy marker, and versioned stale cases — `scripts/effort-disclosure-content.spec.test.mjs`, `scripts/install_agents.spec.test.mjs`
-- [ ] 3.3.2 Run task verify and the full phase gate — `npm run verify`
+- [x] 3.3.1 Write impl tests for disclosure omission, legacy marker, and versioned stale cases — `scripts/effort-disclosure-content.spec.test.mjs`, `scripts/install_agents.spec.test.mjs` ✅ (completed: 2026-11-24 01:15)
+- [x] 3.3.2 Run task verify and the full phase gate — `npm run verify` ✅ (completed: 2026-11-24 01:15)
 
 **Deliverables**:
-- [ ] One header contract and disclosure surfaces
-- [ ] New specialist default `xhigh`; legacy `max` accepted
-- [ ] setup-routing and template text updated
-- [ ] All verification passing
+- [x] One header contract and disclosure surfaces ✅ (2026-11-24 01:15)
+- [x] New specialist default `xhigh`; legacy `max` accepted ✅ (2026-11-24 01:15)
+- [x] setup-routing and template text updated ✅ (2026-11-24 01:15)
+- [x] All verification passing ✅ (2026-11-24 01:15)
 
 **Test slices**: `scripts.tooling`, `content.guidance` (07)
 **Task verify**: `node bin/codeops-test.mjs run --gate task --baseline HEAD --include scripts/effort-disclosure-content.spec.test.mjs --include scripts/install_agents.spec.test.mjs`

@@ -506,6 +506,8 @@ the tool never blocks, delays, or changes any step.
 
 **Feature:** [feature-name]
 **Execution Plan:** `plans/[feature-name]/99-execution-plan.md`
+**Review Independence:** mixed-model | mixed-effort | uniform-effort
+**Effort:** <requested>→<applied> (<mapping>)
 
 **Completed This Session:**
 - [x] Phase X, Task X.X.X: [description]
@@ -523,6 +525,9 @@ the tool never blocks, delays, or changes any step.
 **To Continue:**
 Run `/exec-plan [feature-name]` again in a new session.
 ```
+
+Omit the `Effort:` line when no level is active; never write `default`. Both lines are disclosure,
+never a gate.
 
 ---
 

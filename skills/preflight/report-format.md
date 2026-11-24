@@ -73,6 +73,8 @@ Every finding gets a numbered, structured entry.
 > **Iteration**: [N] (first scan / re-scan after fixes)
 > **Artifact**: [type] at [path]
 > **Codebase Grounded**: [N] source files examined, [M] references verified
+> **Independence**: mixed-model | mixed-effort | uniform-effort
+> Effort: <requested>→<applied> (<mapping>)
 > **Last Updated**: [Date]
 
 ### Codebase Context Summary
@@ -105,6 +107,9 @@ Every finding gets a numbered, structured entry.
 ```
 
 Use the severity icons from SKILL.md (red/orange/yellow/blue circles) in the actual report.
+
+Omit the `Effort` line when no level is active; do not write `default`. The line is disclosure,
+never a gate: a fail-open mapping is reported as `unavailable` rather than blocking the scan.
 
 ## Step 5: Present findings and collect decisions
 

@@ -47,7 +47,7 @@ escalation)` entry.
 | Smallest alternative | The direct alternative and why it is not enough |
 | Use map | Intended features/phases/tags |
 | Permissions | Read-only (reviewer) or the explicit write need (executor) |
-| Effort / reasoning | Optional overrides; default effort `high`, reasoning `max` |
+| Effort / reasoning | Optional overrides; default effort `high`, reasoning `xhigh`; pre-marker `max` agents stay legacy-valid |
 | Maintenance cost | Files, upkeep, and review attention |
 | Independent verdict | `Unnecessary` / `Simplify` / `Justified` from a blind `design-challenger` |
 | Direct user decision | `approved` / `rejected` / `deferred` — explicit, never silence |

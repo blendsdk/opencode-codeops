@@ -151,8 +151,8 @@ describe("skill flag content", () => {
     }
     assert.match(
       read("skills/preflight/SKILL.md"),
-      /`max`[^\n]*`--thorough`|`--thorough`[^\n]*`max`/,
-      "preflight must document max with --thorough"
+      /`xhigh`[^\n]*`--thorough`|`--thorough`[^\n]*`xhigh`/,
+      "preflight must document xhigh with --thorough"
     )
     for (const skill of ["preflight", "make-plan", "exec-plan"]) {
       assert.match(
