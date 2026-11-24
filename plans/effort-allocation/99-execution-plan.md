@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-24 01:00
-> **Progress**: 9/39 tasks (23%)
+> **Last Updated**: 2026-11-24 01:01
+> **Progress**: 11/39 tasks (28%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -79,8 +79,8 @@ verification. Each behavior phase follows spec tests → red → implementation 
 **Reference**: 07 §ST-1–ST-6 · 03-01 §Error handling
 **Objective**: Cover edge cases and run the phase gate.
 
-- [ ] 1.4.1 Write impl tests for invalid markers, helper failure, and parity drift — `bin/effort-vocabulary.impl.test.mjs`, `scripts/effort.spec.test.mjs`
-- [ ] 1.4.2 Extend content tests for the five-level contract and skill text — `scripts/reasoning-effort-content.spec.test.mjs`
+- [x] 1.4.1 Write impl tests for invalid markers, helper failure, and parity drift — `bin/effort-vocabulary.impl.test.mjs`, `scripts/effort.spec.test.mjs` ✅ (completed: 2026-11-24 01:01)
+- [x] 1.4.2 Extend content tests for the five-level contract and skill text — `scripts/reasoning-effort-content.spec.test.mjs` ✅ (completed: 2026-11-24 01:01)
 - [ ] 1.4.3 Run task verify and the full phase gate — `npm run verify`
 
 **Deliverables**:

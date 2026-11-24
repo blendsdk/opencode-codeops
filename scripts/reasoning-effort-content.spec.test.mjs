@@ -2,7 +2,7 @@
  * Specification tests for the adaptive reasoning effort documentation.
  *
  * These content guards pin the required clauses of the shipped contract
- * document: the schema stamp, the four levels, the marker literal, the
+ * document: the schema stamp, the five levels, the marker literal, the
  * precedence chain, the skill table, the derivation signals, and the
  * suggestion-only guarantee. They also guard the plugin wiring that consumes
  * the contract. A failure here means the content does not satisfy the
@@ -38,11 +38,12 @@ describe("reasoning-effort contract document", () => {
     assert.match(read(CONTRACT_DOC), /^> \*\*CodeOps Artifact Schema\*\*: 1$/m)
   })
 
-  it("documents the four levels and the marker literal", () => {
+  it("documents the five levels and the marker literal", () => {
     const content = read(CONTRACT_DOC)
-    for (const level of ["low", "medium", "high", "max"]) {
+    for (const level of ["low", "medium", "high", "xhigh", "max"]) {
       assert.match(content, new RegExp("`" + level + "`"), `must document level ${level}`)
     }
+    assert.match(content, /five levels/i)
     assert.match(content, /\[codeops-effort:/)
   })
 
