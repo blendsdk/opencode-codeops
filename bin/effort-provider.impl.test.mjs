@@ -88,6 +88,28 @@ describe("distance rule", () => {
   })
 })
 
+describe("guard combinations", () => {
+  it("fails a partial set open when the only one-step neighbour is max", () => {
+    const options = { topP: 0.8 }
+    const fixture = { providerID: "openai", variants: variants("low", "high", "max") }
+
+    assert.deepEqual(resolveEffortVariant("xhigh", fixture), {
+      variant: undefined,
+      mapping: "fail-open",
+    })
+    assert.equal(applyEffort(options, "xhigh", fixture), options)
+  })
+
+  it("applies an only-max variant when max is the request", () => {
+    const fixture = { providerID: "openai", variants: variants("max") }
+
+    assert.deepEqual(resolveEffortVariant("max", fixture), {
+      variant: "max",
+      mapping: "exact",
+    })
+  })
+})
+
 describe("malformed siblings", () => {
   it("ignores an unusable exact entry and falls to the nearest valid one", () => {
     const fixture = {

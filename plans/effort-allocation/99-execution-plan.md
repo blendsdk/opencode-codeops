@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-24 01:09
-> **Progress**: 19/39 tasks (49%)
+> **Last Updated**: 2026-11-24 01:10
+> **Progress**: 21/39 tasks (54%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -84,9 +84,9 @@ verification. Each behavior phase follows spec tests → red → implementation 
 - [x] 1.4.3 Run task verify and the full phase gate — `npm run verify` ✅ (completed: 2026-11-24 01:01)
 
 **Deliverables**:
-- [ ] Five levels accepted in JS, Python, types, and skill text
-- [ ] AR-9 map correction verified
-- [ ] All verification passing
+- [x] Five levels accepted in JS, Python, types, and skill text ✅ (2026-11-24 01:09)
+- [x] AR-9 map correction verified ✅ (2026-11-24 01:09)
+- [x] All verification passing ✅ (2026-11-24 01:09)
 
 **Test slices**: `bin.runtime`, `scripts.tooling`, `content.guidance` (07)
 **Task verify**: `node bin/codeops-test.mjs run --gate task --baseline HEAD --include bin/effort-vocabulary.spec.test.mjs --include scripts/effort.spec.test.mjs --include scripts/reasoning-effort-content.spec.test.mjs`
@@ -124,14 +124,14 @@ verification. Each behavior phase follows spec tests → red → implementation 
 **Reference**: 07 §ST-11–ST-19 · 03-02 §Edge cases
 **Objective**: Cover partial sets, malformed variants, dedupe, and session clearing.
 
-- [ ] 2.3.1 Write impl tests for partial sets, only-max, malformed variants, dedupe, and sanitization — `bin/effort-provider.impl.test.mjs`, `plugin/effort-capability.impl.test.mjs`
-- [ ] 2.3.2 Run task verify and the full phase gate — `npm run verify`
+- [x] 2.3.1 Write impl tests for partial sets, only-max, malformed variants, dedupe, and sanitization — `bin/effort-provider.impl.test.mjs`, `plugin/effort-capability.impl.test.mjs` ✅ (completed: 2026-11-24 01:10)
+- [x] 2.3.2 Run task verify and the full phase gate — `npm run verify` ✅ (completed: 2026-11-24 01:10)
 
 **Deliverables**:
-- [ ] Verified provider table and max guard
-- [ ] No raw passthrough
-- [ ] Capability line emitted once per changed tuple
-- [ ] All verification passing
+- [x] Verified provider table and max guard ✅ (2026-11-24 01:10)
+- [x] No raw passthrough ✅ (2026-11-24 01:10)
+- [x] Capability line emitted once per changed tuple ✅ (2026-11-24 01:10)
+- [x] All verification passing ✅ (2026-11-24 01:10)
 
 **Test slices**: `bin.runtime`, `plugin.runtime` (07)
 **Task verify**: `node bin/codeops-test.mjs run --gate task --baseline HEAD --include bin/effort-provider.spec.test.mjs --include bin/effort-provider.impl.test.mjs --include plugin/effort-capability.spec.test.mjs --include plugin/effort-capability.impl.test.mjs`

@@ -67,6 +67,23 @@ describe("capability line", () => {
     )
   })
 
+  it("falls back to unknown when an identifier sanitizes to nothing", () => {
+    const line = buildEffortCapabilityLine({
+      providerID: "\n\t",
+      modelID: "]",
+      variants: [" ", "]]"],
+      contextLimit: 1.5,
+      requested: "high",
+      applied: "high",
+      mapping: "exact",
+    })
+
+    assert.equal(
+      line,
+      "CodeOps effort: model=unknown/unknown; variants=none; context=unknown; requested=high; applied=high; mapping=exact"
+    )
+  })
+
   it("caps every identifier and keeps the line bounded", () => {
     const line = buildEffortCapabilityLine({
       providerID: "p".repeat(100),
