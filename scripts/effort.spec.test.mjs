@@ -133,7 +133,11 @@ describe("codeops_effort.py validation", () => {
 
     assert.equal(result.status, 2)
     for (const level of ["low", "medium", "high", "xhigh", "max"]) {
-      assert.match(result.stderr, new RegExp(level), `error must name allowed level ${level}`)
+      assert.match(
+        result.stderr,
+        new RegExp(`\\b${level}\\b`),
+        `error must name allowed level ${level}`
+      )
     }
     assert.equal(existsSync(join(dir, "reasoning-effort.json")), false)
   })

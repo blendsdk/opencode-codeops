@@ -45,6 +45,22 @@ describe("reasoning-effort contract document", () => {
     }
     assert.match(content, /five levels/i)
     assert.match(content, /\[codeops-effort:/)
+    assert.match(content, /\(low\|medium\|high\|xhigh\|max\)/)
+  })
+
+  it("pins the five-level flag set and an xhigh example", () => {
+    const content = read(CONTRACT_DOC)
+    const start = content.indexOf("## Auto-effort option")
+    assert.notEqual(start, -1, "the contract must have an auto-effort section")
+    const rest = content.slice(start)
+    const nextSection = rest.indexOf("\n## ", 1)
+    const section = nextSection === -1 ? rest : rest.slice(0, nextSection)
+
+    assert.match(section, /five-level set/)
+    for (const level of ["low", "medium", "high", "xhigh", "max"]) {
+      assert.ok(section.includes(`\`${level}\``), `the flag set must name ${level}`)
+    }
+    assert.match(section, /--auto-effort=xhigh/)
   })
 
   it("documents the precedence chain from most specific to inherited", () => {
@@ -138,6 +154,13 @@ describe("skill flag content", () => {
       /`max`[^\n]*`--thorough`|`--thorough`[^\n]*`max`/,
       "preflight must document max with --thorough"
     )
+    for (const skill of ["preflight", "make-plan", "exec-plan"]) {
+      assert.match(
+        read(`skills/${skill}/SKILL.md`),
+        /`low`,\s*`medium`,\s*`high`,\s*`xhigh`,\s*and\s*`max`/,
+        `${skill} must list the five accepted levels`
+      )
+    }
   })
 })
 

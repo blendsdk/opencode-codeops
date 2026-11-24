@@ -153,7 +153,7 @@ describe("session helper", () => {
 
     assert.equal(result.status, 2)
     for (const level of ["low", "medium", "high", "xhigh", "max"]) {
-      assert.match(result.stderr, new RegExp(level), `error must name ${level}`)
+      assert.match(result.stderr, new RegExp(`\\b${level}\\b`), `error must name ${level}`)
     }
     assert.equal(existsSync(join(dir, "reasoning-effort.json")), false)
   })

@@ -38,8 +38,8 @@ export const EFFORT_LEVELS = Object.freeze(["low", "medium", "high", "xhigh", "m
  * project configuration.
  *
  * The list mirrors the CodeOps config schema, which passes provider-native
- * values through so a project can ask for `minimal` or `xhigh` even though the
- * suggestion vocabulary only offers the four common levels.
+ * values through so a project can ask for `minimal` or `none` even though the
+ * suggestion vocabulary only offers the five common levels.
  */
 export const ROUTING_REASONING_VALUES = Object.freeze([
   "none",
