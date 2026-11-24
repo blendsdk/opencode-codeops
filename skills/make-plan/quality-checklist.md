@@ -9,6 +9,8 @@ Run this before finalizing the plan documents. The **Specification-First Testing
 - [ ] Plans that carry a `Reasoning` suggestion record the requested level; the runtime artifacts
       disclose `requested→applied` effort and the independence status, and omit effort when no
       level is active
+- [ ] The plan carries a `## Planning Coverage` map (or records the `--no-coverage-hunt` opt-out)
+      with the RD-01 columns, `<completed>/<total>` summary, freshness line, and source note
 - [ ] All dependencies mapped
 - [ ] The `## Specialist Agents` outcome is recorded in `00-index.md` (candidate or `None` with evidence)
 - [ ] Every planned item traces to the confirmed scope baseline or a user-kept `SE-*` entry

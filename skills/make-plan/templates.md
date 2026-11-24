@@ -60,6 +60,20 @@ excerpt at dispatch time — excerpting for a handoff packet is not restatement)
 **Excluded machinery:** [Only larger support surfaces actually considered, or `None`]
 **Approved complexity:** [AR references, or `None`]
 
+## Planning Coverage
+
+> Copied from the plan register after Phase 1C. Omit this section when the run used
+> `--no-coverage-hunt`.
+
+> **Coverage**: <completed>/<total> clusters · <examined>/12 categories · <N> candidates · <M> residual limits · Effort: <requested→applied> · Independence: <mixed-model|mixed-effort|uniform-effort>
+> **Freshness**: Coverage as of <date>; artifacts <list>
+
+| Cluster | Area | Examined | Not examined / limit | Candidates | Notes / limit | Confidence |
+|---------|------|----------|----------------------|------------|---------------|------------|
+| ... | ... | ... | ... | ... | ... | ... |
+
+**Source note:** merged `CV-*` IDs and `DQ-*` keys per register row, or “none.”
+
 ## Document Index
 
 | #   | Document                                       | Description                                 |
