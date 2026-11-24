@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-24 01:09
-> **Progress**: 15/39 tasks (38%)
+> **Last Updated**: 2026-11-24 01:07
+> **Progress**: 18/39 tasks (46%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -114,10 +114,10 @@ verification. Each behavior phase follows spec tests → red → implementation 
 **Reference**: 03-02 §Resolution algorithm, §Capability line · AR-1, AR-3, AR-23–25
 **Objective**: Implement the verified table, max guard, fail-open path, and capability line.
 
-- [ ] 2.2.1 Add the frozen provider table, resolver, max guard, and no-distant-jump rule — `bin/lib/reasoning-effort.mjs`
-- [ ] 2.2.2 Remove the raw `reasoningEffort` passthrough; return original options on no variant — `bin/lib/reasoning-effort.mjs`
+- [x] 2.2.1 Add the frozen provider table, resolver, max guard, and no-distant-jump rule — `bin/lib/reasoning-effort.mjs` ✅ (completed: 2026-11-24 01:07)
+- [x] 2.2.2 Remove the raw `reasoningEffort` passthrough; return original options on no variant — `bin/lib/reasoning-effort.mjs` ✅ (completed: 2026-11-24 01:07)
 - [ ] 2.2.3 Pass `providerID`/`modelID`, add the deduped capability line, sanitize identifiers, and clear state on `session.deleted` — `plugin/index.ts`
-- [ ] 2.2.4 Update resolver type declarations — `bin/lib/reasoning-effort.d.mts`
+- [x] 2.2.4 Update resolver type declarations — `bin/lib/reasoning-effort.d.mts` ✅ (completed: 2026-11-24 01:07)
 
 ### Step 2.3: Impl tests and phase gate
 

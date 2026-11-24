@@ -365,8 +365,8 @@ describe("provider option application", () => {
     })
     const nearestOnly = { capabilities: { reasoning: true }, variants: { medium: {} } }
     const mapped = applyEffort(options, "xhigh", nearestOnly)
-    assert.deepEqual(mapped, options)
-    assert.notEqual(mapped, options)
+    assert.equal(mapped, options, "a distant nearest match must fail open")
+    assert.equal("reasoningEffort" in mapped, false)
   })
 })
 

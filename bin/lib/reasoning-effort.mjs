@@ -25,7 +25,7 @@ import { join } from "node:path"
 import { ensureSessionTmpDir, sessionTmpDir } from "./tmp-hygiene.mjs"
 
 /**
- * The four levels a plan or skill may suggest.
+ * The five levels a plan or skill may suggest.
  *
  * These are the only values accepted in dispatch markers, session flags, and
  * plan suggestions. Routing policy is project configuration and may name the
@@ -70,14 +70,14 @@ const MAX_STATE_FILE_BYTES = 4096
 const MARKER_PATTERN = /^\[codeops-effort:\s*(low|medium|high|xhigh|max)\]\s*$/
 
 /**
- * Check whether a value is one of the four suggestion levels.
+ * Check whether a value is one of the five suggestion levels.
  *
  * @param value - Value to inspect
- * @returns True only for `"low"`, `"medium"`, `"high"`, or `"max"`
+ * @returns True only for `"low"`, `"medium"`, `"high"`, `"xhigh"`, or `"max"`
  *
  * @example
  * isEffortLevel("high") // true
- * isEffortLevel("xhigh") // false
+ * isEffortLevel("default") // false
  */
 export function isEffortLevel(value) {
   return typeof value === "string" && EFFORT_LEVELS.includes(value)
@@ -158,7 +158,7 @@ export function sessionEffortPath(sessionID, base) {
  *
  * The expected payload is `{"schema":1,"reasoning":"<level>"}` with any
  * unknown keys ignored. Anything else — malformed JSON, the wrong schema, a
- * level outside the four-level allowlist — yields `undefined`.
+ * level outside the five-level allowlist — yields `undefined`.
  *
  * @param text - Raw file contents
  * @returns The validated level, or `undefined`
@@ -320,39 +320,105 @@ const EFFORT_RANK = Object.freeze({
 })
 
 /**
- * Choose the model variant key to apply for a requested level.
+ * How a requested level reached the applied variant, or why it did not.
  *
- * The exact level wins when the model exposes it. Otherwise the nearest
- * exposed level on the provider scale is chosen, and ties resolve to the
- * higher level so ordinary work is never under-powered. `none` is
- * exact-match only: mapping it to a reasoning level would enable reasoning
- * the caller explicitly disabled. Keys whose value is not a plain object are
- * ignored, so a malformed variant can never reach the request options.
- *
- * @param level - Requested level (any routing enum value)
- * @param model - Model object from the hook input
- * @returns The variant key to apply, or `undefined` when none applies
- *
- * @example
- * selectEffortVariant("medium", { variants: { low: {}, high: {} } }) // "high"
+ * - `exact`: the model exposes the requested level.
+ * - `alias`: the verified provider table supplied the variant.
+ * - `nearest`: a one-step canonical neighbour was chosen.
+ * - `fail-open`: nothing safe applied and the request was left unchanged.
  */
-export function selectEffortVariant(level, model) {
-  if (!isRoutingReasoning(level)) return undefined
-  const variants = extractModelVariants(model)
-  if (variants === undefined) return undefined
+export const EFFORT_MAPPINGS = Object.freeze(["exact", "alias", "nearest", "fail-open"])
 
-  if (level === "none") {
-    return isPlainObject(variants.none) ? "none" : undefined
-  }
+/**
+ * Verified provider aliases, keyed by provider id.
+ *
+ * The table is deliberately small and only covers provider/model families
+ * whose option names are known. Runtime variants are authoritative: this table
+ * is consulted only after an exact canonical match fails. OpenAI and Anthropic
+ * use the canonical names unchanged. DeepSeek exposes `high`/`max` instead of
+ * `medium`/`xhigh`, so those two requests map onto its scale.
+ *
+ * Unknown providers have no entry and therefore fail open. `default` is never
+ * a key: the vocabulary has no such level.
+ */
+const VERIFIED_PROVIDER_ALIASES = Object.freeze({
+  openai: Object.freeze({
+    low: "low",
+    medium: "medium",
+    high: "high",
+    xhigh: "xhigh",
+    max: "max",
+  }),
+  anthropic: Object.freeze({
+    low: "low",
+    medium: "medium",
+    high: "high",
+    xhigh: "xhigh",
+    max: "max",
+  }),
+  deepseek: Object.freeze({
+    low: "low",
+    medium: "high",
+    high: "high",
+    xhigh: "max",
+    max: "max",
+    none: "none",
+  }),
+})
 
-  const candidates = Object.keys(variants).filter(
+/**
+ * Maximum length of one identifier inside the capability line.
+ *
+ * The real ids are short. The cap keeps a hostile host value from growing the
+ * prompt-bound line without bound.
+ */
+const MAX_CAPABILITY_IDENTIFIER_LENGTH = 64
+
+/**
+ * Read a model's variants as a normalized id-keyed record.
+ *
+ * Accepts both the OpenCode 2 array shape and the older record shape. A model
+ * without a usable variants collection yields an empty record, which makes
+ * every later lookup fail open.
+ *
+ * @param model - Model object from the hook input
+ * @returns A record mapping variant id to its settings object
+ */
+function modelVariantRecord(model) {
+  if (!isPlainObject(model) || !("variants" in model)) return {}
+  return normalizeModelVariants(model.variants)
+}
+
+/**
+ * List the usable canonical variant keys a model exposes.
+ *
+ * A key counts only when it is a canonical reasoning name, it is not `none`,
+ * and its value is a plain object. Malformed entries are ignored so they can
+ * never reach the request options.
+ *
+ * @param variants - Normalized variant record
+ * @returns Canonical variant keys with usable settings
+ */
+function usableVariantKeys(variants) {
+  return Object.keys(variants).filter(
     (key) =>
       key !== "none" &&
       Object.prototype.hasOwnProperty.call(EFFORT_RANK, key) &&
       isPlainObject(variants[key])
   )
-  if (candidates.includes(level)) return level
+}
 
+/**
+ * Pick the nearest canonical variant to a requested level.
+ *
+ * Ties resolve to the higher level so ordinary work is never under-powered.
+ * The caller still applies the max guard and the distance rule.
+ *
+ * @param level - Requested canonical or routing level
+ * @param candidates - Usable canonical variant keys
+ * @returns The nearest key, or `undefined` when the list is empty
+ */
+function nearestVariantKey(level, candidates) {
   let best
   for (const key of candidates) {
     if (best === undefined) {
@@ -372,20 +438,95 @@ export function selectEffortVariant(level, model) {
 }
 
 /**
+ * Resolve the model variant and the disclosure source for a requested level.
+ *
+ * The order is fixed by the contract:
+ *
+ * 1. `none` is exact-match only; mapping it to a reasoning level would enable
+ *    reasoning the caller explicitly disabled.
+ * 2. An exact canonical variant wins.
+ * 3. The verified provider alias applies when the exact variant is absent.
+ * 4. Otherwise the nearest exposed canonical variant is used, but only when it
+ *    is at most one canonical step away. A nearest `max` is refused unless the
+ *    request was `max` or the DeepSeek alias above supplied it.
+ *
+ * Anything else returns `mapping: "fail-open"` and no variant, which leaves
+ * the request unchanged. The function never throws.
+ *
+ * @param level - Requested level (any routing enum value)
+ * @param model - Model object from the hook input
+ * @returns The variant key and the mapping source
+ *
+ * @example
+ * resolveEffortVariant("medium", {
+ *   providerID: "deepseek",
+ *   variants: { low: {}, high: {}, max: {} },
+ * }) // { variant: "high", mapping: "alias" }
+ */
+export function resolveEffortVariant(level, model) {
+  const failOpen = { variant: undefined, mapping: "fail-open" }
+  if (!isRoutingReasoning(level)) return failOpen
+
+  const variants = modelVariantRecord(model)
+
+  if (level === "none") {
+    return isPlainObject(variants.none)
+      ? { variant: "none", mapping: "exact" }
+      : failOpen
+  }
+
+  const candidates = usableVariantKeys(variants)
+  if (candidates.includes(level)) return { variant: level, mapping: "exact" }
+
+  const providerID =
+    isPlainObject(model) && typeof model.providerID === "string" ? model.providerID : undefined
+  const alias =
+    providerID === undefined ? undefined : VERIFIED_PROVIDER_ALIASES[providerID]?.[level]
+  if (typeof alias === "string" && candidates.includes(alias)) {
+    return { variant: alias, mapping: "alias" }
+  }
+
+  const nearest = nearestVariantKey(level, candidates)
+  if (nearest === undefined) return failOpen
+  if (nearest === "max" && level !== "max") return failOpen
+  if (Math.abs(EFFORT_RANK[nearest] - EFFORT_RANK[level]) > 1) return failOpen
+  return { variant: nearest, mapping: "nearest" }
+}
+
+/**
+ * Choose the model variant key to apply for a requested level.
+ *
+ * This is the variant-key view of {@link resolveEffortVariant}, kept for
+ * callers that only need the key. It returns `undefined` for every fail-open
+ * outcome.
+ *
+ * @param level - Requested level (any routing enum value)
+ * @param model - Model object from the hook input
+ * @returns The variant key to apply, or `undefined` when none applies
+ *
+ * @example
+ * selectEffortVariant("medium", { variants: { low: {}, high: {} } }) // "high"
+ */
+export function selectEffortVariant(level, model) {
+  return resolveEffortVariant(level, model).variant
+}
+
+/**
  * Merge the model's variant options for a level into the request options.
  *
  * The runtime model carries a `variants` record whose entries are the exact
  * provider options for each level (for example `reasoningEffort`, or a nested
  * `reasoning.effort`). This function is the only place that mapping is
  * consumed, so the plugin never hardcodes a provider key. The applied key is
- * chosen by {@link selectEffortVariant}: exact match first, then the nearest
- * exposed level. A matching variant applies even when the model's reasoning
- * capability flag is absent or false, because the variant itself is the
- * provider-known option set and the host applies inherited variants the same
- * way. Only when no variants record exists does the documented
- * `reasoningEffort` passthrough require an explicit reasoning capability. The
- * function is pure: it returns a new object when a change applies and the
- * original object reference otherwise.
+ * chosen by {@link resolveEffortVariant}; a fail-open outcome returns the
+ * original options reference unchanged.
+ *
+ * There is deliberately no raw `reasoningEffort` fallback. Sending a level a
+ * provider never advertised risks an error or a silently ignored option, so a
+ * model without usable variants keeps its request unchanged and the caller
+ * records `effort unavailable` instead.
+ *
+ * The function is pure: it returns a new object when a change applies.
  *
  * @param options - Current provider options
  * @param level - Candidate level from {@link resolveEffort}
@@ -393,17 +534,97 @@ export function selectEffortVariant(level, model) {
  * @returns The original options, or a new merged object when a change applies
  */
 export function applyEffort(options, level, model) {
-  if (!isRoutingReasoning(level)) return options
+  const resolution = resolveEffortVariant(level, model)
+  if (resolution.variant === undefined) return options
+  const variants = modelVariantRecord(model)
+  return deepMergePlain(options, variants[resolution.variant])
+}
 
-  const variants = extractModelVariants(model)
-  if (variants !== undefined) {
-    const variantKey = selectEffortVariant(level, model)
-    if (variantKey === undefined) return options
-    return deepMergePlain(options, variants[variantKey])
-  }
+/**
+ * Restrict one identifier to the capability-line allowlist.
+ *
+ * Only `A-Z`, `a-z`, `0-9`, `.`, `_`, `:`, `/`, and `-` survive. Every other
+ * character — including CR, LF, tabs, and brackets — is removed, so a hostile
+ * id can never add a line or close a field. The result is capped so the
+ * prompt-bound line stays bounded. Non-strings become an empty string.
+ *
+ * @param value - Untrusted identifier
+ * @param maxLength - Maximum accepted length (defaults to 64)
+ * @returns The sanitized identifier
+ *
+ * @example
+ * sanitizeEffortIdentifier("bad\nmodel]") // "badmodel"
+ */
+export function sanitizeEffortIdentifier(value, maxLength = MAX_CAPABILITY_IDENTIFIER_LENGTH) {
+  if (typeof value !== "string") return ""
+  const cap =
+    Number.isInteger(maxLength) && maxLength > 0 ? maxLength : MAX_CAPABILITY_IDENTIFIER_LENGTH
+  return value.replace(/[^A-Za-z0-9._:/-]/g, "").slice(0, cap)
+}
 
-  if (!modelSupportsReasoning(model)) return options
-  return { ...options, reasoningEffort: level }
+/**
+ * Order variant ids for display: canonical rank first, then alphabetically.
+ *
+ * @param a - First variant id
+ * @param b - Second variant id
+ * @returns Negative, zero, or positive per the usual comparator contract
+ */
+function compareVariantIds(a, b) {
+  const rankA = Object.prototype.hasOwnProperty.call(EFFORT_RANK, a)
+    ? EFFORT_RANK[a]
+    : Number.MAX_SAFE_INTEGER
+  const rankB = Object.prototype.hasOwnProperty.call(EFFORT_RANK, b)
+    ? EFFORT_RANK[b]
+    : Number.MAX_SAFE_INTEGER
+  if (rankA !== rankB) return rankA - rankB
+  if (a === b) return 0
+  return a < b ? -1 : 1
+}
+
+/**
+ * Build the one-line, content-free effort capability disclosure.
+ *
+ * The line names the model, the variants the host exposed, the context limit,
+ * the requested level, the applied variant (or `unavailable`), and how the
+ * mapping was reached. Identifiers are sanitized and capped; the context limit
+ * is printed only when it is a positive integer. The result never contains a
+ * newline, so callers can inject it as one system line.
+ *
+ * @param input - Resolution facts; unknown fields degrade to safe defaults
+ * @returns One capability line
+ *
+ * @example
+ * buildEffortCapabilityLine({
+ *   providerID: "openai",
+ *   modelID: "o1",
+ *   variants: ["high"],
+ *   contextLimit: 200000,
+ *   requested: "high",
+ *   applied: "high",
+ *   mapping: "exact",
+ * }) // "CodeOps effort: model=openai/o1; variants=high; context=200000; requested=high; applied=high; mapping=exact"
+ */
+export function buildEffortCapabilityLine(input) {
+  const record = isPlainObject(input) ? input : {}
+  const provider = sanitizeEffortIdentifier(record.providerID) || "unknown"
+  const model = sanitizeEffortIdentifier(record.modelID) || "unknown"
+
+  const rawVariants = Array.isArray(record.variants) ? record.variants : []
+  const variants = [
+    ...new Set(rawVariants.map((value) => sanitizeEffortIdentifier(value)).filter(Boolean)),
+  ].sort(compareVariantIds)
+  const variantText = variants.length > 0 ? variants.join(",") : "none"
+
+  const context =
+    Number.isInteger(record.contextLimit) && record.contextLimit > 0
+      ? String(record.contextLimit)
+      : "unknown"
+
+  const requested = sanitizeEffortIdentifier(record.requested) || "unknown"
+  const applied = sanitizeEffortIdentifier(record.applied) || "unavailable"
+  const mapping = EFFORT_MAPPINGS.includes(record.mapping) ? record.mapping : "fail-open"
+
+  return `CodeOps effort: model=${provider}/${model}; variants=${variantText}; context=${context}; requested=${requested}; applied=${applied}; mapping=${mapping}`
 }
 
 /**

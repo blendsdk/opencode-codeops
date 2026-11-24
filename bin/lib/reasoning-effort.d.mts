@@ -5,8 +5,19 @@
  * these declarations give the TypeScript plugin entry point typed access.
  */
 
-/** A level from the four-level suggestion vocabulary. */
+/** A level from the five-level suggestion vocabulary. */
 export type EffortLevel = "low" | "medium" | "high" | "xhigh" | "max"
+
+/** How a requested level reached its applied variant, or why it did not. */
+export type EffortMapping = "exact" | "alias" | "nearest" | "fail-open"
+
+/** Outcome of resolving one requested level against a model's variants. */
+export interface EffortVariantResolution {
+  /** Variant key to apply, or `undefined` for a fail-open outcome. */
+  variant: RoutingReasoning | undefined
+  /** Source of the mapping decision. */
+  mapping: EffortMapping
+}
 
 /** A reasoning value accepted by `routing.roles.<agent>.reasoning`. */
 export type RoutingReasoning =
@@ -18,11 +29,14 @@ export type RoutingReasoning =
   | "xhigh"
   | "max"
 
-/** The four levels a plan or skill may suggest. */
+/** The five levels a plan or skill may suggest. */
 export declare const EFFORT_LEVELS: readonly EffortLevel[]
 
-/** Check whether a value is one of the four suggestion levels. */
+/** Check whether a value is one of the five suggestion levels. */
 export declare function isEffortLevel(value: unknown): value is EffortLevel
+
+/** Every accepted mapping source, including the fail-open outcome. */
+export declare const EFFORT_MAPPINGS: readonly EffortMapping[]
 
 /** The reasoning values accepted by routing role entries. */
 export declare const ROUTING_REASONING_VALUES: readonly RoutingReasoning[]
@@ -94,6 +108,29 @@ export declare function selectEffortVariant(
   level: unknown,
   model: unknown
 ): RoutingReasoning | undefined
+
+/** Resolve the model variant and the disclosure source for a requested level. */
+export declare function resolveEffortVariant(
+  level: unknown,
+  model: unknown
+): EffortVariantResolution
+
+/** Restrict one identifier to the capability-line allowlist. */
+export declare function sanitizeEffortIdentifier(value: unknown, maxLength?: number): string
+
+/** Input facts for one capability-line disclosure. */
+export interface EffortCapabilityInput {
+  providerID?: unknown
+  modelID?: unknown
+  variants?: unknown
+  contextLimit?: unknown
+  requested?: unknown
+  applied?: unknown
+  mapping?: unknown
+}
+
+/** Build the one-line, content-free effort capability disclosure. */
+export declare function buildEffortCapabilityLine(input?: EffortCapabilityInput): string
 
 /** Merge the model's variant options for a level into the request options. */
 export declare function applyEffort(
