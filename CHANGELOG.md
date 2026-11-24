@@ -2,12 +2,11 @@
 
 All notable changes to CodeOps are recorded here.
 
-## Unreleased
+## 2.8.0 — 2026-11-24
 
 ### Features
 
-- upgrade: add `opencode-codeops upgrade` to replace the global package, remove stale plugin
-  entries, and refresh the global and current-project scopes in one command
+- upgrade: add the one-command upgrade
 
 ## 2.7.0 — 2026-11-24
 
