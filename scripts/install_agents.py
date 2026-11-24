@@ -56,7 +56,7 @@ TEMPLATE_PERMISSIONS: dict[str, dict[str, str]] = {
     "phase-reviewer":            {"read": "allow", "grep": "allow", "glob": "allow", "edit": "deny",  "bash": "allow"},
     "plan-task-executor":        {"read": "allow", "grep": "allow", "glob": "allow", "edit": "allow", "bash": "allow"},
     "plan-task-executor-opus":   {"read": "allow", "grep": "allow", "glob": "allow", "edit": "allow", "bash": "allow"},
-    "preflight-auditor":         {"read": "allow", "grep": "allow", "glob": "allow", "edit": "deny",  "bash": "allow"},
+    "preflight-auditor":         {"read": "allow", "grep": "allow", "glob": "allow", "edit": "deny",  "bash": "deny"},
     "security-auditor":          {"read": "allow", "grep": "allow", "glob": "allow", "edit": "deny",  "bash": "allow"},
     "spec-test-author":          {"read": "allow", "grep": "allow", "glob": "allow", "edit": "allow", "bash": "allow"},
     "financial-integrity-auditor": {"read": "allow", "edit": "deny",  "bash": "deny"},
