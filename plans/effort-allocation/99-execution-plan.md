@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-24 01:07
-> **Progress**: 18/39 tasks (46%)
+> **Last Updated**: 2026-11-24 01:09
+> **Progress**: 19/39 tasks (49%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -116,7 +116,7 @@ verification. Each behavior phase follows spec tests → red → implementation 
 
 - [x] 2.2.1 Add the frozen provider table, resolver, max guard, and no-distant-jump rule — `bin/lib/reasoning-effort.mjs` ✅ (completed: 2026-11-24 01:07)
 - [x] 2.2.2 Remove the raw `reasoningEffort` passthrough; return original options on no variant — `bin/lib/reasoning-effort.mjs` ✅ (completed: 2026-11-24 01:07)
-- [ ] 2.2.3 Pass `providerID`/`modelID`, add the deduped capability line, sanitize identifiers, and clear state on `session.deleted` — `plugin/index.ts`
+- [x] 2.2.3 Pass `providerID`/`modelID`, add the deduped capability line, sanitize identifiers, and clear state on `session.deleted` — `plugin/index.ts` ✅ (completed: 2026-11-24 01:09)
 - [x] 2.2.4 Update resolver type declarations — `bin/lib/reasoning-effort.d.mts` ✅ (completed: 2026-11-24 01:07)
 
 ### Step 2.3: Impl tests and phase gate

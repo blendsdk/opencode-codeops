@@ -22,7 +22,7 @@ import { resolveDataDir } from "../bin/lib/discovery-store.mjs"
 import {
   appendEffortTrace,
   applyEffort,
-  extractModelVariants,
+  buildEffortCapabilityLine,
   findEffortMarker,
   isEffortLevel,
   isEffortTraceEnabled,
@@ -31,7 +31,7 @@ import {
   readRoutingReasoning,
   readSessionEffort,
   resolveEffort,
-  selectEffortVariant,
+  resolveEffortVariant,
 } from "../bin/lib/reasoning-effort.mjs"
 import type { EffortLevel } from "../bin/lib/reasoning-effort.mjs"
 
@@ -190,30 +190,45 @@ function traceEffort(
 }
 
 /**
- * Look up the active model's variant record from the model registry.
+ * Facts the effort resolver needs from the model registry.
+ */
+interface ModelResolutionInfo {
+  /** Variant settings keyed by variant id, normalized for the resolver. */
+  variants: Record<string, unknown>
+  /** Advertised context window, when the registry reports one. */
+  contextLimit: number | undefined
+}
+
+/**
+ * Look up the active model's variants and context limit in the registry.
  *
  * OpenCode 2 request hooks carry only a model reference (provider and model
  * id), while the provider-specific option sets live on the registered model as
- * a `variants` array. Any lookup failure means "no variants", which leaves the
- * request unchanged.
+ * a `variants` array. Any lookup failure means "no usable model facts", which
+ * leaves the request unchanged and discloses a fail-open mapping.
  *
  * @param ctx - Plugin context whose model registry is queried
  * @param ref - Model reference from the request hook
- * @returns A variant record keyed by variant id, or an empty record
+ * @returns Normalized variants and the context limit when known
  */
-async function readModelVariants(
+async function readModelInfo(
   ctx: Plugin.Context,
   ref: { providerID: string; id: string }
-): Promise<Record<string, unknown>> {
+): Promise<ModelResolutionInfo> {
   try {
     const listed = await ctx.model.list()
     const info = listed.data.find(
       (model) => model.providerID === ref.providerID && model.id === ref.id
     )
-    if (info === undefined) return {}
-    return normalizeModelVariants(info.variants)
+    if (info === undefined) return { variants: {}, contextLimit: undefined }
+    const limit = isRecord(info.limit) ? info.limit.context : undefined
+    return {
+      variants: normalizeModelVariants(info.variants),
+      contextLimit:
+        typeof limit === "number" && Number.isInteger(limit) && limit > 0 ? limit : undefined,
+    }
   } catch {
-    return {}
+    return { variants: {}, contextLimit: undefined }
   }
 }
 
@@ -234,10 +249,15 @@ export default Plugin.define({
     const currentDiscovery = () => discovery
 
     // Reasoning-effort state lives for the lifetime of this plugin instance:
-    // the latest dispatch-marker level per session, plus a deduplication set
-    // for unsupported-level warnings.
+    // the latest dispatch-marker level per session, a deduplication set for
+    // unsupported-level warnings, and the last disclosed resolution tuple per
+    // session so the capability line appears once per change.
     const effortMarkers = new Map<string, EffortLevel>()
     const warnedEffortLevels = new Set<string>()
+    const effortDisclosures = new Map<
+      string,
+      { requested: string; applied: string | null; mapping: string }
+    >()
     const effortTraceEnabled = isEffortTraceEnabled(process.env.CODEOPS_EFFORT_TRACE)
 
     // The live run state is memory-only, for the lifetime of this plugin
@@ -266,6 +286,7 @@ export default Plugin.define({
         for await (const event of ctx.event.subscribe({ signal: controller.signal })) {
           if (event.type === "session.deleted") {
             effortMarkers.delete(event.data.sessionID)
+            effortDisclosures.delete(event.data.sessionID)
             progress.clearSession(event.data.sessionID)
             await currentDiscovery()?.onSessionDeleted(event.data.sessionID)
           }
@@ -338,8 +359,13 @@ export default Plugin.define({
           return
         }
 
-        const variants = await readModelVariants(ctx, event.model)
-        const model = { variants }
+        const modelInfo = await readModelInfo(ctx, event.model)
+        const model = {
+          variants: modelInfo.variants,
+          providerID: event.model.providerID,
+          modelID: event.model.id,
+        }
+        const resolution = resolveEffortVariant(level, model)
         const applied = applyEffort(event.options, level, model)
         const changed = applied !== event.options
         traceEffort(effortTraceEnabled, event.sessionID, {
@@ -348,9 +374,40 @@ export default Plugin.define({
           level,
           source,
           applied: changed,
-          variant: selectEffortVariant(level, model) ?? null,
-          variantLevels: Object.keys(extractModelVariants(model) ?? {}),
+          variant: resolution.variant ?? null,
+          mapping: resolution.mapping,
+          variantLevels: Object.keys(modelInfo.variants),
         })
+
+        // One content-free line per changed resolution tuple. The line is
+        // disclosure, not a gate: a fail-open resolution is still reported.
+        const disclosure = {
+          requested: level,
+          applied: resolution.variant ?? null,
+          mapping: resolution.mapping,
+        }
+        const previous = effortDisclosures.get(event.sessionID)
+        if (
+          previous === undefined ||
+          previous.requested !== disclosure.requested ||
+          previous.applied !== disclosure.applied ||
+          previous.mapping !== disclosure.mapping
+        ) {
+          effortDisclosures.set(event.sessionID, disclosure)
+          event.system.push({
+            type: "text",
+            text: buildEffortCapabilityLine({
+              providerID: event.model.providerID,
+              modelID: event.model.id,
+              variants: Object.keys(modelInfo.variants),
+              contextLimit: modelInfo.contextLimit,
+              requested: level,
+              applied: resolution.variant,
+              mapping: resolution.mapping,
+            }),
+          })
+        }
+
         if (!changed) {
           if (marker !== undefined) {
             const warningKey = `${event.sessionID}:${marker}`

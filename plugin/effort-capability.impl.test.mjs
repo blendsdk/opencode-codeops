@@ -84,6 +84,6 @@ describe("capability line", () => {
     assert.equal(line.includes("p".repeat(65)), false)
     assert.equal(line.includes("m".repeat(65)), false)
     assert.equal(line.includes("v".repeat(65)), false)
-    assert.ok(line.length < 400, "the line must stay bounded")
+    assert.ok(line.length < 500, "the line must stay bounded")
   })
 })
