@@ -15,6 +15,7 @@
  * Usage:
  *   opencode-codeops install [options]     Install or upgrade skills and agents
  *   opencode-codeops update [options]      Alias of install
+ *   opencode-codeops upgrade [options]     Replace the global package and refresh both scopes
  *   opencode-codeops status [options]      Show installed versions
  *   opencode-codeops uninstall [options]   Remove managed files
  *   opencode-codeops help                  Show this help
@@ -30,7 +31,7 @@ import { fileURLToPath } from "node:url"
 import { PLUGIN_NAME, readConfiguredPlugin, registerPlugin } from "./lib/opencode-plugin.mjs"
 
 /** Commands this CLI understands. */
-const COMMANDS = new Set(["install", "update", "status", "uninstall", "help"])
+const COMMANDS = new Set(["install", "update", "upgrade", "status", "uninstall", "help"])
 
 /** Prints command usage. */
 function printUsage() {
@@ -39,6 +40,8 @@ function printUsage() {
 Usage:
   opencode-codeops install [options]     Install or upgrade skills and agents (default)
   opencode-codeops update [options]      Alias of install
+  opencode-codeops upgrade [options]     Replace the global package, remove stale plugin
+                                         entries, and refresh global + project scopes
   opencode-codeops status [options]      Show installed skills and agents
   opencode-codeops uninstall [options]   Remove managed skills and agents
   opencode-codeops help                  Show this help
@@ -50,7 +53,12 @@ Options:
   --force            Replace same-named files this package does not own
   --link             Symlink to the source instead of copying (development)
   --no-plugin        Do not register the plugin in the OpenCode config
+  --no-project       upgrade: skip the current project scope
   -h, --help         Show this help
+
+upgrade installs the globally pinned npm package (CODEOPS_VERSION, default
+latest), removes stale CodeOps plugin entries from OpenCode, re-registers the
+new version, and refreshes both the global and current-project scopes.
 
 Scope is auto-detected: inside a CodeOps project (a git repo with .opencode/ or
 codeops/.codeops.yml) the files go to .opencode/; otherwise to ~/.config/opencode/.
@@ -195,6 +203,18 @@ export async function dispatch(argv, io = {}) {
     console.error(`error: unknown command '${first}'`)
     printUsage()
     return 2
+  }
+
+  if (first === "upgrade") {
+    const { upgrade } = await import("./lib/upgrade.mjs")
+    const result = upgrade({
+      cwd: io.cwd ?? process.cwd(),
+      project: !rest.includes("--no-project"),
+      dryRun: rest.includes("--dry-run"),
+      run: io.run,
+    })
+    if (result.code !== 0) console.error(`error: ${result.message}`)
+    return result.code
   }
 
   const command = first === "update" ? "install" : first

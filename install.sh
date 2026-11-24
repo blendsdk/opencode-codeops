@@ -6,6 +6,7 @@
 #   curl -fsSL https://cdn.jsdelivr.net/npm/opencode-codeops@latest/install.sh | bash
 #   curl -fsSL .../install.sh | bash -s -- --project
 #   curl -fsSL .../install.sh | bash -s -- install-agents --project
+#   curl -fsSL .../install.sh | bash -s -- upgrade
 #   curl -fsSL .../install.sh | bash -s -- status
 #   curl -fsSL .../install.sh | bash -s -- uninstall
 #   CODEOPS_VERSION=<tag-or-version> curl -fsSL .../install.sh | bash
@@ -19,6 +20,7 @@
 # Subcommands (see `npx opencode-codeops help` for the full option list):
 #   install     Install or upgrade skills and subagents   (default)
 #   update      Alias of install
+#   upgrade     Replace the global package and refresh global + project scopes
 #   status      Show the installed versions
 #   uninstall   Remove the managed files
 #   help        Show installer help
@@ -45,7 +47,7 @@ fi
 subcommand="install"
 if (( $# > 0 )); then
   case "$1" in
-    install | update | status | uninstall | help)
+    install | update | upgrade | status | uninstall | help)
       subcommand="$1"
       shift
       ;;

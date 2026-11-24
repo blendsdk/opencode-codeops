@@ -118,7 +118,19 @@ CODEOPS_VERSION=1.6.0 curl -fsSL https://cdn.jsdelivr.net/npm/opencode-codeops@l
 ```
 
 `install`/`update` pins the plugin in the OpenCode config to the installer's own version, so the
-plugin and the installed files cannot drift apart; run `update` to move both to a new version.
+plugin and the installed files cannot drift apart.
+
+To replace an existing installation with a new release in one step, run:
+
+```bash
+npx -y opencode-codeops@latest upgrade
+```
+
+`upgrade` installs the global npm package (`CODEOPS_VERSION`, default `latest`), removes stale
+CodeOps plugin entries from the OpenCode config, re-registers the new version, and refreshes both
+the global and current-project scopes. It skips the project scope outside a CodeOps project; pass
+`--no-project` to skip it explicitly, or `--dry-run` to print the planned commands. Restart
+OpenCode afterwards.
 
 Re-running the installer upgrades an existing install in place. It replaces only the files this
 package owns, recorded in `.opencode-codeops.json`. Files you author yourself, or install with
