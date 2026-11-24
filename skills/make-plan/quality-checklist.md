@@ -6,8 +6,9 @@ Run this before finalizing the plan documents. The **Specification-First Testing
 - [ ] All requirements captured
 - [ ] All affected components identified
 - [ ] All scope decisions documented
-- [ ] Plans that carry a `Reasoning` suggestion disclose `requested→applied` effort and the
-      independence status; the effort field is omitted when no level is active
+- [ ] Plans that carry a `Reasoning` suggestion record the requested level; the runtime artifacts
+      disclose `requested→applied` effort and the independence status, and omit effort when no
+      level is active
 - [ ] All dependencies mapped
 - [ ] The `## Specialist Agents` outcome is recorded in `00-index.md` (candidate or `None` with evidence)
 - [ ] Every planned item traces to the confirmed scope baseline or a user-kept `SE-*` entry

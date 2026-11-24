@@ -238,7 +238,8 @@ requested and applied values; it never chooses the level.
 
 In thorough mode the three risk categories — Security & compliance, Non-functional gaps,
 Stakeholder conflicts — use `xhigh`; the other nine use `high`. Canonical `max` is explicit-only
-and is never assigned by this protocol. An unavailable level fails open, is recorded as
+(the verified DeepSeek `xhigh→max` mapping is the one exception) and is never assigned by this
+protocol. An unavailable level fails open, is recorded as
 `effort unavailable`, and never blocks a cluster or a gate.
 
 ## Budget and Scheduling

@@ -120,13 +120,16 @@ describe("plan and routing guidance", () => {
       assert.match(content, new RegExp("`" + level + "`"), `must list ${level}`)
     }
     assert.match(content, /explicit[- ]only/i)
+    assert.match(content, /DeepSeek/)
+    assert.match(content, /xhigh→max/)
     assert.doesNotMatch(content, /`low`, `medium`, `high`, or `max`/)
   })
 
   it("adds the effort-disclosure checklist item", () => {
     const content = read("skills/make-plan/quality-checklist.md")
 
-    assert.match(content, /effort/i)
+    assert.match(content, /record the requested level/i)
+    assert.match(content, /runtime artifacts/i)
     assert.match(content, /requested→applied|requested → applied/i)
   })
 
@@ -137,6 +140,8 @@ describe("plan and routing guidance", () => {
     for (const content of [skill, routing]) {
       assert.match(content, /`xhigh`/, "must name the xhigh ceiling")
       assert.match(content, /max guard|never (?:select|default to) `max`/i)
+      assert.match(content, /DeepSeek/)
+      assert.match(content, /xhigh→max/)
       assert.match(content, /optional/i)
       assert.doesNotMatch(content, /suggestion vocabulary is `low`, `medium`, `high`, and `max`/)
     }

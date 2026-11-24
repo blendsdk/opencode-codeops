@@ -60,7 +60,8 @@ Present:
 Model names are implementation choices, not policy names. Default to the current OpenCode model guidance and environment availability. A project override may pin a model, but every role must remain operable without the pin.
 
 Reasoning effort uses the canonical five levels (`low`, `medium`, `high`, `xhigh`, `max`). `xhigh`
-is the ceiling for adversarial or high-risk work; a max guard keeps `max` explicit-only. Runtime
+is the ceiling for adversarial or high-risk work; a max guard keeps `max` explicit-only (the
+verified DeepSeek `xhigh→max` mapping is the one exception). Runtime
 variants win, backed by the small verified provider table and a one-step nearest rule; an
 unmappable level fails open. New generated specialists default to `xhigh` (pre-marker `max` agents
 remain a legacy exception). Model diversity is optional and needs project approval: every workflow
