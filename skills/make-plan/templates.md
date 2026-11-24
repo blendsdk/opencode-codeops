@@ -63,7 +63,8 @@ excerpt at dispatch time — excerpting for a handoff packet is not restatement)
 ## Planning Coverage
 
 > Copied from the plan register after Phase 1C. Omit this section when the run used
-> `--no-coverage-hunt`.
+> `--no-coverage-hunt`; record `**Coverage:** disabled — --no-coverage-hunt` in the overview
+> instead.
 
 > **Coverage**: <completed>/<total> clusters · <examined>/12 categories · <N> candidates · <M> residual limits · Effort: <requested→applied> · Independence: <mixed-model|mixed-effort|uniform-effort>
 > **Freshness**: Coverage as of <date>; artifacts <list>

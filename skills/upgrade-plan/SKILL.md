@@ -63,9 +63,11 @@ Follow [upgrade-checklists.md](upgrade-checklists.md):
 - convert a blocked legacy task to `[!]` with a short visible reason;
 - preserve technical decisions, requirements, criteria, rationale, and notes;
 - update renamed skill/project-guidance references;
-- mark an existing `## Planning Coverage` (or register `## Coverage Map`) stale when the change
-  touches the plan: replace its `> **Freshness**:` line with
-  `> **Freshness**: STALE — plan changed by upgrade-plan on <date>; re-run the coverage hunt.`;
+- mark every existing copy (`00-index.md` `## Planning Coverage` and
+  `00-ambiguity-register.md` `## Coverage Map`) stale when the change touches the plan: replace
+  each `> **Freshness**:` line
+  with `> **Freshness**: STALE — plan changed by upgrade-plan on <date>; re-run the coverage
+  hunt.`;
 - add missing ambiguity, domain, security, verification, and project-tracking sections; and
 - never silently renumber identifiers that external artifacts reference.
 

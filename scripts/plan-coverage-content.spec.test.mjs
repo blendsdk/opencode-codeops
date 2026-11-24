@@ -33,6 +33,30 @@ function read(relativePath) {
 }
 
 /**
+ * Return one heading section, without its heading.
+ *
+ * @param content - Full document
+ * @param prefix - `##` or `###`
+ * @param title - Exact heading text
+ * @returns The section body
+ */
+function headingSection(content, prefix, title) {
+  const lines = content.split("\n")
+  const start = lines.findIndex((line) => line.trim() === `${prefix} ${title}`)
+  assert.notEqual(start, -1, `missing heading: ${prefix} ${title}`)
+  const body = []
+  let fenced = false
+  for (let index = start + 1; index < lines.length; index += 1) {
+    const line = lines[index]
+    if (line.trim().startsWith("```")) fenced = !fenced
+    if (!fenced && line.startsWith("## ")) break
+    if (!fenced && prefix === "###" && line.startsWith("### ")) break
+    body.push(line)
+  }
+  return body.join("\n")
+}
+
+/**
  * Assert that markers appear in increasing order.
  *
  * @param content - Text to search
@@ -75,74 +99,91 @@ describe("placement and defaults", () => {
 
 describe("flags", () => {
   it("parses disable and thorough before the sentinel with exact announcements", () => {
-    const skill = read(SKILL)
+    const options = headingSection(read(SKILL), "##", "Coverage hunt option")
 
-    assert.match(skill, /--no-coverage-hunt/)
-    assert.match(skill, /--thorough/)
-    assert.match(skill, /before the first `--` sentinel/i)
-    assert.match(skill, /Coverage hunt disabled for this run/)
-    assert.match(skill, /Coverage hunt thorough — 12 clusters/)
-    assert.match(skill, /--no-coverage-hunt[\s\S]{0,120}--thorough[\s\S]{0,80}(?:argument error|invalid)/i)
-    assert.match(skill, /more than one[\s\S]{0,120}argument error/i)
+    assert.match(options, /--no-coverage-hunt/)
+    assert.match(options, /--thorough/)
+    assert.equal(
+      (options.match(/before the first\s+`--`\s+sentinel/g) || []).length,
+      2,
+      "both flag paragraphs must parse before the sentinel"
+    )
+    assert.match(options, /Coverage hunt disabled for this run/)
+    assert.match(options, /Coverage hunt thorough — 12 clusters/)
+    assert.match(options, /--no-coverage-hunt` with `--thorough` is an argument error/i)
+    assert.equal(
+      (options.match(/more than one is an argument error/g) || []).length,
+      2,
+      "both flags must reject duplicates"
+    )
+    assert.match(options, /disabled — --no-coverage-hunt/)
   })
 })
 
 describe("dispatch, merge, and register routing", () => {
   it("dispatches the RD-01 clusters in either host mode", () => {
-    const skill = read(SKILL)
+    const phase = headingSection(read(SKILL), "##", "Phase 1A: Coverage Hunt (before Phase 1B and 1C)")
 
-    assert.match(skill, /four (?:default )?(?:RD-01 )?clusters/i)
-    assert.match(skill, /12 (?:single-category )?clusters|twelve single-category clusters/i)
-    assert.match(skill, /parallel/i)
-    assert.match(skill, /sequential/i)
-    assert.match(skill, /identical packets/i)
-    assert.match(skill, /preflight-auditor/)
-    assert.match(skill, /coverage-hunt/)
-    assert.match(skill, /_shared\/coverage-hunt\.md/)
+    assert.match(phase, /four default clusters/i)
+    assert.match(phase, /twelve single-category clusters/i)
+    assert.match(phase, /parallel/i)
+    assert.match(phase, /sequential/i)
+    assert.match(phase, /identical packets/i)
+    assert.match(phase, /preflight-auditor/)
+    assert.match(phase, /coverage-hunt/)
+    assert.match(phase, /_shared\/coverage-hunt\.md/)
   })
 
   it("merges once, caps the batch, and routes candidates by classification", () => {
-    const skill = read(SKILL)
+    const phase = headingSection(read(SKILL), "##", "Phase 1A: Coverage Hunt (before Phase 1B and 1C)")
+    const merge = headingSection(phase, "###", "Merge and filter")
+    const routing = headingSection(phase, "###", "Register routing")
 
-    assert.match(skill, /dedupe[\s\S]{0,80}root cause/i)
-    assert.match(skill, /resolve from evidence|evidence already answers/i)
-    assert.match(skill, /\b12\b[\s\S]{0,80}material candidates/i)
-    assert.match(skill, /every\s+material\s+candidate\s+enters\s+the register/i)
-    assert.match(skill, /one consolidated (?:round|user round)/i)
-    assert.match(skill, /`ambiguity`[\s\S]{0,40}`assumption`|ambiguity and assumption/i)
-    assert.match(skill, /Scope Expansion Register/)
-    assert.match(skill, /Complexity Escalation Gate/)
-    assert.match(skill, /strict mode[\s\S]{0,120}omit|omit[\s\S]{0,80}strict mode/i)
+    assert.match(merge, /dedupe[\s\S]{0,80}root cause/i)
+    assert.match(merge, /resolve from evidence|evidence already answers/i)
+    assert.match(merge, /\b12\b[\s\S]{0,80}material candidates/i)
+    assert.match(merge, /every\s+material\s+candidate\s+enters\s+the register/i)
+    assert.match(merge, /one consolidated (?:round|user round)/i)
+    assert.match(routing, /`ambiguity`[\s\S]{0,40}`assumption`|ambiguity and assumption/i)
+    assert.match(routing, /Scope Expansion Register/)
+    assert.match(routing, /Complexity Escalation Gate/)
+    assert.match(routing, /strict mode[\s\S]{0,120}omit|omit[\s\S]{0,80}strict mode/i)
   })
 
   it("keeps Phase 1C authority and the re-scan rule", () => {
-    const skill = read(SKILL)
+    const phase = headingSection(read(SKILL), "##", "Phase 1A: Coverage Hunt (before Phase 1B and 1C)")
+    const gate = headingSection(phase, "###", "Gate unchanged")
 
-    assert.match(skill, /every row resolved|resolved or explicitly deferred/i)
-    assert.match(skill, /user confirmation|confirmed the complete register/i)
-    assert.match(skill, /does not (?:change|replace|bypass)[\s\S]{0,80}gate|gate[\s\S]{0,80}unchanged/i)
-    assert.match(skill, /affected clusters only|re-run only\s+the\s+affected clusters/i)
+    assert.match(gate, /every row resolved or explicitly deferred/i)
+    assert.match(gate, /user confirmation of the\s+complete register/i)
+    assert.match(gate, /delegated provenance/)
+    assert.match(gate, /does not bypass, replace, or close the gate/i)
+    assert.match(phase, /re-run only\s+the\s+affected clusters/i)
   })
 })
 
 describe("coverage map placement", () => {
   it("writes the register map before 1C and copies it into the index after 1C", () => {
-    const skill = read(SKILL)
+    const phase = headingSection(read(SKILL), "##", "Phase 1A: Coverage Hunt (before Phase 1B and 1C)")
+    const placement = headingSection(phase, "###", "Coverage map placement")
 
-    assert.match(skill, /00-ambiguity-register\.md/)
-    assert.match(skill, /## Coverage Map/)
-    assert.match(skill, /## Planning Coverage/)
-    assert.match(skill, /00-index\.md/)
-    assert.match(skill, /after Phase 1C|after the gate/i)
     assert.match(
-      skill,
+      placement,
+      /Before Phase 1C[\s\S]{0,200}00-ambiguity-register\.md[\s\S]{0,80}## Coverage Map/
+    )
+    assert.match(
+      placement,
+      /After Phase 1C[\s\S]{0,200}00-index\.md[\s\S]{0,80}## Planning Coverage/
+    )
+    assert.match(
+      placement,
       /\| Cluster \| Area \| Examined \| Not examined \/ limit \| Candidates \| Notes \/ limit \| Confidence \|/
     )
-    assert.match(skill, /<completed>\/<total> clusters/)
-    assert.match(skill, /Freshness/)
-    assert.match(skill, /Source note/)
-    assert.match(skill, /CV-\*/)
-    assert.match(skill, /DQ-\*/)
+    assert.match(placement, /<completed>\/<total> clusters/)
+    assert.match(placement, /Freshness/)
+    assert.match(placement, /Source note/)
+    assert.match(placement, /CV-\*/)
+    assert.match(placement, /DQ-\*/)
   })
 
   it("updates the index template and checklist", () => {
@@ -160,7 +201,9 @@ describe("coverage map placement", () => {
   it("marks an existing map stale when upgrade-plan changes the plan", () => {
     const upgrade = read(UPGRADE)
 
-    assert.match(upgrade, /Planning Coverage|coverage map/i)
+    assert.match(upgrade, /every existing copy/i)
+    assert.match(upgrade, /00-index\.md/)
+    assert.match(upgrade, /00-ambiguity-register\.md/)
     assert.match(upgrade, /STALE|stale/)
     assert.match(upgrade, /Freshness|freshness/i)
   })
@@ -168,17 +211,18 @@ describe("coverage map placement", () => {
 
 describe("effort, summary, and compatibility", () => {
   it("announces the effort map and discloses requested to applied", () => {
-    const skill = read(SKILL)
+    const phase = headingSection(read(SKILL), "##", "Phase 1A: Coverage Hunt (before Phase 1B and 1C)")
 
-    assert.match(skill, /C1[\s\S]{0,40}C3[\s\S]{0,80}`?high`?/i)
-    assert.match(skill, /C4[\s\S]{0,40}`?xhigh`?/i)
-    assert.match(skill, /recon[\s\S]{0,60}`?low`?[\s\S]{0,40}`?medium`?/i)
-    assert.match(skill, /synthesis[\s\S]{0,40}`?high`?/i)
-    assert.match(skill, /`max`[\s\S]{0,40}explicit-only|explicit-only[\s\S]{0,40}`max`/i)
-    assert.match(skill, /requested→applied/)
-    assert.match(skill, /Coverage hunt active — 4 clusters/i)
-    assert.match(skill, /Effort:/)
-    assert.match(skill, /Independence:/)
+    assert.match(phase, /C1[\s\S]{0,40}C3[\s\S]{0,80}`?high`?/i)
+    assert.match(phase, /C4[\s\S]{0,40}`?xhigh`?/i)
+    assert.match(phase, /recon[\s\S]{0,60}`?low`?[\s\S]{0,40}`?medium`?/i)
+    assert.match(phase, /synthesis[\s\S]{0,40}`?high`?/i)
+    assert.match(phase, /`max`[\s\S]{0,40}explicit-only|explicit-only[\s\S]{0,40}`max`/i)
+    assert.match(phase, /requested→applied/)
+    assert.match(phase, /Coverage hunt active — 4 clusters, <N> agents/i)
+    assert.match(phase, /Effort:/)
+    assert.match(phase, /Independence:/)
+    assert.match(phase, /RD-03 task-class policy and shared effort contract are canonical/i)
   })
 
   it("keeps the Reasoning suggestion and execution handoff intact", () => {
@@ -188,32 +232,45 @@ describe("effort, summary, and compatibility", () => {
     assert.match(skill, /Reasoning:[\s\S]{0,200}xhigh|Reasoning[\s\S]{0,120}xhigh/i)
     assert.match(skill, /never default to `max`|never default[\s\S]{0,40}max/i)
     assert.match(skill, /exec-plan[\s\S]{0,160}phase suggestion/i)
-    assert.match(templates, /`xhigh`/)
-    assert.match(templates, /`max`/)
+    for (const level of ["low", "medium", "high", "xhigh", "max"]) {
+      assert.match(templates, new RegExp("`" + level + "`"), `templates must list ${level}`)
+    }
   })
 
   it("states the discovery, fallback, metric, preflight, and specialist boundaries", () => {
-    const skill = read(SKILL)
+    const phase = headingSection(read(SKILL), "##", "Phase 1A: Coverage Hunt (before Phase 1B and 1C)")
+    const discovery = headingSection(phase, "###", "Discovery integration")
+    const fallback = headingSection(phase, "###", "Fallback")
+    const metrics = headingSection(phase, "###", "Metrics")
+    const boundaries = headingSection(phase, "###", "Boundaries and summary")
 
-    assert.match(skill, /kind=plan/)
-    assert.match(skill, /artifact=<plan (?:dir|folder)>/)
-    assert.match(skill, /inline fallback/i)
-    assert.match(skill, /incomplete/i)
-    assert.match(skill, /effort unavailable/i)
+    assert.match(discovery, /discovery\.enabled: true/)
+    assert.match(discovery, /three Discovery tools/)
+    assert.match(discovery, /chatMaxQuestions/)
+    assert.match(discovery, /kind=plan/)
+    assert.match(discovery, /artifact=<plan dir>/)
+    assert.match(discovery, /DQ-<n>/)
+    assert.match(discovery, /(?:no new|do not add a) page, endpoint, or\s+question-key scheme/i)
+    assert.match(fallback, /inline fallback/i)
+    assert.match(fallback, /incomplete/i)
+    assert.match(fallback, /effort unavailable/i)
     for (const event of ["completed", "accepted", "fallback", "independence", "effort"]) {
-      assert.match(skill, new RegExp(`coverage_hunt\\.${event}`))
+      assert.match(metrics, new RegExp(`coverage_hunt\\.${event}`))
     }
-    assert.match(skill, /stage=planning/)
-    assert.match(skill, /does not (?:replace|change)[\s\S]{0,80}preflight|preflight[\s\S]{0,80}unchanged/i)
-    assert.match(skill, /specialist[\s\S]{0,120}(?:after|still)/i)
+    assert.match(metrics, /stage=planning/)
+    assert.match(metrics, /no prompt, decision, path, or artifact content/i)
+    assert.match(boundaries, /does not replace or\s+change preflight/i)
+    assert.match(boundaries, /specialist[\s\S]{0,120}still runs/i)
   })
 
   it("keeps the security boundaries", () => {
-    const skill = read(SKILL)
+    const phase = headingSection(read(SKILL), "##", "Phase 1A: Coverage Hunt (before Phase 1B and 1C)")
+    const security = headingSection(phase, "###", "Security")
 
-    assert.match(skill, /prompt[- ]injection/i)
-    assert.match(skill, /canonicaliz/i)
-    assert.match(skill, /no secrets|secrets/i)
-    assert.match(skill, /no shell interpolation|never[\s\S]{0,80}interpolat/i)
+    assert.match(security, /prompt[- ]injection/i)
+    assert.match(security, /canonicaliz/i)
+    assert.match(security, /no secrets/i)
+    assert.match(security, /no shell interpolation|never[\s\S]{0,80}interpolat/i)
+    assert.match(security, /Discovery keeps its\s+existing local-only binding/i)
   })
 })
