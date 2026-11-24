@@ -33,6 +33,28 @@ function read(relativePath) {
 }
 
 /**
+ * Return one level-2 section, without its heading.
+ *
+ * @param content - Full document
+ * @param title - Exact level-2 heading text
+ * @returns The section body, excluding headings inside fenced code
+ */
+function section(content, title) {
+  const lines = content.split("\n")
+  const start = lines.findIndex((line) => line.trim() === `## ${title}`)
+  assert.notEqual(start, -1, `missing section: ${title}`)
+  const body = []
+  let fenced = false
+  for (let index = start + 1; index < lines.length; index += 1) {
+    const line = lines[index]
+    if (line.trim().startsWith("```")) fenced = !fenced
+    if (!fenced && line.startsWith("## ")) break
+    body.push(line)
+  }
+  return body.join("\n")
+}
+
+/**
  * Assert that the markers appear in increasing order.
  *
  * @param content - Text to search
@@ -62,25 +84,33 @@ describe("placement and defaults", () => {
   it("is on by default for full discovery and health checks; add mode is unchanged", () => {
     const skill = read(SKILL)
     const review = read(REVIEW)
+    const options = section(skill, "Coverage hunt option")
 
-    assert.match(skill, /default/i)
-    assert.match(skill, /Full Discovery[\s\S]{0,160}(?:coverage )?hunt/i)
-    assert.match(review, /Health Check[\s\S]{0,300}(?:coverage )?hunt/i)
-    assert.match(review, /add_requirement[\s\S]{0,200}(?:does not run|unchanged|not run)/i)
+    assert.match(options, /hunt is on by default for Full\s+Discovery and Health Check/i)
+    assert.match(options, /add_requirement`? does not run it/i)
+    assert.match(
+      review,
+      /Health Check runs the coverage hunt by\s+default|runs the coverage hunt by\s+default/i
+    )
+    const add = review.slice(
+      review.indexOf("## add_requirement Protocol"),
+      review.indexOf("## review_requirements Protocol")
+    )
+    assert.match(add, /does not run the coverage hunt/i)
   })
 })
 
 describe("flags", () => {
   it("parses the disable and thorough flags before the sentinel", () => {
-    const skill = read(SKILL)
+    const options = section(read(SKILL), "Coverage hunt option")
 
-    assert.match(skill, /--no-coverage-hunt/)
-    assert.match(skill, /--thorough/)
-    assert.match(skill, /before the first `--` sentinel/i)
-    assert.match(skill, /Coverage hunt disabled for this run/)
-    assert.match(skill, /Coverage hunt thorough — 12 clusters/)
-    assert.match(skill, /--no-coverage-hunt[\s\S]{0,200}--thorough[\s\S]{0,80}argument error|--no-coverage-hunt[\s\S]{0,80}--thorough[\s\S]{0,80}invalid/i)
-    assert.match(skill, /more than one[\s\S]{0,120}argument error/i)
+    assert.match(options, /--no-coverage-hunt/)
+    assert.match(options, /--thorough/)
+    assert.match(options, /before the first `--`\s+sentinel/i)
+    assert.match(options, /Coverage hunt disabled for this run/)
+    assert.match(options, /Coverage hunt thorough — 12 clusters/)
+    assert.match(options, /--no-coverage-hunt` with `--thorough` is an argument error/i)
+    assert.match(options, /more than one is an argument error/i)
   })
 
   it("parses Discovery and scope flags and lists the supported workflow", () => {
@@ -171,10 +201,11 @@ describe("health check", () => {
     assert.match(review, /review_requirements/)
     assert.match(review, /### Coverage/)
     assert.match(review, /diagnostic/i)
-    assert.match(review, /does not add open (?:register )?rows/i)
-    assert.match(review, /reopen(?:s)? the gate/i)
-    assert.match(review, /asks? (?:you )?to act|user asks to act/i)
-    assert.match(review, /writes? the (?:consolidated )?map|write the consolidated map/i)
+    assert.match(
+      review,
+      /does not add open\s+(?:register )?rows or reopen the gate unless the user asks to act/i
+    )
+    assert.match(review, /after presenting the report, write the consolidated coverage map/i)
   })
 })
 
@@ -190,32 +221,38 @@ describe("effort and summary disclosure", () => {
     assert.match(skill, /requested→applied/)
     assert.match(skill, /Effort:/)
     assert.match(skill, /Independence:/)
-    assert.match(skill, /Coverage hunt active — 4 clusters/i)
+    assert.match(skill, /Coverage hunt active — 4 clusters, <N> agents/i)
+    assert.match(skill, /Fallback: inline/)
   })
 })
 
 describe("fallback, metrics, and security", () => {
   it("states the fallback and content-free metric rules", () => {
     const skill = read(SKILL)
+    const phase = section(skill, "Phase 2A: Coverage Hunt (before the gate)")
 
-    assert.match(skill, /inline fallback/i)
-    assert.match(skill, /incomplete/i)
-    assert.match(skill, /effort unavailable/i)
-    assert.match(skill, /raw `reasoningEffort`|raw reasoningEffort/i)
+    assert.match(phase, /inline fallback/i)
+    assert.match(phase, /incomplete/i)
+    assert.match(phase, /effort unavailable/i)
+    assert.match(phase, /raw `reasoningEffort`|raw reasoningEffort/i)
     for (const event of ["completed", "accepted", "fallback", "independence", "effort"]) {
-      assert.match(skill, new RegExp(`coverage_hunt\\.${event}`))
+      assert.match(phase, new RegExp(`coverage_hunt\\.${event}`))
     }
-    assert.match(skill, /stage=requirements/)
-    assert.match(skill, /no (?:prompt|content)|never .*prompt/i)
+    assert.match(phase, /stage=requirements/)
+    assert.match(phase, /no (?:prompt|content)|never .*prompt/i)
   })
 
   it("references the injection and path rules without duplicating them", () => {
     const skill = read(SKILL)
+    const phase = section(skill, "Phase 2A: Coverage Hunt (before the gate)")
+    const security = phase.slice(phase.indexOf("### Security"), phase.indexOf("### Metrics"))
 
-    assert.match(skill, /prompt[- ]injection/i)
-    assert.match(skill, /path canonicaliz|canonicaliz/i)
-    assert.match(skill, /no shell interpolation|never[\s\S]{0,80}interpolat/i)
-    assert.match(skill, /no secrets|secrets/i)
+    assert.match(security, /prompt[- ]injection/i)
+    assert.match(security, /canonicaliz/i)
+    assert.match(security, /no shell interpolation|never[\s\S]{0,80}interpolat/i)
+    assert.match(security, /no secrets|secrets/i)
+    assert.match(security, /preflight-auditor/)
+    assert.doesNotMatch(skill, /coverage-auditor template/)
   })
 })
 

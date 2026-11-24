@@ -57,11 +57,7 @@ default. It produces a diagnostic report — it does NOT modify the RDs unless t
    - **Scope creep** — "Should Have" items that should be "Won't Have".
    - **Orphans** — features mentioned but not owned by any RD.
    - **Traceability** — decisions in RDs back-reference AR # entries; the register exists and is fully resolved.
-3. Write the consolidated coverage map to `requirements/00-ambiguity-register.md` under a
-   `## Coverage Map` heading, after the register table and before the resolution notes. The map is
-   diagnostic evidence; it does not add open register rows or reopen the gate unless the user asks
-   to act on a finding.
-4. Produce a diagnostic report:
+3. Produce a diagnostic report from this template:
 
 ```markdown
 ## Requirements Health Check: [Project Name]
@@ -96,8 +92,14 @@ default. It produces a diagnostic report — it does NOT modify the RDs unless t
 **Complexity candidates:** routed to the Complexity Escalation Gate
 ```
 
+4. After presenting the report, write the consolidated coverage map to
+   `requirements/00-ambiguity-register.md` under a `## Coverage Map` heading, after the register
+   table and before the resolution notes. The map is diagnostic evidence; it does not add open
+   register rows or reopen the gate unless the user asks to act on a finding.
+
 The health check is diagnostic: it writes the map and reports candidates, but it does not add open
-register rows or rewrite RDs. After presenting the report, offer to fix the issues found — e.g. via
+register rows or reopen the gate unless the user asks to act on a finding. It never rewrites RDs
+without a fix instruction. After presenting the report, offer to fix the issues found — e.g. via
 add_requirement for missing coverage, or by revising specific RDs (each revision that introduces a
 new decision must go through the Zero-Ambiguity Gate). When the user asks to act on a material
 candidate, add it as an open register row and reopen the gate until it is resolved or explicitly

@@ -165,6 +165,9 @@ operate inside an accepted addition only after `Keep` is recorded.
 
 ## Workflow bindings
 
+- **make-requirements:** run the coverage hunt only after the scope baseline is confirmed. Optional
+  candidates keep their `CV-*` identity, are routed to the Scope Expansion Register in exploration
+  mode, and are omitted in strict scope.
 - **make-plan:** trace every planned item to the original scope baseline or a kept `SE-*` entry.
   Optional ideas are silent in strict scope and register proposals in exploration mode before any
   plan artifact promotes them.

@@ -174,7 +174,7 @@ describe("content-free validation", () => {
         "--data",
         JSON.stringify(data),
       ])
-      assert.notEqual(result.status, 0, `must reject ${JSON.stringify(data)}`)
+      assert.equal(result.status, 2, `must reject ${JSON.stringify(data)}`)
     }
   })
 
@@ -182,8 +182,11 @@ describe("content-free validation", () => {
     const fixture = makeFixture()
     const bad = [
       ["coverage_hunt.independence", { status: "same-model" }],
+      ["coverage_hunt.independence", { status: ["mixed-model"] }],
       ["coverage_hunt.effort", { mapping: "guess" }],
+      ["coverage_hunt.effort", { requested: {} }],
       ["coverage_hunt.fallback", { reason: "because" }],
+      ["coverage_hunt.fallback", { reason: "none" }],
     ]
     for (const [event, data] of bad) {
       const result = emit(fixture, [
@@ -196,5 +199,34 @@ describe("content-free validation", () => {
       ])
       assert.equal(result.status, 2, `${event}: ${result.stderr}`)
     }
+  })
+
+  it("rejects fields owned by another event", () => {
+    const fixture = makeFixture()
+    const result = emit(fixture, [
+      "--event",
+      "coverage_hunt.completed",
+      "--stage",
+      "requirements",
+      "--data",
+      JSON.stringify({ status: "mixed-model" }),
+    ])
+
+    assert.equal(result.status, 2)
+    assert.match(result.stderr, /not allowed/i)
+  })
+
+  it("allows none only as the effort fallback reason", () => {
+    const fixture = makeFixture()
+    const result = emit(fixture, [
+      "--event",
+      "coverage_hunt.effort",
+      "--stage",
+      "planning",
+      "--data",
+      JSON.stringify({ requested: "xhigh", applied: "unavailable", mapping: "fail-open", fallback_reason: "none" }),
+    ])
+
+    assert.equal(result.status, 0, result.stderr)
   })
 })

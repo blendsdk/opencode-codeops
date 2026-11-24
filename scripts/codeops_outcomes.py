@@ -34,29 +34,58 @@ COVERAGE_EVENTS = {
 COVERAGE_STAGES = {"requirements", "planning"}
 COVERAGE_LEVELS = {"low", "medium", "high", "xhigh", "max"}
 COVERAGE_MAPPINGS = {"exact", "alias", "nearest", "fail-open"}
-COVERAGE_REASONS = {
-    "subagents-unavailable", "dispatch-failed", "model-unavailable", "none",
+COVERAGE_FALLBACK_REASONS = {
+    "subagents-unavailable", "dispatch-failed", "model-unavailable",
 }
+COVERAGE_EFFORT_FALLBACK_REASONS = COVERAGE_FALLBACK_REASONS | {"none"}
 COVERAGE_STATUSES = {"mixed-model", "mixed-effort", "uniform-effort"}
 PROVIDER_BOUNDARIES = {"same-provider", "cross-provider"}
 COUNT_FIELDS = {
     "clusters", "candidates", "limits", "material", "accepted", "optional", "complexity",
 }
 
+#: Each coverage-hunt event owns a fixed set of content-free fields. A field
+#: from another event is rejected so the payload cannot drift into a generic
+#: key-value store.
+EVENT_FIELDS = {
+    "coverage_hunt.completed": {"clusters", "candidates", "limits"},
+    "coverage_hunt.accepted": {"material", "accepted", "optional", "complexity"},
+    "coverage_hunt.fallback": {"reason"},
+    "coverage_hunt.independence": {"status", "provider_boundary"},
+    "coverage_hunt.effort": {"requested", "applied", "mapping", "fallback_reason"},
+}
 
-def validate_coverage_data(raw: str) -> dict[str, int | str]:
-    """Validate a coverage-hunt payload against the content-free allowlist.
+
+def _require_vocabulary(key: str, item: Any, allowed: set[str]) -> None:
+    """Reject a value outside an event's fixed string vocabulary.
 
     Args:
+        key: Field name used in the error message.
+        item: Candidate value; non-strings are rejected before membership so
+            a JSON array or object cannot crash set membership.
+        allowed: Accepted string values.
+
+    Raises:
+        ValueError: When the value is not an allowed string.
+    """
+    if not isinstance(item, str) or item not in allowed:
+        raise ValueError(f"data field {key!r} is outside its fixed vocabulary.")
+
+
+def validate_coverage_data(event: str, raw: str) -> dict[str, int | str]:
+    """Validate a coverage-hunt payload against the per-event allowlist.
+
+    Args:
+        event: Coverage-hunt event name.
         raw: JSON object supplied through `--data`.
 
     Returns:
         The validated object.
 
     Raises:
-        ValueError: When the payload is not an object, names an unknown field,
-            carries a non-scalar or negative count, or uses a value outside
-            its fixed vocabulary.
+        ValueError: When the payload is not an object, names a field that the
+            event does not own, carries a non-scalar or negative count, or
+            uses a value outside its fixed vocabulary.
     """
     try:
         value = json.loads(raw)
@@ -65,29 +94,28 @@ def validate_coverage_data(raw: str) -> dict[str, int | str]:
     if not isinstance(value, dict):
         raise ValueError("--data must be a JSON object.")
 
+    allowed_fields = EVENT_FIELDS[event]
     validated: dict[str, int | str] = {}
     for key, item in value.items():
+        if key not in allowed_fields:
+            raise ValueError(f"data field {key!r} is not allowed for {event}.")
         if key in COUNT_FIELDS:
             if isinstance(item, bool) or not isinstance(item, int) or item < 0:
                 raise ValueError(f"data field {key!r} must be a non-negative integer.")
         elif key == "status":
-            if item not in COVERAGE_STATUSES:
-                raise ValueError("data field 'status' is outside its fixed vocabulary.")
+            _require_vocabulary(key, item, COVERAGE_STATUSES)
         elif key == "provider_boundary":
-            if item not in PROVIDER_BOUNDARIES:
-                raise ValueError("data field 'provider_boundary' is outside its fixed vocabulary.")
+            _require_vocabulary(key, item, PROVIDER_BOUNDARIES)
         elif key == "mapping":
-            if item not in COVERAGE_MAPPINGS:
-                raise ValueError("data field 'mapping' is outside its fixed vocabulary.")
-        elif key in {"requested", "applied"}:
-            allowed = COVERAGE_LEVELS | ({"unavailable"} if key == "applied" else set())
-            if item not in allowed:
-                raise ValueError(f"data field {key!r} is outside its fixed vocabulary.")
-        elif key in {"reason", "fallback_reason"}:
-            if item not in COVERAGE_REASONS:
-                raise ValueError(f"data field {key!r} is outside its fixed vocabulary.")
-        else:
-            raise ValueError(f"data field {key!r} is not allowed.")
+            _require_vocabulary(key, item, COVERAGE_MAPPINGS)
+        elif key == "requested":
+            _require_vocabulary(key, item, COVERAGE_LEVELS)
+        elif key == "applied":
+            _require_vocabulary(key, item, COVERAGE_LEVELS | {"unavailable"})
+        elif key == "reason":
+            _require_vocabulary(key, item, COVERAGE_FALLBACK_REASONS)
+        elif key == "fallback_reason":
+            _require_vocabulary(key, item, COVERAGE_EFFORT_FALLBACK_REASONS)
         validated[key] = item
     return validated
 
@@ -140,7 +168,7 @@ def emit(args: argparse.Namespace) -> int:
             print("--data is only accepted for coverage-hunt events.", file=sys.stderr)
             return 2
         try:
-            data = validate_coverage_data(args.data)
+            data = validate_coverage_data(args.event, args.data)
         except ValueError as exc:
             print(f"Invalid coverage-hunt data: {exc}", file=sys.stderr)
             return 2

@@ -13,6 +13,10 @@ All notable changes to CodeOps are recorded here.
 - effort: disclose requested→applied effort and independence in preflight reports and exec-plan
   summaries
 - specialists: default new generated agents to `xhigh` with a post-frontmatter format marker
+- coverage-hunt: add the shared protocol, the coverage-auditor mode, and the requirements/plan
+  integrations
+- coverage-hunt: add `--no-coverage-hunt` and `--thorough` to `make-requirements` and `make-plan`
+- metrics: record five content-free coverage-hunt events at the requirements and planning stages
 
 ### Changes
 
@@ -22,6 +26,8 @@ All notable changes to CodeOps are recorded here.
 - effort: remove the raw `reasoningEffort` passthrough when a model exposes no usable variants
 - preflight: `--thorough` recommends a uniform `xhigh`, not `max`
 - specialists: accept pre-marker `max` agents as `LEGACY`; a versioned `max` agent is `STALE`
+- coverage-hunt: mark existing coverage maps stale after `add_requirement` or `upgrade-plan`;
+  `add_requirement` itself does not run the hunt
 
 ## 2.6.0 — 2026-11-12
 
