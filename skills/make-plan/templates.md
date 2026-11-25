@@ -483,6 +483,7 @@ task-size criteria in [quality-checklist.md](quality-checklist.md))
 > **Phase baseline tree**: _(recorded by the exec-plan skill from a temporary-index snapshot of
 > committed, staged, unstaged, and untracked phase-start state)_
 > **Review**: _(recorded by the exec-plan skill: `reviewed <YYYY-MM-DD HH:MM>` or `carried forward`)_
+> **Verification balance**: _(recorded by the exec-plan skill: `<T> test / <P> product lines (<R>:1)`)_
 > **Lenses**: [add-on lenses — include this line only when the target repo carries a quality
 > profile; informational: activation stays profile-driven]
 > **Reasoning**: [advisory level — `low`, `medium`, `high`, `xhigh`, or `max`, with a one-line

@@ -19,3 +19,5 @@
 | RV-005 | 3 | MINOR | skills/exec-plan/SKILL.md | deferred |
 | SR-001 | 3 | MINOR | agent-templates/phase-reviewer.md | fixed |
 | RV-006 | 3 | MINOR | plans/right-sized-verification/03-02-review-calibration.md | fixed |
+| RV-001 | 4 | MINOR | skills/exec-plan/execution-protocol.md | fixed |
+| RV-002 | 4 | MINOR | skills/exec-plan/execution-protocol.md | fixed |

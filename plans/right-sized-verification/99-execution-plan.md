@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-25 00:43
-> **Progress**: 18/31 tasks (58%)
+> **Last Updated**: 2026-11-25 02:56
+> **Progress**: 21/31 tasks (68%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -140,7 +140,9 @@ the property (PF-030).
 
 ## Phase 4: Verification balance
 
-> **Phase baseline tree**: _(recorded by exec-plan)_
+> **Phase baseline tree**: 34b84043bcb9222dd371e900cd79e8a405d8412d
+> **Verification balance**: 0 test / 22 product lines (0.0:1)
+> **Review**: reviewed 2026-11-25 02:56 — correctness review; RV-001..RV-002 (minor) fixed (05-findings.md)
 > **Reasoning**: medium — documented counting rule, no code
 
 ### Step 4.1: Report-only balance line
@@ -148,12 +150,12 @@ the property (PF-030).
 **Reference**: 03-03 · AR-5, AR-16, AR-17, AR-30
 **Objective**: Every phase states its test-to-product balance.
 
-- [ ] 4.1.1 `skills/exec-plan/execution-protocol.md` post-phase step 1: classification, counts, balance line (03-03 §File classification, §Counts, §Output, §Error Handling)
-- [ ] 4.1.2 `skills/make-plan/templates.md`: `> **Verification balance**:` in the 99 phase header (03-03 §Text changes)
-- [ ] 4.1.3 Green check: `node --test --test-name-pattern "^ST-1[56]\b" scripts/right-sized-verification-content.spec.test.mjs` passes
+- [x] 4.1.1 `skills/exec-plan/execution-protocol.md` post-phase step 1: classification, counts, balance line (03-03 §File classification, §Counts, §Output, §Error Handling) ✅ (completed: 2026-11-25 00:44)
+- [x] 4.1.2 `skills/make-plan/templates.md`: `> **Verification balance**:` in the 99 phase header (03-03 §Text changes) ✅ (completed: 2026-11-25 00:45)
+- [x] 4.1.3 Green check: `node --test --test-name-pattern "^ST-1[56]\b" scripts/right-sized-verification-content.spec.test.mjs` passes ✅ (completed: 2026-11-25 00:45)
 
 **Deliverables**:
-- [ ] ST-15..ST-16 green
+- [x] ST-15..ST-16 green
 
 **Task verify**: `node --test --test-name-pattern "^ST-([1-9]|1[0-6])\b" scripts/right-sized-verification-content.spec.test.mjs` (this and earlier phases' ST cases, all green) and `node bin/codeops-test.mjs run --gate task --baseline HEAD`, whose only allowed failures are the expected-red ST cases named on the gate line and, until Phase 5, `plugin/compaction-note.spec.test.mjs` as a whole file (its import fails at file level)
 **Verify (gate)**: `npm run verify` — expected red: ST-17..ST-24 only

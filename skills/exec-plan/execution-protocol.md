@@ -185,11 +185,31 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
    the time the plan's verification tier sets. Adaptive mode may explicitly disable independent
    review; announce that choice. Trivial tasks are never reviewed. A docs-only diff →
    phase-reviewer only, and the auditor skip is logged — never silent.
+   - **Verification balance (report-only).** Classify every file in the phase's review diff (the
+     snapshot diff in step 2) and count its lines:
+
+     | Class | Paths |
+     |---|---|
+     | Test | `*.test.*`, `*.spec.*`, `*_test.*`, `test_*.*`, `*Test.*`, `*_spec.*`; any path with a `test/`, `tests/`, `__tests__/`, `spec/`, or `fixtures/` segment; files matched by a test map's test globs |
+     | Excluded | CodeOps artifacts under `plans/`, `requirements/`, and `codeops/`; lockfiles (`*.lock`, `package-lock.json`, `pnpm-lock.yaml`, `yarn.lock`); generated `dist/` and `build/` directories |
+     | Product | Every other changed file — Markdown counts as product |
+
+     Record `> **Verification balance**: <T> test / <P> product lines (<R>:1)` in the phase header
+     and in the phase summary, where T and P are added lines and R = T / P with one decimal (`n/a`
+     when P is 0). At the `standard` tier, append ` ⚠️ above 1.5:1` when R is above 1.5. The
+     balance never blocks, never asks, and never changes a gate result. When the diff is
+     unavailable, record `> **Verification balance**: unavailable — <reason>` and review the phase
+     now. This command counts the file conventions above (add a test map's globs by judgment):
+
+     ```bash
+     python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_worktree_snapshot.py" diff --root . \
+       --baseline <phase-baseline-tree> | awk '/^diff --git /{f=$0; sub(/^diff --git "?a\/.* "?b\//,"",f); sub(/"$/,"",f); h=1; c=(f~/^(plans|requirements|codeops)\//||f~/(^|\/)(dist|build)\//||f~/(\.lock|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$/)?"x":((f~/(^|\/)(test|tests|__tests__|spec|fixtures)\//||f~/(\.test\.|\.spec\.|_test\.|_spec\.|Test\.)/||f~/(^|\/)test_/)?"t":"p"); next} h&&/^(\+\+\+|---) /{next} /^@@/{h=0} /^\+/{a[c]++} /^-/{d[c]++} END{printf "test=%d product=%d changed=%d\n", a["t"], a["p"], a["p"]+d["p"]}'
+     ```
    - Read the tier from the `> **Verification tier**:` line in `00-index.md`. A plan with no tier
      line, or with an unknown value, is `critical`; say so once in the run summary.
    - `critical`: review the phase now.
    - `standard`: review the phase now when it is risk-tagged or changes 150 or more product lines
-     (added + deleted lines, classified as in the verification balance below). Otherwise write
+     (the `changed` count above: added + deleted product lines). Otherwise write
      `> **Review**: carried forward` in its phase header and skip steps 2–6 for this phase.
 2. **Dispatch in parallel:** the correctness reviewer, every risk-selected auditor (security,
    financial integrity, concurrency, performance, semantics, or migration), and any specialist
