@@ -2,7 +2,7 @@
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
 > **Progress**: 0/37 tasks (0%)
-> **Last Updated**: 2026-11-25 13:31
+> **Last Updated**: 2026-11-25 22:56
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -23,7 +23,7 @@ real sessions.
 | Median context per primary step (exec-plan) | 356k (p90 649k) | ≤ 150k |
 | Bookkeeping steps in exec-plan (edits to CodeOps artifacts + `date` + progress-bar + `mark` calls) | 29% of edits are artifacts; `date` ~5% of shell calls | ≥ 70% of the Phase 0 bookkeeping share removed |
 | Plan documents (M) | 9–15 files, 50–260 KB | 1 file, ≤ 20 KB |
-| Verification share of tasks (M, leading-verb classifier) | re-measured in 0.1.8 | ≤ 25% |
+| Verification share of tasks (M, leading-verb classifier) | 44–47% (0.1.6 arms); 57% original plan | ≤ 25% |
 | Test : product lines per phase | 1.6:1 repo-wide | ≤ 1:1 |
 | Review rounds per standard plan (dispatches reported separately) | one per phase + re-reviews + refute | 1 end round + ≤ 1 refute |
 
@@ -103,6 +103,7 @@ Findings that shape the levers:
 | D-10 | ~~Nested dispatch via `experimental.subagent_depth: 2`~~ — superseded: the smoke showed child sessions have no subagent tool at all, so arms run as root sessions (D-9) and no config change is needed | User, 2026-11-25 |
 | D-11 | Arm runtime: arms read SKILL and `_shared` files by path from a checkout of the ref under test and run `${CODEOPS_PLUGIN_ROOT}` commands against that checkout; reviewer/executor roles run as generic subagents with the ref's template text in the packet; plugin hooks stay at the installed version as a controlled constant | User, 2026-11-25 |
 | D-12 | Release as MAJOR (3.0.0); contract-changing commits carry a `BREAKING CHANGE:` footer | User, 2026-11-25 |
+| D-13 | Arm isolation is enforced by the OS: bubblewrap sandbox, private standalone OpenCode with no session history, CodeOps plugin off for every arm with the ref's standards loaded through `instructions` (revises D-11's "plugin hooks stay at the installed version"), network limited to the model API plus an npm mirror that refuses CodeOps, automatic per-arm audit; the harness is committed under `scripts/bench/harness/` | User, 2026-11-25 |
 
 ## Measurement method
 
@@ -168,9 +169,9 @@ only counts and classes):
 - [x] 0.1.3 Add `"!scripts/bench/"` to `package.json` `files`; write `scripts/bench/README.md` (kit usage and the arm protocol) ✅ (completed: 2026-11-25 12:53; `npm pack --dry-run` lists no bench file)
 - [x] 0.1.4 Smoke arm (D-9): one headless `opencode run` root session in a throwaway worktree dispatches one reviewer subagent and reads a skill by path from a ref checkout; `bench.py sessions --root` shows the child session and the main checkout's `git status` is unchanged ✅ (completed: 2026-11-25 12:54; `ses_ded71fc75ffe3iujkpVyMlKMXn`, 35 s: skill read by path from the ref, 1 child session, 1 review dispatch detected, main checkout unchanged; headless default model is `opencode/tidepool-alpha-free`, so arms pass `-m` explicitly)
 - [x] 0.1.5 Calibrate: `bench.py sessions --root` on the three §Evidence references reproduces fresh, cached, and message counts within 1% ✅ (completed: 2026-11-25 12:53; exact match on all three (fresh, cached, messages, subagent sessions) once compaction spend is counted)
-- [ ] 0.1.6 Pin the baseline ref (current main SHA, recorded in §Results); baseline arms: M ×2 (make-plan, preflight, exec-plan sessions) and S ×3 (exec-plan); record metrics, the noise band, and the exec-plan bookkeeping step share
-- [ ] 0.1.7 Optional reference arm: M ×1 on `v2.8.1` (attributes Wave 1; no gate)
-- [ ] 0.1.8 `bench.py plans` on H, M, S originals and `bench.py instructions` on the baseline ref; record in §Results; end-of-phase review
+- [x] 0.1.6 Pin the baseline ref (current main SHA, recorded in §Results); baseline arms: M ×2 (make-plan, preflight, exec-plan sessions) and S ×3 (exec-plan); record metrics, the noise band, and the exec-plan bookkeeping step share ✅ (completed: 2026-11-25 22:56; baseline in §Results; 5 valid sandboxed arms)
+- [x] 0.1.7 Optional reference arm: M ×1 on `v2.8.1` (attributes Wave 1; no gate) ✅ (completed: 2026-11-25 22:56; skipped by design — optional, no gate; attributing Wave 1 does not change any decision here)
+- [~] 0.1.8 `bench.py plans` on H, M, S originals and `bench.py instructions` on the baseline ref; record in §Results; end-of-phase review ⏳ (implemented: 2026-11-25 22:56; static baselines in §Results; end-of-phase review pending)
 
 **Verify**: `npm run verify`
 
@@ -230,20 +231,59 @@ only counts and classes):
 
 ## Results
 
-_Filled by each measurement task. One row per arm run._
-
 **Baseline ref:** `7509f22d725f71281bfb55f1077d1ee657da8fd2` (main after Wave 1 and the kit).
 **Arm model:** `deepseek/deepseek-flash#max` (the user's working model; ~89k of their messages in
-the 60 days before 2026-11-25). **Harness:** packets and runner outside the repository
-(`$TMPDIR/bench-lean/`); M arms pin `quality.verificationTier: standard`; acceptance = the
-subject's original spec files copied over the arm's own, plus the subject's `npm run verify`.
-A first S run read the finished implementation from a full-checkout ref and is discarded; arms now
-use a process-only ref, a standalone shallow subject, and out-of-reach outputs (bench README §Arm
-protocol), and every arm's tool inputs are audited for out-of-scope paths.
+the 60 days before 2026-11-25). **Harness:** `scripts/bench/harness/` (bench README §Arm protocol):
+process-only ref, standalone shallow subject, bubblewrap sandbox with a private OpenCode and no
+CodeOps plugin, network limited to the model API plus an npm mirror that refuses CodeOps; M arms pin
+`quality.verificationTier: standard`; acceptance = the subject's original spec files copied over
+the arm's own, plus the subject's `npm run verify`.
 
-| Phase | Subject | Run | Ref SHA | Workflow | Model | Fresh | Cached | Primary steps | Median ctx/step | Bookkeeping steps | Docs / KB | Verification share | Test:product | Review rounds / dispatches | Instruction tok | Assumptions | Tests pass |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| 0 | S | 1 | `7509f22` | exec-plan | deepseek-flash#max | 215,826 | 10,515,200 | 90 | 118,141 | 26 of 104 calls | 1 / 3.4 | 67% (2/3) | — | 1 / 1 | — | 2 | 36/36, verify ✅ |
+**Discarded runs (kept under `discarded/` in the output store, never compared):** six arms whose
+agents reached the original answers before the isolation was complete — one through a
+full-checkout ref, two through this repository's history from subagents that never saw the
+prompt rules, one through a global npm install and the npm registry — plus the first unsandboxed
+set, rerun under identical conditions. All five valid baselines below have clean audits.
+
+### Phase 0 baseline (valid arms)
+
+| Arm | Workflow | Min | Fresh | Cached | Primary steps | Median ctx/step | Tool calls | Bookkeeping calls | Subagents | Review rounds / dispatches | Cost |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| S1 | exec-plan | 12 | 289,994 | 10,079,744 | 69 | 131,556 | 119 | 32 (27%) | 1 | 1 / 1 | — |
+| S2 | exec-plan | 11 | 250,694 | 10,149,632 | 82 | 122,057 | 126 | 37 (29%) | 1 | 1 / 1 | — |
+| S3 | exec-plan | 12 | 269,667 | 8,004,224 | 56 | 112,306 | 96 | 31 (32%) | 1 | 1 / 1 | — |
+| M1 | make-plan + preflight | 64 | 2,995,363 | 139,973,248 | — | — | — | — | — | — | — |
+| M1 | exec-plan | 40 | 856,487 | 50,215,552 | — | — | — | — | — | — | — |
+| M2 | make-plan + preflight | 48 | 2,692,057 | 162,783,104 | — | — | — | — | — | — | — |
+| M2 | exec-plan | 53 | 965,561 | 62,615,680 | — | — | — | — | — | — | — |
+
+Medians per workflow (spread = (max − min) / median across repeats):
+
+| Workflow | n | Min | Fresh | Cached | Primary steps | Median ctx/step | Bookkeeping share of calls | Review rounds / dispatches |
+|---|---|---|---|---|---|---|---|---|
+| S exec-plan | 3 | 11.9 (12%) | 269,667 (15%) | 10,079,744 (21%) | 69 (38%) | 122,057 (16%) | 29% (18%) | 1 / 1 |
+| M make-plan | 2 | 19.3 (12%) | 1,140,138 (8%) | 63,517,632 (37%) | 180 (53%) | 260,065 (10%) | 35% (7%) | 0 / 0 |
+| M preflight | 2 | 36.6 (36%) | 1,703,572 (12%) | 87,860,544 (1%) | 197 (8%) | 299,349 (4%) | 17% (98%) | 0.5 / 2.5 |
+| M exec-plan | 2 | 46.5 (28%) | 911,024 (12%) | 56,415,616 (22%) | 212 (13%) | 205,102 (6%) | 40% (7%) | 3 / 3 |
+
+| Quality and shape | M1 | M2 | S1–S3 |
+|---|---|---|---|
+| Acceptance (original specs) | 16/16, verify ✅ | 15/16 (ST-7 edge case), own verify ✅ | 36/36, verify ✅ (each) |
+| Plan documents / KB | 11 / 155.8 | 11 / 154.0 | 1 / ~3 |
+| Tasks / verification share | 15 / 47% | 18 / 44% | 3 / 67% |
+| Spec cases / decisions | 17 / — | 15 / 34 | — |
+| Assumptions logged | 32 | 16 | 2 each |
+| Total cost (planning + execution) | $2.02 | $2.08 | — |
+
+**Static baselines (0.1.8).** Original plans: H 15 docs / 254 KB / 86 tasks / 48% verification;
+M 10 / 119 KB / 14 / 57%; S 1 / 1.8 KB / 6 / 33%. Instruction footprint at the baseline ref
+(always-read, approx tokens): make-plan 44.4k, make-requirements 30.9k, preflight 33.6k,
+exec-plan 36.2k.
+
+**What the baseline says.** Planning (make-plan + preflight) is ~75% of an M feature's tokens
+(~2.8M fresh / ~150M cached vs ~0.9M / ~56M to execute). Bookkeeping is 29% (S) to 40% (M) of
+exec-plan tool calls — the lever B gate (≥ 70% of it removed) is therefore ≤ 9% (S) and ≤ 12% (M).
+Decision band per metric = max(10%, the spread above).
 
 ## Risks and rollback
 

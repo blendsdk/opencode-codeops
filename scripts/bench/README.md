@@ -46,39 +46,44 @@ OpenCode stores a message's tool calls either in the message's `content` list or
 ## Arm protocol (A/B runs)
 
 An *arm* is one workflow run (make-plan, preflight, or exec-plan) on a fixed subject, following the
-CodeOps skill text at a fixed ref. Subagent sessions cannot dispatch subagents, so every arm is a
-**headless root session**.
+CodeOps skill text at a fixed ref. The subjects are past features of this repository, and agents
+asked to rebuild existing code go looking for it — in other checkouts, git history, installed
+packages, the npm registry, GitHub, and web search. Prompt rules do not reach the subagents an arm
+dispatches, so isolation is enforced by the OS, not by instructions.
 
-1. **Process-only ref.** Build the CodeOps ref under test as a copy of `skills/`, `_shared/`,
-   `agent-templates/`, `standards/`, `references/`, `schemas/`, and the process scripts only —
-   never product code. The subjects are past features of this repository, so a full checkout
-   holds their answers. Python tools become stubs that run compiled bytecode kept outside the ref,
-   so arms can run them but not read them; text that documents a subject's deliverable is
-   removed, and the build fails if any subject answer remains. The arm reads
-   `skills/<name>/SKILL.md` and `_shared/` **by path** (never through the skill tool) and
-   substitutes `${CODEOPS_PLUGIN_ROOT}` with the ref path. Reviewer and executor roles run as
-   generic subagents whose packet carries the ref's `agent-templates/` text. Plugin hooks stay at
-   the installed version for every arm.
-2. **Standalone subject.** `git init` plus a shallow fetch of the subject's base commit from this
-   repository (`--depth 30`), then delete `FETCH_HEAD`: no later commit or object is reachable.
-   Run the install step (`npm ci`) before the arm starts — it is not measured. Post-Wave-1 arms
-   pin `quality.verificationTier: standard` in the subject's `codeops/codeops.json`.
-   **Outputs** (logs, diffs, results, acceptance specs, runner) live outside every path an arm is
-   given, so later arms cannot read earlier answers; the arm prompt forbids reading anything
-   outside the ref, its input packet, and its subject, and each arm's tool inputs are audited
-   for out-of-scope paths afterward.
-3. **Run.** From the subject worktree:
-   `opencode run -m <model> --title bench-<subject>-<workflow>-<ref>-<n> --archived --auto "<prompt>"`
-   with `-m <provider/model#variant>` pinned to the user's working model (the headless default
-   differs; record it). The arm prompt names the ref path, the workflow, the input packet,
-   `--no-commit`, forbids pushing, and forbids the `question` tool: a headless run cannot answer
-   it, so the arm answers from the input packet or takes the recommended option. Each workflow is its own sibling session on the
-   same worktree.
-4. **Inputs.** Identical across arms (see the plan's §Measurement method). Questions the inputs do
-   not answer: take the skill's recommended option and log it as an assumption.
-5. **Measure.** Find the session ID by title, then `bench.py sessions --root <id> --json`. Check
-   the subject's acceptance tests in the worktree, and that the main checkout's `git status` is
-   unchanged.
-6. **Repeat.** Baselines run more than once; the decision band is max(10%, observed spread); a pass
+```bash
+python3 scripts/bench/harness/run_arm.py <M|S> <n> <ref-sha> [--pin-tier] [--workflows a,b]
+```
+
+Outputs (results, logs, diffs, acceptance specs, per-arm session databases) go to
+`~/.local/state/codeops-bench/`; inputs live in `$TMPDIR/bench-lean/`.
+
+1. **Process-only ref** (`harness/build_ref.py`). A copy of `skills/`, `_shared/`,
+   `agent-templates/`, `standards/`, `references/`, `schemas/`, and the process scripts — never
+   product code. Python tools become stubs that run compiled bytecode, text that documents a
+   subject's deliverable is removed, and the build fails if a subject answer remains. Arms read
+   skills **by path** (never through the skill tool) and substitute `${CODEOPS_PLUGIN_ROOT}` with
+   the ref path; reviewer and executor roles are generic subagents carrying the ref's template text.
+2. **Standalone subject.** `git init` plus a shallow fetch (`--depth 30`) of the subject's base
+   commit, `FETCH_HEAD` deleted: no later commit or object is reachable. `npm ci` runs before the
+   arm and is not measured. M arms pin `quality.verificationTier: standard`.
+3. **Sandbox** (`harness/sandbox.py`, bubblewrap). Root filesystem read-only; `/home`, `/tmp`,
+   `/var/tmp`, and `/run/user` are empty tmpfs mounts with only the ref, its tools, the arm's
+   packet and workspace, node, and the opencode binary mounted back; globally installed CodeOps
+   packages are hidden. OpenCode runs as a private standalone server on a seeded data directory
+   (schema, migrations, credentials, model catalog — no sessions) and a config with no plugins and
+   no global skills; the ref's standards load through `instructions`. The CodeOps plugin is off for
+   every arm (its package contains subject answers).
+4. **Network** (`harness/netproxy.py`). The sandbox has its own network namespace with loopback
+   only. HTTPS goes through an allow-listed CONNECT proxy (model API host only); npm goes through a
+   filtering registry mirror that refuses `opencode-codeops`. Every attempt is logged; denials are
+   recorded per arm.
+5. **Run.** `opencode run --standalone -m <model> --title bench-<subject>-<workflow>-<ref>-<n>
+   --auto "<prompt>"`, one sibling session per workflow on the same subject, pinned to the user's
+   working model. The prompt forbids the `question` tool (a headless run cannot answer it): the arm
+   answers from its packet or takes the recommended option and logs an assumption.
+6. **Measure and check.** `bench.py sessions --db <arm db>`; the subject's original spec files
+   copied over the arm's own plus the subject's `npm run verify`; an automatic audit of every
+   tool input for paths outside the arm's roots; the main checkout's `git status` unchanged.
+7. **Repeat.** Baselines run more than once; the decision band is max(10%, observed spread); a pass
    inside the band gets one confirming re-run; report medians.
-7. **Clean up.** `git worktree remove` both worktrees.
