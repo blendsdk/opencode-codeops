@@ -49,14 +49,24 @@ An *arm* is one workflow run (make-plan, preflight, or exec-plan) on a fixed sub
 CodeOps skill text at a fixed ref. Subagent sessions cannot dispatch subagents, so every arm is a
 **headless root session**.
 
-1. **Ref checkout.** `git worktree add --detach $CODEOPS_TMPDIR/ref-<sha> <sha>` for the CodeOps
-   ref under test. The arm reads `skills/<name>/SKILL.md` and `_shared/` **by path** from there
-   (never through the skill tool) and substitutes `${CODEOPS_PLUGIN_ROOT}` with that path.
-   Reviewer and executor roles run as generic subagents whose packet carries the ref's
-   `agent-templates/` text. Plugin hooks stay at the installed version for every arm.
-2. **Subject worktree.** `git worktree add --detach $CODEOPS_TMPDIR/subj-<arm> <base>`; run the
-   install step (`npm ci`) before the arm starts — it is not measured. Post-Wave-1 arms pin
-   `quality.verificationTier: standard` in the worktree's `codeops/codeops.json`.
+1. **Process-only ref.** Build the CodeOps ref under test as a copy of `skills/`, `_shared/`,
+   `agent-templates/`, `standards/`, `references/`, `schemas/`, and the process scripts only —
+   never product code. The subjects are past features of this repository, so a full checkout
+   holds their answers. Python tools become stubs that run compiled bytecode kept outside the ref,
+   so arms can run them but not read them; text that documents a subject's deliverable is
+   removed, and the build fails if any subject answer remains. The arm reads
+   `skills/<name>/SKILL.md` and `_shared/` **by path** (never through the skill tool) and
+   substitutes `${CODEOPS_PLUGIN_ROOT}` with the ref path. Reviewer and executor roles run as
+   generic subagents whose packet carries the ref's `agent-templates/` text. Plugin hooks stay at
+   the installed version for every arm.
+2. **Standalone subject.** `git init` plus a shallow fetch of the subject's base commit from this
+   repository (`--depth 30`), then delete `FETCH_HEAD`: no later commit or object is reachable.
+   Run the install step (`npm ci`) before the arm starts — it is not measured. Post-Wave-1 arms
+   pin `quality.verificationTier: standard` in the subject's `codeops/codeops.json`.
+   **Outputs** (logs, diffs, results, acceptance specs, runner) live outside every path an arm is
+   given, so later arms cannot read earlier answers; the arm prompt forbids reading anything
+   outside the ref, its input packet, and its subject, and each arm's tool inputs are audited
+   for out-of-scope paths afterward.
 3. **Run.** From the subject worktree:
    `opencode run -m <model> --title bench-<subject>-<workflow>-<ref>-<n> --archived --auto "<prompt>"`
    with `-m <provider/model#variant>` pinned to the user's working model (the headless default

@@ -2,7 +2,7 @@
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
 > **Progress**: 0/37 tasks (0%)
-> **Last Updated**: 2026-11-25 12:54
+> **Last Updated**: 2026-11-25 13:31
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -232,8 +232,18 @@ only counts and classes):
 
 _Filled by each measurement task. One row per arm run._
 
+**Baseline ref:** `7509f22d725f71281bfb55f1077d1ee657da8fd2` (main after Wave 1 and the kit).
+**Arm model:** `deepseek/deepseek-flash#max` (the user's working model; ~89k of their messages in
+the 60 days before 2026-11-25). **Harness:** packets and runner outside the repository
+(`$TMPDIR/bench-lean/`); M arms pin `quality.verificationTier: standard`; acceptance = the
+subject's original spec files copied over the arm's own, plus the subject's `npm run verify`.
+A first S run read the finished implementation from a full-checkout ref and is discarded; arms now
+use a process-only ref, a standalone shallow subject, and out-of-reach outputs (bench README §Arm
+protocol), and every arm's tool inputs are audited for out-of-scope paths.
+
 | Phase | Subject | Run | Ref SHA | Workflow | Model | Fresh | Cached | Primary steps | Median ctx/step | Bookkeeping steps | Docs / KB | Verification share | Test:product | Review rounds / dispatches | Instruction tok | Assumptions | Tests pass |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| 0 | S | 1 | `7509f22` | exec-plan | deepseek-flash#max | 215,826 | 10,515,200 | 90 | 118,141 | 26 of 104 calls | 1 / 3.4 | 67% (2/3) | — | 1 / 1 | — | 2 | 36/36, verify ✅ |
 
 ## Risks and rollback
 

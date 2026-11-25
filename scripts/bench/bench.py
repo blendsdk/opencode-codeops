@@ -34,7 +34,7 @@ from typing import Iterator, List, Optional, Tuple
 DEFAULT_DB = Path.home() / ".local" / "share" / "opencode" / "opencode.db"
 
 EDIT_TOOLS = {"edit", "write", "patch"}
-ARTIFACT_DIRS = ("plans", "requirements", "codeops")
+ARTIFACT_RE = re.compile(r"(^|/)(plans|requirements|codeops)/")
 TEST_PATH_RE = re.compile(
     r"(^|/)(test|tests|__tests__|spec|fixtures)/|\.test\.|\.spec\.|_test\.|_spec\.|Test\.|(^|/)test_"
 )
@@ -129,8 +129,12 @@ def relative_path(path: str, directory: str) -> str:
 
 
 def classify_path(path: str) -> str:
-    """Classify a repository path as `artifacts`, `tests`, or `product`."""
-    if path.split("/", 1)[0] in ARTIFACT_DIRS:
+    """Classify a repository path as `artifacts`, `tests`, or `product`.
+
+    Artifact folders are matched as any path segment, because a session's recorded directory
+    can be an ancestor of the repository it works in (headless runs in a worktree).
+    """
+    if ARTIFACT_RE.search(path):
         return "artifacts"
     if TEST_PATH_RE.search(path):
         return "tests"
