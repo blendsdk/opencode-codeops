@@ -1,6 +1,9 @@
 ---
 name: outcome-review
-description: Review local CodeOps outcome evidence to improve workflow quality without uploading project content. Use for CodeOps retrospective, workflow metrics, escaped findings, rework analysis, planning accuracy, or project process review. Separates plugin-level problems from project-specific configuration and recommends only evidence-backed changes.
+description: >-
+  Use when the user wants a retrospective on CodeOps workflow quality from local outcome evidence —
+  CodeOps retrospective, workflow metrics, escaped findings, rework analysis, planning accuracy,
+  project process review. Not for auditing a plan or requirements (use preflight).
 ---
 
 # CodeOps outcome review

@@ -1,19 +1,12 @@
 ---
 name: retro-requirements
 description: >-
-  Reverse-engineer an existing codebase into structured requirements. Use for
-  "retro-requirements", "reverse requirements", "reconstruct requirements from
-  code", "requirements archaeology", or "reverse-engineer this codebase". Trigger
-  when the user wants to reconstruct requirements from an existing, undocumented,
-  or legacy codebase — for documentation, migration, or a from-scratch rebuild —
-  e.g. "document what this app does", "extract requirements from this code",
-  "reverse-engineer this service into a spec". Analyzes any language/framework
-  through a 9-phase archaeology pipeline and produces a reconstruction brief
-  that feeds the make-requirements skill. Extracts WHAT the system does (not HOW),
-  classifies every behavior by confidence (✅/⚠️/🔴), and enforces a hard
-  Bug-or-Feature Triage Gate so bugs are never silently documented as features.
-  Supports --scope PATH to analyze one module/package and --continue to resume
-  an interrupted session.
+  Use when the user wants requirements reconstructed from an existing, undocumented, or legacy
+  codebase for documentation, migration, or a rebuild — "retro-requirements", "reverse
+  requirements", "reconstruct requirements from code", "requirements archaeology", "reverse-engineer
+  this codebase", "document what this app does", "extract requirements from this code",
+  "reverse-engineer this service into a spec". Accepts --scope PATH and --continue. Not for a new
+  idea (use make-requirements).
 ---
 
 # Reverse Requirements Engineering

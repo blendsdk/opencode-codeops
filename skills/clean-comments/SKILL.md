@@ -1,6 +1,9 @@
 ---
 name: clean-comments
-description: Audit and clean source comments and API documentation without changing behavior. Use for clean comments, clean JSDoc, remove planning references from code, improve API docs, or enforce CodeOps documentation standards. Removes ephemeral requirement/plan identifiers, documents non-trivial public behavior, and supports report-only or references-only modes.
+description: >-
+  Use when the user wants source comments and API documentation cleaned without changing behavior —
+  clean comments, clean JSDoc, remove planning references from code, improve API docs, enforce
+  CodeOps documentation standards. Not for architecture documentation (use techdocs).
 ---
 
 # Clean source documentation

@@ -1,6 +1,10 @@
 ---
 name: upgrade-plan
-description: Upgrade an existing CodeOps requirements set, specification, plan, or project from a legacy artifact format to the current schema and quality standards. Use for upgrade my plan, upgrade requirements, migrate CodeOps artifacts, or bring project artifacts up to date. Assesses and previews changes, closes content ambiguities before structural migration, preserves user-authored semantics and progress, and verifies the result without advancing the roadmap.
+description: >-
+  Use when the user wants an existing CodeOps requirements set, specification, plan, or project
+  brought from a legacy artifact format to the current schema — upgrade my plan, upgrade
+  requirements, migrate CodeOps artifacts, bring project artifacts up to date. Not for moving to the
+  nested layout (use setup-codeops).
 ---
 
 # Upgrade CodeOps artifacts

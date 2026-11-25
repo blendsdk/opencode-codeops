@@ -1,6 +1,10 @@
 ---
 name: analyze-agents
-description: Run the project-level specialist check on demand. Reads the repository's requirements, plans, findings ledgers, and manifests directly (no script), applies the specialist-agent detection criteria, presents at most two evidence-backed lightweight proposals or a None with evidence, and records the check state consumed by the analyze-project coverage line.
+description: >-
+  Use when the user wants the project-level specialist-agent check run on demand — "analyze-agents",
+  "check for specialist agents", "do we need a specialist reviewer" — or the specialist coverage
+  that analyze-project reports refreshed. Not for configuring routing or generating agents (use
+  setup-routing) or for refreshing AGENTS.md (use analyze-project).
 ---
 
 # analyze-agents

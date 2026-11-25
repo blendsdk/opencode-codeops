@@ -1,15 +1,10 @@
 ---
 name: grill-me
 description: >-
-  Relentlessly interrogate a design to eliminate ambiguity before any planning,
-  requirements, or implementation work begins. Use for "grill me", "grill-me",
-  "disambiguate", "deep-dive", or "interview me about this". Runs a structured,
-  branch-by-branch interview: maps the design tree of major decision branches,
-  walks each branch surfacing options, assumptions, and sub-decisions one at a
-  time, resolves cross-branch dependencies, and confirms explicit shared
-  understanding. Acts as a senior architect conducting a design review — never
-  accepts vague answers, names every decision/assumption/constraint, resolves
-  dependencies first, and tracks the decision tree until zero ambiguity remains.
+  Use when the user wants to be interrogated about a design to remove ambiguity before requirements,
+  planning, or implementation — "grill me", "grill-me", "disambiguate", "deep-dive", "interview me
+  about this". Not for writing requirements (use make-requirements), writing a plan (use make-plan),
+  or auditing a finished artifact (use preflight).
 ---
 
 # Deep Disambiguation Protocol (`grill-me`)

@@ -1,17 +1,12 @@
 ---
 name: make-requirements
 description: >-
-  Gather and document requirements, turn an idea into formal requirement
-  documents (RDs). Use for "make-requirements" (full discovery: brain dump or
-  bare idea into a structured requirements/ set), "add_requirement" (add one new
-  RD to an existing set), and "review_requirements" (health check / gap analysis
-  on an existing set). Trigger when the user wants to capture, expand, structure,
-  or audit what a system must do before building it — e.g. "help me spec out my
-  app", "document requirements", "what features am I missing", "add a feature to
-  the requirements", "review my requirements for gaps". Acts as a proactive
-  domain consultant: absorbs the seed idea, expands it with comparable-system
-  features, challenges it with edge cases, then decomposes it into numbered RDs
-  behind a hard Zero-Ambiguity Gate.
+  Use when the user wants to capture, expand, structure, or audit what a system must do before
+  building it — "make-requirements", "add_requirement", "review_requirements", "help me spec out my
+  app", "document requirements", "what features am I missing", "add a feature to the requirements",
+  "review my requirements for gaps". Produces numbered requirement documents (RDs). Not for
+  reverse-engineering existing code (use retro-requirements) or planning the implementation (use
+  make-plan).
 ---
 
 # Requirements Gathering & Documentation

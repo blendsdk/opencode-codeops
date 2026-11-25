@@ -1,17 +1,11 @@
 ---
 name: roadmap
 description: >-
-  Tracks features across their lifecycle in a live, per-repo roadmap — every RD, plan, and task and
-  the lifecycle stage each is in. Layout-aware: a single plans/00-roadmap.md in flat layout, or a
-  two-tier per-feature + portfolio roadmap under codeops/ in nested layout. Use when the user says
-  "roadmap", "make_roadmap", "update_roadmap", "review_roadmap", "show_roadmap", "archive_roadmap", or
-  "compact_roadmap". Covers six actions: make_roadmap (create + seed rows from disk),
-  update_roadmap (re-infer stages, sync to disk, cascade to the portfolio), review_roadmap
-  (read-only health check for drift/broken links), show_roadmap (read-only status overview —
-  progress, stages, and next steps), archive_roadmap (move a completed feature to the archive), and
-  compact_roadmap (slim a bloated roadmap: strip the legacy Notes log and trim fat cells). Detects
-  the action from the user's phrasing or arguments and branches. The roadmap is the cross-session
-  derived cross-session summary at the RD/plan altitude.
+  Use when the user wants to create, update, review, show, archive, or compact the per-repo roadmap
+  of RDs, plans, and tasks and their lifecycle stages — "roadmap", "make_roadmap", "update_roadmap",
+  "review_roadmap", "show_roadmap", "archive_roadmap", "compact_roadmap", "show the roadmap", "where
+  do things stand". Not for planning a feature (use make-plan) or for GitHub issues (use
+  github-issues).
 ---
 
 # roadmap — Live Feature-Set Roadmap Keeper

@@ -1,16 +1,11 @@
 ---
 name: exec-plan
 description: >-
-  Executes an implementation plan created by the make-plan skill. Use when the user says
-  "exec-plan", "run the plan", "execute the plan", "implement the named feature plan",
-  or "continue the plan for a feature". Accepts a feature name and an optional commit-mode
-  flag: --ask-commit (default, ask after each verified task), --no-commit (never commit),
-  or --auto-commit (commit + push after each verified task). Reads the feature's execution plan,
-  finds the next incomplete task, and runs the per-task loop (implement, update the execution
-  plan immediately, verify, then commit per mode) following specification-first task ordering.
-  Under the repo's CodeOps quality policy, a risk-derived quality loop reviews each executed
-  phase (reviewer + auditor agents); critical/major findings require an authorized ruling in
-  every commit mode, using the user in normal mode or eligible delegated resolution in auto-design.
+  Use when the user wants to execute, run, continue, or resume an implementation plan created by
+  make-plan — "exec-plan", "run the plan", "execute the plan", "implement the named feature plan",
+  "continue the plan for a feature". Takes a feature name and an optional --ask-commit (default),
+  --no-commit, or --auto-commit. Not for creating a plan (use make-plan) or auditing one (use
+  preflight).
 ---
 
 # exec-plan — Execute an Implementation Plan

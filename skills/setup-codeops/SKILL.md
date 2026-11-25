@@ -1,7 +1,11 @@
 ---
 name: setup-codeops
 description: >-
-  Sets up or upgrades CodeOps in the current git repo. It scaffolds a fresh nested codeops/ layout, auto-migrates a flat requirements/ + plans/ layout, and detects obsolete traceability.json workflow-state graphs in an existing nested project. Use when the user says "setup-codeops", "/setup-codeops", "set up codeops", "initialize codeops", "upgrade existing codeops", "migrate to the nested layout", or "scaffold the codeops structure". Supports --dry-run, unattended --yes, and --enable-discovery/--disable-discovery for existing projects. Every migration previews deterministically, refuses unsafe or ambiguous apply, requires clean Git state for writes, and is idempotent. setup-codeops is the SOLE writer of the layout marker.
+  Use when the user wants to set up, upgrade, or migrate CodeOps in the current git repository —
+  "setup-codeops", "/setup-codeops", "set up codeops", "initialize codeops", "upgrade existing
+  codeops", "migrate to the nested layout", "scaffold the codeops structure". Accepts --dry-run,
+  --yes, --enable-discovery, and --disable-discovery. Not for agent routing (use setup-routing) or
+  for upgrading individual plans (use upgrade-plan).
 ---
 
 # CodeOps Layout Setup (`setup-codeops`)

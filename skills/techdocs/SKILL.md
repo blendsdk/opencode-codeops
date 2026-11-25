@@ -1,17 +1,10 @@
 ---
 name: techdocs
 description: >-
-  Creates and maintains VitePress-compatible technical architecture documentation and
-  architecture decision records (ADRs). Use when the user says "make_techdocs",
-  "review_techdocs", "techdocs", "document the architecture", "create architecture docs",
-  "write ADRs", or "architecture decision records". Covers two modes: make_techdocs to
-  create or comprehensively regenerate the docs/ set (system overview, data model, API
-  design, infrastructure, security, ADRs, developer guides, reference), and review_techdocs
-  to run a 7-dimension health check (staleness, completeness, accuracy, ADR coverage, link
-  health, diagram accuracy, getting-started) and produce a diagnostic report. Also fires
-  automatically as an incremental or comprehensive update when an exec-plan phase or plan
-  completes, or when make-requirements completes — but only if the project has opted in.
-  Scope is technical/architectural docs for developers, NOT product/end-user documentation.
+  Use when the user wants technical architecture documentation or architecture decision records for
+  developers — "techdocs", "make_techdocs", "review_techdocs", "document the architecture", "create
+  architecture docs", "write ADRs", "architecture decision records". Not for product or end-user
+  documentation, or for cleaning code comments (use clean-comments).
 ---
 
 # techdocs — Technical Architecture Documentation

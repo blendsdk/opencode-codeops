@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-25 08:32
-> **Progress**: 25/31 tasks (81%)
+> **Last Updated**: 2026-11-25 08:36
+> **Progress**: 28/31 tasks (90%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -189,7 +189,9 @@ the property (PF-030).
 
 ## Phase 6: Skill descriptions
 
-> **Phase baseline tree**: _(recorded by exec-plan)_
+> **Phase baseline tree**: c69bc0beb14bf7d4b18138534ae4a4bb575a930d
+> **Verification balance**: 0 test / 81 product lines (0.0:1)
+> **Review**: reviewed 2026-11-25 08:36 — correctness review; RV-001 (minor) fixed; resolves the Phase 3 RV-005 deferral (05-findings.md)
 > **Reasoning**: medium — text rewrite with fact-preservation check; runs after Phases 2, 3, 5 changed skill bodies
 
 ### Step 6.1: Rewrite descriptions
@@ -197,12 +199,12 @@ the property (PF-030).
 **Reference**: 03-04 · AR-21, AR-27
 **Objective**: Trigger-only descriptions ≤500 characters.
 
-- [ ] 6.1.1 Rewrite the descriptions of make-requirements, make-plan, exec-plan, preflight, grill-me, retro-requirements, roadmap, techdocs, setup-codeops; move any fact missing from a body into that body (03-04 §Rules)
-- [ ] 6.1.2 Rewrite the descriptions of analyze-agents, analyze-project, clean-comments, git-commit, github-issues, organize-tests (single line, keeps `test-impact map`), outcome-review, setup-routing, upgrade-plan (03-04 §Rules)
-- [ ] 6.1.3 Green check: ST-23..ST-24 pass; `npm run verify` fully green
+- [x] 6.1.1 Rewrite the descriptions of make-requirements, make-plan, exec-plan, preflight, grill-me, retro-requirements, roadmap, techdocs, setup-codeops; move any fact missing from a body into that body (03-04 §Rules) ✅ (completed: 2026-11-25 08:34)
+- [x] 6.1.2 Rewrite the descriptions of analyze-agents, analyze-project, clean-comments, git-commit, github-issues, organize-tests (single line, keeps `test-impact map`), outcome-review, setup-routing, upgrade-plan (03-04 §Rules) ✅ (completed: 2026-11-25 08:34)
+- [x] 6.1.3 Green check: ST-23..ST-24 pass; `npm run verify` fully green ✅ (completed: 2026-11-25 08:35)
 
 **Deliverables**:
-- [ ] ST-23..ST-24 green; full verify green
+- [x] ST-23..ST-24 green; full verify green
 
 **Task verify**: `node bin/codeops-test.mjs run --gate task --baseline HEAD` — allowed failures: ST-23..ST-24 only, until 6.1.3; none after
 **Verify (gate)**: `npm run verify`

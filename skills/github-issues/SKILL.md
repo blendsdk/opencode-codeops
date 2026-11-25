@@ -1,6 +1,10 @@
 ---
 name: github-issues
-description: Inspect a repository's GitHub issues as an adaptive table using its own labels, issue types, project fields, dependencies, priorities, and effort scheme; or close/reopen explicitly named issues with guarded native reasons. Use for GitHub issue overview, issue triage, dependencies, close issue, reopen issue, duplicate issue, or CodeOps backlog review. Read operations may be implicit; mutations require explicit user intent.
+description: >-
+  Use when the user wants an overview or triage of the repository's GitHub issues, their
+  dependencies and backlog, or wants an explicitly named issue closed or reopened — GitHub issue
+  overview, issue triage, dependencies, close issue, reopen issue, duplicate issue, CodeOps backlog
+  review. Not for the CodeOps roadmap (use roadmap).
 ---
 
 # GitHub issue operations

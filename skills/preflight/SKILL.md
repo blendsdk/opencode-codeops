@@ -1,14 +1,11 @@
 ---
 name: preflight
 description: >-
-  Runs a rigorous multi-dimensional quality audit of a plan, requirements, or any artifact,
-  grounded in the actual codebase. Use for "preflight", "quality audit", "review gate",
-  "audit this plan", "audit these requirements", or "review my plan/requirements before I build it".
-  An adversarial review gate that hunts for every ambiguity, contradiction, gap, and risk, verifies
-  every claim against the real code, scores findings on a 13-dimension scan, and presents each one
-  with options and a recommendation for the user to decide — it never fixes silently. Takes an
-  artifact target (e.g. requirements, requirements RD-03, a feature name, a feature design document,
-  or a file/dir path) plus optional --continue to resume an interrupted session.
+  Use when the user wants an independent quality audit of a plan, requirements, or any artifact
+  before building it — "preflight", "quality audit", "review gate", "audit this plan", "audit these
+  requirements", "review my plan/requirements before I build it". Takes a target (requirements, one
+  RD, a feature name, a design document, or a file/dir path) and optional --continue. Not for
+  creating artifacts (use make-plan or make-requirements) or for a design interview (use grill-me).
 ---
 
 # preflight — Multi-Dimensional, Codebase-Grounded Quality Audit

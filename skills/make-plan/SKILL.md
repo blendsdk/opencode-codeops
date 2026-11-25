@@ -1,7 +1,10 @@
 ---
 name: make-plan
 description: >-
-  Creates a detailed, multi-document implementation plan for a software feature or task before any code is written. Use when the user wants to "make a plan", types "make-plan", or asks to "plan this feature", "create an implementation plan", "plan out this work", or "write a spec/plan" for something to be built. Drives a mandatory clarifying-questions interview, a hard Zero-Ambiguity Gate, and produces a feature plan document set ending in a task-by-task execution plan. For EXECUTING an existing plan, use the exec-plan skill instead.
+  Use when the user wants an implementation plan before any code is written — "make-plan", "make a
+  plan", "plan this feature", "create an implementation plan", "plan out this work", "write a
+  spec/plan" for something to be built. Not for executing an existing plan (use exec-plan), auditing
+  one (use preflight), or capturing requirements (use make-requirements).
 ---
 
 # Implementation Plan Creation (`make-plan`)

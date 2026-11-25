@@ -1,6 +1,10 @@
 ---
 name: analyze-project
-description: Analyze the current repository and create or refresh concise CodeOps-aware AGENTS.md guidance using observed manifests, commands, structure, conventions, verification, and integration-branch facts. Use for analyze project, initialize project guidance, refresh AGENTS.md, or compact project instructions. Preserves hand-authored content and previews consequential rewrites.
+description: >-
+  Use when the user wants CodeOps-aware AGENTS.md guidance created or refreshed from the
+  repository's real manifests, commands, and conventions — analyze project, initialize project
+  guidance, refresh AGENTS.md, compact project instructions. Not for the specialist-agent check (use
+  analyze-agents).
 ---
 
 # Analyze project guidance

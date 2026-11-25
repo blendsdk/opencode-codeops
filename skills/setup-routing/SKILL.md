@@ -1,6 +1,10 @@
 ---
 name: setup-routing
-description: Configure risk- and capability-based OpenCode subagent routing for a project. Use when the user asks to set up CodeOps routing, specialist reviewers, model or reasoning policy, or project-local agents. Analyzes the system's domains and risks, proposes roles and review requirements, records structured CodeOps policy, and optionally generates project-local OpenCode agent files. Never weakens CodeOps gates when agents are unavailable.
+description: >-
+  Use when the user wants CodeOps subagent routing configured for a project — set up CodeOps
+  routing, specialist reviewers, model or reasoning policy, project-local agents. Not for the
+  on-demand specialist-agent check (use analyze-agents) or for setting up the CodeOps layout (use
+  setup-codeops).
 ---
 
 # Configure CodeOps routing for OpenCode

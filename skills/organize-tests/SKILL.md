@@ -1,6 +1,6 @@
 ---
 name: organize-tests
-description: Build or refresh a test-impact map for an existing project so local development runs only affected feature-slice test groups while CI keeps a full-suite release gate. Use for organize tests, group tests, test impact map, speed up tests, affected-only testing, test selection, or test-suite health. Detects runners and language adapters, inventories tests, proposes feature slices and tiered groups, runs shadow-mode adoption, updates AGENTS.md and CI additively, and audits drift. Never edits tests or weakens the full gate.
+description: Use when the user wants a test-impact map so local work runs only the affected test groups while CI keeps the full gate — organize tests, group tests, test impact map, speed up tests, affected-only testing, test selection, test-suite health. Not for writing or editing tests.
 ---
 
 # Organize Tests

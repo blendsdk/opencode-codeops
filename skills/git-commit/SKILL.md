@@ -1,6 +1,9 @@
 ---
 name: git-commit
-description: Safely verify, stage, and commit repository changes with a detailed Conventional Commit message, optionally rebasing and pushing when the user explicitly requests push. Use for commit my changes, git commit, commit and push, or prepare a CodeOps checkpoint. Inspects untracked files and secrets, never bypasses hooks, never force-pushes, and stops on verification or rebase failure.
+description: >-
+  Use when the user wants repository changes verified and committed with a Conventional Commit
+  message, optionally pushed — commit my changes, git commit, commit and push, prepare a CodeOps
+  checkpoint. Not for GitHub issues (use github-issues).
 ---
 
 # Guarded Git commit
