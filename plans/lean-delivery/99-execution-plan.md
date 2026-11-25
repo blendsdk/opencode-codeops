@@ -2,7 +2,7 @@
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
 > **Progress**: 0/37 tasks (0%)
-> **Last Updated**: 2026-11-25 12:53
+> **Last Updated**: 2026-11-25 12:54
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -166,7 +166,7 @@ only counts and classes):
 - [x] 0.1.1 Write `scripts/bench/bench.spec.test.mjs` (≤ 6 cases) against a tiny synthetic SQLite fixture built in the test: fresh/cached split; recursive tree walk; primary-only steps and median context; edit share by path class; bookkeeping step count; output contains no message text — confirm it fails ✅ (completed: 2026-11-25 12:43; red: 6/6 fail on the missing bench.py)
 - [x] 0.1.2 Implement `scripts/bench/bench.py` (`sessions`, `plans`, `instructions`), read-only against the OpenCode DB; the 0.1.1 cases pass ✅ (completed: 2026-11-25 12:53; reads tool calls from both message `content` and `session_part`; tree totals include compaction spend; 6/6 pass)
 - [x] 0.1.3 Add `"!scripts/bench/"` to `package.json` `files`; write `scripts/bench/README.md` (kit usage and the arm protocol) ✅ (completed: 2026-11-25 12:53; `npm pack --dry-run` lists no bench file)
-- [ ] 0.1.4 Smoke arm (D-9): one headless `opencode run` root session in a throwaway worktree dispatches one reviewer subagent and reads a skill by path from a ref checkout; `bench.py sessions --root` shows the child session and the main checkout's `git status` is unchanged
+- [x] 0.1.4 Smoke arm (D-9): one headless `opencode run` root session in a throwaway worktree dispatches one reviewer subagent and reads a skill by path from a ref checkout; `bench.py sessions --root` shows the child session and the main checkout's `git status` is unchanged ✅ (completed: 2026-11-25 12:54; `ses_ded71fc75ffe3iujkpVyMlKMXn`, 35 s: skill read by path from the ref, 1 child session, 1 review dispatch detected, main checkout unchanged; headless default model is `opencode/tidepool-alpha-free`, so arms pass `-m` explicitly)
 - [x] 0.1.5 Calibrate: `bench.py sessions --root` on the three §Evidence references reproduces fresh, cached, and message counts within 1% ✅ (completed: 2026-11-25 12:53; exact match on all three (fresh, cached, messages, subagent sessions) once compaction spend is counted)
 - [ ] 0.1.6 Pin the baseline ref (current main SHA, recorded in §Results); baseline arms: M ×2 (make-plan, preflight, exec-plan sessions) and S ×3 (exec-plan); record metrics, the noise band, and the exec-plan bookkeeping step share
 - [ ] 0.1.7 Optional reference arm: M ×1 on `v2.8.1` (attributes Wave 1; no gate)

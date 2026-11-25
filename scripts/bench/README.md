@@ -58,9 +58,11 @@ CodeOps skill text at a fixed ref. Subagent sessions cannot dispatch subagents, 
    install step (`npm ci`) before the arm starts — it is not measured. Post-Wave-1 arms pin
    `quality.verificationTier: standard` in the worktree's `codeops/codeops.json`.
 3. **Run.** From the subject worktree:
-   `opencode run --title bench-<subject>-<workflow>-<ref>-<n> --archived --auto "<arm prompt>"`
-   on the default model (record it). The arm prompt names the ref path, the workflow, the input
-   packet, `--no-commit`, and forbids pushing. Each workflow is its own sibling session on the
+   `opencode run -m <model> --title bench-<subject>-<workflow>-<ref>-<n> --archived --auto "<prompt>"`
+   with `-m <provider/model#variant>` pinned to the user's working model (the headless default
+   differs; record it). The arm prompt names the ref path, the workflow, the input packet,
+   `--no-commit`, forbids pushing, and forbids the `question` tool: a headless run cannot answer
+   it, so the arm answers from the input packet or takes the recommended option. Each workflow is its own sibling session on the
    same worktree.
 4. **Inputs.** Identical across arms (see the plan's §Measurement method). Questions the inputs do
    not answer: take the skill's recommended option and log it as an assumption.
