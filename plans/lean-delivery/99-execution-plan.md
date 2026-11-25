@@ -2,7 +2,7 @@
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
 > **Progress**: 0/37 tasks (0%)
-> **Last Updated**: 2026-11-25 12:02
+> **Last Updated**: 2026-11-25 12:53
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -72,8 +72,9 @@ Findings that shape the levers:
    tokens are subagents and half its edits rewrite plan documents.
 4. **Verification multiplies at the source** — every behavior becomes a spec case before tiers or
    reviews can trim anything.
-5. **Environment.** Installed CodeOps is 2.8.1 (Wave 1 unreleased); OpenCode allows subagent depth
-   1 (all 72 nested dispatch attempts failed).
+5. **Environment.** Installed CodeOps is 2.8.1 (Wave 1 unreleased); subagent sessions cannot
+   dispatch subagents (all 72 nested attempts failed; in this harness the tool is absent), so arms
+   run as headless root sessions.
 
 ## Levers (in shipping order)
 
@@ -98,8 +99,8 @@ Findings that shape the levers:
 | D-6 | Lever A applies to both tiers | User, 2026-11-25 |
 | D-7 | At `standard`, one end-of-plan review round (+ refute); per-phase review only when risk-tagged; the 150-line trigger is removed | User, 2026-11-25 |
 | D-8 | Any phase (1–4) may supersede existing spec assertions whose guarded behavior or text it changes; each phase's first task lists them, the user approves them in one batch, and the phase's new spec file guards the replacement | User, 2026-11-25 (extended to Phases 1–3) |
-| D-9 | A/B arms run as subagents in throwaway git worktrees, following the CodeOps skill text at a named ref, answering questions from the subject's recorded inputs | User, 2026-11-25 |
-| D-10 | Nested dispatch for arms: `experimental.subagent_depth: 2` in this repository's project `opencode.json`; one OpenCode restart | User, 2026-11-25 |
+| D-9 | A/B arms run as headless root sessions (`opencode run --title bench-<arm> --archived --auto`) started inside throwaway git worktrees, on the user's default model (recorded per arm), following the CodeOps skill text at a named ref, answering questions from the subject's recorded inputs | User, 2026-11-25; revised 2026-11-25 (subagent sessions have no subagent tool) |
+| D-10 | ~~Nested dispatch via `experimental.subagent_depth: 2`~~ — superseded: the smoke showed child sessions have no subagent tool at all, so arms run as root sessions (D-9) and no config change is needed | User, 2026-11-25 |
 | D-11 | Arm runtime: arms read SKILL and `_shared` files by path from a checkout of the ref under test and run `${CODEOPS_PLUGIN_ROOT}` commands against that checkout; reviewer/executor roles run as generic subagents with the ref's template text in the packet; plugin hooks stay at the installed version as a controlled constant | User, 2026-11-25 |
 | D-12 | Release as MAJOR (3.0.0); contract-changing commits carry a `BREAKING CHANGE:` footer | User, 2026-11-25 |
 
@@ -160,11 +161,13 @@ only counts and classes):
 
 ### Phase 0 — Measurement kit and baseline
 
-- [ ] 0.1.1 Write `scripts/bench/bench.spec.test.mjs` (≤ 6 cases) against a tiny synthetic SQLite fixture built in the test: fresh/cached split; recursive tree walk; primary-only steps and median context; edit share by path class; bookkeeping step count; output contains no message text — confirm it fails
-- [ ] 0.1.2 Implement `scripts/bench/bench.py` (`sessions`, `plans`, `instructions`), read-only against the OpenCode DB; the 0.1.1 cases pass
-- [ ] 0.1.3 Add `"!scripts/bench/"` to `package.json` `files`; write `scripts/bench/README.md` (kit usage and the arm protocol)
-- [ ] 0.1.4 Add `experimental.subagent_depth: 2` to this repository's `opencode.json` (D-10); the user restarts OpenCode; smoke arm: a subagent dispatches one reviewer subagent and reads a skill by path from a ref checkout; `bench.py sessions --root` shows the depth-2 session
-- [ ] 0.1.5 Calibrate: `bench.py sessions --root` on the three §Evidence references reproduces fresh, cached, and message counts within 1%
+> **Phase baseline tree**: c0665623f6db04ef8ecff6a877a9ba19b7983247
+
+- [x] 0.1.1 Write `scripts/bench/bench.spec.test.mjs` (≤ 6 cases) against a tiny synthetic SQLite fixture built in the test: fresh/cached split; recursive tree walk; primary-only steps and median context; edit share by path class; bookkeeping step count; output contains no message text — confirm it fails ✅ (completed: 2026-11-25 12:43; red: 6/6 fail on the missing bench.py)
+- [x] 0.1.2 Implement `scripts/bench/bench.py` (`sessions`, `plans`, `instructions`), read-only against the OpenCode DB; the 0.1.1 cases pass ✅ (completed: 2026-11-25 12:53; reads tool calls from both message `content` and `session_part`; tree totals include compaction spend; 6/6 pass)
+- [x] 0.1.3 Add `"!scripts/bench/"` to `package.json` `files`; write `scripts/bench/README.md` (kit usage and the arm protocol) ✅ (completed: 2026-11-25 12:53; `npm pack --dry-run` lists no bench file)
+- [ ] 0.1.4 Smoke arm (D-9): one headless `opencode run` root session in a throwaway worktree dispatches one reviewer subagent and reads a skill by path from a ref checkout; `bench.py sessions --root` shows the child session and the main checkout's `git status` is unchanged
+- [x] 0.1.5 Calibrate: `bench.py sessions --root` on the three §Evidence references reproduces fresh, cached, and message counts within 1% ✅ (completed: 2026-11-25 12:53; exact match on all three (fresh, cached, messages, subagent sessions) once compaction spend is counted)
 - [ ] 0.1.6 Pin the baseline ref (current main SHA, recorded in §Results); baseline arms: M ×2 (make-plan, preflight, exec-plan sessions) and S ×3 (exec-plan); record metrics, the noise band, and the exec-plan bookkeeping step share
 - [ ] 0.1.7 Optional reference arm: M ×1 on `v2.8.1` (attributes Wave 1; no gate)
 - [ ] 0.1.8 `bench.py plans` on H, M, S originals and `bench.py instructions` on the baseline ref; record in §Results; end-of-phase review
@@ -201,7 +204,7 @@ only counts and classes):
 - [ ] 3.1.3 Measure M's post-Phase-2 phase sizes (2.1.8 plans) and set the dispatch threshold so M's feature phases dispatch
 - [ ] 3.1.4 exec-plan: dispatch each phase at or above the threshold to a fresh executor with the phase packet and a structured report (files changed, verify result, blockers); the parent keeps summaries, calls `mark`, and computes the balance
 - [ ] 3.1.5 `agent-templates/plan-task-executor.md` and `plan-task-executor-opus.md`: accept the phase packet and return the report contract; regenerate packaged agents with `CODEOPS_PLUGIN_ROOT=$(pwd)`; `install_agents.py --check` clean
-- [ ] 3.1.6 Review timing at `standard`: one end-of-plan round + refute; per-phase round only for risk-tagged phases; remove the 150-line trigger; `critical` unchanged
+- [ ] 3.1.6 Implement review timing at `standard`: one end-of-plan round + refute; per-phase round only for risk-tagged phases; remove the 150-line trigger; `critical` unchanged
 - [ ] 3.1.7 Arm M ×n (exec-plan) on the Phase 3 SHA; gate: median context per primary step ≤ 150k, execution cached tokens −60% vs 0.1.6, review rounds = 1 (+ ≤ 1 refute), acceptance tests pass; record; end-of-phase review with `agent-pipeline-reviewer`
 
 **Verify**: `npm run verify`

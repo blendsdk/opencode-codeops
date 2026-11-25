@@ -39,6 +39,7 @@
     "scripts/",
     "!scripts/*.test.mjs",
     "!scripts/*.spec.test.mjs",
+    "!scripts/bench/",
     "bin/",
     "!bin/fixtures/",
     "!bin/*.test.mjs",
