@@ -554,7 +554,9 @@ authoring the execution plan; it carries the step structure, the verification ti
 compressed small-feature form, the prohibited/required lists, and the immutable-oracle rule.
 Generated plans must reference `07-testing-strategy.md` ST-cases in spec-test tasks. The red phase
 is a distinct verification task at the `critical` tier; at the `standard` tier it runs inside the
-spec-test task.
+spec-test task, the green check runs inside the phase's last implementation task, and the phase's
+`**Verify (gate)**` line (or its single `**Verify**` line) is the gate — no separate green-phase or
+gate-verification task.
 
 ---
 

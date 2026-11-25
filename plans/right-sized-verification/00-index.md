@@ -1,7 +1,7 @@
 # Right-Sized Verification (Wave 1) Implementation Plan
 
 > **Feature**: Make CodeOps verification proportional to the work, sharpen review, and keep execution state across compaction
-> **Status**: Planning Complete
+> **Status**: Done
 > **Created**: 2026-11-24 23:41
 > **Implements**: REQ-RIGHT-SIZED-VERIFICATION (standalone — no RD, per AR-1)
 > **Verification tier**: critical — every phase reviewed under today's review rules; test shape per AR-24
@@ -45,6 +45,31 @@ Baseline, measured 2026-11-24 in this repository (AR-23):
 | Review fix commits | 8 "review findings" commits vs 54 `feat(` commits | −40% per feature | `git log --oneline \| grep -ci "review findings"` |
 | Tokens / wall time | not recorded | −20% tokens, −25% time on standard work | `metrics.enabled` + outcome-review on the next real feature |
 | Critical tier | today's ordering | unchanged | Phase 7 critical replay keeps the distinct red-phase task and per-phase review |
+
+### Result (recorded 2026-11-25 09:39)
+
+Phase 7 replay of `live-task-sidebar` (re-authored under the final rules; counts are numbered
+checkbox tasks; "verification" is a per-task semantic count, because the keyword metric above
+misclassifies implementation lines that mention "gate", "guard", or a folded green check):
+
+| Plan | Tasks | Verification tasks | Share |
+|---|---|---|---|
+| Original (pre-tier) | 14 | 8 | 57.1% |
+| `standard`, first rules (v1) | 16 | 10 | 62.5% |
+| `standard`, final rules after AR-31 (v3) | 12 | 5 | 41.7% |
+| `critical` | 18 | 12 | 66.7% |
+
+- Derived tier for the replay subject: `standard` (no real-risk signal; format and compatibility
+  evolution only), as AR-29 intends.
+- `critical` keeps today's ordering: a distinct red-phase, green-phase, and gate task per feature
+  phase, implementation tests after implementation.
+- The first standard rules did not reduce task count; AR-31 folded the green check and the gate
+  into existing tasks. Verification tasks fell from 8 to 5 (−37.5%) on a plan that was already
+  compact.
+- Target "≤ 40% for a standard-tier plan": **narrowly missed (41.7%)** on this sample; recorded as
+  a near miss, not a pass.
+- `fix-shared-reference-install` (mini-plan control, no tier): 6 → 5 tasks, verification 2 → 2.
+- Balance, review-fix, token, and time targets are measured on the next real feature.
 
 **What closes this plan (AC-3):** the Phase 7 replay of `live-task-sidebar` as `standard` meets the
 verification-share target, and its `critical` replay keeps today's ordering. The balance,

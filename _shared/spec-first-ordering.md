@@ -44,6 +44,8 @@ The tier sizes the ceremony and the review timing to the work; it never changes 
 |---|---|---|
 | Spec tests first | Yes — from the ST-cases, before implementation | Yes |
 | Red check | Inside the spec-test task: run the declared spec file and confirm it fails; no separate task | A distinct red-phase task |
+| Green check | Inside the phase's last implementation task: run every declared spec file of the phase and confirm they pass; no separate task | A distinct green-phase task |
+| Phase gate | The phase's `**Verify (gate)**` line (or its single `**Verify**` line); no separate gate task | A distinct gate-verification task |
 | Implementation tests | Only for the error paths and edge cases named in the ST-cases or the component specifications | Edge cases, internals, and error paths |
 | Coverage goal | Every ST-case and acceptance criterion has at least one test; no percentage targets | The same rule; percentage targets only when the plan records them as a decision |
 | Independent review | A phase is reviewed when it is risk-tagged or changes 150 or more product lines; otherwise its review is carried forward to the completion review | Every non-trivial phase |
@@ -86,10 +88,16 @@ never edits the test.)
 
 ## Small features (compressed form)
 
-You MAY compress into a single step, but the ordering is still mandatory. The red phase stays its own task
-(N.1.2) at the `critical` tier. At the `standard` tier N.1.1 and N.1.2 are one task —
-write the specification tests, then run the declared spec file and confirm it fails — and N.1.5
-covers only the error paths and edge cases the specification names:
+You MAY compress into a single step, but the ordering is still mandatory. The red phase stays its
+own task (N.1.2) at the `critical` tier, and so do the green phase (N.1.4) and the gate
+verification (N.1.6). At the `standard` tier the tier adds no separate verification tasks: N.1.1
+and N.1.2 are one task (write the specification tests, run the declared spec file, confirm it
+fails); the green check (N.1.4) runs inside the phase's last implementation task, which runs every
+declared spec file of the phase (implementation itself keeps the plan's normal task sizing and may
+span several tasks); N.1.5 is
+a task only when the specification names error paths or edge cases to test; and the gate is the
+phase's `**Verify (gate)**` line (or its single `**Verify**` line), not a task — also for phases
+without specification tests:
 
 ```
 Step N.1: [Feature Name]

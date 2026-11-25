@@ -24,3 +24,5 @@
 | RV-001 | 5 | MINOR | bin/lib/codeops-progress.mjs | fixed |
 | RV-001 | 6 | MINOR | skills/retro-requirements/SKILL.md | fixed |
 | RV-005 | 3 | MINOR | skills/exec-plan/SKILL.md | fixed |
+| RV-001 | 7 | MINOR | _shared/spec-first-ordering.md | fixed |
+| RV-002 | 7 | MINOR | _shared/spec-first-ordering.md | fixed |
