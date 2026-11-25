@@ -152,6 +152,8 @@ summary template. The essentials:
    in `plans/$ARGUMENTS/`.
 3. Determine the starting point: a `[~]` task is resumed first (re-verify, then promote or keep
    fixing); otherwise the first `[ ]` task.
+   After a context compaction, re-read `99-execution-plan.md` and `05-findings.md` before the
+   next action; trust their marks and rulings over the summary.
 4. If the plan is missing/empty/already complete, **STOP** — see the load table in
    [execution-protocol.md](execution-protocol.md). Generally suggest the make-plan skill.
 

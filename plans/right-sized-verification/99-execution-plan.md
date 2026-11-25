@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-25 02:56
-> **Progress**: 21/31 tasks (68%)
+> **Last Updated**: 2026-11-25 08:32
+> **Progress**: 25/31 tasks (81%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -164,7 +164,9 @@ the property (PF-030).
 
 ## Phase 5: Compaction note
 
-> **Phase baseline tree**: _(recorded by exec-plan)_
+> **Phase baseline tree**: b7b692072275126a9a92d4c92232b77fc500c335
+> **Verification balance**: 149 test / 81 product lines (1.8:1)
+> **Review**: reviewed 2026-11-25 08:32 — correctness review; RV-001 (minor) fixed (05-findings.md)
 > **Reasoning**: medium — small pure helper and one hook call
 
 ### Step 5.1: Helper, hook, and resume sentence
@@ -172,13 +174,13 @@ the property (PF-030).
 **Reference**: 03-05 · AR-22
 **Objective**: A compacted run keeps its place.
 
-- [ ] 5.1.1 `buildCompactionNote` in `bin/lib/codeops-progress.mjs` plus its declaration in `bin/lib/codeops-progress.d.mts` (03-05 §New function); ST-17..ST-22 pass
-- [ ] 5.1.2 Push the note from the `compaction` hook in `plugin/index.ts` with try/catch (03-05 §Plugin change); `npx tsc --noEmit` passes
-- [ ] 5.1.3 `skills/exec-plan/SKILL.md` resume rules: the compaction re-read sentence (03-05 §Skill change)
-- [ ] 5.1.4 Write `plugin/compaction-note.impl.test.mjs` (07 §Implementation Tests); `npm run verify` — expected red: ST-23..ST-24 only
+- [x] 5.1.1 `buildCompactionNote` in `bin/lib/codeops-progress.mjs` plus its declaration in `bin/lib/codeops-progress.d.mts` (03-05 §New function); ST-17..ST-22 pass ✅ (completed: 2026-11-25 02:57)
+- [x] 5.1.2 Push the note from the `compaction` hook in `plugin/index.ts` with try/catch (03-05 §Plugin change); `npx tsc --noEmit` passes ✅ (completed: 2026-11-25 02:57)
+- [x] 5.1.3 `skills/exec-plan/SKILL.md` resume rules: the compaction re-read sentence (03-05 §Skill change) ✅ (completed: 2026-11-25 02:57)
+- [x] 5.1.4 Write `plugin/compaction-note.impl.test.mjs` (07 §Implementation Tests); `npm run verify` — expected red: ST-23..ST-24 only ✅ (completed: 2026-11-25 02:59)
 
 **Deliverables**:
-- [ ] ST-17..ST-22 green; impl test green; type-check clean
+- [x] ST-17..ST-22 green; impl test green; type-check clean
 
 **Task verify**: `node --test --test-name-pattern "^ST-([1-9]|1[0-6])\b" scripts/right-sized-verification-content.spec.test.mjs` (earlier phases' content ST cases, all green) plus `node --test plugin/compaction-note.spec.test.mjs plugin/compaction-note.impl.test.mjs` and `node bin/codeops-test.mjs run --gate task --baseline HEAD`, whose only allowed failures are the expected-red ST cases named on the gate line
 **Verify (gate)**: `npm run verify` — expected red: ST-23..ST-24 only

@@ -10,6 +10,7 @@ import {
   ensureSessionTmpDir,
 } from "../bin/lib/tmp-hygiene.mjs"
 import {
+  buildCompactionNote,
   createCodeOpsProgress,
   registerCodeOpsProgressTool,
 } from "../bin/lib/codeops-progress.mjs"
@@ -305,8 +306,18 @@ export default Plugin.define({
       event.system.push({ type: "text", text: standardsText })
     })
 
+    // When this session owns an unfinished CodeOps run, the compaction request
+    // also carries a short note naming the plan, phase, and task, so the summary
+    // keeps the run's place and the agent re-reads the plan instead of trusting
+    // memory. A failure here never blocks compaction: the standards are already in.
     await ctx.session.hook("compaction", (event) => {
       event.system.push({ type: "text", text: `${STANDARDS_HEADING}\n\n${standardsText}` })
+      try {
+        const note = buildCompactionNote(progress.snapshot(), event.sessionID)
+        if (note !== null) event.system.push({ type: "text", text: note })
+      } catch {
+        warnContentFree("Could not build the CodeOps compaction note.")
+      }
     })
 
     // ---------------------------------------------------------------------

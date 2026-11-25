@@ -491,6 +491,64 @@ export function isRunStale(snapshot, nowMs) {
   return nowMs - snapshot.updatedAt >= CODE_OPS_STALE_MS
 }
 
+/** The longest plan, phase, or task value a compaction note quotes. */
+const COMPACTION_VALUE_CAP = 60
+
+/**
+ * Make one reported value safe to quote inside the compaction note.
+ *
+ * Control characters and line breaks become spaces, whitespace runs collapse,
+ * double quotes become single quotes, and the result is cut at
+ * {@link COMPACTION_VALUE_CAP} characters, so a reported value can neither
+ * break the note onto new lines nor close its quotes.
+ *
+ * @param value - A reported plan, phase, or task value, or `null`.
+ * @returns The sanitized value, or `—` when the value is absent or empty.
+ */
+function compactionValue(value) {
+  if (typeof value !== "string") return "—"
+  const cleaned = value
+    .replace(/[\u0000-\u001f\u007f-\u009f]/g, " ")
+    .replace(/"/g, "'")
+    .replace(/\s+/g, " ")
+    .trim()
+  if (cleaned === "") return "—"
+  return cleaned.length > COMPACTION_VALUE_CAP ? cleaned.slice(0, COMPACTION_VALUE_CAP) : cleaned
+}
+
+/**
+ * Build the note that keeps an executing run's place across a context compaction.
+ *
+ * The note is meant for the compaction request of the session that owns the
+ * run: it names the plan, phase, and task and tells the agent to re-read the
+ * execution plan and the findings ledger instead of trusting the summary. There
+ * is deliberately no staleness check — long verify and review steps report no
+ * progress, and those are exactly when compaction happens. The result is a
+ * single line of at most 373 characters.
+ *
+ * @param snapshot - The current run snapshot, or `null` when no run is active.
+ * @param sessionID - The session being compacted.
+ * @returns The note, or `null` when there is no run, another session owns it,
+ *   or the run is done.
+ *
+ * @example
+ * buildCompactionNote(progress.snapshot(), "ses_1")
+ * // → 'CodeOps run in progress — plan "my-plan", phase "2", task "2.1.3". After compaction, …'
+ */
+export function buildCompactionNote(snapshot, sessionID) {
+  if (snapshot === null || snapshot.sessionID !== sessionID || snapshot.activity === "done") {
+    return null
+  }
+  const plan = compactionValue(snapshot.plan)
+  const phase = compactionValue(snapshot.phase)
+  const task = compactionValue(snapshot.task)
+  return (
+    `CodeOps run in progress — plan "${plan}", phase "${phase}", task "${task}". ` +
+    "After compaction, re-read the plan's 99-execution-plan.md and 05-findings.md " +
+    "(plans/ or codeops/features/*/plans/); trust them over memory."
+  )
+}
+
 /**
  * Render the visible sidebar lines for a run snapshot.
  *

@@ -214,6 +214,16 @@ export declare function mergeRunState(
 /** Test whether a run has not been updated for ten minutes. */
 export declare function isRunStale(snapshot: Pick<CodeOpsRunState, "updatedAt">, nowMs: number): boolean
 
+/**
+ * Build the compaction note for the session that owns an unfinished run.
+ *
+ * @param snapshot - The current run snapshot, or `null` when no run is active.
+ * @param sessionID - The session being compacted.
+ * @returns A single-line note of at most 400 characters, or `null` when there
+ *   is no run, another session owns it, or the run is done.
+ */
+export declare function buildCompactionNote(snapshot: CodeOpsRunState | null, sessionID: string): string | null
+
 /** The rendered sidebar text for a run snapshot. */
 export interface CodeOpsRunDisplay {
   /** The three display lines (fewer segments when values are unknown). */

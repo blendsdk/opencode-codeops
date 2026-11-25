@@ -21,3 +21,4 @@
 | RV-006 | 3 | MINOR | plans/right-sized-verification/03-02-review-calibration.md | fixed |
 | RV-001 | 4 | MINOR | skills/exec-plan/execution-protocol.md | fixed |
 | RV-002 | 4 | MINOR | skills/exec-plan/execution-protocol.md | fixed |
+| RV-001 | 5 | MINOR | bin/lib/codeops-progress.mjs | fixed |
