@@ -12,7 +12,7 @@
 
 import assert from "node:assert/strict"
 import { execFileSync } from "node:child_process"
-import { mkdtempSync, rmSync } from "node:fs"
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { dirname, join } from "node:path"
 import { DatabaseSync } from "node:sqlite"
@@ -108,11 +108,13 @@ function buildFixture(path) {
   // real messages use; m1 and m2 use `session_part` rows.
   message.run("m3", "R", "assistant", 3, 13, assistant(300, 0, 0, 2000, 100, [
     { type: "text", text: "SECRET-TEXT-ALPHA" },
-    toolItem("shell", { command: "python3 /p/scripts/codeops_plan.py mark plans/f 1.1.1 x" }),
+    toolItem("shell", { command: "python3 /p/scripts/codeops_plan.py \\\n  mark plans/f 1.1.1 x" }),
     toolItem("shell", { command: "npm test # SECRET-CMD-DELTA" }),
     toolItem("subagent", {
-      agent: "correctness-reviewer", description: "Phase 1 review", prompt: "SECRET-PROMPT-EPSILON",
+      agent: "general", description: "Phase 1 check",
+      prompt: "<!-- Agent template: phase-reviewer -->\nSECRET-PROMPT-EPSILON",
     }),
+    toolItem("codeops_progress", { plan: "f", activity: "implementing" }),
   ]))
   message.run("c1", "C1", "assistant", 1, 14, assistant(10, 1, 0, 100, 0))
   message.run("g1", "G1", "assistant", 1, 15, assistant(20, 2, 0, 200, 3))
@@ -127,12 +129,32 @@ function buildFixture(path) {
     path: "/w/repo/src/app.ts", oldString: "a", newString: "b",
   }))
   part.run("m1", "R", 3, "tool", 11, tool("shell", { command: "date '+%Y-%m-%d %H:%M'" }))
+  part.run("m1", "R", 4, "tool", 11, tool("edit", {
+    path: "/elsewhere/notes.md", oldString: "a", newString: "b",
+  }))
+  part.run("m1", "R", 5, "tool", 11, tool("subagent", {
+    agent: "general", description: "audit", prompt: "<!-- Agent template: preflight-auditor -->\nx",
+  }))
+  part.run("m1", "R", 6, "tool", 11, tool("subagent", {
+    agent: "general", description: "Phase 2 review", prompt: "<!-- Agent template: plan-task-executor -->\nx",
+  }))
+  part.run("m1", "R", 7, "tool", 11, tool("subagent", {
+    agent: "general", description: "Phase 3 review", prompt: "look around",
+  }))
   part.run("m2", "R", 0, "reasoning", 12, JSON.stringify({ type: "reasoning", text: "SECRET-REASONING-GAMMA" }))
   part.run("m2", "R", 1, "tool", 12, tool("write", {
     path: "/w/repo/src/app.test.ts", content: "SECRET-CONTENT-BETA",
   }))
   part.run("m2", "R", 2, "tool", 12, tool("shell", {
     command: "cd /w/repo && python3 /p/scripts/codeops_plan.py plans/f --progress-bar",
+  }))
+  part.run("m2", "R", 3, "tool", 12, tool("shell", { command: "grep -n date src/app.ts" }))
+  part.run("m2", "R", 4, "tool", 12, tool("shell", {
+    command: "sed -i 's/SECRET-OLD-ZETA/y/' plans/f/99-execution-plan.md",
+  }))
+  part.run("m2", "R", 5, "tool", 12, tool("subagent", {
+    agent: "general", description: "refute",
+    prompt: "<!-- Agent template: phase-reviewer -->\nMode: refute\nRV-001",
   }))
   sql.close()
 }
@@ -183,23 +205,28 @@ describe("bench sessions", () => {
     assert.equal(tree.subagent_cached, 100 + 200)
   })
 
-  it("ST-B3 — counts steps and context per step on the primary session only", () => {
-    const { primary } = report()
+  it("ST-B3 — counts steps and context on the primary session and context across the tree", () => {
+    const { primary, tree } = report()
     assert.equal(primary.steps, 3)
     // context per step = input + cache.read + cache.write → 1150, 3200, 2400
     assert.equal(primary.ctx_median, 2400)
     assert.equal(primary.ctx_p90, 3200)
+    // the tree adds the child (110) and grandchild (223) steps
+    assert.equal(tree.ctx_median, 1150)
+    assert.equal(tree.ctx_p90, 3200)
   })
 
-  it("ST-B4 — classifies primary edits by path as CodeOps artifacts, tests, or product", () => {
+  it("ST-B4 — classifies primary edits as CodeOps artifacts, tests, product, or outside the repository", () => {
     const { primary } = report()
-    assert.deepEqual(primary.edits, { artifacts: 1, tests: 1, product: 1 })
+    assert.deepEqual(primary.edits, { artifacts: 1, tests: 1, product: 1, other: 1 })
   })
 
-  it("ST-B5 — counts bookkeeping calls: artifact edits, date, progress bar, and mark", () => {
+  it("ST-B5 — counts bookkeeping: artifact edits and scripted writes, date, progress bar, mark, progress tool", () => {
     const { primary } = report()
-    assert.equal(primary.tool_calls, 8)
-    assert.equal(primary.bookkeeping_calls, 4)
+    assert.equal(primary.tool_calls, 16)
+    // artifact edit, date, progress bar, sed -i on a plan, multi-line mark, codeops_progress;
+    // `grep -n date` is not a timestamp
+    assert.equal(primary.bookkeeping_calls, 6)
   })
 
   it("ST-B6 — never prints message, prompt, command, or file text", () => {
@@ -213,5 +240,37 @@ describe("bench sessions", () => {
         assert.equal(out.includes(secret), false, `output leaked ${secret}`)
       }
     }
+  })
+
+  it("ST-B7 — classifies dispatches by the template their prompt carries, never by description", () => {
+    const { primary } = report()
+    assert.deepEqual(primary.dispatches, { review: 1, refute: 1, audit: 1, executor: 1, other: 1 })
+    assert.equal(primary.review_rounds, 1)
+    assert.equal(primary.refute_rounds, 1)
+    assert.equal(primary.reviewer_dispatches, 1)
+  })
+})
+
+describe("bench plans", () => {
+  it("ST-B8 — counts a task as verification by what it produces or runs, whatever the verb", () => {
+    const plan = join(dir, "plan-fixture")
+    const rows = [
+      ["Create `scripts/x.spec.test.mjs` (6 cases) — confirm it fails", true],
+      ["Update tests for the new parser", true],
+      ["Spec tests for the parser (red)", true],
+      ["Test the parser end to end", true],
+      ["**[spec]** Write tests", true],
+      ["Full verification: `npm run verify`", true],
+      ["Add the skill's checks (frontmatter) to content tests", true],
+      ["Write the parser (AC-1..AC-4) with tests", false],
+      ["Write the README section on testing fixtures", false],
+      ["Implement X (tests follow in 1.1.3)", false],
+    ]
+    const lines = rows.map(([text], index) => `- [ ] 1.1.${index + 1} ${text}`)
+    mkdirSync(plan, { recursive: true })
+    writeFileSync(join(plan, "99-execution-plan.md"), `# Plan\n\n${lines.join("\n")}\n`)
+    const [result] = JSON.parse(bench(["plans", plan, "--json"]))
+    assert.equal(result.tasks, rows.length)
+    assert.equal(result.verification_tasks, rows.filter(([, verify]) => verify).length)
   })
 })

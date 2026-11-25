@@ -1,0 +1,25 @@
+# Fixed interface facts (identical for every arm)
+
+The implementation must satisfy these surfaces exactly. Everything else is a design decision.
+
+## `bin/lib/codeops-rpc.mjs` (new) — declarations for `bin/lib/codeops-rpc.d.mts`
+
+```ts
+@@CODEOPS_RPC_DTS@@```
+
+## Behavior pinned by acceptance
+
+- `registerCodeOpsRpc(ctx, { pluginVersion })` resolves to `false` and never throws when `ctx.rpc`
+  is missing, `ctx.rpc` is `{}`, `ctx.rpc.register` is not a function, or `register` rejects. On
+  success it resolves to `true` after registering a definition whose `id` is `"codeops"` with a
+  `status` handler that returns exactly `{ pluginVersion, openCodeVersion: ctx.app.version,
+  directory: ctx.location.directory }` (all strings).
+- `plugin/index.ts` registers only through `registerCodeOpsRpc`, inside `try { … } catch`, reports
+  failure through the existing `warnContentFree(…)`, and never calls `.rpc.register` directly.
+  `setup` keeps all existing hooks with and without the RPC API.
+- `plugin/tui.tsx` (new, `./tui` entry): claims the slot with `append: "sidebar.content"`, imports
+  from `../bin/lib/codeops-rpc.mjs`, renders only a payload validated by `isCodeOpsStatus`, uses no
+  `setInterval`/`setTimeout`, and contains the strip text `CodeOps v` exactly once.
+- `package.json`: `exports["./tui"]` is `"./plugin/tui.tsx"`; `files` contains `plugin/`,
+  `!plugin/*.test.mjs`, and `!plugin/*.spec.test.mjs`; `npm pack --dry-run` ships `plugin/tui.tsx`
+  and no plugin test file.

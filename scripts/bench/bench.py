@@ -39,24 +39,51 @@ TEST_PATH_RE = re.compile(
     r"(^|/)(test|tests|__tests__|spec|fixtures)/|\.test\.|\.spec\.|_test\.|_spec\.|Test\.|(^|/)test_"
 )
 PATCH_FILE_RE = re.compile(r"^\*\*\* (?:Update|Add|Delete) File: (.+)$", re.MULTILINE)
-DATE_RE = re.compile(r"(^|[\s;&|(`])date(\s|$|\))")
-PLAN_BOOKKEEPING_RE = re.compile(r"codeops_plan\.py\b.*(--progress-bar|\smark\s)")
-REVIEW_RE = re.compile(r"review|audit|refut", re.IGNORECASE)
+#: `date` in command position: at the start, after a separator, or inside `$(` / backticks.
+DATE_RE = re.compile(r"(?:^|[;&|]\s*|\$\(\s*|`\s*)date\b", re.MULTILINE)
+PLAN_BOOKKEEPING_RE = re.compile(r"codeops_plan\.py\b.*?(--progress-bar|\smark\b)", re.DOTALL)
+#: A shell command that writes a file (in-place edit, redirect, tee, scripted write).
+SHELL_WRITE_RE = re.compile(
+    r"\b(?:sed|perl)\s+(?:-\w+\s+)*-i|>>?\s*[\"']?[\w./-]+|\btee\b|write_text\(|open\([^)]*['\"][wa]['\"]"
+)
+#: An artifact path inside a shell command (after a space, quote, slash, or `=`).
+ARTIFACT_IN_COMMAND_RE = re.compile(r"(?:^|[\s/'\"=])(?:plans|requirements|codeops)/")
+PROGRESS_TOOLS = {"codeops_progress"}
+DISPATCH_TOOLS = {"subagent", "task"}
+TEMPLATE_RE = re.compile(r"Agent template:\s*([\w-]+)|project domain specialist (reviewer|executor)")
+REFUTE_RE = re.compile(r"^Mode:\s*refute\b", re.MULTILINE)
+REVIEW_ROLES = {
+    "phase-reviewer", "correctness-reviewer", "security-auditor", "perf-auditor",
+    "financial-integrity-auditor", "concurrency-auditor", "semantics-reviewer",
+    "domain-specialist-reviewer", "performance-auditor", "reviewer",
+}
+AUDIT_ROLES = {"preflight-auditor"}
+EXECUTOR_ROLES = {"plan-task-executor", "plan-task-executor-opus", "domain-specialist-executor",
+                  "executor", "executor-opus", "demanding-executor"}
 
 TASK_RE = re.compile(
     r"^-\s*\[[ xX~!]\]\s+(?:\*\*)?(?:[0-9]+\.[0-9]+\.[0-9]+|T-[0-9]+\.[0-9]+)\b(?:\*\*)?\s*(.*)$"
 )
 FENCE_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
-ROLE_TAG_RE = re.compile(r"^(\[[^\]]+\]\s*)+")
+ROLE_TAG_RE = re.compile(r"^(?:\[[^\]]+\]\s*)+")
 VERIFY_VERB_RE = re.compile(
-    r"^(?:(?:run|verify|review|re-review|audit|red|green|gate|confirm|check|smoke)\b"
+    r"^(?:(?:run|verify|review|re-review|audit|red|green|gate|confirm|check|smoke|test)\b"
     r"|(?:final\s+)?full\s+verif)",
     re.IGNORECASE,
 )
-AUTHOR_VERB_RE = re.compile(r"^(?:write|add|author|extend)\b", re.IGNORECASE)
-TEST_OBJECT_RE = re.compile(r"(?<![-\w])(?:tests?|fixtures?)(?![-\w])|\.(?:spec|impl)\.test\.|\.test\.", re.IGNORECASE)
-#: How far into an authoring task its object may appear ("Write the parser spec tests …").
-TEST_OBJECT_WINDOW = 80
+#: What a task produces: tests, spec cases, test files, or fixtures.
+TEST_OBJECT_RE = re.compile(
+    r"(?<![-\w])(?:tests?|spec\s+(?:tests?|cases?|files?)|fixtures?)(?![-\w])|\.(?:spec|impl)\.test\.|\.test\.",
+    re.IGNORECASE,
+)
+#: Documentation *about* tests ("the README section on testing fixtures") is not verification.
+DOC_ABOUT_RE = re.compile(
+    r"\b(?:readme|docs?|documentation|guide|changelog|section)\b.*?\b(?:on|about|describing|covering)\b",
+    re.IGNORECASE,
+)
+#: The task's first clause names its object; later clauses are detail ("— confirm it fails").
+CLAUSE_SPLIT_RE = re.compile(r"\s+[—–]\s+|;\s+|,\s+|\s+with\s+")
+PAREN_RE = re.compile(r"\([^)]*\)")
 CASE_RE = re.compile(r"\b(?:ST|AC)-[0-9]+\b")
 DECISION_RE = re.compile(r"\bD-[0-9]+\b")
 REGISTER_ROW_RE = re.compile(r"^\|\s*[0-9]+\s*\|", re.MULTILINE)
@@ -122,18 +149,22 @@ def token_split(data: dict) -> Tuple[int, int, int]:
     return fresh, read, inp + read + write
 
 
-def relative_path(path: str, directory: str) -> str:
-    """Express a tool path relative to the session directory when it lies inside it."""
+def relative_path(path: str, directory: str) -> Optional[str]:
+    """Express a tool path relative to the session directory; None when it lies outside it."""
     base = directory.rstrip("/") + "/"
-    return path[len(base):] if path.startswith(base) else path.lstrip("./")
+    if path.startswith(base):
+        return path[len(base):]
+    return None if path.startswith("/") else path.lstrip("./")
 
 
-def classify_path(path: str) -> str:
-    """Classify a repository path as `artifacts`, `tests`, or `product`.
+def classify_path(path: Optional[str]) -> str:
+    """Classify a path as `artifacts`, `tests`, `product`, or `other` (outside the repository).
 
     Artifact folders are matched as any path segment, because a session's recorded directory
     can be an ancestor of the repository it works in (headless runs in a worktree).
     """
+    if path is None:
+        return "other"
     if ARTIFACT_RE.search(path):
         return "artifacts"
     if TEST_PATH_RE.search(path):
@@ -151,8 +182,35 @@ def edited_paths(call: dict) -> List[str]:
 
 
 def is_bookkeeping_shell(command: str) -> bool:
-    """Tell whether a shell command is timestamp or plan-progress bookkeeping."""
-    return bool(DATE_RE.search(command) or PLAN_BOOKKEEPING_RE.search(command))
+    """Tell whether a shell command is bookkeeping.
+
+    Bookkeeping is a timestamp (`date` in command position), a plan-progress call
+    (`codeops_plan.py --progress-bar` or `mark`, also across line continuations), or a scripted
+    write to a CodeOps artifact (`sed -i`, redirects, `tee`, or a scripted file write that names
+    a `plans/`, `requirements/`, or `codeops/` path).
+    """
+    if DATE_RE.search(command) or PLAN_BOOKKEEPING_RE.search(command):
+        return True
+    return bool(ARTIFACT_IN_COMMAND_RE.search(command) and SHELL_WRITE_RE.search(command))
+
+
+def dispatch_class(inp: dict) -> str:
+    """Classify a subagent dispatch as `review`, `refute`, `audit`, `executor`, or `other`.
+
+    The template text the prompt carries decides (prompts are inspected in memory, never
+    printed); a named agent role is the fallback. Free-text descriptions never decide.
+    """
+    prompt = str(inp.get("prompt") or "")
+    match = TEMPLATE_RE.search(prompt)
+    role = (match.group(1) or f"domain-specialist-{match.group(2)}") if match else str(
+        inp.get("agent") or inp.get("subagent_type") or "")
+    if role in REVIEW_ROLES:
+        return "refute" if REFUTE_RE.search(prompt) else "review"
+    if role in AUDIT_ROLES:
+        return "audit"
+    if role in EXECUTOR_ROLES:
+        return "executor"
+    return "other"
 
 
 def percentile(values: List[int], fraction: float) -> int:
@@ -168,14 +226,15 @@ def measure_primary(db: sqlite3.Connection, session_id: str) -> dict:
     row = db.execute("SELECT directory FROM session_v2 WHERE id = ?", (session_id,)).fetchone()
     directory = row[0] if row else ""
     contexts: List[int] = []
-    edits = {"artifacts": 0, "tests": 0, "product": 0}
+    edits = {"artifacts": 0, "tests": 0, "product": 0, "other": 0}
+    dispatches = {"review": 0, "refute": 0, "audit": 0, "executor": 0, "other": 0}
     models: Counter = Counter()
-    total_calls = bookkeeping = dispatches = rounds = 0
+    total_calls = bookkeeping = rounds = refute_rounds = 0
     for mid, data in assistant_messages(db, session_id):
         contexts.append(token_split(data)[2])
         model = data.get("model") or {}
         models["{}/{}#{}".format(model.get("providerID", "?"), model.get("id", "?"), model.get("variant") or "-")] += 1
-        reviewed = False
+        step_classes = set()
         for call in tool_calls(db, mid, data):
             total_calls += 1
             name = call.get("name")
@@ -188,12 +247,14 @@ def measure_primary(db: sqlite3.Connection, session_id: str) -> dict:
                     bookkeeping += 1
             elif name in ("shell", "bash") and is_bookkeeping_shell(str(inp.get("command") or "")):
                 bookkeeping += 1
-            elif name in ("subagent", "task") and REVIEW_RE.search(
-                "{} {}".format(inp.get("agent") or inp.get("subagent_type") or "", inp.get("description") or "")
-            ):
-                dispatches += 1
-                reviewed = True
-        rounds += int(reviewed)
+            elif name in PROGRESS_TOOLS:
+                bookkeeping += 1
+            elif name in DISPATCH_TOOLS:
+                cls = dispatch_class(inp)
+                dispatches[cls] += 1
+                step_classes.add(cls)
+        rounds += int("review" in step_classes)
+        refute_rounds += int("refute" in step_classes)
     return {
         "session": session_id,
         "steps": len(contexts),
@@ -203,7 +264,9 @@ def measure_primary(db: sqlite3.Connection, session_id: str) -> dict:
         "edits": edits,
         "bookkeeping_calls": bookkeeping,
         "review_rounds": rounds,
-        "reviewer_dispatches": dispatches,
+        "reviewer_dispatches": dispatches["review"],
+        "refute_rounds": refute_rounds,
+        "dispatches": dispatches,
         "model": models.most_common(1)[0][0] if models else None,
     }
 
@@ -226,6 +289,11 @@ def measure_tree(db: sqlite3.Connection, root: str) -> dict:
         "fresh": 0, "cached": 0, "cost": 0.0, "messages": 0, "compactions": 0,
         "subagent_fresh": 0, "subagent_cached": 0,
     }
+    contexts: List[int] = []
+    for sid in ids:
+        contexts += [token_split(data)[2] for _mid, data in assistant_messages(db, sid)]
+    totals["ctx_median"] = int(statistics.median(contexts)) if contexts else 0
+    totals["ctx_p90"] = percentile(contexts, 0.9)
     for sid in ids:
         spends = [(data, False) for _mid, data in assistant_messages(db, sid)]
         spends += [(data, True) for data in compaction_messages(db, sid)]
@@ -289,13 +357,14 @@ def is_verification_task(text: str) -> bool:
     """Classify a task by its leading verb phrase.
 
     Verification means running or checking (run, verify, review, audit, red/green, gate, smoke,
-    full verification) or authoring tests (write/add/author/extend whose object, near the start,
-    is tests, a test file, or fixtures).
+    test, full verification), or producing tests whatever the verb: the task's first clause names
+    tests, spec cases, a test file, or fixtures, and not documentation about them.
     """
-    head = ROLE_TAG_RE.sub("", text.lstrip("`* "))
+    head = ROLE_TAG_RE.sub("", text.lstrip("* ")).lstrip("`* ")
     if VERIFY_VERB_RE.match(head):
         return True
-    return bool(AUTHOR_VERB_RE.match(head) and TEST_OBJECT_RE.search(head[:TEST_OBJECT_WINDOW]))
+    clause = CLAUSE_SPLIT_RE.split(PAREN_RE.sub("", head), 1)[0]
+    return bool(TEST_OBJECT_RE.search(clause) and not DOC_ABOUT_RE.search(clause))
 
 
 def measure_plan(plan_dir: Path) -> dict:

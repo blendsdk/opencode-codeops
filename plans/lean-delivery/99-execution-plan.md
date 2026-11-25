@@ -2,7 +2,7 @@
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
 > **Progress**: 0/37 tasks (0%)
-> **Last Updated**: 2026-11-25 22:56
+> **Last Updated**: 2026-11-26 00:15
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -104,6 +104,7 @@ Findings that shape the levers:
 | D-11 | Arm runtime: arms read SKILL and `_shared` files by path from a checkout of the ref under test and run `${CODEOPS_PLUGIN_ROOT}` commands against that checkout; reviewer/executor roles run as generic subagents with the ref's template text in the packet; plugin hooks stay at the installed version as a controlled constant | User, 2026-11-25 |
 | D-12 | Release as MAJOR (3.0.0); contract-changing commits carry a `BREAKING CHANGE:` footer | User, 2026-11-25 |
 | D-13 | Arm isolation is enforced by the OS: bubblewrap sandbox, private standalone OpenCode with no session history, CodeOps plugin off for every arm with the ref's standards loaded through `instructions` (revises D-11's "plugin hooks stay at the installed version"), network limited to the model API plus an npm mirror that refuses CodeOps, automatic per-arm audit; the harness is committed under `scripts/bench/harness/` | User, 2026-11-25 |
+| D-14 | Phase 0 review fixes: subject M is slice 1 only (TUI/RPC foundation, FR-6–FR-9 and FR-11; acceptance = the tui-foundation spec) because slice 0 changes CodeOps's own plan parser, which every ref ships and arms can read or probe; the bench spec's review, bookkeeping, and edit-class assertions are superseded by stricter ones (template-based dispatch classes, refute rounds, scripted artifact writes, progress-tool calls, out-of-repo edits, tree-wide context, a classifier table); all five baselines are rerun | User, 2026-11-26 |
 
 ## Measurement method
 
@@ -133,10 +134,10 @@ only counts and classes):
 3. **Sessions.** Each workflow is its own sibling arm session on the same worktree: make-plan;
    preflight (baseline refs only); exec-plan. Gates name the workflow they measure.
 4. **Inputs (identical across arms).**
-   - **M** = `live-task-sidebar`: `01-requirements.md` and `00-ambiguity-register.md` read from
-     `d168332` (the register is a question→answer lookup), plus an interface excerpt (exported
-     names); base = `d168332^`; scope = M's Phases 1–2; acceptance = its spec tests from
-     `d168332..6ac519d` excluding ST-12 (live smoke). Post-Wave-1 arms pin
+   - **M** = `live-task-sidebar` slice 1 (D-14): `01-requirements.md` and
+     `00-ambiguity-register.md` read from `d168332` (the register is a question→answer lookup),
+     plus an interface sheet; base = `d168332^`; scope = FR-6–FR-9 and FR-11 (no slice 0, no live
+     smoke); acceptance = `plugin/tui-foundation.spec.test.mjs` at `6ac519d`. Post-Wave-1 arms pin
      `quality.verificationTier: standard` in the worktree's `codeops/codeops.json`.
    - **S** = `reasoning-effort-trace` T-03.1–T-03.3: the plan objective plus the interface excerpt
      (`isEffortTraceEnabled`, `appendEffortTrace`, `sessionEffortTracePath`); base = `80f4e18^`;
@@ -169,7 +170,7 @@ only counts and classes):
 - [x] 0.1.3 Add `"!scripts/bench/"` to `package.json` `files`; write `scripts/bench/README.md` (kit usage and the arm protocol) ✅ (completed: 2026-11-25 12:53; `npm pack --dry-run` lists no bench file)
 - [x] 0.1.4 Smoke arm (D-9): one headless `opencode run` root session in a throwaway worktree dispatches one reviewer subagent and reads a skill by path from a ref checkout; `bench.py sessions --root` shows the child session and the main checkout's `git status` is unchanged ✅ (completed: 2026-11-25 12:54; `ses_ded71fc75ffe3iujkpVyMlKMXn`, 35 s: skill read by path from the ref, 1 child session, 1 review dispatch detected, main checkout unchanged; headless default model is `opencode/tidepool-alpha-free`, so arms pass `-m` explicitly)
 - [x] 0.1.5 Calibrate: `bench.py sessions --root` on the three §Evidence references reproduces fresh, cached, and message counts within 1% ✅ (completed: 2026-11-25 12:53; exact match on all three (fresh, cached, messages, subagent sessions) once compaction spend is counted)
-- [x] 0.1.6 Pin the baseline ref (current main SHA, recorded in §Results); baseline arms: M ×2 (make-plan, preflight, exec-plan sessions) and S ×3 (exec-plan); record metrics, the noise band, and the exec-plan bookkeeping step share ✅ (completed: 2026-11-25 22:56; baseline in §Results; 5 valid sandboxed arms)
+- [ ] 0.1.6 Pin the baseline ref (current main SHA, recorded in §Results); baseline arms: M ×2 (make-plan, preflight, exec-plan sessions) and S ×3 (exec-plan); record metrics, the noise band, and the exec-plan bookkeeping step share (reopened 2026-11-26 00:15: rerun under the corrected harness, D-14)
 - [x] 0.1.7 Optional reference arm: M ×1 on `v2.8.1` (attributes Wave 1; no gate) ✅ (completed: 2026-11-25 22:56; skipped by design — optional, no gate; attributing Wave 1 does not change any decision here)
 - [~] 0.1.8 `bench.py plans` on H, M, S originals and `bench.py instructions` on the baseline ref; record in §Results; end-of-phase review ⏳ (implemented: 2026-11-25 22:56; static baselines in §Results; end-of-phase review pending)
 
@@ -245,35 +246,13 @@ full-checkout ref, two through this repository's history from subagents that nev
 prompt rules, one through a global npm install and the npm registry — plus the first unsandboxed
 set, rerun under identical conditions. All five valid baselines below have clean audits.
 
-### Phase 0 baseline (valid arms)
+### Phase 0 baseline
 
-| Arm | Workflow | Min | Fresh | Cached | Primary steps | Median ctx/step | Tool calls | Bookkeeping calls | Subagents | Review rounds / dispatches | Cost |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| S1 | exec-plan | 12 | 289,994 | 10,079,744 | 69 | 131,556 | 119 | 32 (27%) | 1 | 1 / 1 | — |
-| S2 | exec-plan | 11 | 250,694 | 10,149,632 | 82 | 122,057 | 126 | 37 (29%) | 1 | 1 / 1 | — |
-| S3 | exec-plan | 12 | 269,667 | 8,004,224 | 56 | 112,306 | 96 | 31 (32%) | 1 | 1 / 1 | — |
-| M1 | make-plan + preflight | 64 | 2,995,363 | 139,973,248 | — | — | — | — | — | — | — |
-| M1 | exec-plan | 40 | 856,487 | 50,215,552 | — | — | — | — | — | — | — |
-| M2 | make-plan + preflight | 48 | 2,692,057 | 162,783,104 | — | — | — | — | — | — | — |
-| M2 | exec-plan | 53 | 965,561 | 62,615,680 | — | — | — | — | — | — | — |
-
-Medians per workflow (spread = (max − min) / median across repeats):
-
-| Workflow | n | Min | Fresh | Cached | Primary steps | Median ctx/step | Bookkeeping share of calls | Review rounds / dispatches |
-|---|---|---|---|---|---|---|---|---|
-| S exec-plan | 3 | 11.9 (12%) | 269,667 (15%) | 10,079,744 (21%) | 69 (38%) | 122,057 (16%) | 29% (18%) | 1 / 1 |
-| M make-plan | 2 | 19.3 (12%) | 1,140,138 (8%) | 63,517,632 (37%) | 180 (53%) | 260,065 (10%) | 35% (7%) | 0 / 0 |
-| M preflight | 2 | 36.6 (36%) | 1,703,572 (12%) | 87,860,544 (1%) | 197 (8%) | 299,349 (4%) | 17% (98%) | 0.5 / 2.5 |
-| M exec-plan | 2 | 46.5 (28%) | 911,024 (12%) | 56,415,616 (22%) | 212 (13%) | 205,102 (6%) | 40% (7%) | 3 / 3 |
-
-| Quality and shape | M1 | M2 | S1–S3 |
-|---|---|---|---|
-| Acceptance (original specs) | 16/16, verify ✅ | 15/16 (ST-7 edge case), own verify ✅ | 36/36, verify ✅ (each) |
-| Plan documents / KB | 11 / 155.8 | 11 / 154.0 | 1 / ~3 |
-| Tasks / verification share | 15 / 47% | 18 / 44% | 3 / 67% |
-| Spec cases / decisions | 17 / — | 15 / 34 | — |
-| Assumptions logged | 32 | 16 | 2 each |
-| Total cost (planning + execution) | $2.02 | $2.08 | — |
+_Superseded on 2026-11-26 by the Phase 0 review (D-14): arm M1 read subject M's slice-0 answer
+from the ref's compiled parser tools, the audit could not see it, and several metrics were biased
+(review dispatches by description, wording-dependent verification classifier, bookkeeping gaps).
+The five baselines are being rerun under the corrected harness; the earlier numbers are kept in the
+output store under `discarded/` and are not used for any gate._
 
 **Static baselines (0.1.8).** Original plans: H 15 docs / 254 KB / 86 tasks / 48% verification;
 M 10 / 119 KB / 14 / 57%; S 1 / 1.8 KB / 6 / 33%. Instruction footprint at the baseline ref

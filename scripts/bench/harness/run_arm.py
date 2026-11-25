@@ -21,8 +21,8 @@ TIMEOUT = {"make-plan": 5400, "preflight": 5400, "exec-plan": 10800}
 
 SUBJECTS = {
     "M": {"base": "d168332^", "slug": "live-task-sidebar",
-          "accept": ["scripts/codeops_plan.spec.test.mjs", "scripts/codeops_plan_migrate.spec.test.mjs",
-                     "plugin/tui-foundation.spec.test.mjs"]},
+          # Slice 1 only: slice 0 fixes CodeOps's own plan parser, which every ref ships and runs.
+          "accept": ["plugin/tui-foundation.spec.test.mjs"]},
     "S": {"base": "80f4e18^", "slug": "reasoning-effort-trace",
           "accept": ["bin/reasoning-effort.spec.test.mjs", "scripts/reasoning-effort-content.spec.test.mjs"]},
 }
@@ -37,7 +37,7 @@ Rules (all mandatory):
 2. Wherever the text says ${{CODEOPS_PLUGIN_ROOT}}, use {ref} (never the environment variable).
 3. When the text dispatches a named CodeOps agent role, dispatch the `general` subagent and start
    its prompt with the full text of that role's template from {ref}/agent-templates/ (the
-   role -> template map is ROLE_TO_TEMPLATE in {ref}/scripts/install_agents.py), then the packet.
+   role -> template map is {ref}/agent-templates/ROLES.md), then the packet.
 4. NEVER use the question tool. Whenever the workflow asks the user something or needs a user
    decision or approval, answer it yourself: use the input packet first; if it does not answer the
    question, choose the recommended option and append one line
@@ -51,8 +51,9 @@ Rules (all mandatory):
 
 TASKS = {
     ("M", "make-plan"): """Workflow: make-plan. Feature name: `live-task-sidebar`.
-Plan only the requirements in {p}/01-requirements.md EXCEPT FR-10 (the live smoke on an
-installed OpenCode build): leave FR-10 out of scope and plan no live-smoke task.
+Plan only slice 1 of {p}/01-requirements.md: FR-6, FR-7, FR-8, FR-9, and FR-11. Slice 0 (FR-1 to
+FR-5 and FR-12) and FR-10 (the live smoke on an installed OpenCode build) are out of scope: plan no
+task for them.
 {p}/00-ambiguity-register.md holds the user's recorded answers: use it as a question -> answer
 lookup for every decision the workflow raises. {p}/interface.md lists fixed interface facts the
 implementation must satisfy. Write the plan under {subj}/plans/live-task-sidebar/.""",
@@ -84,7 +85,13 @@ def session_id(title, db_path):
 
 
 def audit(db_path, root, allowed):
-    """List tool-input paths under /home or /tmp outside the arm's allowed roots (sandbox check)."""
+    """List tool-input paths that reach outside the arm's roots (sandbox check).
+
+    Flagged: any /home path other than the sandbox home, and any harness path under /tmp
+    (refs, tools, packets, other arms) outside the arm's own ref, packet, and workspace — the
+    compiled tools included, which arms may run only through the ref's stubs. Other /tmp paths
+    are the arm's own scratch.
+    """
     sys.path.insert(0, str(REPO / "scripts/bench"))
     import bench
     db = bench.open_db(Path(db_path))
@@ -94,7 +101,9 @@ def audit(db_path, root, allowed):
             for c in bench.tool_calls(db, mid, data):
                 blob = json.dumps((c.get("state") or {}).get("input") or {})
                 for path in re.findall(r"(/(?:home|tmp)/[^\s\"'`;|&)\\]+)", blob):
-                    if not path.startswith(allowed):
+                    harness = path.startswith((str(W), "/tmp/.bench"))
+                    home = path.startswith("/home/") and not path.startswith(sandbox.ARM_HOME)
+                    if (harness or home) and not path.startswith(allowed):
                         bad.add(path[:80])
     return sorted(bad)
 
@@ -110,11 +119,13 @@ def main():
     s = SUBJECTS[a.subject]
     wfs = a.workflows.split(",") if a.workflows else (
         ["make-plan", "preflight", "exec-plan"] if a.subject == "M" else ["exec-plan"])
-    ref = W / f"ref-{a.ref}"
-    if not ref.is_dir():
-        rc, out = sh(["python3", "-I", str(Path(__file__).with_name("build_ref.py")), a.ref])
-        if rc:
-            sys.exit(f"ref build failed: {out}")
+    # Rebuild the ref for every arm from the full SHA: no stale or hand-edited ref is ever reused.
+    full = sh(["git", "-C", str(REPO), "rev-parse", "--verify", a.ref + "^{commit}"])[1].strip()
+    a.ref = full[:7]
+    rc, out = sh(["python3", "-I", str(Path(__file__).with_name("build_ref.py")), full])
+    if rc:
+        sys.exit(f"ref build failed: {out}")
+    ref = Path(out.strip().splitlines()[-1])
     work = W / "arms" / f"{a.subject}-{a.ref}-{a.n}"
     arm = STORE / "arms" / f"{a.subject}-{a.ref}-{a.n}"
     if arm.exists() or work.exists():
@@ -149,11 +160,11 @@ def main():
             "schema": 1, "mode": "strict", "artifacts": {"layout": "flat", "root": "plans"},
             "quality": {"verificationTier": "standard"}}, indent=2) + "\n")
     main_before = sh(["git", "-C", str(REPO), "status", "--porcelain"])[1]
-    tools = W / f"tools-{a.ref}"
+    tools = ref.with_name(ref.name.replace("ref-", "tools-", 1))
     data_dir, config_dir = arm / "data", arm / "config"
     db_path = sandbox.seed_data(data_dir)
     sandbox.write_config(config_dir, ref)
-    allowed = (str(ref), str(tools), str(p), str(work), "/tmp/", sandbox.ARM_HOME)
+    allowed = (str(ref), str(p), str(work), sandbox.ARM_HOME)
     # Network: model API only (CONNECT allow-list) plus an npm mirror that refuses CodeOps itself.
     net_dir = arm / "net"
     net_dir.mkdir()
@@ -202,10 +213,18 @@ def main():
         dst = subj / rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(accept_src / rel, dst)
-    rc, out = sh(["node", "--test", *s["accept"]], cwd=subj, timeout=900)
+    # Arm-written code runs inside the sandbox, with no network (no proxies are listening).
+    offline = arm / "offline"
+    offline.mkdir()
+
+    def boxed(argv):
+        return sandbox.bwrap(argv, cwd=subj, data_dir=data_dir, config_dir=config_dir, proxy_dir=offline,
+                             ro=[ref, p], rw=[work])
+
+    rc, out = sh(boxed(["node", "--test", *s["accept"]]), timeout=900)
     (arm / "accept.log").write_text(out)
     pas = re.search(r"ℹ pass (\d+)", out); fail = re.search(r"ℹ fail (\d+)", out)
-    vrc, vout = sh(["npm", "run", "verify"], cwd=subj, timeout=1800)
+    vrc, vout = sh(boxed(["npm", "run", "verify"]), timeout=1800)
     (arm / "verify.log").write_text(vout)
     main_after = sh(["git", "-C", str(REPO), "status", "--porcelain"])[1]
     plans = sh(["python3", "-I", str(REPO / "scripts/bench/bench.py"), "plans", "--json",
@@ -227,6 +246,7 @@ def main():
         shutil.copytree(subj / "plans" / s["slug"], arm / "plan", dirs_exist_ok=True)
     (arm / "subject.diff").write_text(sh(["git", "diff", "HEAD"], cwd=subj)[1])
     shutil.copy(assumptions, arm / "assumptions.md")
+    sandbox.scrub_credentials(db_path)
     shutil.rmtree(work, ignore_errors=True)
     note("done " + json.dumps(summary))
     print(json.dumps(summary))

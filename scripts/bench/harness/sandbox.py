@@ -14,6 +14,8 @@ HOST_DB = Path.home() / ".local/share/opencode/opencode.db"
 NVM = Path.home() / ".nvm"
 OC_BIN = Path.home() / ".opencode/bin"
 ARM_HOME = "/home/arm"
+#: Only the arm model's provider credential is copied in; it is wiped after the arm.
+CREDENTIAL_PROVIDER = "deepseek"
 KV_KEYS = ("models-dev:v3:catalog", "models-dev:v3:catalog:meta", "websearch:provider")
 
 
@@ -28,7 +30,8 @@ def seed_data(data_dir: Path) -> Path:
         "ORDER BY CASE type WHEN 'table' THEN 0 ELSE 1 END"
     ):
         dst.execute(sql)
-    for table, where, args in (("migration", "", ()), ("credential", "", ()),
+    for table, where, args in (("migration", "", ()),
+                               ("credential", " WHERE integration_id = ?", (CREDENTIAL_PROVIDER,)),
                                ("kv", f" WHERE key IN ({','.join('?' * len(KV_KEYS))})", KV_KEYS)):
         cols = [r[1] for r in src.execute(f"PRAGMA table_info({table})")]
         rows = src.execute(f"SELECT {','.join(cols)} FROM {table}{where}", args).fetchall()
@@ -93,3 +96,12 @@ def bwrap(argv, *, cwd: Path, data_dir: Path, config_dir: Path, proxy_dir: Path,
 def node_version() -> str:
     """The nvm node directory name in use on the host (for example v24.21.0)."""
     return shutil.which("node").split("/versions/node/")[1].split("/")[0]
+
+
+def scrub_credentials(db_path: Path) -> None:
+    """Delete every credential from an arm's data directory once the arm is finished."""
+    db = sqlite3.connect(db_path)
+    db.execute("DELETE FROM credential")
+    db.commit()
+    db.execute("VACUUM")
+    db.close()

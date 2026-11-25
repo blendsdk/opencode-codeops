@@ -33,11 +33,11 @@ python3 scripts/bench/bench.py instructions --ref <checkout> [--json]
 | cached | cache.read over the same messages |
 | messages | assistant messages in the tree (compactions are counted separately) |
 | steps | assistant messages of the named (primary) session only |
-| ctx per step | input + cache.read + cache.write of one primary assistant message; median and p90 (nearest rank) |
-| edits | primary `edit`/`write`/`patch` targets, classed as `artifacts` (`plans/`, `requirements/`, `codeops/`), `tests` (test naming or test folders), or `product` |
-| bookkeeping calls | primary edits that touch an artifact, plus shell calls that run `date` or `codeops_plan.py` with `--progress-bar` or `mark` |
-| review rounds / dispatches | primary steps that dispatch at least one subagent whose agent or description names review, audit, or refute / the number of such dispatches |
-| verification tasks | numbered plan tasks whose leading phrase runs or checks (run, verify, review, audit, red, green, gate, confirm, check, smoke, full verification) or authors tests (write/add/author/extend whose object near the start is tests, a test file, or fixtures) |
+| ctx per step | input + cache.read + cache.write of one assistant message; median and p90 (nearest rank) for the primary session and for the whole tree |
+| edits | primary `edit`/`write`/`patch` targets, classed as `artifacts` (`plans/`, `requirements/`, `codeops/`), `tests` (test naming or test folders), `product`, or `other` (outside the repository) |
+| bookkeeping calls | primary edits that touch an artifact; shell calls that run `date` in command position, call `codeops_plan.py` with `--progress-bar` or `mark` (also across line continuations), or write an artifact path (`sed -i`, redirects, `tee`, scripted writes); and `codeops_progress` tool calls |
+| dispatches | each subagent dispatch classed by the agent template its prompt carries (the named role as fallback; never the description): `review`, `refute` (a review template whose packet starts `Mode: refute`), `audit` (preflight), `executor`, `other`; review rounds and refute rounds = primary steps with at least one such dispatch |
+| verification tasks | numbered plan tasks that run or check (run, verify, review, audit, red, green, gate, confirm, check, smoke, test, full verification) or whose first clause (parenthetical asides removed) produces tests, spec cases, a test file, or fixtures — not documentation *about* them |
 | instruction tokens | characters / 4 of SKILL.md plus linked Markdown, two levels deep; a link is conditional when its line names a flag, tier, or condition |
 
 OpenCode stores a message's tool calls either in the message's `content` list or in
@@ -55,13 +55,18 @@ dispatches, so isolation is enforced by the OS, not by instructions.
 python3 scripts/bench/harness/run_arm.py <M|S> <n> <ref-sha> [--pin-tier] [--workflows a,b]
 ```
 
-Outputs (results, logs, diffs, acceptance specs, per-arm session databases) go to
-`~/.local/state/codeops-bench/`; inputs live in `$TMPDIR/bench-lean/`.
+`python3 scripts/bench/harness/build_packets.py` regenerates the inputs from git history plus
+`harness/packets/`. Outputs (results, logs, diffs, acceptance specs, per-arm session databases)
+go to `~/.local/state/codeops-bench/`; inputs live in `/tmp/bench-lean/`.
 
 1. **Process-only ref** (`harness/build_ref.py`). A copy of `skills/`, `_shared/`,
    `agent-templates/`, `standards/`, `references/`, `schemas/`, and the process scripts — never
-   product code. Python tools become stubs that run compiled bytecode, text that documents a
-   subject's deliverable is removed, and the build fails if a subject answer remains. Arms read
+   product code — rebuilt from the full SHA for every arm. Python tools become stubs that run
+   compiled bytecode; the role -> template map is written as plain `agent-templates/ROLES.md`;
+   text that documents a subject's deliverable is removed; and the build fails if a subject
+   answer remains anywhere in the ref **or its compiled tools**. A subject must never be a change
+   to a tool the workflows themselves run (a shipped tool is readable, or at least probeable, by
+   every arm). Arms read
    skills **by path** (never through the skill tool) and substitute `${CODEOPS_PLUGIN_ROOT}` with
    the ref path; reviewer and executor roles are generic subagents carrying the ref's template text.
 2. **Standalone subject.** `git init` plus a shallow fetch (`--depth 30`) of the subject's base
@@ -73,7 +78,8 @@ Outputs (results, logs, diffs, acceptance specs, per-arm session databases) go t
    packages are hidden. OpenCode runs as a private standalone server on a seeded data directory
    (schema, migrations, credentials, model catalog — no sessions) and a config with no plugins and
    no global skills; the ref's standards load through `instructions`. The CodeOps plugin is off for
-   every arm (its package contains subject answers).
+   every arm (its package contains subject answers). Only the model provider's credential is
+   copied in, and it is wiped when the arm ends.
 4. **Network** (`harness/netproxy.py`). The sandbox has its own network namespace with loopback
    only. HTTPS goes through an allow-listed CONNECT proxy (model API host only); npm goes through a
    filtering registry mirror that refuses `opencode-codeops`. Every attempt is logged; denials are
@@ -83,7 +89,9 @@ Outputs (results, logs, diffs, acceptance specs, per-arm session databases) go t
    working model. The prompt forbids the `question` tool (a headless run cannot answer it): the arm
    answers from its packet or takes the recommended option and logs an assumption.
 6. **Measure and check.** `bench.py sessions --db <arm db>`; the subject's original spec files
-   copied over the arm's own plus the subject's `npm run verify`; an automatic audit of every
-   tool input for paths outside the arm's roots; the main checkout's `git status` unchanged.
+   copied over the arm's own plus the subject's `npm run verify`, both run inside the sandbox with
+   no network; an automatic audit flags every tool input that names a `/home` path other than the
+   sandbox home or a harness path (refs, compiled tools, packets, other arms) outside the arm's own
+   ref, packet, and workspace; the main checkout's `git status` unchanged.
 7. **Repeat.** Baselines run more than once; the decision band is max(10%, observed spread); a pass
    inside the band gets one confirming re-run; report medians.
