@@ -2,8 +2,8 @@
 
 > **Document**: 99-execution-plan.md
 > **Parent**: [Index](00-index.md)
-> **Last Updated**: 2026-11-25 08:36
-> **Progress**: 28/31 tasks (90%)
+> **Last Updated**: 2026-11-25 09:37
+> **Progress**: 29/32 tasks (91%)
 > **CodeOps Artifact Schema**: 1
 
 ## Overview
@@ -34,9 +34,9 @@ the property (PF-030).
 | 4 | Verification balance | 3 |
 | 5 | Compaction note | 4 |
 | 6 | Skill descriptions | 3 |
-| 7 | Tracking & assessment | 3 |
+| 7 | Tracking & assessment | 4 |
 
-**Total: 31 tasks across 7 phases**
+**Total: 32 tasks across 7 phases**
 
 > **⚠️ EXECUTION RULE — APPLIES TO EVERY AGENT EXECUTING THIS PLAN:**
 >
@@ -213,7 +213,7 @@ the property (PF-030).
 
 ## Phase 7: Tracking & assessment
 
-> **Phase baseline tree**: _(recorded by exec-plan)_
+> **Phase baseline tree**: ec20c01d4bba81ffe0fd536d73ba44a6dee58bb4
 > **Reasoning**: medium — bookkeeping and measurement
 
 ### Step 7.1: Roadmap, Wave 2 issue, assessment
@@ -222,8 +222,9 @@ the property (PF-030).
 **Objective**: Track follow-up work and measure the result.
 
 - [ ] 7.1.1 Confirm `plans/00-roadmap.md` shows `REQ-RIGHT-SIZED-VERIFICATION` at its final stage and `REQ-WAVE2-ENTRY-AND-FLOWS` at ⬜ Backlog (rows added at plan creation; AR-26)
-- [ ] 7.1.2 Draft the Wave 2 GitHub issue (router + status CLI, lightweight change path, bug flow, converge pass; deferred list), show it to the user, and post it only after explicit approval (AR-8)
-- [ ] 7.1.3 Assessment replay in `$CODEOPS_TMPDIR` (00-index §Assessment): replay `make-plan` for `live-task-sidebar`, answering from its original `00-ambiguity-register.md`; record the derived tier; produce it once as `standard` (config override if it derived `critical`) and once as `critical`; record the verification share of both against the baseline and confirm the critical replay keeps today's ordering; replay `fix-shared-reference-install` as the mini-plan control; delete the replay output
+- [x] 7.1.2 Draft the Wave 2 GitHub issue (router + status CLI, lightweight change path, bug flow, converge pass; deferred list), show it to the user, and post it only after explicit approval (AR-8) ✅ (completed: 2026-11-25 09:37) — posted as issue #4 (Wave 2); the install_agents.py template-root bug filed as issue #5
+- [~] 7.1.3 Assessment replay in `$CODEOPS_TMPDIR` (00-index §Assessment): replay `make-plan` for `live-task-sidebar`, answering from its original `00-ambiguity-register.md`; record the derived tier; produce it once as `standard` (config override if it derived `critical`) and once as `critical`; record the verification share of both against the baseline and confirm the critical replay keeps today's ordering; replay `fix-shared-reference-install` as the mini-plan control; delete the replay output ⏳ (implemented: 2026-11-25 09:07)
+- [~] 7.1.4 Runtime AR-31: at `standard`, fold the green check into the implementation task and use the phase's `**Verify (gate)**` line as the gate (no separate gate task) in `_shared/spec-first-ordering.md`, `skills/make-plan/templates.md`, and `skills/make-plan/SKILL.md`; review; then re-run the 7.1.3 replay ⏳ (implemented: 2026-11-25 09:36)
 
 **Deliverables**:
 - [ ] Roadmap rows; issue posted or withheld by the user; assessment recorded in 00-index

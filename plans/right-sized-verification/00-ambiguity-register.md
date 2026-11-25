@@ -1,7 +1,7 @@
 ## Ambiguity Register: Right-Sized Verification (Wave 1)
 
-> **Status**: ✅ GATE PASSED — all 30 items resolved
-> **Last Updated**: 2026-11-24 23:52
+> **Status**: ✅ GATE PASSED — all 31 items resolved
+> **Last Updated**: 2026-11-25 09:36
 > **Coverage:** disabled — --no-coverage-hunt (AR-2)
 
 | # | Category | Ambiguity / Gap | Options Presented | User Decision | Status |
@@ -36,6 +36,7 @@
 | 28 | Behavioral | (preflight PF-006) The refuter may overturn security/perf/specialist findings and runs at critical tier, conflicting with exec-plan "a critical/major finding may never be dismissed automatically" | RV only at standard / RV all tiers / all findings all tiers (as ruled) | User: keep AR-19/AR-20 as ruled — all findings, all tiers. Consequence: refuted findings are reported and ledgered, the user may reinstate any of them, and the exec-plan "never dismissed automatically" rule is reworded to match | ✅ Resolved |
 | 29 | Behavioral | (preflight PF-012) AR-13 makes any data-and-migration lens critical; compatibility wording alone selects that lens, so most plans derive critical | Real risk only / keep AR-13 | User: `critical` when the financial lens, a security risk tag/profile, the distributed-and-concurrent lens, or a migration/backfill of persisted data applies; format or compatibility evolution alone stays `standard` (the lens still adds its questions). Refines AR-13 | ✅ Resolved |
 | 30 | Data & state | (preflight PF-014) AR-15 "changed product lines" vs AR-16 added-only with all Markdown excluded; Markdown is shipped product in docs-heavy repos | Count Markdown, exclude artifacts / keep as ruled | User: product = every non-test file including Markdown, except CodeOps artifacts (`plans/`, `requirements/`, `codeops/`), lockfiles, and generated directories (`dist/`); the review trigger counts added + deleted lines, the balance counts added lines. Refines AR-15/AR-16 | ✅ Resolved |
+| 31 | Behavioral (runtime) | Assessment replay: the standard tier still keeps a separate green-phase task and a separate per-phase gate-verify task, so it did not reduce task count (replay of live-task-sidebar: 16 tasks vs 14 original) | Tighten standard now / record and defer / record and stop | User: tighten now — at `standard` the green check runs inside the implementation task, and the phase's `**Verify (gate)**` line is the gate with no separate gate-verify task; `critical` unchanged. Verified by re-running the replay (no new test file, per AR-24) | ✅ Resolved |
 
 ### Resolution Notes
 
