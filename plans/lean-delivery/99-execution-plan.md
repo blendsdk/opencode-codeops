@@ -1,8 +1,8 @@
 # Task T-08: Lean delivery — far fewer tokens, steps, and verification tasks per feature
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 22/37 tasks (59%)
-> **Last Updated**: 2026-11-26 11:03
+> **Progress**: 27/37 tasks (73%)
+> **Last Updated**: 2026-11-26 11:05
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -208,12 +208,14 @@ only counts and classes):
 
 ### Phase 3 — Levers A+E: phase-scoped execution, one review round
 
+> **Phase baseline tree**: e0a81e0c4036c11c1c572b7b9310f856017d8639
+
 - [x] 3.1.1 List the existing spec assertions Phase 3 supersedes (e.g. `right-sized-verification-content.spec.test.mjs` ST-7 "150 … product lines") and get the user's one-batch approval (D-8) ✅ (completed: 2026-11-26 11:03; one superseded, approved: the 150-product-line review trigger (ST-7); 'at most one refute per phase' stays true)
-- [ ] 3.1.2 Write `scripts/phase-dispatch-content.spec.test.mjs` (≤ 6 cases): per-phase executor dispatch above the threshold at both tiers, the compact packet, the structured report, parent-only marks and balance, `critical` phases on the session model, standard end review round — confirm it fails
-- [ ] 3.1.3 Measure M's post-Phase-2 phase sizes (2.1.8 plans) and set the dispatch threshold so M's feature phases dispatch
-- [ ] 3.1.4 exec-plan: dispatch each phase at or above the threshold to a fresh executor with the phase packet and a structured report (files changed, verify result, blockers); the parent keeps summaries, calls `mark`, and computes the balance
-- [ ] 3.1.5 `agent-templates/plan-task-executor.md` and `plan-task-executor-opus.md`: accept the phase packet and return the report contract; regenerate packaged agents with `CODEOPS_PLUGIN_ROOT=$(pwd)`; `install_agents.py --check` clean
-- [ ] 3.1.6 Implement review timing at `standard`: one end-of-plan round + refute; per-phase round only for risk-tagged phases; remove the 150-line trigger; `critical` unchanged
+- [x] 3.1.2 Write `scripts/phase-dispatch-content.spec.test.mjs` (≤ 6 cases): per-phase executor dispatch above the threshold at both tiers, the compact packet, the structured report, parent-only marks and balance, `critical` phases on the session model, standard end review round — confirm it fails ✅ (completed: 2026-11-26 11:04; red: 6/6 fail)
+- [x] 3.1.3 Measure M's post-Phase-2 phase sizes (2.1.8 plans) and set the dispatch threshold so M's feature phases dispatch ✅ (completed: 2026-11-26 11:04; Phase 2 M plans: phases of 7, and 4+4 tasks (baseline 5+5, 4+5+2); threshold = 3 or more tasks, so every feature phase dispatches)
+- [x] 3.1.4 exec-plan: dispatch each phase at or above the threshold to a fresh executor with the phase packet and a structured report (files changed, verify result, blockers); the parent keeps summaries, calls `mark`, and computes the balance ✅ (completed: 2026-11-26 11:05; phase-scoped dispatch section, phase report, parent-only marks/gate/balance; PD-1..PD-4 green)
+- [x] 3.1.5 `agent-templates/plan-task-executor.md` and `plan-task-executor-opus.md`: accept the phase packet and return the report contract; regenerate packaged agents with `CODEOPS_PLUGIN_ROOT=$(pwd)`; `install_agents.py --check` clean ✅ (completed: 2026-11-26 11:05; both executor templates return the phase report and never edit the plan; agents and golden regenerated; --check clean)
+- [x] 3.1.6 Implement review timing at `standard`: one end-of-plan round + refute; per-phase round only for risk-tagged phases; remove the 150-line trigger; `critical` unchanged ✅ (completed: 2026-11-26 11:05; standard: one end-of-plan review round + refute, risk-tagged phases only; 150-line trigger removed; PD-5 green)
 - [ ] 3.1.7 Arm M ×n (exec-plan) on the Phase 3 SHA; gate: median context per primary step ≤ 150k, execution cached tokens −60% vs 0.1.6, review rounds = 1 (+ ≤ 1 refute), acceptance tests pass; record; end-of-phase review with `agent-pipeline-reviewer`
 
 **Verify**: `npm run verify`

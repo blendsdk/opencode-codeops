@@ -80,7 +80,7 @@ SR (domain-specialist-reviewer), each numbered `XX-NNN`. Every finding-producing
 | Independent review on | Post-phase quality review covers **all executed phases and task mini-plans** (whole-task diff), at the time the verification tier sets; trivial tasks are never reviewed |
 | Docs-only diff | Phase reviewer still runs (immediately, or in the completion review when the phase is carried forward); security/perf auditors skip — the skip is logged, never silent |
 | `critical` tier (also: no tier line, or an unknown value) | Every non-trivial phase is reviewed when it ends |
-| `standard` tier | A phase is reviewed when it ends if it is risk-tagged or changes 150 or more product lines (added + deleted, counted per the verification-balance classification in exec-plan's post-phase step); otherwise it is marked `carried forward`. At plan completion — before the plan is reported done, finally pushed, or released — the completion review covers every carried-forward phase as one cumulative diff |
+| `standard` tier | One review round per plan: a phase is reviewed when it ends only if it is risk-tagged; otherwise it is marked `carried forward`. At plan completion — before the plan is reported done, finally pushed, or released — the completion review covers every carried-forward phase as one cumulative diff |
 | Security risk tags active | Security auditor dispatches once per phase with the union of applicable checklists and supersedes the reviewer's security lens |
 | Performance-critical tag + code diff | Performance auditor dispatches and supersedes the reviewer's performance lens |
 

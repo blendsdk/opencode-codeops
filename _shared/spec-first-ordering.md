@@ -49,7 +49,7 @@ ceremony and the review timing to the work; it never changes the order.
 | Phase gate | The phase's `**Verify (gate)**` line (or its single `**Verify**` line); no separate gate task | A distinct gate-verification task |
 | Implementation tests | Only where an acceptance criterion names an error path or edge case | Edge cases, internals, and error paths |
 | Coverage goal | Every acceptance criterion has at least one test; no percentage targets | Every ST-case and acceptance criterion has at least one test; percentage targets only when the plan records them as a decision |
-| Independent review | A phase is reviewed when it is risk-tagged or changes 150 or more product lines; otherwise its review is carried forward to the completion review | Every non-trivial phase |
+| Independent review | One end-of-plan review round (the completion review, with its refute pass); a phase is reviewed as it ends only when it is risk-tagged | Every non-trivial phase |
 
 - At `standard` the specification cases are the acceptance criteria: the plan's
   `## Acceptance criteria` rows, guided at 3–8 per phase. Implementation tests only where an

@@ -1,5 +1,5 @@
 <!-- Agent template: plan-task-executor
-     description: Executes one dispatched lower-sensitivity unit — normally a whole phase, occasionally a single task — from a CodeOps exec-plan. Implements code, writes/updates tests, runs the project verify command, reports pass/fail per task. Use for trivial and standard phases when a cheaper model than the session's is warranted.
+     description: Executes one dispatched lower-sensitivity unit — normally a whole phase, occasionally a single task — from a CodeOps exec-plan. Implements code, writes/updates tests, runs the project verify command, returns one structured phase report (files changed, verify result, blockers per task) and never edits the plan. Dispatched for every phase of three or more tasks at the standard tier.
      See agents/ for the OpenCode agent definition files generated from this template.
      Do not add YAML frontmatter here â use install_agents.py to generate agent files. -->
 
@@ -41,7 +41,11 @@ original-goal or smallest-design context blocks execution; report it to the pare
 - If the packet is insufficient, or you hit a decision it doesn't cover, STOP and report
   exactly what is missing or ambiguous as a blocker — never guess, and never edit the
   execution plan or roadmap (the parent session owns those and the user conversation).
-- Report per task, 3-4 lines each: what changed, test status, any blocker.
+- Return one **phase report** and nothing else: for each task, its id, the files changed, the
+  verify command you ran with its one-line result (`PASS` with the test count, or `FAIL` with the
+  log path), and any blockers; then deviations from the packet and open questions. Never edit
+  `99-execution-plan.md`, the roadmap, or the findings ledger — the parent records progress from
+  your report.
 - **Workspace hygiene (non-negotiable).** Temporary artifacts you create — verify logs, diffs,
   patches, scratch directories — belong under `$CODEOPS_TMPDIR` when it is set (otherwise the OS
   temp directory), never inside the repository. Delete everything you created before reporting

@@ -44,7 +44,12 @@ parent.
 - If the packet is insufficient, or you hit a decision it doesn't cover, STOP and report
   exactly what is missing or ambiguous as a blocker — never guess, and never edit the
   execution plan or roadmap (the parent session owns those and the user conversation).
-- Report per task: what changed, test status, and residual risk.
+- Return one **phase report** and nothing else: for each task, its id, the files changed, the
+  verify command you ran with its one-line result (`PASS` with the test count, or `FAIL` with the
+  log path), and any blockers; then deviations from the packet and open questions. Never edit
+  `99-execution-plan.md`, the roadmap, or the findings ledger — the parent records progress from
+  your report.
+  Note the residual risk per task.
 - **Workspace hygiene (non-negotiable).** Temporary artifacts you create — verify logs, diffs,
   patches, scratch directories — belong under `$CODEOPS_TMPDIR` when it is set (otherwise the OS
   temp directory), never inside the repository. Delete everything you created before reporting

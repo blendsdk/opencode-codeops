@@ -134,12 +134,13 @@ A **trivial task** has **no plan document** to run: do the work directly, then r
 **[../../_shared/layout-convention.md](../../_shared/layout-convention.md)** — the lane exists in both
 layouts (flat gained it in 3.2.0).
 
-## Execution mode — inline first
+## Execution mode — phase-scoped dispatch
 
-Phases run **inline** on the session model by default; a phase is dispatched as ONE pinned-model
-executor only when its routing tag maps to a cheaper model AND the phase amortizes the executor
-bootstrap. Per-task or parallel dispatch happens only on the user's explicit request (it costs
-more tokens, not fewer). Full rules in [execution-protocol.md](execution-protocol.md).
+Every phase of three or more tasks runs in a fresh executor (`standard`: the `executor` role;
+`critical`: the session model), which returns one structured phase report; the primary session
+keeps the plan, the decisions, and a short summary per phase, records every `mark`, runs the phase
+gate, and computes the verification balance. Smaller phases run inline. Per-task dispatch happens
+only on the user's explicit request. Full rules in [execution-protocol.md](execution-protocol.md).
 
 ## Execution protocol (summary)
 
@@ -248,8 +249,8 @@ source of truth and tells the skill where to pick up.
 Every non-trivial executed phase (and task mini-plan) gets a post-phase quality review under
 strict defaults unless an allowed adaptive-mode policy explicitly disables it. The plan's
 verification tier sets when: at `critical` (and for plans without a tier line) every phase is
-reviewed as it ends; at `standard` a small, untagged phase is carried forward to the completion
-review that runs before the plan is reported done. Activation rules,
+reviewed as it ends; at `standard` there is one review round per plan — the completion review
+that runs before the plan is reported done — and only a risk-tagged phase is reviewed as it ends. Activation rules,
 lenses, supersession, dispatch packets, and budget caps are defined
 once in **[../../_shared/quality-profile.md](../../_shared/quality-profile.md)** — this skill
 links to them, never restates them.

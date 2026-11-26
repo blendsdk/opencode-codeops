@@ -207,8 +207,8 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
      header for a single-document plan. A plan with no tier line, or with an unknown value, is
      `critical`; say so once in the run summary.
    - `critical`: review the phase now.
-   - `standard`: review the phase now when it is risk-tagged or changes 150 or more product lines
-     (the `changed` count above: added + deleted product lines). Otherwise write
+   - `standard`: one review round per plan — the completion review below, with its refute pass.
+     Review a phase now only when it is risk-tagged; otherwise write
      `> **Review**: carried forward` in its phase header and skip steps 2–6 for this phase.
 2. **Dispatch in parallel:** the correctness reviewer, every risk-selected auditor (security,
    financial integrity, concurrency, performance, semantics, or migration), and any specialist
@@ -356,21 +356,27 @@ visible stop packet come from `_shared/zero-ambiguity-gate.md`. Record an approv
 
 ---
 
-## Execution mode — inline first (routing-aware)
+## Execution mode — phase-scoped dispatch
 
-When `codeops/codeops.json` carries routing policy (see the setup-routing skill), route by PHASE,
-not by task, and prefer inline unless isolation, independence, context control, or a capability
-match materially improves the result:
+Route by PHASE, not by task. The primary session keeps the plan, the decisions, and one short
+summary per phase; the edits and tool output of a phase live in a fresh context that ends with it.
 
-1. **Inline for tightly coupled work.** Keep the primary agent responsible for decisions, durable
-   state, plan/roadmap updates, and work whose tasks share substantial context.
-2. **Dispatch bounded phases.** Use an executor role for a self-contained phase when a fresh
-   context, different capability/effort, or isolation from the decision conversation is useful.
+1. **Dispatch every phase of three or more tasks** to a fresh executor with the phase packet below
+   — at both tiers. A `standard` phase runs on the `executor` role; a `critical` phase runs on the
+   session model (the `demanding-executor` role when routing provides one, otherwise the inherited
+   model). Routing policy may pick a role's model or reasoning level; it never keeps a phase of
+   three or more tasks inline.
+2. **Run a phase of fewer than three tasks inline** (§Inline phases).
 3. **Parallelize only independent work.** Read-heavy reconnaissance and independent reviews are
    preferred candidates. Parallel writes require disjoint ownership and an explicit merge plan.
 4. **Select reviewers by risk.** Every non-trivial phase's diff gets correctness review, at the
    time the plan's verification tier sets; add security,
    financial-integrity, concurrency, performance, semantics, or migration reviewers from tags.
+
+**The phase report.** The executor returns one structured report and nothing else: for each task,
+its id, the files changed, the verify command it ran with its one-line result (`PASS` with the
+test count, or `FAIL` with the log path), and any blockers; then deviations from the packet and
+open questions. The parent keeps a summary of at most ten lines per phase — never the transcript.
 
 **The phase packet.** When a phase IS dispatched, the parent composes the packet; the executor
 receives nothing else and must not need anything else:
@@ -388,7 +394,7 @@ receives nothing else and must not need anything else:
 - the scope mode (`strict` or `explore`) and confirmed product scope baseline; missing or invalid
   scope context fails closed to strict mode. Missing or invalid original-goal or smallest-design
   context blocks dispatch;
-- the target file paths and the project's verify command;
+- the target file paths, the phase baseline tree, and the task and gate verify commands;
 - the phase's reasoning marker line (`[codeops-effort: <level>]`), resolved from the run's forced
   `--auto-effort=<level>` level, else the phase's `Reasoning:` suggestion; omitted when neither
   exists.
@@ -428,11 +434,12 @@ gates a dispatch.
    session level unchanged.
 4. When `$CODEOPS_TMPDIR` is empty or the helper fails, print an advise-only note and continue.
 
-**Division of labor.** The PARENT — never the executor — updates `99-execution-plan.md`
-(two-stage marks via `mark`, which also keeps the Progress header current) and the roadmap. The
-executor implements task-by-task, runs verify per the Verify-output capture rule, and reports per
-task. `mark --state implemented` as the executor reports each implementation; verify (or trust
-the executor's verify run and spot-check it); `mark --state done` on pass.
+**Division of labor.** The PARENT — never the executor — records progress: the executor never edits
+`99-execution-plan.md`, the roadmap, or the findings ledger. The executor implements task-by-task,
+runs verify per the Verify-output capture rule, and returns the phase report. From the report the
+parent calls `mark --state implemented` and, for each task whose verify passed (trust the reported
+result and spot-check it), `mark --state done`; it then runs the phase gate itself, computes the
+verification balance from the phase's snapshot diff, and runs the post-phase step.
 
 **Blocker path.** On ambiguity, missing packet context, or a failing SPEC test, the executor
 stops and returns a blocker report. The parent then runs the zero-ambiguity loop above with the
