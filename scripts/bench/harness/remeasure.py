@@ -17,6 +17,11 @@ import run_arm  # noqa: E402
 RESULTS = run_arm.STORE / "results.jsonl"
 
 
+def full_sha(ref):
+    return subprocess.run(["git", "-C", str(run_arm.REPO), "rev-parse", ref], capture_output=True, text=True,
+                          check=True).stdout.strip()
+
+
 def arm_dir(rec):
     return run_arm.STORE / "arms" / f"{rec['subject']}-{rec['ref']}-{rec['n']}"
 
@@ -44,8 +49,13 @@ def main():
             violations += [f for f in changed if s["forbidden_paths"].search(f)]
         if s["forbidden_scope"]:
             violations += sorted(set(s["forbidden_scope"].findall(plan_text)))
-        flagged = sorted({p for r in rows if r["workflow"] != "acceptance" and r["subject"] == rec["subject"]
-                          and r["n"] == rec["n"] and r["ref"] == rec["ref"] for p in (r.get("out_of_scope") or [])})
+        sessions = [r for r in rows if r["workflow"] != "acceptance" and r["subject"] == rec["subject"]
+                    and r["n"] == rec["n"] and r["ref"] == rec["ref"] and r.get("session")]
+        allowed = (str(run_arm.W / f"ref-{full_sha(rec['ref'])}"), str(run_arm.W / "packets" / rec["subject"]),
+                   str(run_arm.W / "arms" / f"{rec['subject']}-{rec['ref']}-{rec['n']}"), run_arm.sandbox.ARM_HOME)
+        flagged = sorted({p for r in sessions for p in run_arm.audit(arm / "data" / "opencode.db", r["session"], allowed)})
+        for r in sessions:
+            r["out_of_scope"] = run_arm.audit(arm / "data" / "opencode.db", r["session"], allowed)
         rec["scope_violations"] = violations
         rec["audit"] = run_arm.audit_verdict(flagged, None)
         rec["valid"] = not violations and not rec["audit"]["violations"] and rec.get("main_unchanged", False)

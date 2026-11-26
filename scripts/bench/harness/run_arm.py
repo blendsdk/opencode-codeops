@@ -87,6 +87,10 @@ def session_id(title, db_path):
     return row[0] if row else None
 
 
+#: Tool-input fields that hold text being written, not paths being accessed.
+WRITTEN_CONTENT_KEYS = {"content", "newString", "oldString", "patchText"}
+
+
 def audit(db_path, root, allowed):
     """List tool-input paths that reach outside the arm's roots (sandbox check).
 
@@ -102,7 +106,10 @@ def audit(db_path, root, allowed):
     for s in bench.session_tree(db, root):
         for mid, data in bench.assistant_messages(db, s):
             for c in bench.tool_calls(db, mid, data):
-                blob = json.dumps((c.get("state") or {}).get("input") or {})
+                inp = (c.get("state") or {}).get("input") or {}
+                # Text an arm writes into files is content, not access.
+                accessed = {k: v for k, v in inp.items() if k not in WRITTEN_CONTENT_KEYS}
+                blob = json.dumps(accessed)
                 for path in re.findall(r"(/(?:home|tmp)/[^\s\"'`;|&)\\]+)", blob):
                     harness = path.startswith((str(W), "/tmp/.bench"))
                     home = path.startswith("/home/") and not path.startswith(sandbox.ARM_HOME)
@@ -127,8 +134,11 @@ def audit_verdict(paths, work):
     """
     benign_exact = {str(W), str(W) + "/", f"{W}/arms", f"{W}/arms/", f"{W}/packets", f"{W}/packets/",
                     "/home/gevik", "/home/gevik/"}
+    # Globs directly under the harness root match nothing the sandbox does not already show.
+    root_glob = re.compile(re.escape(str(W)) + r"/[^/]*\*[^/]*$")
     benign_prefix = (f"{W}/tools-", "/home/gevik/.opencode", "/home/gevik/.nvm/")
-    violations = [p for p in paths if p.rstrip("*") not in benign_exact and not p.startswith(benign_prefix)]
+    violations = [p for p in paths if p.rstrip("*") not in benign_exact and not p.startswith(benign_prefix)
+                  and not root_glob.match(p)]
     return {"benign": len(paths) - len(violations), "violations": violations}
 
 
