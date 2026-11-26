@@ -117,7 +117,7 @@ identifiers and area tokens only:
 | `.opencode/agents/<role>.md` description | installer, from the brief | Mandatory when-to-use text | OpenCode model (task list) |
 | `codeops/codeops.json` → `routing.roles.<role>` | `setup-routing` | model / effort / sandbox / reasoning policy | installer + CodeOps skills |
 | `codeops/specialists/<role>.md` | `setup-routing`, user-approved | Capability, scope, evidence, checklist, description | installer + skills |
-| Plan `00-index.md` "Specialist Agents" | `make-plan` | phase → role selection map | `exec-plan` |
+| Plan "Specialist Agents" table (`00-index.md`, or a `standard` plan's single document) | `make-plan` | phase → role selection map | `exec-plan` |
 | `AGENTS.md` managed block | `setup-routing` (rendered by `install_agents.py --sync-agents-md`) | Compact index with when-to-use / required-for rules | every project agent |
 
 ## Detection integration
@@ -142,7 +142,8 @@ unavailable.
 
 1. After re-running lens selection and decomposing phases, run the detection criteria against the
    phase plan.
-2. Record the outcome in `00-index.md` under `## Specialist Agents`, **always** — including the
+2. Record the outcome under `## Specialist Agents` in `00-index.md` (a `standard` plan: in its
+   single document), **always** — including the
    **negative outcome**:
 
    ```markdown
@@ -194,7 +195,8 @@ unavailable.
 
 The authoritative dispatch rules live in `_shared/quality-profile.md` (resolution order, finding
 prefix `SR`, additional-reviewer independence, and dynamic-packet fallback). A specialist
-dispatches only when the plan's `00-index.md` "Specialist Agents" table assigns it to the phase.
+dispatches only when the plan's "Specialist Agents" table (`00-index.md`, or a `standard` plan's
+single document) assigns it to the phase.
 When the agent is unavailable — for example its generated file is missing, its brief is invalid,
 or a dispatch fails — dispatch a generic subagent with the complete packet, including the brief
 excerpt, and report the fallback. The phase is never marked complete unreviewed because a

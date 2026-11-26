@@ -17,7 +17,7 @@ parent.
   In explore mode, return optional ideas as `SE-*` proposals to the parent; never implement or
   authorize them.
 - **Documentation ban (non-negotiable).** The packet quotes AR/D-n decisions, ST-cases/ACs, and spec
-  excerpts for YOUR understanding only — never copy a plan/requirement/AR/RD/ST/PA/task identifier
+  excerpts for YOUR understanding only — never copy a plan/requirement/AR/RD/ST/PA/D-n/AC-n/task identifier
   or a `codeops/`/`plans/`/`requirements/` path into a code comment or doc comment. Those files are
   ephemeral; the shipped code must stand on its own. Keep the behavior a plan note describes, drop
   the citation, and restate any rationale in plain language.
@@ -29,7 +29,7 @@ parent.
   wherever practical. Do not pad trivial private code with comments that merely restate it.
   **Missing documentation blocks completion.** Use the project's documentation linter when
   configured, but also perform this semantic read. Finally, grep your
-  changed files for `\b(RD|AR|PA|PF|HR|GATE|AC|ST|ADR|DEF)-[0-9]` and `(codeops|plans|requirements)/`
+  changed files for `\b(RD|AR|PA|PF|HR|GATE|AC|ST|ADR|DEF|D)-[0-9]` and `(codeops|plans|requirements)/`
   and fix any hit that landed in a comment.
 - Write/update tests, run the verify command with output captured to a temp log — report a
   PASS one-liner per task, or the last 50 log lines on failure — and explicitly note any

@@ -81,7 +81,7 @@ ceremony and the review timing to the work; it never changes the order.
 **✅ REQUIRED in every generated `99-execution-plan.md`:** the specification-first order per
 feature phase; explicit `[feature].spec.test.[ext]` file references, plus
 `[feature].impl.test.[ext]` references wherever implementation tests are planned; references to
-the ST-cases from `07-testing-strategy.md` in spec-test tasks; and a red check before
+the ST-cases from `07-testing-strategy.md` (at `standard`: the plan's `AC-n` rows) in spec-test tasks; and a red check before
 implementation — a distinct red-phase verification task at the `critical` tier, inside the
 spec-test task at the `standard` tier.
 

@@ -39,7 +39,7 @@ command). The conventions behind the packet live in `_shared/quality-profile.md`
   understanding only — never copy a plan/requirement/decision identifier or a
   `codeops/`/`plans/`/`requirements/` path into test code or comments. State each test's intent
   in plain language. Before reporting done, grep your written files for
-  `\b(RD|AR|PA|PF|HR|GATE|AC|ST|ADR|DEF)-[0-9]` and `(codeops|plans|requirements)/` and fix any
+  `\b(RD|AR|PA|PF|HR|GATE|AC|ST|ADR|DEF|D)-[0-9]` and `(codeops|plans|requirements)/` and fix any
   hit that landed in a comment.
 - If the packet is insufficient — an interface signature missing, a case ambiguous, framework
   conventions unclear — STOP and report exactly what is missing as a blocker. Never guess an

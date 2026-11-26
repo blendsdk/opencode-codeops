@@ -94,7 +94,7 @@ with active scope exploration.
 
 Re-run [../../references/domains/selection.md](../../references/domains/selection.md) before component decomposition. Requirements-stage lens selection is evidence, not a permanent assumption. Apply every selected lens to specifications, acceptance criteria, failure narratives, and test strategy.
 
-After lens selection and phase decomposition, run the specialist-gap check in [../../_shared/specialist-agents.md](../../_shared/specialist-agents.md). The `analyze-agents` skill executes the same detection flow on demand; the manual criteria in the linked protocol document remain the fallback when the skill is unavailable. Record the outcome in `00-index.md` under `## Specialist Agents` — always, including `None` with its reason and evidence. In the final plan summary, include a `Specialist check:` line — `None — <evidence>` or the candidate names. Candidate creation is reserved authority: `--auto-design` may not approve it, and approved roles are created through `setup-routing`.
+After lens selection and phase decomposition, run the specialist-gap check in [../../_shared/specialist-agents.md](../../_shared/specialist-agents.md). The `analyze-agents` skill executes the same detection flow on demand; the manual criteria in the linked protocol document remain the fallback when the skill is unavailable. Record the outcome under `## Specialist Agents` in `00-index.md` (a `standard` plan: in its single document) — always, including `None` with its reason and evidence. In the final plan summary, include a `Specialist check:` line — `None — <evidence>` or the candidate names. Candidate creation is reserved authority: `--auto-design` may not approve it, and approved roles are created through `setup-routing`.
 
 A folder `plans/<feature-name>/` containing:
 
@@ -214,8 +214,8 @@ delegated auto-design resolution) — but the ceremony around it is smaller:
    preflight**. Phase 1B's re-evaluation still runs in context.
 3. **One document.** Write only `99-execution-plan.md` from the standard single-document template
    in [templates.md](templates.md): a header (`Implements`, `Verification tier: standard`,
-   Progress, Last Updated, specialist check), `## Goal` (goal, smallest viable design, out of
-   scope), `## Decisions` (`D-n` rows with the answer and who gave it), `## Acceptance criteria`
+   Progress, Last Updated), `## Goal` (goal, smallest viable design, out of scope),
+   `## Specialist Agents` (the specialist-gap outcome and any phase → role map), `## Decisions` (`D-n` rows with the answer and who gave it), `## Acceptance criteria`
    (`AC-n` rows — these are the spec cases, 3–8 per phase), and `## Tasks`. No `00–07` documents.
 4. **Gate.** Phase 1C passes when every `D-n` row is answered or a named, approved deferral; write
    the document only then.

@@ -136,12 +136,12 @@ or response content.
 | Agent | Packet contents (the agent receives nothing else and must need nothing else) |
 |-------|------------------------------------------------------------------------------|
 | phase-reviewer, security-auditor, perf-auditor | Phase diff (`git diff <phase-start-ref>..HEAD`), original goal + smallest viable design, relevant approved complexity AR/PF/RV excerpts, the phase's task + Deliverable lines, active lenses, scope mode (`strict` or `explore`), confirmed scope baseline, profile excerpt, the `Finding calibration` section, verify command + last result |
-| phase-reviewer in `Mode: refute` | `Mode: refute` as the first packet-body line after the header; the phase diff; the 🔴/🟠 findings to challenge, verbatim; the ST-cases and requirements they cite (when any are cited); the `Finding calibration` section; the refute output contract (one row per finding: `<ID> — Confirmed \| Downgraded → <severity> \| Refuted — <evidence file:line>`) |
-| plan-task-executor, plan-task-executor-opus | Phase task + Deliverable + Verify lines, governing spec/ST/AR excerpts, original goal + smallest viable design, relevant approved complexity PF/RV excerpts, target paths, scope mode (`strict` or `explore`), confirmed scope baseline, verify command |
+| phase-reviewer in `Mode: refute` | `Mode: refute` as the first packet-body line after the header; the phase diff; the 🔴/🟠 findings to challenge, verbatim; the ST-cases or acceptance criteria and requirements they cite (when any are cited); the `Finding calibration` section; the refute output contract (one row per finding: `<ID> — Confirmed \| Downgraded → <severity> \| Refuted — <evidence file:line>`) |
+| plan-task-executor, plan-task-executor-opus | Phase task + Deliverable + Verify lines, governing spec/ST/AR excerpts (a `standard` plan: the phase's `AC-n` rows and the relevant `D-n` rows), original goal + smallest viable design, relevant approved complexity PF/RV excerpts, target paths, scope mode (`strict` or `explore`), confirmed scope baseline, verify command |
 | spec-test-author | Spec excerpts + test cases, planned interface signatures from the plan documents, test framework/conventions, the FORBIDDEN implementation-file list, verify command (expected RED) |
 | preflight-auditor | The artifact under audit + ONE assigned cluster — a dimension cluster in `preflight-audit` mode or a category cluster in `coverage-hunt` mode — + original goal + smallest viable design + relevant approved complexity AR/PF/RV excerpts + scope mode (`strict` or `explore`) + confirmed scope baseline |
 | domain-specialist-reviewer | Line-1 dispatch header; phase diff; original goal + smallest viable design; phase task + Deliverable lines; active lenses plus the brief's domain checklist; scope mode + confirmed baseline; the `Finding calibration` section; verify command + last result; the specialist brief excerpt |
-| domain-specialist-executor | Phase task + Deliverable + Verify lines; governing spec/ST/AR excerpts; original goal + smallest viable design; target paths; scope mode + confirmed baseline; verify command; the specialist brief excerpt |
+| domain-specialist-executor | Phase task + Deliverable + Verify lines; governing spec/ST/AR excerpts (a `standard` plan: the phase's `AC-n` and relevant `D-n` rows); original goal + smallest viable design; target paths; scope mode + confirmed baseline; verify command; the specialist brief excerpt |
 | design-challenger | Problem + candidate options, **without** the parent's preferred choice (per `_shared/recommendation-hardening.md`) |
 | codebase-scout | The factual questions, search hints, and the facts-only contract |
 
@@ -172,7 +172,8 @@ specialist falls back to a complete dynamic packet with the fallback reported.
   diff — never a third pass.
 - **Scout:** ≤3 codebase-scout dispatches per skill run, enforced by the dispatching parent.
 - **Challenger:** caps live in `_shared/recommendation-hardening.md` and apply unchanged.
-- **Specialist dispatch:** limited to the roles listed in the plan's `## Specialist Agents` table;
+- **Specialist dispatch:** limited to the roles listed in the plan's `## Specialist Agents` table
+  (`00-index.md`, or a `standard` plan's single document);
   no additional fan-out.
 
 ## Model, effort, and agent resolution

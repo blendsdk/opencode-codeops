@@ -114,7 +114,11 @@ A **non-trivial task** has a single mini-plan at the resolved task path (flat:
 `codeops/features/<f>/plans/<task-slug>/99-execution-plan.md`). Execute it **exactly like a feature
 plan** — same per-task loop, same real-time update mandate, same commit modes — it is just a
 smaller `99-execution-plan.md` (objective + checklist + verify, no `00–07` set). Specification-first
-ordering still applies *when the task warrants tests* (e.g. a bugfix's regression test).
+ordering still applies *when the task warrants tests* (e.g. a bugfix's regression test). A single
+`99-execution-plan.md` whose header declares `> **Implements**:` and `> **Verification tier**:
+standard` is not a mini-plan but a `standard` feature plan (see
+[../../_shared/layout-convention.md](../../_shared/layout-convention.md)): it keeps its own
+`## Decisions` table, and a complexity escalation is recorded there instead of switching paths.
 
 A complexity escalation ends the mini-plan path before any approval can become executable. Mark
 the affected task `[!]`, preserve any implementation diff without marking it verified, and switch
@@ -209,10 +213,12 @@ For each task, in order:
 > compressed single-session form are in [execution-protocol.md](execution-protocol.md).
 
 > **🚨 Zero-ambiguity during execution.** If you hit any detail not covered by the plan docs or
-> `00-ambiguity-register.md`, STOP and record it. In normal mode, present options and wait for an
+> the plan's decision owner (`00-ambiguity-register.md`, or a `standard` plan's `## Decisions`
+> table), STOP and record it. In normal mode, present options and wait for an
 > explicit user decision. With active auto-design, resolve an eligible technical choice under the
 > shared policy or escalate a reserved choice. Record the authorized resolution in
-> `00-ambiguity-register.md` (tag `(runtime)`), update affected plan documents, then resume.
+> `00-ambiguity-register.md` (tag `(runtime)`) — in a `standard` plan, as a `(runtime)` `D-n` row
+> in its `## Decisions` table — update affected plan documents, then resume.
 > Never guess.
 
 > **🚨 Complexity escalation during execution.** A material new layer, dependency, harness,
@@ -252,7 +258,8 @@ The flow: the protocol records a phase-start ref when the phase begins; after th
 task verifies, the correctness reviewer and any active auditors are dispatched **in parallel** on
 the phase diff, their findings are merged and presented in severity-grouped batches, and each
 ruling is recorded in the plan's findings ledger (`05-findings.md`). Specialist roles listed in
-the plan's `## Specialist Agents` table dispatch per `_shared/quality-profile.md`; an unavailable
+the plan's `## Specialist Agents` table (`00-index.md`, or a `standard` plan's single document)
+dispatch per `_shared/quality-profile.md`; an unavailable
 specialist falls back to a generic packet and the fallback is reported.
 
 > **🚨 Finding gate (load-bearing).** Findings are calibrated and every 🔴/🟠 finding gets one

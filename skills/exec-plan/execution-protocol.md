@@ -211,7 +211,8 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
      `> **Review**: carried forward` in its phase header and skip steps 2–6 for this phase.
 2. **Dispatch in parallel:** the correctness reviewer, every risk-selected auditor (security,
    financial integrity, concurrency, performance, semantics, or migration), and any specialist
-   reviewer listed in the plan's `## Specialist Agents` table, each with the dispatch header on
+   reviewer listed in the plan's `## Specialist Agents` table (`00-index.md`, or a `standard`
+   plan's single document), each with the dispatch header on
    line 1 of its prompt and its packet (`_shared/quality-profile.md`)
    Create the review diff with:
 
@@ -324,7 +325,8 @@ pass/fail gating are unchanged — and the temp log is read-only evidence, never
 ### Zero-Ambiguity During Execution
 
 If you encounter any implementation detail, behavioral question, edge case, or design choice not
-covered by the plan documents or `00-ambiguity-register.md`, first record it and mark affected
+covered by the plan documents or the plan's decision owner (`00-ambiguity-register.md`, or a
+`standard` plan's `## Decisions` table), first record it and mark affected
 tasks `[!]` with `Blocked: <short reason>` until the owning artifact is resolved.
 
 First determine whether the discovery is an ambiguity inside authorized scope, a necessary
@@ -338,8 +340,9 @@ they are silent in strict scope or use the Scope Expansion Register during explo
 3. **Obtain authority.** Wait for the user's explicit decision when normal mode or reserved
    authority applies. An auto-design resolution must include the policy's complete provenance.
 4. **Record** it in `00-ambiguity-register.md` with the next sequential AR number, tagged
-   `(runtime)` in the Category column. Update the register header to note items added during
-   execution.
+   `(runtime)` in the Category column, and update the register header to note items added during
+   execution — in a `standard` single-document plan, as the next `D-n` row tagged `(runtime)` in its
+   `## Decisions` table (never create a register file for it).
 5. **Only then** update affected plan artifacts, confirm direct entry checks still pass, and
    resume implementation using the authorized decision.
 
@@ -372,10 +375,12 @@ match materially improves the result:
 receives nothing else and must not need anything else:
 
 - the phase's task lines, Deliverables, and Verify lines verbatim from `99-execution-plan.md`;
-- the relevant excerpts of the governing `03-XX` spec documents (the excerpts, not filenames);
-- the applicable ST-cases from `07-testing-strategy.md`;
-- the AR decisions that bear on the phase and any relevant approved complexity PF/RV decisions
-  (quoted entries, not whole reports);
+- the relevant excerpts of the governing `03-XX` spec documents (the excerpts, not filenames; a
+  `standard` plan has none);
+- the applicable ST-cases from `07-testing-strategy.md`, or the phase's `AC-n` rows from a
+  `standard` plan's `## Acceptance criteria`;
+- the AR decisions — or a `standard` plan's relevant `D-n` rows — that bear on the phase and any
+  relevant approved complexity PF/RV decisions (quoted entries, not whole reports);
 - the original goal and smallest viable design from `00-index.md` or the single document's
   `## Goal`, or the session-derived legacy
   baseline when the plan predates that section;
@@ -624,8 +629,9 @@ A deviation is by definition territory the plan doesn't cover — route it by ma
 - **Material deviation** (different approach, different files, different behavior than the plan
   specifies): run the Zero-Ambiguity loop above — STOP, present the deviation with options in
   normal mode, or apply active auto-design to an eligible technical choice and escalate a reserved
-  choice. Record the authorized resolution in `00-ambiguity-register.md` tagged `(runtime)` and
-  update the task description. If it changes artifacts outside the selected plan, obtain approval
+  choice. Record the authorized resolution in `00-ambiguity-register.md` tagged `(runtime)` (a
+  `standard` plan: a `(runtime)` `D-n` row in its `## Decisions` table) and update the task
+  description. If it changes artifacts outside the selected plan, obtain approval
   for the exact expanded modification set before editing, then continue.
 - **Mechanical correction** (typo'd path, renamed symbol, an import the plan forgot): note it in
   the execution plan and continue — no user round-trip needed.

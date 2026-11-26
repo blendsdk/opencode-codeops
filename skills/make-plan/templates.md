@@ -34,7 +34,6 @@ the goal, the decisions, the acceptance criteria (which are the spec cases), and
 > **Verification tier**: standard — [one-line reason]
 > **Progress**: 0/[N] tasks (0%)
 > **Last Updated**: [YYYY-MM-DD HH:MM]
-> **Specialist check**: [None — evidence | candidate names]
 
 ## Goal
 
@@ -43,6 +42,10 @@ the goal, the decisions, the acceptance criteria (which are the spec cases), and
 **Smallest viable design:** [the direct solution, reusing named existing patterns]
 
 **Out of scope:** [what this plan deliberately leaves out]
+
+## Specialist Agents
+
+[`None — <evidence>`, or a table: | Phase | Role | Why |]
 
 ## Decisions
 
@@ -69,7 +72,7 @@ when the user or the requirement names them.
 > **Verify (gate)**: `[project verify command]`
 
 - [ ] 1.1.1 Write the spec tests for AC-1..AC-3 in `[feature].spec.test.[ext]` and confirm they fail
-- [ ] 1.1.2 Implement [component] — [file(s)]; D-2
+- [ ] 1.1.2 Implement [component] — [file(s)] (per D-2; never cite D-n or AC-n in code comments)
 - [ ] 1.1.3 Implement [component] — [file(s)]; run the phase's spec tests and confirm they pass
 ```
 
