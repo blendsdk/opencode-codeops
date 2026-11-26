@@ -2,6 +2,63 @@
 
 All notable changes to CodeOps are recorded here.
 
+## 3.0.0 — 2026-11-26
+
+### Breaking Changes
+
+- exec-plan: run each phase in a fresh executor and review a standard plan once
+- plan: write standard-tier plans as one document with acceptance criteria as spec cases
+
+### Fixes
+
+- release: ignore the layout schema version in the version-parity guard
+- make-plan: keep Security-First at standard and map checklist terms to the single document
+- make-plan: keep what a standard run needs on its reading list
+- exec-plan: carry the dispatched-phase rules into the SKILL summary and the packet list
+- exec-plan: close the phase-dispatch specialist review findings
+- plan: look up a standard plan's approved complexity D-n rows
+- plan: close the standard-plan specialist review findings
+- plan: close the mark re-review findings
+- plan: close the mark review findings
+
+### Documentation
+
+- lean-delivery: record the Phase 4 result
+- lean-delivery: record the Phase 3 result and close the phase
+- lean-delivery: record the Phase 2 result (cost per feature -80%)
+- lean-delivery: record the Phase 1 result (bookkeeping halved, gate accepted)
+- lean-delivery: record the corrected Phase 0 baseline
+- lean-delivery: plan measured, far leaner standard-tier delivery
+- right-sized-verification: add the preflighted Wave 1 plan
+
+### Features
+
+- skills: tell make-plan and exec-plan runs what to read and what to skip
+- plan: record each task transition with one codeops_plan.py mark call
+- verification: add no separate verification tasks at the standard tier
+- skills: make every skill description a trigger, not a summary
+- plugin: keep an executing run's place across compaction
+- verification: report each phase's verification balance
+- review: calibrate findings and refute critical/major ones once
+- verification: size test ceremony and review timing by plan tier
+
+### Chores
+
+- bench: treat any glob under the harness root as a sandbox listing
+- bench: give each arm its own ref copy so arms can run in parallel
+- bench: finalize the Phase 0 baseline
+- bench: close the Phase 0 re-review findings
+- bench: close the Phase 0 review findings
+- bench: sandbox the A/B arms and record the Phase 0 baseline
+- bench: harden the arm protocol against answer leakage
+- bench: record the headless smoke arm and pin the arm model
+- bench: add the content-free session measurement kit
+- right-sized-verification: track Wave 2 and record the replay decision
+
+### Tests
+
+- right-sized-verification: add the specification oracle
+
 ## 2.8.1 — 2026-11-24
 
 ### Fixes
