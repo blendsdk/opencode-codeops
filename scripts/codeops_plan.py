@@ -35,11 +35,15 @@ FENCE_OPEN_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 TASK_ID_RE = re.compile(r"^\s*(?:\*\*)?([0-9]+\.[0-9]+\.[0-9]+|T-[0-9]+\.[0-9]+)(?=[\s*—–-]|$)")
 BLOCKED_REASON_RE = re.compile(r"(?:blocked|reason)\s*:\s*\S", re.IGNORECASE)
 #: A task line's trailing status suffix written by ``mark`` (or by hand in the same format): the
-#: last emoji-and-label group, closing with ``)`` at the end of the line, so task text that quotes
-#: the format stays intact.
+#: last emoji-and-label group whose label is followed by ``:`` or a date, closing with ``)`` at the
+#: end of the line or before trailing `` — evidence``. Task text that merely quotes the format
+#: (``the ⏳ (implemented) state``) stays intact.
 STATUS_SUFFIX_RE = re.compile(
-    r"\s+(?:✅|⏳|🚫)\s*\((?:completed|implemented|Blocked)\b(?:(?!\s(?:✅|⏳|🚫)\s*\().)*\)\s*$"
+    r"\s+(?:✅|⏳|🚫)\s*\((?:completed|implemented|Blocked)(?::|\s+\d{4}-)"
+    r"(?:(?!\s(?:✅|⏳|🚫)\s*\().)*?\)(?:\s+[—–-]\s+(?:(?!(?:✅|⏳|🚫)\s*\().)*)?\s*$"
 )
+#: The parts of a status suffix: emoji, label, and the text inside the parentheses.
+SUFFIX_PARTS_RE = re.compile(r"^(✅|⏳|🚫)\s*\((completed|implemented|Blocked):?\s*(.*?)\)(?:\s+[—–-]\s+.*)?$")
 PROGRESS_HEADER_RE = re.compile(r"^(>[ \t]*\*\*Progress\*\*:[ \t]*)\d+\s*/\s*\d+\s+tasks\s*\(\d+%\)", re.MULTILINE)
 LAST_UPDATED_RE = re.compile(r"^(>[ \t]*\*\*Last Updated\*\*:[ \t]*)[^\r\n]*", re.MULTILINE)
 MARK_STATES = {
@@ -342,11 +346,19 @@ def mark_task(execution_text: str, task_id: str, state: str, note: str | None, n
 
 
 def _same_status(suffix: str, emoji: str, label: str, note: str) -> bool:
-    """Tell whether an existing status suffix already records this state and note."""
-    suffix = suffix.strip()
-    if not suffix.startswith(f"{emoji} ({label}"):
+    """Tell whether an existing status suffix already records this state and exactly this note.
+
+    ``mark`` writes ``Blocked: <reason>; <time>`` for a block and ``<label>: <time>[; <note>]``
+    otherwise; the note is compared against the segment the same state writes.
+    """
+    parts = SUFFIX_PARTS_RE.match(suffix.strip())
+    if not parts or parts.group(1) != emoji or parts.group(2) != label:
         return False
-    return not note or note in suffix
+    inner = parts.group(3)
+    if label == "Blocked":
+        return inner.rsplit("; ", 1)[0] == note
+    recorded = inner.split("; ", 1)[1] if "; " in inner else ""
+    return not note or recorded == note
 
 
 def mark_main(argv: list[str]) -> int:

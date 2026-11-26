@@ -180,11 +180,13 @@ describe("codeops_plan.py mark keeps the rest of the file intact", () => {
   it("ST-K9 — preserves CRLF endings, task text that quotes the suffix format, and line positions", () => {
     const fixture = makePlan()
     const text = [
-      "> **Progress**: 0/2 tasks (0%)",
+      "> **Progress**: 0/4 tasks (0%)",
       "> **Last Updated**: 2000-01-01 00:00",
       "Intro with a form feed \f inside.",
       "- [ ] 1.1.1 Document the ✅ (completed: <time>) suffix format",
       "- [ ] 1.1.2 Second task",
+      "- [~] 1.1.3 Hand-marked task ⏳ (implemented: 2026-01-01 00:00) — 19/19 pass",
+      "- [ ] 1.1.4 Show the ⏳ (implemented) state in the sidebar (UI)",
       "",
     ].join("\r\n")
     writeFileSync(fixture.file, text)
@@ -196,6 +198,13 @@ describe("codeops_plan.py mark keeps the rest of the file intact", () => {
     const lines = after.split("\r\n")
     assert.match(lines[3], /^- \[x\] 1\.1\.1 Document the ✅ \(completed: <time>\) suffix format ✅ \(completed: \d{4}-/)
     assert.equal(lines[4], "- [ ] 1.1.2 Second task", "the next task is untouched")
+    // an older hand-written suffix with trailing evidence is replaced, not duplicated
+    mark(fixture, ["--task", "1.1.3", "--state", "done"])
+    const third = readFileSync(fixture.file, "utf8").split("\r\n")[5]
+    assert.match(third, /^- \[x\] 1\.1\.3 Hand-marked task ✅ \(completed: [^)]+\)$/)
+    // task text that quotes the format and ends in ")" keeps its text
+    mark(fixture, ["--task", "1.1.4", "--state", "done"])
+    assert.match(readFileSync(fixture.file, "utf8").split("\r\n")[6], /^- \[x\] 1\.1\.4 Show the ⏳ \(implemented\) state in the sidebar \(UI\) ✅ \(completed: /)
   })
 })
 

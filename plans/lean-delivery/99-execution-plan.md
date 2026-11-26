@@ -1,8 +1,8 @@
 # Task T-08: Lean delivery — far fewer tokens, steps, and verification tasks per feature
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 13/37 tasks (35%)
-> **Last Updated**: 2026-11-26 08:45
+> **Progress**: 14/37 tasks (38%)
+> **Last Updated**: 2026-11-26 08:52
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -179,6 +179,7 @@ only counts and classes):
 
 ### Phase 1 — Lever B: collapse bookkeeping
 
+> **Review**: reviewed 2026-11-26 08:55 (review + one re-review; findings closed)
 > **Phase baseline tree**: c0bc461b4746ea933ca5fadd701b3c1687c557b2
 
 - [x] 1.1.1 List the existing spec assertions Phase 1 supersedes (e.g. `scripts/exec-plan-progress-content.spec.test.mjs` ST-19 on report moments) and get the user's one-batch approval (D-8) ✅ (completed: 2026-11-26 07:05; none superseded: the ten report moments, fail-soft wording, README sidebar text, and the parser `--json`/`--progress-bar` contracts all stay true)
@@ -191,7 +192,9 @@ only counts and classes):
 
 ### Phase 2 — Levers C+D: one-document standard plan, tests equal acceptance criteria
 
-- [ ] 2.1.1 List the existing spec assertions Phase 2 supersedes (e.g. `right-sized-verification-content.spec.test.mjs` ST-15 "report-only"/"1.5:1"/"never block"; `plan-coverage-content.spec.test.mjs` coverage hunt by default for full plans) and get the user's one-batch approval (D-8)
+> **Phase baseline tree**: d51fbb14e145e8e6965e55319f4f5ec9121f93f4
+
+- [x] 2.1.1 List the existing spec assertions Phase 2 supersedes (e.g. `right-sized-verification-content.spec.test.mjs` ST-15 "report-only"/"1.5:1"/"never block"; `plan-coverage-content.spec.test.mjs` coverage hunt by default for full plans) and get the user's one-batch approval (D-8) ✅ (completed: 2026-11-26 08:52; two superseded, approved: coverage hunt default -> critical only; balance report-only -> blocks above 1:1 at standard)
 - [ ] 2.1.2 Write `scripts/lean-plan-content.spec.test.mjs` and `scripts/codeops-plan-single-doc.spec.test.mjs` (≤ 9 cases together): single-document form, Decisions owning decisions, ACs as spec cases, blocking brake at standard, critical unchanged, the approved replacements, and `codeops_plan.py` reading Implements and tier from the plan header — confirm they fail
 - [ ] 2.1.3 Shared protocols for single-document plans: `_shared/zero-ambiguity-gate.md` (at `standard` the plan's Decisions table owns decisions, runtime ambiguities, and complexity approvals with full evidence), `_shared/layout-convention.md` (a mini-plan is a single document without a tier line), exec-plan's tier/goal/baseline source and STOP-packet path for single-document plans
 - [ ] 2.1.4 make-plan: at `standard`, one batched question round with recommended answers, no coverage hunt, no separate register, no preflight step; write only `99-execution-plan.md` (header, Decisions, Acceptance criteria, Tasks); `critical` path unchanged
