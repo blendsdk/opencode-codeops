@@ -407,6 +407,8 @@ receives nothing else and must not need anything else:
   scope context fails closed to strict mode. Missing or invalid original-goal or smallest-design
   context blocks dispatch;
 - the target file paths, the phase baseline tree, and the task and gate verify commands;
+- the phase-report contract (§The phase report), so a generic fallback subagent returns the same
+  report;
 - the phase's reasoning marker line (`[codeops-effort: <level>]`), resolved from the run's forced
   `--auto-effort=<level>` level, else the phase's `Reasoning:` suggestion; omitted when neither
   exists.

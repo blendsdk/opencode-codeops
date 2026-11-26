@@ -156,7 +156,9 @@ summary template. The essentials:
 2. Find incomplete tasks — both `[ ]` and implemented-but-unverified `[~]`; read supporting specs
    in `plans/$ARGUMENTS/`.
 3. Determine the starting point: a `[~]` task is resumed first (re-verify, then promote or keep
-   fixing); otherwise the first `[ ]` task.
+   fixing); otherwise the first `[ ]` task. A dispatched phase with no marks but a non-empty diff
+   against its `Phase baseline tree` was interrupted: reconcile it first (protocol Step 1, the
+   dispatched-phase resume rule).
    After a context compaction, re-read `99-execution-plan.md` and `05-findings.md` before the
    next action; trust their marks and rulings over the summary.
 4. If the plan is missing/empty/already complete, **STOP** — see the load table in
@@ -167,6 +169,10 @@ upgrade assessment; ask before migration or execution with recorded compatibilit
 silently upgrade.
 
 ### Step 2 — Execute tasks (per-task loop)
+
+This loop is how an inline phase runs (fewer than three tasks). A phase of three or more tasks runs
+it inside a fresh executor; the parent then records every mark below from the executor's phase
+report (§Execution mode).
 
 For each task, in order:
 
