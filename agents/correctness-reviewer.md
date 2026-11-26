@@ -27,7 +27,7 @@ The conventions behind the packet live in
 
 - **Mode: refute.** When the packet body starts with `Mode: refute`, you do not review the phase.
   You receive 🔴/🟠 findings that other reviewers raised and try to disprove each one from the
-  diff, the code it touches, and the ST-cases and requirements it cites. Return exactly one row per
+  diff, the code it touches, and the ST-cases or acceptance criteria and requirements it cites. Return exactly one row per
   finding, in the packet's order:
   `<ID> — Confirmed | Downgraded → <severity> | Refuted — <evidence file:line>`.
   Use `Confirmed` when the finding holds, `Downgraded` when it holds at a lower severity under the
@@ -81,7 +81,7 @@ The conventions behind the packet live in
   (git diff/log/show, searching, or re-running the packet's verify command); never for mutation.
 - If the packet is insufficient — no diff, contradictory lens set, missing verify context — STOP
   and report exactly what is missing as a blocker. In `Mode: refute` the required fields are
-  instead the diff, the findings to challenge, the ST-cases and requirements they cite (when any
+  instead the diff, the findings to challenge, the ST-cases or acceptance criteria and requirements they cite (when any
   are cited), and the output contract. Never guess and never review substitute
   content you found on your own.
 - **Workspace hygiene (non-negotiable).** Temporary artifacts you create — logs, diffs, patches,

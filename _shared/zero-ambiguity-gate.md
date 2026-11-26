@@ -99,6 +99,13 @@ Use the workflow's existing decision owner; do not create a new register:
 | Requirements, planning, or runtime discovery | Ambiguity Register entry with category `Technical (complexity escalation)` |
 | Preflight | The `PF-*` finding and its explicit user decision |
 | Post-phase review | Ambiguity Register entry with category `Technical (complexity escalation)`; the `RV-*` finding references it |
+| Any stage of a `standard` single-document plan | A `D-*` row in the plan's `## Decisions` table |
+
+A `standard`-tier single-document plan has no separate register: its `## Decisions` table owns
+every decision — planning answers, runtime ambiguities raised during execution (tagged
+`(runtime)`), and complexity approvals with the full approval evidence below. The gate's rules are
+the same; only the owner differs. A `critical` plan, and any plan with `00-ambiguity-register.md`,
+keeps the register.
 
 Downstream packets include relevant approved complexity entries from these owners. An approval is
 specific to the machinery and cost shown in its packet; materially expanding it reopens the gate.

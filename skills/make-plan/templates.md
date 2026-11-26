@@ -15,6 +15,67 @@ plans/<feature-name>/
 └── 99-execution-plan.md
 ```
 
+A `standard`-tier plan is one document instead — see the next section.
+
+---
+
+## Standard single-document plan
+
+At the `standard` tier make-plan writes only `plans/<feature-name>/99-execution-plan.md` (nested:
+`codeops/features/<f>/plans/<plan>/99-execution-plan.md`). It owns everything the 00–07 set would:
+the goal, the decisions, the acceptance criteria (which are the spec cases), and the tasks. Cite
+`D-n` and `AC-n` instead of `AR-n` and `ST-n`; restate nothing.
+
+```markdown
+# Plan: [Feature Name]
+
+> **CodeOps Artifact Schema**: 1
+> **Implements**: [RD-NN | <feature>/RD-NN | REQ-…]
+> **Verification tier**: standard — [one-line reason]
+> **Progress**: 0/[N] tasks (0%)
+> **Last Updated**: [YYYY-MM-DD HH:MM]
+> **Specialist check**: [None — evidence | candidate names]
+
+## Goal
+
+[The requested outcome in two or three sentences.]
+
+**Smallest viable design:** [the direct solution, reusing named existing patterns]
+
+**Out of scope:** [what this plan deliberately leaves out]
+
+## Decisions
+
+| # | Decision | Answer | Source |
+|---|---|---|---|
+| D-1 | [the question] | [the answer] | User, [date] \| recommended, accepted [date] |
+
+Runtime ambiguities are added as `(runtime)` rows; a complexity approval carries the full approval
+evidence from the shared gate. A deferral names what is deferred and who approved it.
+
+## Acceptance criteria
+
+| # | Given / when | Then | Phase |
+|---|---|---|---|
+| AC-1 | [input or situation] | [observable result] | 1 |
+
+Each AC is a specification test case (3–8 per phase). Error paths and edge cases appear here only
+when the user or the requirement names them.
+
+## Tasks
+
+### Phase 1 — [Name]
+
+> **Verify (gate)**: `[project verify command]`
+
+- [ ] 1.1.1 Write the spec tests for AC-1..AC-3 in `[feature].spec.test.[ext]` and confirm they fail
+- [ ] 1.1.2 Implement [component] — [file(s)]; D-2
+- [ ] 1.1.3 Implement [component] — [file(s)]; run the phase's spec tests and confirm they pass
+```
+
+The execution-rules block, the Review and Verification balance phase-header lines, and the
+task-size rules are the same as in the `99-execution-plan.md` template below.
+
 ---
 
 ## Reference, don't restate (NON-NEGOTIABLE)

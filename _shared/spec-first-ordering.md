@@ -37,19 +37,23 @@ Phase N: [Feature Name]
 
 ## Verification tiers
 
-A full plan records its tier in `00-index.md` as `> **Verification tier**: <tier> — <reason>`.
-The tier sizes the ceremony and the review timing to the work; it never changes the order.
+A full plan records its tier as `> **Verification tier**: <tier> — <reason>` — in `00-index.md` for
+a `critical` plan, in the header of the single document for a `standard` plan. The tier sizes the
+ceremony and the review timing to the work; it never changes the order.
 
 | Aspect | `standard` | `critical` |
 |---|---|---|
-| Spec tests first | Yes — from the ST-cases, before implementation | Yes |
+| Spec tests first | Yes — from the acceptance criteria (`AC-n`), before implementation | Yes — from the ST-cases |
 | Red check | Inside the spec-test task: run the declared spec file and confirm it fails; no separate task | A distinct red-phase task |
 | Green check | Inside the phase's last implementation task: run every declared spec file of the phase and confirm they pass; no separate task | A distinct green-phase task |
 | Phase gate | The phase's `**Verify (gate)**` line (or its single `**Verify**` line); no separate gate task | A distinct gate-verification task |
-| Implementation tests | Only for the error paths and edge cases named in the ST-cases or the component specifications | Edge cases, internals, and error paths |
-| Coverage goal | Every ST-case and acceptance criterion has at least one test; no percentage targets | The same rule; percentage targets only when the plan records them as a decision |
+| Implementation tests | Only where an acceptance criterion names an error path or edge case | Edge cases, internals, and error paths |
+| Coverage goal | Every acceptance criterion has at least one test; no percentage targets | Every ST-case and acceptance criterion has at least one test; percentage targets only when the plan records them as a decision |
 | Independent review | A phase is reviewed when it is risk-tagged or changes 150 or more product lines; otherwise its review is carried forward to the completion review | Every non-trivial phase |
 
+- At `standard` the specification cases are the acceptance criteria: the plan's
+  `## Acceptance criteria` rows, guided at 3–8 per phase. Implementation tests only where an
+  acceptance criterion names an error path or edge case — never added for coverage.
 - A plan without a tier line is `critical`, and so is a plan whose tier line has an unknown value.
 - The tier changes **when** a diff is reviewed, never **whether** it is reviewed. The review rules
   live in [quality-profile.md](quality-profile.md).

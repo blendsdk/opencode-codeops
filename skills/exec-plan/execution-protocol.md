@@ -32,8 +32,9 @@ If the execution plan can't be loaded cleanly, **STOP** and handle as follows:
 
 ### Artifact schema check
 
-Read `00-index.md` and `99-execution-plan.md`. A current plan declares one or more RDs on its
-`> **Implements**:` line and uses `[ ]`, `[~]`, `[x]`, and `[!]` as its complete task-state
+Read `00-index.md` (when the plan has one) and `99-execution-plan.md`. A current plan declares one
+or more RDs on its `> **Implements**:` line — in `00-index.md`, or in the header of a `standard`
+single-document plan — and uses `[ ]`, `[~]`, `[x]`, and `[!]` as its complete task-state
 vocabulary. A legacy `CodeOps Skills Version` stamp or no schema stamp triggers a read-only
 upgrade assessment. Do not execute a legacy plan merely because its task checkbox shape can be
 parsed; the user must approve migration or explicitly accept the recorded compatibility risk.
@@ -95,7 +96,9 @@ complete. For each task, in order:
    `_shared/zero-ambiguity-gate.md`, mark the task `[!]`. For a T-NN mini-plan, preserve the current
    diff without marking it verified and switch to the full standalone-plan path before dispatching
    the challenger, presenting the packet, or accepting a decision; its
-   `00-ambiguity-register.md` owns the decision. For a full plan, dispatch the required blind
+   `00-ambiguity-register.md` owns the decision. A `standard` single-document plan does not switch:
+   it runs the challenger and packet in place and records the decision in its `## Decisions` table.
+   For a full plan, dispatch the required blind
    challenger, present the complete visible stop packet, and wait for explicit user approval.
    Auto-design, auto-commit, or a generic finding ruling cannot approve the larger option.
 2. Implement the task following the technical specifications. **The code and doc comments you
@@ -147,7 +150,7 @@ complete. For each task, in order:
 
    ```bash
    git diff --name-only | xargs grep -nEI \
-     -e '\b(RD|AR|PA|PF|HR|GATE|AC|ST|ADR|DEF)-[0-9]+' \
+     -e '\b(RD|AR|PA|PF|HR|GATE|AC|ST|ADR|DEF|D)-[0-9]+' \
      -e '\b(codeops|plans|requirements)/[[:alnum:]._/-]*' 2>/dev/null
    ```
 
@@ -187,17 +190,21 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
 
      Record `> **Verification balance**: <T> test / <P> product lines (<R>:1)` in the phase header
      and in the phase summary, where T and P are added lines and R = T / P with one decimal (`n/a`
-     when P is 0). At the `standard` tier, append ` ⚠️ above 1.5:1` when R is above 1.5. The
-     balance never blocks, never asks, and never changes a gate result. When the diff is
-     unavailable, record `> **Verification balance**: unavailable — <reason>` and review the phase
-     now. This command counts the file conventions above (add a test map's globs by judgment):
+     when P is 0). At `critical` the balance is report-only: it never blocks, never asks, and never
+     changes a gate result. At `standard`, a phase above 1:1 (R above 1.0) stops before the phase
+     closes: present the STOP packet — the test and product line counts, the largest test
+     additions, and the smallest change that brings the phase back to 1:1 — and wait for the user's
+     decision to keep the tests (with a recorded reason) or trim them; record it as a row in the
+     plan's decision owner. When the diff is unavailable, record
+     `> **Verification balance**: unavailable — <reason>` and review the phase now. This command counts the file conventions above (add a test map's globs by judgment):
 
      ```bash
      python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_worktree_snapshot.py" diff --root . \
        --baseline <phase-baseline-tree> | awk '/^diff --git /{f=$0; sub(/^diff --git "?a\/.* "?b\//,"",f); sub(/"$/,"",f); h=1; c=(f~/^(plans|requirements|codeops)\//||f~/(^|\/)(dist|build)\//||f~/(\.lock|package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$/)?"x":((f~/(^|\/)(test|tests|__tests__|spec|fixtures)\//||f~/(\.test\.|\.spec\.|_test\.|_spec\.|Test\.)/||f~/(^|\/)test_/)?"t":"p"); next} h&&/^(\+\+\+|---) /{next} /^@@/{h=0} /^\+/{a[c]++} /^-/{d[c]++} END{printf "test=%d product=%d changed=%d\n", a["t"], a["p"], a["p"]+d["p"]}'
      ```
-   - Read the tier from the `> **Verification tier**:` line in `00-index.md`. A plan with no tier
-     line, or with an unknown value, is `critical`; say so once in the run summary.
+   - Read the tier from the `> **Verification tier**:` line in `00-index.md`, or in the plan's own
+     header for a single-document plan. A plan with no tier line, or with an unknown value, is
+     `critical`; say so once in the run summary.
    - `critical`: review the phase now.
    - `standard`: review the phase now when it is risk-tagged or changes 150 or more product lines
      (the `changed` count above: added + deleted product lines). Otherwise write
@@ -246,7 +253,7 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
      stop before presenting or accepting a complexity decision: mark the task `[!]`, preserve the
      diff without marking it verified, and switch to the full standalone-plan path. The new
      `00-ambiguity-register.md` owns the packet and decision. Resume only after that plan's gates
-     pass.
+     pass. A `standard` single-document plan records the decision in its `## Decisions` table.
 4. **Record decisions durably** in the plan's findings ledger after each ruling batch. The ledger
    is `plans/<plan>/05-findings.md` (flat) or
    `codeops/features/<f>/plans/<plan>/05-findings.md` (nested), created lazily on first use, with a
@@ -369,7 +376,8 @@ receives nothing else and must not need anything else:
 - the applicable ST-cases from `07-testing-strategy.md`;
 - the AR decisions that bear on the phase and any relevant approved complexity PF/RV decisions
   (quoted entries, not whole reports);
-- the original goal and smallest viable design from `00-index.md`, or the session-derived legacy
+- the original goal and smallest viable design from `00-index.md` or the single document's
+  `## Goal`, or the session-derived legacy
   baseline when the plan predates that section;
 - the scope mode (`strict` or `explore`) and confirmed product scope baseline; missing or invalid
   scope context fails closed to strict mode. Missing or invalid original-goal or smallest-design

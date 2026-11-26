@@ -269,16 +269,17 @@ it("ST-14 — the finding gate and both commit-mode pause rules apply to Confirm
 
 // --- Verification balance ----------------------------------------------------
 
-it("ST-15 — exec-plan reports a report-only verification balance with a defined classification", () => {
+it("ST-15 — exec-plan reports a verification balance with a defined classification", () => {
   const step = section(read(PROTOCOL), "### Post-phase quality step (profile-gated)")
   assertTokens(
     step,
-    ["Verification balance", "`*.test.*`", "`*_test.*`", "`test_*", "`fixtures/`", "`plans/`", "`requirements/`", "`codeops/`", "lockfile", "`dist/`", "above 1.5:1", "unavailable"],
+    ["Verification balance", "`*.test.*`", "`*_test.*`", "`test_*", "`fixtures/`", "`plans/`", "`requirements/`", "`codeops/`", "lockfile", "`dist/`", "unavailable"],
     "the post-phase step",
   )
   const text = prose(step)
   assert.match(text, /markdown.{0,80}product|product.{0,80}markdown/i)
-  assert.match(text, /never block/i)
+  // The threshold and when it blocks are pinned by LP-6 in lean-plan-content.spec.test.mjs,
+  // which superseded the report-only 1.5:1 rule.
 })
 
 it("ST-16 — the phase header template carries the verification balance line", () => {

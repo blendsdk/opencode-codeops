@@ -146,7 +146,8 @@ id**, and the repo can hold multiple unrelated feature-sets at once, so "everyth
 under `plans/`" is **not** a valid membership rule. Link deterministically instead:
 
 - Every plan declares every requirement it implements on one `> **Implements**: RD-NN, RD-NN`
-  line in its `00-index.md` (feature-qualified identifiers in nested layout — see the ID rules in
+  line in its `00-index.md`, or in the header of a `standard` single-document plan's
+  `99-execution-plan.md` (feature-qualified identifiers in nested layout — see the ID rules in
   the convention doc). The `Plan Created` hook reads this line and links the plan to each matching
   RD row in that feature's roadmap.
 - A plan with **no declared RD** is linked only when the user explicitly states which

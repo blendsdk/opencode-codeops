@@ -87,10 +87,11 @@ describe("placement and defaults", () => {
     assert.match(phaseOne, /after Phase 1\.2[\s\S]{0,80}1\.3[\s\S]{0,100}before\s+Phase 1[BC]/i)
   })
 
-  it("runs for full plans and skips mini-plans and trivial tasks", () => {
+  it("skips mini-plans and trivial tasks", () => {
     const skill = read(SKILL)
 
-    assert.match(skill, /full (?:feature )?plans?[\s\S]{0,120}default/i)
+    // Which full plans run the hunt by default (critical only) is pinned by LP-5 in
+    // lean-plan-content.spec.test.mjs; it superseded the "every full plan" default.
     assert.match(skill, /mini-plans?[\s\S]{0,120}(?:do not|skip|unchanged)/i)
     assert.match(skill, /trivial tasks?[\s\S]{0,120}(?:do not|skip|unchanged)/i)
     assert.match(skill, /mini-plan boundary|Mini-plans and trivial tasks skip/i)

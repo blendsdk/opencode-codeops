@@ -58,7 +58,7 @@ verbatim when creating either. The portfolio is a separate, higher-altitude temp
 | ID | `RD-NN` for a top-level requirement; `T-NN` for a lightweight task (nested layout — separate per-feature namespace, see the task-lane spec); `↳ DEF-n` for a nested discovered dependency. |
 | Title | Short human label. |
 | RD | Relative link to `requirements/RD-*.md`, or `—` if not yet drafted. |
-| Plan | Relative link to the plan folder's `00-index.md`, or `—` if no plan yet. |
+| Plan | Relative link to the plan folder's `00-index.md` (a `standard` single-document plan: its `99-execution-plan.md`), or `—` if no plan yet. |
 | Stage | One of the 9 lifecycle states (text form). A `Blocked` row records its prior stage in-cell — `Blocked (was: <stage>)` — so unblocking never depends on memory. |
 | Status | The matching emoji for the stage (see legend). |
 | Last Updated | Date (or date + time) of the last change to this row. |

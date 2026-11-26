@@ -53,7 +53,13 @@ fi
 | Ambiguity register | `requirements/00-ambiguity-register.md` or `plans/<plan>/00-ambiguity-register.md` | the same file, under the feature |
 | Scope-expansion register | See the target-qualified rules below | the same target-qualified filename, under the feature |
 | Task mini-plan | `plans/<task-slug>/99-execution-plan.md` | `codeops/features/<f>/plans/<task-slug>/99-execution-plan.md` |
+| Standard single-document plan | `plans/<plan>/99-execution-plan.md` | `codeops/features/<f>/plans/<plan>/99-execution-plan.md` |
 | Archive | `plans/_archive/<set>/` | `codeops/_archive/<f>/` |
+
+Two plans live in a single `99-execution-plan.md`: a **task mini-plan** (`> **Type**: Task
+(lightweight)`, no verification tier) and a **`standard`-tier feature plan**, whose header declares
+`> **Implements**:` and `> **Verification tier**: standard`. A `critical` feature plan keeps the full
+document set with `00-index.md`.
 
 In nested layout, a feature's inner directories are created **lazily** — only when that
 feature's first RD, plan, or task is written. The marker and the (possibly empty) portfolio

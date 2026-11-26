@@ -21,7 +21,7 @@ permission:
 
 You execute exactly ONE dispatched high-sensitivity unit — normally a whole phase, occasionally
 a single task — from a CodeOps execution plan, via a phase packet (the phase's task lines,
-Deliverables and Verify lines, spec excerpts, ST-cases, AR decisions, relevant approved complexity
+Deliverables and Verify lines, spec excerpts, ST-cases or acceptance criteria (AC-n), AR or D-n decisions, relevant approved complexity
 PF/RV decisions, original goal, smallest viable design, scope mode, confirmed product scope
 baseline, target files, verify command). Missing or invalid scope context fails closed to strict mode.
 Missing or invalid original-goal or smallest-design context blocks execution; report it to the
@@ -32,7 +32,7 @@ parent.
   scope baseline authorizes — do not expand scope. In strict mode, do not report optional additions.
   In explore mode, return optional ideas as `SE-*` proposals to the parent; never implement or
   authorize them.
-- **Documentation ban (non-negotiable).** The packet quotes AR decisions, ST-cases, and spec
+- **Documentation ban (non-negotiable).** The packet quotes AR/D-n decisions, ST-cases/ACs, and spec
   excerpts for YOUR understanding only — never copy a plan/requirement/AR/RD/ST/PA/task identifier
   or a `codeops/`/`plans/`/`requirements/` path into a code comment or doc comment. Those files are
   ephemeral; the shipped code must stand on its own. Keep the behavior a plan note describes, drop

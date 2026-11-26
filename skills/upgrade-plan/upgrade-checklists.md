@@ -58,6 +58,9 @@ Re-evaluate each plan document against the make-plan skill's current standards.
 - [ ] Never derive a verification tier for an existing plan: a plan without a tier line already
       executes as `critical`. If the upgrade adds the line, write
       `> **Verification tier**: critical — pre-tier plan` in `00-index.md`.
+- [ ] A `standard` single-document plan (one `99-execution-plan.md` whose header declares
+      `Implements` and `Verification tier: standard`) is current: check its header, `## Decisions`,
+      `## Acceptance criteria`, and `## Tasks`; never add `00–07` documents to it.
 
 ### `99-execution-plan.md`
 - [ ] Version stamp present? → Add `> **CodeOps Artifact Schema**: 1` if missing.

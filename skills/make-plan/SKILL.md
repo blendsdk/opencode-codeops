@@ -52,16 +52,17 @@ If `$ARGUMENTS` contains exactly one exact standalone `--thorough` token before 
 sentinel, remove it and expand the run to twelve single-category clusters. Zero occurrences mean
 four clusters; more than one is an argument error. Announce `Coverage hunt thorough — 12 clusters`.
 
-`--no-coverage-hunt` with `--thorough` is an argument error. Full feature plans run the coverage
-hunt by default. Mini-plans and trivial tasks skip the hunt and keep their existing lightweight
-path. An opted-out full plan records `**Coverage:** disabled — --no-coverage-hunt` in `00-index.md`.
+`--no-coverage-hunt` with `--thorough` is an argument error. Critical-tier plans run the coverage
+hunt by default; standard-tier plans skip it (see [Standard plan](#standard-plan-single-document)).
+Mini-plans and trivial tasks skip the hunt and keep their existing lightweight path. An opted-out full plan records `**Coverage:** disabled — --no-coverage-hunt` in `00-index.md`.
 
 ## Plan readiness proof
 
 A plan is not ready merely because its documents exist. Before presenting it as executable,
-directly confirm that its required documents exist, its `00-index.md` declares every implemented
-RD on one `> **Implements**:` line, its ambiguity register has no open material item, and its
-specification tests are ordered before implementation tasks. Run the semantic Zero-Ambiguity Gate.
+directly confirm that its required documents exist, its `00-index.md` (or, for a `standard`
+single-document plan, its own header) declares every implemented RD on one `> **Implements**:`
+line, its decision owner — the ambiguity register or the plan's `## Decisions` table — has no open
+material item, and its specification tests are ordered before implementation tasks. Run the semantic Zero-Ambiguity Gate.
 Do not create a graph, readiness record, or transition request. `99-execution-plan.md` is the sole
 mutable task-progress authority.
 
@@ -171,7 +172,8 @@ These rules are universal. For build/test/verify commands, package manager, stru
 - **No raw git commands in plan documents.** Plans must not contain `git add/commit/push` or bash blocks running git. When a plan needs to commit, it references the **git-commit skill** (commit) or **git-commit skill in push mode** (commit + push) command. Execution commit behavior is owned by the exec-plan skill.
 - **Specification-first testing ordering is non-negotiable** (see Phase 2 and [templates.md](templates.md)): spec tests → red phase → implement → green phase → impl tests → verify. The plan's verification tier (below) decides only which of these steps are separate tasks.
 - **Zero-Ambiguity Gate (Phase 1C) must pass before any plan document except its incrementally
-  persisted `00-ambiguity-register.md` is written.** No other exceptions.
+  persisted `00-ambiguity-register.md` is written** (a `standard` plan writes its single document
+  only after the gate). No other exceptions.
 
 ## Verification tier
 
@@ -192,9 +194,36 @@ Mini-plans and trivial tasks have no tier.
 3. **Override.** The user may override the proposal. The recorded reason says why; when the
    configured tier differs from the derivation, the reason names both, for example
    `standard — config override (derived critical: security tag)`.
-4. **Record.** Write the final tier into `00-index.md` as
-   `> **Verification tier**: <standard|critical> — <one-line reason>`. exec-plan reads only this
-   line; a plan without it is executed as `critical`.
+4. **Record.** Write the final tier as
+   `> **Verification tier**: <standard|critical> — <one-line reason>` into `00-index.md` (`critical`)
+   or the header of the single document (`standard`). exec-plan reads only this line; a plan
+   without it is executed as `critical`.
+
+## Standard plan (single document)
+
+When the provisional tier at Phase 1.3 is `standard`, make-plan takes the lean path. The
+Zero-Ambiguity rule is unchanged — every material decision still needs the user's answer (or a
+delegated auto-design resolution) — but the ceremony around it is smaller:
+
+1. **Questions.** Run Phase 1.1–1.3, then ask every open material decision in one batched round,
+   each with a recommended answer and its reason (Discovery publishes the round when it applies).
+   Ask a follow-up only for a vague answer or a decision the answers themselves surface.
+2. **No coverage hunt** (Phase 1A is skipped), **no separate register** (the plan's `## Decisions`
+   table owns every decision, including runtime ambiguities and complexity approvals, per
+   [../../_shared/zero-ambiguity-gate.md](../../_shared/zero-ambiguity-gate.md)), and **no
+   preflight**. Phase 1B's re-evaluation still runs in context.
+3. **One document.** Write only `99-execution-plan.md` from the standard single-document template
+   in [templates.md](templates.md): a header (`Implements`, `Verification tier: standard`,
+   Progress, Last Updated, specialist check), `## Goal` (goal, smallest viable design, out of
+   scope), `## Decisions` (`D-n` rows with the answer and who gave it), `## Acceptance criteria`
+   (`AC-n` rows — these are the spec cases, 3–8 per phase), and `## Tasks`. No `00–07` documents.
+4. **Gate.** Phase 1C passes when every `D-n` row is answered or a named, approved deferral; write
+   the document only then.
+5. **Escalation.** If the final tier (re-derived after lens selection) is `critical`, or the user
+   asks for it, switch to the full path below; the answered `D-n` rows become its register rows.
+
+A `critical` plan keeps the full path unchanged: the 00–07 document set, the coverage hunt by
+default, the Ambiguity Register, and preflight before execution.
 
 ## Optional input: requirements documents
 
@@ -228,8 +257,8 @@ separately in the Scope Expansion Register and wait for `Keep`, `Defer`, or `Dis
 
 ## Phase 1A: Coverage Hunt (before Phase 1B and 1C)
 
-Full feature plans run the coverage hunt by default after Phase 1.2 and Phase 1.3 and before
-Phase 1B and Phase 1C. The hunt never runs before the scope baseline exists and never after
+Critical-tier plans run the coverage hunt by default after Phase 1.2 and Phase 1.3 and before
+Phase 1B and Phase 1C; standard plans skip it. The hunt never runs before the scope baseline exists and never after
 Phase 1C is declared passed. The canonical cluster partition, packet, result contract, materiality
 filter, budget, and fallback live in
 [../../_shared/coverage-hunt.md](../../_shared/coverage-hunt.md); do not restate them. The effort
@@ -497,13 +526,16 @@ Report what was created:
 **To begin implementation:** use the exec-plan skill on `[feature-name]`.
 ```
 
+For a `standard` plan, the summary lists the single document, its decision and acceptance-criteria
+counts, and the specialist check; it carries no coverage line and does not suggest preflight.
+
 ---
 
 ## Phase 5 — Roadmap Sync
 
 After the plan is created, sync the roadmap if one is in play:
 
-- **If `plans/00-roadmap.md` exists:** set the implemented RD's row to stage `Plan Created` (📋) and link the new plan. The link is deterministic — `00-index.md` declares `> **Implements**: RD-NN`, and the row is matched from that line. A plan with no declared RD is linked only when the user explicitly says which RD (or `DEF-n`) it belongs to. Update the roadmap BEFORE moving on.
+- **If `plans/00-roadmap.md` exists:** set the implemented RD's row to stage `Plan Created` (📋) and link the new plan. The link is deterministic — `00-index.md` (or a `standard` plan's own header) declares `> **Implements**: RD-NN`, and the row is matched from that line. A plan with no declared RD is linked only when the user explicitly says which RD (or `DEF-n`) it belongs to. Update the roadmap BEFORE moving on.
 - **If it does NOT exist:** ask the user whether to create a roadmap. Never auto-create it silently.
 
 See the **roadmap skill** for the full Roadmap Keeper protocol.

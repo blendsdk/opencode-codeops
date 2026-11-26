@@ -223,6 +223,12 @@ def inspect_migration(codeops_root: Path) -> Migration:
             plan_dir = execution.parent
             index = plan_dir / "00-index.md"
             index_text = index.read_text(encoding="utf-8") if index.is_file() else ""
+            if not index.is_file():
+                # A standard-tier single-document plan declares Implements in its own header;
+                # its declaration is kept (and updated) there instead of creating an index.
+                single_text = execution.read_text(encoding="utf-8")
+                if parse_implements(single_text):
+                    index, index_text = execution, single_text
             declared = tuple(_qualify(feature_dir.name, item) for item in parse_implements(index_text))
             if declared:
                 implements, source = declared, "existing declaration"

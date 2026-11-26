@@ -251,11 +251,13 @@ def inspect_plan(plan_dir: Path, root: Path | None = None) -> PlanStatus:
     problems: list[str] = []
     index_text = index_path.read_text(encoding="utf-8") if index_path.is_file() else ""
     execution_text = execution_path.read_text(encoding="utf-8") if execution_path.is_file() else ""
-    if not index_path.is_file():
+    # A standard-tier plan is a single document whose header declares Implements; it has no index.
+    single_document = not index_path.is_file() and bool(parse_implements(execution_text))
+    if not index_path.is_file() and not single_document:
         problems.append("missing required 00-index.md")
     if not execution_path.is_file():
         problems.append("missing required 99-execution-plan.md")
-    implements = parse_implements(index_text)
+    implements = parse_implements(execution_text if single_document else index_text)
     if not implements:
         problems.append("00-index.md must declare one or more requirement or tracker targets in **Implements**")
     tasks = parse_tasks(execution_text)
