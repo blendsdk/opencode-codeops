@@ -475,9 +475,8 @@ python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_plan.py" mark --plan <plan-dir> 
    the header Progress counter (only `[x]` counts) and the Last Updated stamp, and prints the
    progress bar. It touches only the counted task line — never fenced or quoted examples — and
    repeating a transition changes nothing. No separate `date`, hand edit, or progress-bar step.
-3. A legacy (≤3.2.0) plan whose **Master Progress Checklist** is the source of truth keeps the
-   hand-edit procedure: change the checklist mark with a timestamp, update the Progress counter
-   and the Last Updated stamp, obtaining timestamps from the system clock — never invented.
+3. The same call serves a legacy (≤3.2.0) plan: its **Master Progress Checklist** lines are the
+   plan's counted task lines (its phase sections carry task tables), so `mark` edits exactly them.
 
 Task mark formats (what `mark` writes):
 

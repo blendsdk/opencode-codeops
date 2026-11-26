@@ -176,6 +176,29 @@ describe("codeops_plan.py mark", () => {
   })
 })
 
+describe("codeops_plan.py mark keeps the rest of the file intact", () => {
+  it("ST-K9 — preserves CRLF endings, task text that quotes the suffix format, and line positions", () => {
+    const fixture = makePlan()
+    const text = [
+      "> **Progress**: 0/2 tasks (0%)",
+      "> **Last Updated**: 2000-01-01 00:00",
+      "Intro with a form feed \f inside.",
+      "- [ ] 1.1.1 Document the ✅ (completed: <time>) suffix format",
+      "- [ ] 1.1.2 Second task",
+      "",
+    ].join("\r\n")
+    writeFileSync(fixture.file, text)
+    const result = mark(fixture, ["--task", "1.1.1", "--state", "done"])
+    assert.equal(result.status, 0, result.stderr)
+    const after = readFileSync(fixture.file, "utf8")
+    assert.equal(after.split("\r\n").length, text.split("\r\n").length, "every line keeps its CRLF ending")
+    assert.equal(after.replace(/\r\n/g, "").includes("\n"), false, "no bare LF is introduced")
+    const lines = after.split("\r\n")
+    assert.match(lines[3], /^- \[x\] 1\.1\.1 Document the ✅ \(completed: <time>\) suffix format ✅ \(completed: \d{4}-/)
+    assert.equal(lines[4], "- [ ] 1.1.2 Second task", "the next task is untouched")
+  })
+})
+
 describe("exec-plan uses mark for task transitions", () => {
   it("ST-K8 — the per-task loop and update procedure call mark with the progress report in the same step", () => {
     const skill = readFileSync(join(ROOT, "skills", "exec-plan", "SKILL.md"), "utf8")

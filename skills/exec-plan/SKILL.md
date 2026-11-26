@@ -172,8 +172,8 @@ For each task, in order:
    promote with `--state done` only after its verification passes. One `mark` call sets the
    checkbox and timestamped status suffix, refreshes the Progress header and Last Updated stamp,
    and prints the progress bar — no separate `date`, hand edit, or progress-bar step. A task never
-   shows `[x]` with a failing verify. (A pre-3.3.0 plan whose Master Progress Checklist is the
-   source of truth keeps the hand-edit procedure; see the protocol's dual-format detection.)
+   shows `[x]` with a failing verify. The same call serves a pre-3.3.0 plan, whose Master
+   Progress Checklist lines are its counted task lines.
 
    - **Report progress** — when the `codeops_progress` tool is available — at the transition
      points in [execution-protocol.md](execution-protocol.md) §Progress Reporting, issued in the

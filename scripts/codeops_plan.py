@@ -34,10 +34,14 @@ TASK_RE = re.compile(r"^-\s*\[([ xX~!])\]\s+(.+?)\s*$")
 FENCE_OPEN_RE = re.compile(r"^ {0,3}(`{3,}|~{3,})")
 TASK_ID_RE = re.compile(r"^\s*(?:\*\*)?([0-9]+\.[0-9]+\.[0-9]+|T-[0-9]+\.[0-9]+)(?=[\s*—–-]|$)")
 BLOCKED_REASON_RE = re.compile(r"(?:blocked|reason)\s*:\s*\S", re.IGNORECASE)
-#: A task line's trailing status suffix written by ``mark`` (or by hand in the same format).
-STATUS_SUFFIX_RE = re.compile(r"\s+(?:✅|⏳|🚫)\s*\((?:completed|implemented|Blocked)\b.*$")
+#: A task line's trailing status suffix written by ``mark`` (or by hand in the same format): the
+#: last emoji-and-label group, closing with ``)`` at the end of the line, so task text that quotes
+#: the format stays intact.
+STATUS_SUFFIX_RE = re.compile(
+    r"\s+(?:✅|⏳|🚫)\s*\((?:completed|implemented|Blocked)\b(?:(?!\s(?:✅|⏳|🚫)\s*\().)*\)\s*$"
+)
 PROGRESS_HEADER_RE = re.compile(r"^(>[ \t]*\*\*Progress\*\*:[ \t]*)\d+\s*/\s*\d+\s+tasks\s*\(\d+%\)", re.MULTILINE)
-LAST_UPDATED_RE = re.compile(r"^(>[ \t]*\*\*Last Updated\*\*:[ \t]*).*$", re.MULTILINE)
+LAST_UPDATED_RE = re.compile(r"^(>[ \t]*\*\*Last Updated\*\*:[ \t]*)[^\r\n]*", re.MULTILINE)
 MARK_STATES = {
     "implemented": ("~", "⏳", "implemented"),
     "done": ("x", "✅", "completed"),
@@ -91,11 +95,12 @@ def _task_line_numbers(execution_text: str) -> Iterator[tuple[int, str]]:
     """Yield ``(line index, task id)`` for every real execution-task line, in document order.
 
     The same rule as ``_task_lines``: fenced blocks are skipped and the text must begin with a
-    task id.
+    task id. Lines are split on ``\n`` only, so indices match the lines ``mark_task`` rewrites
+    even when the text holds other line-break characters (form feeds, U+2028).
     """
     fence_char = ""
     fence_length = 0
-    for index, line in enumerate(execution_text.splitlines()):
+    for index, line in enumerate(execution_text.split("\n")):
         line = line.rstrip()
         if fence_char:
             indent = len(line) - len(line.lstrip(" "))
@@ -318,19 +323,30 @@ def mark_task(execution_text: str, task_id: str, state: str, note: str | None, n
     if index is None:
         raise MarkError(f"no execution task {task_id} in the plan")
     line = lines[index]
+    ending = "\r" if line.endswith("\r") else ""
     task = TASK_RE.match(line.rstrip())
-    if task.group(1).lower() == marker and STATUS_SUFFIX_RE.search(line):
+    current = STATUS_SUFFIX_RE.search(task.group(2))
+    note_text = note.strip() if note and note.strip() else ""
+    if task.group(1).lower() == marker and current and _same_status(current.group(0), emoji, label, note_text):
         return execution_text
     body = STATUS_SUFFIX_RE.sub("", task.group(2).strip())
-    detail = f"Blocked: {note.strip()}; {now}" if state == "blocked" else \
-        f"{label}: {now}" + (f"; {note.strip()}" if note and note.strip() else "")
-    lines[index] = f"- [{marker}] {body} {emoji} ({detail})"
+    detail = f"Blocked: {note_text}; {now}" if state == "blocked" else \
+        f"{label}: {now}" + (f"; {note_text}" if note_text else "")
+    lines[index] = f"- [{marker}] {body} {emoji} ({detail}){ending}"
     text = "\n".join(lines)
     tasks = parse_tasks(text)
     verified = sum(task.marker == "x" for task in tasks)
     percentage = round(verified / len(tasks) * 100) if tasks else 0
     text = PROGRESS_HEADER_RE.sub(lambda m: f"{m.group(1)}{verified}/{len(tasks)} tasks ({percentage}%)", text, count=1)
     return LAST_UPDATED_RE.sub(lambda m: f"{m.group(1)}{now}", text, count=1)
+
+
+def _same_status(suffix: str, emoji: str, label: str, note: str) -> bool:
+    """Tell whether an existing status suffix already records this state and note."""
+    suffix = suffix.strip()
+    if not suffix.startswith(f"{emoji} ({label}"):
+        return False
+    return not note or note in suffix
 
 
 def mark_main(argv: list[str]) -> int:
@@ -347,14 +363,16 @@ def mark_main(argv: list[str]) -> int:
     if not path.is_file():
         print(f"codeops_plan.py mark: missing {path}", file=sys.stderr)
         return 2
-    original = path.read_text(encoding="utf-8")
+    with path.open(encoding="utf-8", newline="") as handle:  # keep CRLF files byte-stable
+        original = handle.read()
     try:
         updated = mark_task(original, args.task, args.state, args.note, datetime.now().strftime("%Y-%m-%d %H:%M"))
     except MarkError as error:
         print(f"codeops_plan.py mark: {error}", file=sys.stderr)
         return 2
     if updated != original:
-        path.write_text(updated, encoding="utf-8")
+        with path.open("w", encoding="utf-8", newline="") as handle:
+            handle.write(updated)
     tasks = parse_tasks(updated)
     print(render_progress(sum(task.marker == "x" for task in tasks), len(tasks)))
     return 0
