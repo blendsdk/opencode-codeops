@@ -7,7 +7,7 @@ features of this same repository and a full checkout would contain their answers
 are replaced by stubs that run compiled bytecode kept outside the ref, so arms can run them but
 not read them. Mentions of subject S's trace switch are removed from the copied docs.
 
-Usage: python3 -I build_ref.py <sha>   ->  /tmp/bench-lean/ref-<sha>
+Usage: python3 -I build_ref.py <sha> [tag]   ->  /tmp/bench-lean/ref-<sha>[-<tag>]
 """
 import ast, io, py_compile, re, shutil, subprocess, sys, tarfile
 from pathlib import Path
@@ -23,10 +23,12 @@ ANSWER_PATTERNS = [
 ]
 
 
-def build(sha: str) -> Path:
+def build(sha: str, tag: str = "") -> Path:
+    """Build the ref; a tag gives each arm its own copy so parallel arms never share one."""
     sha = subprocess.run(["git", "-C", str(REPO), "rev-parse", "--verify", sha + "^{commit}"],
                          capture_output=True, text=True, check=True).stdout.strip()
-    ref, tools = W / f"ref-{sha}", W / f"tools-{sha}"
+    suffix = f"{sha}-{tag}" if tag else sha
+    ref, tools = W / f"ref-{suffix}", W / f"tools-{suffix}"
     for d in (ref, tools):
         if d.exists():
             shutil.rmtree(d)
@@ -83,4 +85,4 @@ def strip_trace(ref: Path) -> None:
 
 
 if __name__ == "__main__":
-    print(build(sys.argv[1]))
+    print(build(sys.argv[1], sys.argv[2] if len(sys.argv) > 2 else ""))

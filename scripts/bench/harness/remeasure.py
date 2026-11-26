@@ -51,7 +51,9 @@ def main():
             violations += sorted(set(s["forbidden_scope"].findall(plan_text)))
         sessions = [r for r in rows if r["workflow"] != "acceptance" and r["subject"] == rec["subject"]
                     and r["n"] == rec["n"] and r["ref"] == rec["ref"] and r.get("session")]
-        allowed = (str(run_arm.W / f"ref-{full_sha(rec['ref'])}"), str(run_arm.W / "packets" / rec["subject"]),
+        full = full_sha(rec["ref"])
+        allowed = (str(run_arm.W / f"ref-{full}-{rec['subject']}-{rec['n']}"), str(run_arm.W / f"ref-{full}"),
+                   str(run_arm.W / "packets" / rec["subject"]),
                    str(run_arm.W / "arms" / f"{rec['subject']}-{rec['ref']}-{rec['n']}"), run_arm.sandbox.ARM_HOME)
         flagged = sorted({p for r in sessions for p in run_arm.audit(arm / "data" / "opencode.db", r["session"], allowed)})
         for r in sessions:

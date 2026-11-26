@@ -195,7 +195,7 @@ def run():
     # Rebuild the ref for every arm from the full SHA: no stale or hand-edited ref is ever reused.
     full = sh(["git", "-C", str(REPO), "rev-parse", "--verify", a.ref + "^{commit}"])[1].strip()
     a.ref = full[:7]
-    rc, out = sh(["python3", "-I", str(Path(__file__).with_name("build_ref.py")), full])
+    rc, out = sh(["python3", "-I", str(Path(__file__).with_name("build_ref.py")), full, f"{a.subject}-{a.n}"])
     if rc:
         sys.exit(f"ref build failed: {out}")
     ref = Path(out.strip().splitlines()[-1])
