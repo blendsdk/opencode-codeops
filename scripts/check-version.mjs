@@ -39,6 +39,13 @@ const SCANNED_DIRS = [
   "schemas",
 ]
 
+/**
+ * Schema-version declarations that may coincide with the product version: the
+ * `codeops/` layout version (`layoutVersion: "X.Y.Z"`). They are removed before
+ * scanning, because they are independent of the product version.
+ */
+const SCHEMA_VERSION_PATTERNS = [/layoutVersion:\s*"[^"]*"/g]
+
 /** Files that legitimately contain the version and are exempt from the scan. */
 const EXEMPT_FILES = new Set(["package.json", "package-lock.json", "CHANGELOG.md"])
 
@@ -106,7 +113,8 @@ export function findVersionLiterals(version) {
       } catch {
         continue
       }
-      if (pattern.test(content)) hits.push(name)
+      const scanned = SCHEMA_VERSION_PATTERNS.reduce((text, schema) => text.replace(schema, ""), content)
+      if (pattern.test(scanned)) hits.push(name)
     }
   }
 

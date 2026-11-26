@@ -20,7 +20,7 @@ CodeOps supports two layouts. A repo is in exactly one of them, decided by a sin
 1. If codeops/.codeops.yml exists AND it declares `codeopsLayout: nested`
        → NESTED layout. Resolve all artifact paths under codeops/features/<feature>/…
 2. Otherwise (no marker, or a malformed/incomplete marker)
-       → FLAT layout (the pre-3.0.0 behavior, unchanged). Surface a warning if a marker
+       → FLAT layout (the original behavior, unchanged). Surface a warning if a marker
          exists but is malformed, then proceed as flat — never crash.
 3. In NESTED layout, <feature> is the target feature, which the skill ASKS the user to
        confirm/choose — it never silently guesses (see "Feature targeting" below).
