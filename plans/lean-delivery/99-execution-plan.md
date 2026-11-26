@@ -2,7 +2,7 @@
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
 > **Progress**: 0/37 tasks (0%)
-> **Last Updated**: 2026-11-26 00:15
+> **Last Updated**: 2026-11-26 03:48
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -170,7 +170,7 @@ only counts and classes):
 - [x] 0.1.3 Add `"!scripts/bench/"` to `package.json` `files`; write `scripts/bench/README.md` (kit usage and the arm protocol) ✅ (completed: 2026-11-25 12:53; `npm pack --dry-run` lists no bench file)
 - [x] 0.1.4 Smoke arm (D-9): one headless `opencode run` root session in a throwaway worktree dispatches one reviewer subagent and reads a skill by path from a ref checkout; `bench.py sessions --root` shows the child session and the main checkout's `git status` is unchanged ✅ (completed: 2026-11-25 12:54; `ses_ded71fc75ffe3iujkpVyMlKMXn`, 35 s: skill read by path from the ref, 1 child session, 1 review dispatch detected, main checkout unchanged; headless default model is `opencode/tidepool-alpha-free`, so arms pass `-m` explicitly)
 - [x] 0.1.5 Calibrate: `bench.py sessions --root` on the three §Evidence references reproduces fresh, cached, and message counts within 1% ✅ (completed: 2026-11-25 12:53; exact match on all three (fresh, cached, messages, subagent sessions) once compaction spend is counted)
-- [ ] 0.1.6 Pin the baseline ref (current main SHA, recorded in §Results); baseline arms: M ×2 (make-plan, preflight, exec-plan sessions) and S ×3 (exec-plan); record metrics, the noise band, and the exec-plan bookkeeping step share (reopened 2026-11-26 00:15: rerun under the corrected harness, D-14)
+- [x] 0.1.6 Pin the baseline ref (current main SHA, recorded in §Results); baseline arms: M ×2 (make-plan, preflight, exec-plan sessions) and S ×3 (exec-plan); record metrics, the noise band, and the exec-plan bookkeeping step share ✅ (completed: 2026-11-26 03:48; corrected harness, 5 valid arms, §Results)
 - [x] 0.1.7 Optional reference arm: M ×1 on `v2.8.1` (attributes Wave 1; no gate) ✅ (completed: 2026-11-25 22:56; skipped by design — optional, no gate; attributing Wave 1 does not change any decision here)
 - [~] 0.1.8 `bench.py plans` on H, M, S originals and `bench.py instructions` on the baseline ref; record in §Results; end-of-phase review ⏳ (implemented: 2026-11-25 22:56; static baselines in §Results; end-of-phase review pending)
 
@@ -246,13 +246,48 @@ full-checkout ref, two through this repository's history from subagents that nev
 prompt rules, one through a global npm install and the npm registry — plus the first unsandboxed
 set, rerun under identical conditions. All five valid baselines below have clean audits.
 
-### Phase 0 baseline
+### Phase 0 baseline (valid arms, corrected harness, 2026-11-26)
 
-_Superseded on 2026-11-26 by the Phase 0 review (D-14): arm M1 read subject M's slice-0 answer
-from the ref's compiled parser tools, the audit could not see it, and several metrics were biased
-(review dispatches by description, wording-dependent verification classifier, bookkeeping gaps).
-The five baselines are being rerun under the corrected harness; the earlier numbers are kept in the
-output store under `discarded/` and are not used for any gate._
+All five arms passed the audit: their flagged paths are probes of what the sandbox shows (their own
+ref, tools, packet, and workspace; the masked nvm folder) and of the OpenCode binary's plugin API,
+which contains none of the subjects' answers. The network filter blocked GitHub, the npm
+`opencode-codeops` package, and three web-search services.
+
+| Arm | Workflow | Min | Fresh | Cached | Primary steps | Median ctx/step (primary / tree) | Tool calls | Bookkeeping | Review / refute rounds | Cost |
+|---|---|---|---|---|---|---|---|---|---|---|
+| S1 | exec-plan | 15 | 383,698 | 10,958,208 | 69 | 133,443 / 115,182 | 112 | 33 (29%) | 2 / 1 | $0.18 |
+| S2 | exec-plan | 10 | 256,828 | 8,943,488 | 79 | 99,251 / 93,564 | 92 | 25 (27%) | 1 / 0 | $0.13 |
+| S3 | exec-plan | 10 | 263,377 | 8,655,232 | 60 | 124,333 / 108,885 | 98 | 32 (33%) | 1 / 0 | $0.13 |
+| M1 | make-plan | 22 | 1,101,929 | 39,059,968 | 109 | 232,637 / 100,843 | 154 | — | — | $0.57 |
+| M1 | preflight | 29 | 1,836,482 | 112,219,008 | 249 | 341,760 / 202,359 | 427 | — | — | $1.08 |
+| M1 | exec-plan | 37 | 433,111 | 45,225,216 | 217 | 199,035 / 189,486 | 291 | 127 (44%) | 1 / 0 | $0.25 |
+| M2 | make-plan | 21 | 1,272,076 | 61,945,344 | 155 | 271,952 / 154,530 | 230 | — | — | $0.68 |
+| M2 | preflight | 35 | 1,827,781 | 115,905,920 | 227 | 360,950 / 134,668 | 344 | — | — | $1.08 |
+| M2 | exec-plan | 27 | 551,685 | 27,861,632 | 132 | 164,601 / 144,526 | 150 | 42 (28%) | 0 / 0 | $0.25 |
+
+Bookkeeping is reported for exec-plan only: during make-plan and preflight, plan-document edits
+are the work itself.
+
+| Workflow medians (spread) | n | Fresh | Cached | Primary steps | Median ctx/step | Bookkeeping share |
+|---|---|---|---|---|---|---|
+| S exec-plan | 3 | 263,377 (48%) | 8,943,488 (26%) | 69 (28%) | 124,333 (28%) | 29% (27–33%) |
+| M planning (make-plan + preflight) | 2 | 3,019,134 (5%) | 164,565,120 (16%) | — | — | — |
+| M exec-plan | 2 | 492,398 (24%) | 36,543,424 (48%) | 174 (49%) | 181,818 (19%) | 36% (28–44%) |
+
+| Quality and shape | M1 | M2 | S1–S3 |
+|---|---|---|---|
+| Acceptance (tui-foundation spec) | 7/8 (strip text rendered twice), verify ❌ | 8/8, verify ✅ | 36/36, verify ✅ each |
+| Plan documents / KB | 10 / 153.1 | 11 / 138.6 | 1–2 / ~3 |
+| Tasks / verification share | 17 / 41% | 7 / 29% | 3 / 67% |
+| Spec cases / decisions | 30 / 39 | 5 / 31 | — |
+| Assumptions logged | 23 | 31 | 2–3 |
+| Total cost | $1.90 | $2.01 | $0.13–0.18 |
+
+**What the baseline says.** Planning is ~80% of an M feature's tokens (~3.0M fresh / ~165M
+cached vs ~0.5M / ~37M to execute). Bookkeeping is 29% (S) and 36% (M) of exec-plan tool calls, so
+the lever B gate (≥ 70% removed) is ≤ 9% (S) and ≤ 11% (M). Decision band per metric =
+max(10%, the spread above); M execution varies widely (plan shapes of 7 to 17 tasks), so M
+execution gates take confirming re-runs.
 
 **Static baselines (0.1.8).** Original plans: H 15 docs / 254 KB / 86 tasks / 48% verification;
 M 10 / 119 KB / 14 / 57%; S 1 / 1.8 KB / 6 / 33%. Instruction footprint at the baseline ref
