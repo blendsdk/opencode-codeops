@@ -1,8 +1,8 @@
 # Task T-08: Lean delivery — far fewer tokens, steps, and verification tasks per feature
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 28/37 tasks (76%)
-> **Last Updated**: 2026-11-26 12:06
+> **Progress**: 32/37 tasks (86%)
+> **Last Updated**: 2026-11-26 12:24
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -223,10 +223,12 @@ only counts and classes):
 
 ### Phase 4 — Lever F: instruction diet
 
-- [ ] 4.1.1 List every content spec assertion that pins text the diet moves; get the user's one-batch approval (D-8)
-- [ ] 4.1.2 Write the replacement spec file (≤ 9 cases) guarding the moved text at its new location — confirm it fails
-- [ ] 4.1.3 Split make-plan, exec-plan, preflight, and make-requirements into a lean core plus `critical`-only references; move option blocks (`--auto-design`, `--explore-scope`, `--auto-effort`, Discovery) behind their flags
-- [ ] 4.1.4 `bench.py instructions`: standard-path footprint ≤ 15k tokens per workflow (from 35–49k)
+> **Phase baseline tree**: 53083cbe72b02dd6365e08536b04caad74296778
+
+- [x] 4.1.1 List every content spec assertion that pins text the diet moves; get the user's one-batch approval (D-8) ✅ (completed: 2026-11-26 12:22; light trim (user's choice): no text moves, so no assertion is superseded)
+- [x] 4.1.2 Write the replacement spec file (≤ 9 cases) guarding the moved text at its new location — confirm it fails ✅ (completed: 2026-11-26 12:22; instruction-diet-content spec (2 cases); red: 2/2 fail)
+- [x] 4.1.3 Split make-plan, exec-plan, preflight, and make-requirements into a lean core plus `critical`-only references; move option blocks (`--auto-design`, `--explore-scope`, `--auto-effort`, Discovery) behind their flags ✅ (completed: 2026-11-26 12:24; light trim (user's choice): standard-run reading lists in make-plan and exec-plan; option and critical-only links marked conditional; no file splits)
+- [x] 4.1.4 `bench.py instructions`: standard-path footprint ≤ 15k tokens per workflow (from 35–49k) ✅ (completed: 2026-11-26 12:24; always-read: make-plan 46.1k → 32.5k, exec-plan 38.4k → 31.7k; ≤15k not reached (light trim, accepted scope))
 - [ ] 4.1.5 Arm M ×1 on the Phase 4 SHA; gate: median context per primary step does not regress vs 3.1.7, acceptance tests pass; record; end-of-phase review with `agent-pipeline-reviewer`
 
 **Verify**: `npm run verify`

@@ -12,11 +12,21 @@ description: >-
 
 > **CodeOps Artifact Schema**: 1
 
+## What a run reads
+
+Load documents when a step needs them, not up front: this file, `execution-protocol.md` (the
+sections the current step needs), `commit-modes.md` before the first commit decision,
+`_shared/quality-profile.md` when a review or dispatch packet is built, and
+`_shared/layout-convention.md` for paths. Option policies stay unread without their flag:
+`_shared/auto-design.md` only when `--auto-design` is active,
+`_shared/scope-expansion-control.md` only when `--explore-scope` is active, and
+`_shared/reasoning-effort.md` only when `--auto-effort` is active or a phase packet needs a
+reasoning marker.
+
 ## Auto-design option
 
 If `$ARGUMENTS` contains exactly one exact standalone `--auto-design` token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero occurrences means normal mode, more than one is invalid, and tokens at or after the sentinel are target content; announce `Auto-design active — eligible technical decisions are
-delegated and recorded`; then read and apply
-[../../_shared/auto-design.md](../../_shared/auto-design.md). Resolve eligible runtime technical
+delegated and recorded`; then (only when the token is present) read and apply [../../_shared/auto-design.md](../../_shared/auto-design.md). Resolve eligible runtime technical
 ambiguities under that policy, update owning artifacts and stale downstream state, and re-run
 gates before resuming. Propagate only to explicitly invoked supported children; an unsupported child fails closed. This mode does not grant action permission, commit permission, or scope
 expansion and does not imply `--auto-commit`. **Normal mode:** without the exact token, every
@@ -25,8 +35,7 @@ must not infer delegated authority.
 
 ## Scope exploration option
 
-If `$ARGUMENTS` contains exactly one exact standalone `--explore-scope` token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero occurrences means strict scope, more than one is invalid, and tokens at or after the sentinel are target content; announce `Scope exploration active — optional additions will be proposed for your decision`; then read and apply
-[../../_shared/scope-expansion-control.md](../../_shared/scope-expansion-control.md). Strict scope is the default:
+If `$ARGUMENTS` contains exactly one exact standalone `--explore-scope` token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero occurrences means strict scope, more than one is invalid, and tokens at or after the sentinel are target content; announce `Scope exploration active — optional additions will be proposed for your decision`; then (only when the token is present) read and apply [../../_shared/scope-expansion-control.md](../../_shared/scope-expansion-control.md). Strict scope is the default:
 do not report or implement optional additions raised during execution or review.
 Exploration may create `SE-*` proposals, but only the user may choose `Keep` and authorize a plan
 update.
@@ -37,8 +46,7 @@ If `$ARGUMENTS` contains exactly one exact standalone `--auto-effort` or `--auto
 token before the first `--` sentinel, remove it before resolving targets, paths, or modes; zero
 occurrences means each phase's `Reasoning:` level is printed as a suggestion only, more than one
 or an invalid level is an argument error. The accepted levels are `low`, `medium`, `high`,
-`xhigh`, and `max`. Announce `Auto-effort active — reasoning <level> applied for this run`; then read and apply
-[../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. A bare
+`xhigh`, and `max`. Announce `Auto-effort active — reasoning <level> applied for this run`; then (only when the token is present) read and apply [../../_shared/reasoning-effort.md](../../_shared/reasoning-effort.md) §Auto-effort option. A bare
 flag follows each phase's suggestion; `--auto-effort=<level>` forces that level for the whole run,
 including every dispatch marker composed during it. The run clears the level before its final
 summary.
