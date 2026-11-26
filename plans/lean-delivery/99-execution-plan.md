@@ -1,8 +1,8 @@
 # Task T-08: Lean delivery — far fewer tokens, steps, and verification tasks per feature
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 19/37 tasks (51%)
-> **Last Updated**: 2026-11-26 09:00
+> **Progress**: 21/37 tasks (57%)
+> **Last Updated**: 2026-11-26 10:02
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -200,8 +200,8 @@ only counts and classes):
 - [x] 2.1.4 make-plan: at `standard`, one batched question round with recommended answers, no coverage hunt, no separate register, no preflight step; write only `99-execution-plan.md` (header, Decisions, Acceptance criteria, Tasks); `critical` path unchanged ✅ (completed: 2026-11-26 08:57; make-plan standard section, critical-only hunt default, single-document template, ordering rules (2.1.6 text); LP-1, LP-2, LP-4, LP-5 green; LP-2's section reader made fence-aware before commit)
 - [x] 2.1.5 exec-plan entry gate, `codeops_plan.py`, roadmap sync, upgrade-plan, and `codeops_plan_migrate.py` accept a standard single-document plan ✅ (completed: 2026-11-26 08:57; parser and nested migration read a single document's header; roadmap, upgrade-plan, make-plan roadmap hook updated; SD-1, SD-2 green)
 - [x] 2.1.6 `_shared/spec-first-ordering.md`, templates, and agent-template vocabulary (AC-n, D-n): at `standard` spec cases are the ACs (guide 3–8 per phase), implementation tests only where an AC names an error path or edge; the parent computes the balance and raises the STOP packet above 1:1 at `standard`; regenerate affected packaged agents with `CODEOPS_PLUGIN_ROOT=$(pwd)` ✅ (completed: 2026-11-26 09:00; ordering rules (AC-n spec cases, 3–8 per phase), executor/reviewer vocabulary, D-n in the plan-ID leak check; agents regenerated with CODEOPS_PLUGIN_ROOT=$(pwd); executor golden fixture follows the template)
-- [ ] 2.1.7 Planning-only arms at the Phase 2 SHA re-author H, M, S from their input packets; `bench.py plans`; gate on M: 1 document ≤ 20 KB, verification share ≤ 25%; H and S reported
-- [ ] 2.1.8 Arm M ×n (make-plan then exec-plan) on the Phase 2 SHA; gate: planning fresh −50% and cached −60% vs baseline make-plan + preflight, acceptance tests pass; record; end-of-phase review with `agent-pipeline-reviewer`
+- [x] 2.1.7 Planning-only arms at the Phase 2 SHA re-author H, M, S from their input packets; `bench.py plans`; gate on M: 1 document ≤ 20 KB, verification share ≤ 25%; H and S reported ✅ (completed: 2026-11-26 10:02; M only (H and S replays skipped: not gated); 1 document, 21–27 KB, verification 29–38% — narrowly missed, accepted)
+- [x] 2.1.8 Arm M ×n (make-plan then exec-plan) on the Phase 2 SHA; gate: planning fresh −50% and cached −60% vs baseline make-plan + preflight, acceptance tests pass; record; end-of-phase review with `agent-pipeline-reviewer` ✅ (completed: 2026-11-26 10:02; planning fresh −91%, cached −94%; cost −80%; acceptance 8/8; specialist review closed)
 
 **Verify**: `npm run verify`
 
@@ -311,6 +311,23 @@ needs (counted as bookkeeping by design), plus hand-written phase-header lines, 
 them, and roadmap row edits. Further cuts (phase-header and roadmap writes through one call,
 dropping the intermediate `[~]` mark) are deferred; planning, ~80% of a feature's tokens, is the
 larger lever.
+
+### Phase 2 result — levers C+D (ref `de1f95e`, 2026-11-26)
+
+Two M arms, make-plan then exec-plan (no preflight), compared with baseline M3/M4 (make-plan +
+preflight + exec-plan). Both valid; acceptance 8/8 each.
+
+| M arm | Planning fresh / cached | Execution fresh / cached | Total cost | Total time |
+|---|---|---|---|---|
+| Baseline M3 | 2.55M / 103.3M | 0.78M / 38.0M | $1.77 | 89 min |
+| Baseline M4 | 2.83M / 184.6M | 0.68M / 34.7M | $2.01 | 90 min |
+| Phase 2 M1 | 0.25M / 9.0M | 0.49M / 21.1M | $0.36 | 32 min |
+| Phase 2 M2 | 0.25M / 8.9M | 0.65M / 25.1M | $0.42 | 41 min |
+
+Planning fresh −91% and cached −94% (gates −50% / −60%: met). Cost per feature −80%, time −60%.
+Plan shape: 1 plan document (plus the review ledger written during execution), 21.2 KB and 26.7 KB
+(gate ≤ 20 KB: narrowly missed); verification share 29% and 38% on 7–8 tasks (gate ≤ 25%:
+missed by one task each). **Accepted by the user (2026-11-26).**
 
 **Static baselines (0.1.8).** Original plans: H 15 docs / 254 KB / 86 tasks / 46% verification;
 M 10 / 119 KB / 14 / 57%; S 1 / 1.8 KB / 6 / 33%. Instruction footprint at the baseline ref
