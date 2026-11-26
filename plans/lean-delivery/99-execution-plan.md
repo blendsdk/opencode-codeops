@@ -1,8 +1,8 @@
 # Task T-08: Lean delivery — far fewer tokens, steps, and verification tasks per feature
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 32/37 tasks (86%)
-> **Last Updated**: 2026-11-26 12:24
+> **Progress**: 33/37 tasks (89%)
+> **Last Updated**: 2026-11-26 13:07
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -229,7 +229,7 @@ only counts and classes):
 - [x] 4.1.2 Write the replacement spec file (≤ 9 cases) guarding the moved text at its new location — confirm it fails ✅ (completed: 2026-11-26 12:22; instruction-diet-content spec (2 cases); red: 2/2 fail)
 - [x] 4.1.3 Split make-plan, exec-plan, preflight, and make-requirements into a lean core plus `critical`-only references; move option blocks (`--auto-design`, `--explore-scope`, `--auto-effort`, Discovery) behind their flags ✅ (completed: 2026-11-26 12:24; light trim (user's choice): standard-run reading lists in make-plan and exec-plan; option and critical-only links marked conditional; no file splits)
 - [x] 4.1.4 `bench.py instructions`: standard-path footprint ≤ 15k tokens per workflow (from 35–49k) ✅ (completed: 2026-11-26 12:24; always-read: make-plan 46.1k → 32.5k, exec-plan 38.4k → 31.7k; ≤15k not reached (light trim, accepted scope))
-- [ ] 4.1.5 Arm M ×1 on the Phase 4 SHA; gate: median context per primary step does not regress vs 3.1.7, acceptance tests pass; record; end-of-phase review with `agent-pipeline-reviewer`
+- [x] 4.1.5 Arm M ×1 on the Phase 4 SHA; gate: median context per primary step does not regress vs 3.1.7, acceptance tests pass; record; end-of-phase review with `agent-pipeline-reviewer` ✅ (completed: 2026-11-26 13:07; acceptance 8/8 ×2; context 146–149k (+5%, within band); review findings fixed in 05ab341)
 
 **Verify**: `npm run verify`
 
@@ -349,6 +349,16 @@ Median context per primary step ≤ 150k: met. Review rounds = 1: met. Execution
 vs the 0.1.6 baseline (gate −60%): missed. One arm failed one acceptance test (the strip text
 rendered twice — a miss earlier baseline arms also made). **Accepted by the user (2026-11-26).**
 A standard feature now costs ≈ $0.35–0.40 end to end (baseline $1.77–2.01).
+
+### Phase 4 result — lever F, light trim (ref `96c2268`, 2026-11-26)
+
+Light trim chosen by the user: reading lists in make-plan and exec-plan, option and critical-only
+links flag-gated; no file splits. Always-read instruction footprint: make-plan 46.1k → 32.6k,
+exec-plan 38.4k → 31.7k approx tokens (≤ 15k gate not reached — accepted scope). Two M arms
+(make-plan + exec-plan), both valid, acceptance 8/8 each; total cost $0.47 / $0.43; median context
+per primary step 146k / 149k vs 136k / 141k in Phase 3 (+5%, inside the decision band; ≤ 150k
+holds). One arm's plan lacked the `mark` execution-rules block — the reading-list defect the phase
+review found (RV-002), fixed in `05ab341`.
 
 **Static baselines (0.1.8).** Original plans: H 15 docs / 254 KB / 86 tasks / 46% verification;
 M 10 / 119 KB / 14 / 57%; S 1 / 1.8 KB / 6 / 33%. Instruction footprint at the baseline ref
