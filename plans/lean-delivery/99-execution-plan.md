@@ -1,8 +1,8 @@
 # Task T-08: Lean delivery — far fewer tokens, steps, and verification tasks per feature
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 27/37 tasks (73%)
-> **Last Updated**: 2026-11-26 11:05
+> **Progress**: 28/37 tasks (76%)
+> **Last Updated**: 2026-11-26 12:06
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -208,6 +208,7 @@ only counts and classes):
 
 ### Phase 3 — Levers A+E: phase-scoped execution, one review round
 
+> **Review**: reviewed 2026-11-26 12:06 (specialist review + one re-review; findings closed)
 > **Phase baseline tree**: e0a81e0c4036c11c1c572b7b9310f856017d8639
 
 - [x] 3.1.1 List the existing spec assertions Phase 3 supersedes (e.g. `right-sized-verification-content.spec.test.mjs` ST-7 "150 … product lines") and get the user's one-batch approval (D-8) ✅ (completed: 2026-11-26 11:03; one superseded, approved: the 150-product-line review trigger (ST-7); 'at most one refute per phase' stays true)
@@ -216,7 +217,7 @@ only counts and classes):
 - [x] 3.1.4 exec-plan: dispatch each phase at or above the threshold to a fresh executor with the phase packet and a structured report (files changed, verify result, blockers); the parent keeps summaries, calls `mark`, and computes the balance ✅ (completed: 2026-11-26 11:05; phase-scoped dispatch section, phase report, parent-only marks/gate/balance; PD-1..PD-4 green)
 - [x] 3.1.5 `agent-templates/plan-task-executor.md` and `plan-task-executor-opus.md`: accept the phase packet and return the report contract; regenerate packaged agents with `CODEOPS_PLUGIN_ROOT=$(pwd)`; `install_agents.py --check` clean ✅ (completed: 2026-11-26 11:05; both executor templates return the phase report and never edit the plan; agents and golden regenerated; --check clean)
 - [x] 3.1.6 Implement review timing at `standard`: one end-of-plan round + refute; per-phase round only for risk-tagged phases; remove the 150-line trigger; `critical` unchanged ✅ (completed: 2026-11-26 11:05; standard: one end-of-plan review round + refute, risk-tagged phases only; 150-line trigger removed; PD-5 green)
-- [ ] 3.1.7 Arm M ×n (exec-plan) on the Phase 3 SHA; gate: median context per primary step ≤ 150k, execution cached tokens −60% vs 0.1.6, review rounds = 1 (+ ≤ 1 refute), acceptance tests pass; record; end-of-phase review with `agent-pipeline-reviewer`
+- [x] 3.1.7 Arm M ×n (exec-plan) on the Phase 3 SHA; gate: median context per primary step ≤ 150k, execution cached tokens −60% vs 0.1.6, review rounds = 1 (+ ≤ 1 refute), acceptance tests pass; record; end-of-phase review with `agent-pipeline-reviewer` ✅ (completed: 2026-11-26 12:06; ctx ≤150k and 1 review round met; execution cached −45–56% (gate −60%) and one 7/8 acceptance accepted by the user)
 
 **Verify**: `npm run verify`
 
@@ -331,6 +332,21 @@ Planning fresh −91% and cached −94% (gates −50% / −60%: met). Cost per f
 Plan shape: 1 plan document (plus the review ledger written during execution), 21.2 KB and 26.7 KB
 (gate ≤ 20 KB: narrowly missed); verification share 29% and 38% on 7–8 tasks (gate ≤ 25%:
 missed by one task each). **Accepted by the user (2026-11-26).**
+
+### Phase 3 result — levers A+E (ref `7f042f7`, 2026-11-26)
+
+Two M exec-plan arms re-executing the Phase 2 arms' plans (paired). Both valid.
+
+| M exec-plan | Cached tokens | Median ctx/step (primary) | Review rounds | Cost | Acceptance |
+|---|---|---|---|---|---|
+| Baseline M3 / M4 | 38.0M / 34.7M | 173k / 182k | 2 / 2 | $0.41 / $0.34 | 8/8, 8/8 |
+| Phase 2 M1 / M2 | 21.1M / 25.1M | 169k / 159k | 1 / 2 | $0.24 / $0.31 | 8/8, 8/8 |
+| Phase 3 M1 / M2 | 16.1M / 20.2M | 136k / 141k | 1 / 1 | $0.23 / $0.28 | 8/8, 7/8 |
+
+Median context per primary step ≤ 150k: met. Review rounds = 1: met. Execution cached −56% / −45%
+vs the 0.1.6 baseline (gate −60%): missed. One arm failed one acceptance test (the strip text
+rendered twice — a miss earlier baseline arms also made). **Accepted by the user (2026-11-26).**
+A standard feature now costs ≈ $0.35–0.40 end to end (baseline $1.77–2.01).
 
 **Static baselines (0.1.8).** Original plans: H 15 docs / 254 KB / 86 tasks / 46% verification;
 M 10 / 119 KB / 14 / 57%; S 1 / 1.8 KB / 6 / 33%. Instruction footprint at the baseline ref
