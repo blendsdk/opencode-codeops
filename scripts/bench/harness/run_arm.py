@@ -118,6 +118,30 @@ def audit(db_path, root, allowed):
     return sorted(bad)
 
 
+RULES_BLOCK_RE = re.compile(r"^> \*\*⚠️ EXECUTION RULE.*?(?=\n(?!>)|\Z)", re.MULTILINE | re.DOTALL)
+
+
+def seed_plan(source, target, ref):
+    """Copy a stored plan into the subject with every task reset to `[ ]`.
+
+    The plan's embedded execution-rules block is replaced by the ref's template block, as a plan
+    written under the ref's rules would carry; everything else stays byte-for-byte.
+    """
+    sys.path.insert(0, str(REPO / "scripts/bench"))
+    import bench
+    target.mkdir(parents=True, exist_ok=True)
+    template = (ref / "skills" / "make-plan" / "templates.md").read_text()
+    block = RULES_BLOCK_RE.search(template)
+    for doc in sorted(Path(source).glob("*.md")):
+        text = doc.read_text()
+        if doc.name == "99-execution-plan.md":
+            text = re.sub(r"(?m)^- \[[~x!]\] ", "- [ ] ", text)
+            text = re.sub(r" (?:✅|⏳|🚫) \((?:completed|implemented|Blocked)\b.*$", "", text, flags=re.MULTILINE)
+            if block:
+                text = RULES_BLOCK_RE.sub(lambda _: block.group(0), text, count=1)
+        (target / doc.name).write_text(text)
+
+
 def task_text(execution_plan):
     """The plan's numbered task lines only: notes and registers may name out-of-scope items."""
     sys.path.insert(0, str(REPO / "scripts/bench"))
@@ -162,6 +186,8 @@ def run():
     ap.add_argument("ref")
     ap.add_argument("--pin-tier", action="store_true")
     ap.add_argument("--workflows", default=None)
+    ap.add_argument("--seed-plan", type=Path, default=None,
+                    help="a stored arm's plan folder to execute (paired exec-plan comparisons)")
     a = ap.parse_args()
     s = SUBJECTS[a.subject]
     wfs = a.workflows.split(",") if a.workflows else (
@@ -201,6 +227,8 @@ def run():
         d = subj / "plans" / s["slug"]
         d.mkdir(parents=True)
         shutil.copy(p / "99-execution-plan.md", d / "99-execution-plan.md")
+    if a.seed_plan:
+        seed_plan(a.seed_plan, subj / "plans" / s["slug"], ref)
     if a.pin_tier:
         (subj / "codeops").mkdir(exist_ok=True)
         (subj / "codeops" / "codeops.json").write_text(json.dumps({

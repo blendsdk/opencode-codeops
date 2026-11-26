@@ -102,11 +102,10 @@ complete. For each task, in order:
    write must never reference the plan, requirements, `codeops/`, or any RD/AR/task ID** — those
    files are ephemeral; the shipped code must stand on its own (per the standards' Documentation
    ban). Restate any rationale you drew from the plan in plain language instead.
-3. **🚨 Immediately update `99-execution-plan.md`** — mark the task `[~]` with a timestamp
-   (`- [~] 1.1.1 … ⏳ (implemented: YYYY-MM-DD HH:MM)`, timestamp via `date '+%Y-%m-%d %H:%M'`)
-   and update the Progress header. Do this before running verification or anything else — if the
-   session crashes now, the implementation progress is preserved and the resume session knows the
-   task still needs verification.
+3. **🚨 Immediately update `99-execution-plan.md`** — `mark --state implemented` (§Update
+   procedure; the progress report for this moment goes in the same step). Do this before running
+   verification or anything else — if the session crashes now, the implementation progress is
+   preserved and the resume session knows the task still needs verification.
 4. Run verification, with output captured per the **Verify-output capture rule** below. Use the
    task command for a normal task: the plan's validated `**Task verify**` line, or the map's
    `task` gate with `--baseline <phase-baseline-tree>` and `--include <declared-spec-file>` for
@@ -120,18 +119,10 @@ complete. For each task, in order:
    - **PASS** → before promoting, run the **documentation-standard self-check** below on the files
      this task changed. Missing documentation and leaked plan references are invisible to
      build+test, so a green verify is NOT sufficient — the self-check is a hard part of the
-     done-criterion. Only when it is clean,
-     promote the mark to `[x]` with a completion timestamp
-     (`- [x] 1.1.1 … ✅ (completed: YYYY-MM-DD HH:MM)`).
-     Immediately derive and show the user the current task progress from the selected plan directory:
-
-     ```bash
-     python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_plan.py" --root . --plan "<selected-plan-directory>" --progress-bar
-     ```
-
-     Present the command's single `Progress: […] X/Y tasks (Z%)` line in the next commentary update.
-     This read-only display is required after every `[x]` promotion; never estimate it or count
-     `[~]` as complete.
+     done-criterion. Only when it is clean, promote with `mark --state done` (optionally
+     `--note "<short evidence>"`). Its output is the single `Progress: […] X/Y tasks (Z%)` line:
+     present it in the next commentary update. This display is required after every `[x]`
+     promotion; never estimate it or count `[~]` as complete.
    - **FAIL** → the mark STAYS `[~]`. Fix the implementation and re-verify; promote only on pass.
      A task is never `[x]` with a failing verify.
 
@@ -424,10 +415,10 @@ gates a dispatch.
 4. When `$CODEOPS_TMPDIR` is empty or the helper fails, print an advise-only note and continue.
 
 **Division of labor.** The PARENT — never the executor — updates `99-execution-plan.md`
-(two-stage marks), the Progress header, and the roadmap. The executor implements task-by-task,
-runs verify per the Verify-output capture rule, and reports per task. Mark `[~]` as the executor
-reports each implementation; verify (or trust the executor's verify run and spot-check it);
-promote to `[x]` on pass.
+(two-stage marks via `mark`, which also keeps the Progress header current) and the roadmap. The
+executor implements task-by-task, runs verify per the Verify-output capture rule, and reports per
+task. `mark --state implemented` as the executor reports each implementation; verify (or trust
+the executor's verify run and spot-check it); `mark --state done` on pass.
 
 **Blocker path.** On ambiguity, missing packet context, or a failing SPEC test, the executor
 stops and returns a blocker report. The parent then runs the zero-ambiguity loop above with the
@@ -469,19 +460,31 @@ agent crashes during verify or commit, the plan already reflects exactly how far
 
 ### Update procedure
 
-1. On implementation: change `[ ]` → `[~]` with an implemented-timestamp in the plan's task
-   list — the **phase checkbox lists** (3.3.0 format) or the **Master Progress Checklist**
-   (legacy format); on verify pass: promote `[~]` → `[x]` with a completion timestamp.
-2. Update the Progress counter in the header (e.g., `3/12 tasks (25%)`) — only `[x]` tasks count
-   as complete.
-3. Update the Last Updated timestamp (obtain timestamps via `date '+%Y-%m-%d %H:%M'` — never
-   invent them).
+Record every transition with one call — the `codeops_progress` report for that moment (§Progress
+Reporting) goes in the same step, as a parallel tool call:
 
-Task mark formats:
+```bash
+python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_plan.py" mark --plan <plan-dir> --task <id> \
+  --state implemented|done|blocked [--note "<short evidence or reason>"]
+```
+
+1. On implementation: `--state implemented` (`[ ]` → `[~]`); on verify pass: `--state done`
+   (`[~]` → `[x]`); on a blocker: `--state blocked --note "<reason>"` (`[!]`, the visible reason
+   the parser requires).
+2. `mark` takes the timestamp from the system clock, replaces the task's status suffix, refreshes
+   the header Progress counter (only `[x]` counts) and the Last Updated stamp, and prints the
+   progress bar. It touches only the counted task line — never fenced or quoted examples — and
+   repeating a transition changes nothing. No separate `date`, hand edit, or progress-bar step.
+3. A legacy (≤3.2.0) plan whose **Master Progress Checklist** is the source of truth keeps the
+   hand-edit procedure: change the checklist mark with a timestamp, update the Progress counter
+   and the Last Updated stamp, obtaining timestamps from the system clock — never invented.
+
+Task mark formats (what `mark` writes):
 
 ```markdown
 - [~] 1.1.1 Task description ⏳ (implemented: YYYY-MM-DD HH:MM)
 - [x] 1.1.1 Task description ✅ (completed: YYYY-MM-DD HH:MM)
+- [!] 1.1.1 Task description 🚫 (Blocked: <reason>; YYYY-MM-DD HH:MM)
 ```
 
 ### Native progress mirror (visibility aid)
@@ -508,7 +511,7 @@ Never suggest an upgrade on format grounds (AR-5, plans/plan-token-efficiency).
 
 ### Hard gate
 
-Before running verification you MUST have already marked the task `[~]` with a timestamp. Before
+Before running verification you MUST have already marked the task `[~]` (via `mark`). Before
 committing, proceeding to the next task, ending a session, or presenting a session summary, the
 task's final state MUST be recorded truthfully — `[x]` (with timestamp) only if its verify passed,
 otherwise still `[~]` — with the progress counter and Last Updated stamp current.
@@ -539,7 +542,8 @@ Report at these moments; `plan` is the plan folder name, and every call carries 
 | Waiting (before pausing for an explicit user decision) | `{ plan, activity: "waiting" }` |
 | Run done (all tasks complete) | `{ plan, activity: "done" }` |
 
-One call per listed moment, no other calls (noise control). A reporting failure or a host without
+One call per listed moment, no other calls (noise control); a moment that coincides with a `mark`
+transition is reported in the same step as that call. A reporting failure or a host without
 the tool never blocks, delays, or changes any step.
 
 ---

@@ -1,8 +1,8 @@
 # Task T-08: Lean delivery — far fewer tokens, steps, and verification tasks per feature
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 0/37 tasks (0%)
-> **Last Updated**: 2026-11-26 07:02
+> **Progress**: 12/37 tasks (32%)
+> **Last Updated**: 2026-11-26 07:07
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -179,10 +179,12 @@ only counts and classes):
 
 ### Phase 1 — Lever B: collapse bookkeeping
 
-- [ ] 1.1.1 List the existing spec assertions Phase 1 supersedes (e.g. `scripts/exec-plan-progress-content.spec.test.mjs` ST-19 on report moments) and get the user's one-batch approval (D-8)
-- [ ] 1.1.2 Write `scripts/codeops-plan-mark.spec.test.mjs` (≤ 9 cases): `mark` sets `[~]`/`[x]`/`[!]` with a system timestamp, updates Progress and Last Updated, prints the bar, touches only real task lines (never quoted example lines), is idempotent, rejects an unknown id; plus the protocol-wording replacements approved in 1.1.1 — confirm it fails
-- [ ] 1.1.3 Implement `codeops_plan.py mark --plan <dir> --task <id> --state implemented|done|blocked [--note <text>]`
-- [ ] 1.1.4 exec-plan protocol and SKILL: one `mark` call per transition, with the progress-tool report in the same step, replaces the manual edit, `date`, and progress-bar steps; roadmap sync only at phase boundaries; README sidebar text updated
+> **Phase baseline tree**: c0bc461b4746ea933ca5fadd701b3c1687c557b2
+
+- [x] 1.1.1 List the existing spec assertions Phase 1 supersedes (e.g. `scripts/exec-plan-progress-content.spec.test.mjs` ST-19 on report moments) and get the user's one-batch approval (D-8) ✅ (completed: 2026-11-26 07:05; none superseded: the ten report moments, fail-soft wording, README sidebar text, and the parser `--json`/`--progress-bar` contracts all stay true)
+- [x] 1.1.2 Write `scripts/codeops-plan-mark.spec.test.mjs` (≤ 9 cases): `mark` sets `[~]`/`[x]`/`[!]` with a system timestamp, updates Progress and Last Updated, prints the bar, touches only real task lines (never quoted example lines), is idempotent, rejects an unknown id; plus the protocol-wording replacements approved in 1.1.1 — confirm it fails ✅ (completed: 2026-11-26 07:05; red: 7/8 fail; ST-K7 passes early because the parser already rejects unknown arguments with the id in its error)
+- [x] 1.1.3 Implement `codeops_plan.py mark --plan <dir> --task <id> --state implemented|done|blocked [--note <text>]` ✅ (completed: 2026-11-26 07:06; ST-K1–K7 pass; parser specs and doctest pass)
+- [x] 1.1.4 exec-plan protocol and SKILL: one `mark` call per transition, with the progress-tool report in the same step, replaces the manual edit, `date`, and progress-bar steps; roadmap sync only at phase boundaries; README sidebar text updated ✅ (completed: 2026-11-26 07:07; SKILL loop, protocol update procedure and step loop, division of labor, plan-template rules block; README unchanged (the sidebar behaves as before); content specs 201/201)
 - [ ] 1.1.5 Arms S ×n and M ×1 (exec-plan) on the Phase 1 SHA; gate: ≥ 70% of the 0.1.6 bookkeeping share removed (≤ 9% S, ≤ 12% M), acceptance tests pass; total primary steps reported; record; end-of-phase review
 
 **Verify**: `npm run verify`

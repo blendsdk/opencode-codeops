@@ -462,19 +462,17 @@ task-size criteria in [quality-checklist.md](quality-checklist.md))
 > The task checkboxes in the phase sections below are the **single source of truth** for
 > progress. Every task line appears exactly once in this document. The executing agent MUST:
 >
-> 1. **On implementation:** mark the task `[~]` with a timestamp —
->    `- [~] 1.1.1 Task description ⏳ (implemented: YYYY-MM-DD HH:MM)`
-> 2. **On verify pass:** promote it to `[x]` —
->    `- [x] 1.1.1 Task description ✅ (completed: YYYY-MM-DD HH:MM)`
-> 3. **Update the Progress header** (`> **Progress**: X/Y tasks (Z%)`) and the Last Updated
->    stamp after EVERY task — never batch updates. Only `[x]` counts as complete.
-> 4. **Resume** by scanning the phase sections top-to-bottom: the first `[~]` task is resumed
->    first, else the first `[ ]` task.
-> 5. **On blocker:** mark the task `[!]` and append `Blocked: <short reason>` on the same line.
->    The plan lifecycle is `Ready`, `Executing`, `Done`, or `Blocked`, derived from these markers.
+> 1. **Record every transition with one call** — `codeops_plan.py mark --plan <this plan's
+>    folder> --task <id> --state implemented` on implementation (`[~]`), `--state done` on verify
+>    pass (`[x]`), `--state blocked --note "<short reason>"` on a blocker (`[!]`). `mark` writes
+>    the timestamped status suffix, refreshes the Progress header and Last Updated stamp (only
+>    `[x]` counts as complete), and prints the progress bar — never batch or hand-edit updates.
+> 2. **Resume** by scanning the phase sections top-to-bottom: the first `[~]` task is resumed
+>    first, else the first `[ ]` task. The plan lifecycle is `Ready`, `Executing`, `Done`, or
+>    `Blocked`, derived from these markers.
 >
-> Timestamps come from `date '+%Y-%m-%d %H:%M'` — never invented. Failure to keep the marks
-> current means progress is invisible after crashes, context resets, or session handoffs.
+> Failure to keep the marks current means progress is invisible after crashes, context resets, or
+> session handoffs.
 
 ---
 

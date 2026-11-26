@@ -166,15 +166,19 @@ For each task, in order:
    challenge, show the full visible stop packet, and wait for explicit user approval before adding
    the larger machinery. Auto-design cannot approve it. Otherwise implement the task following the
    technical specs in `plans/$ARGUMENTS/`.
-2. **🚨 Immediately update `99-execution-plan.md`** — completion marks are **two-stage**: mark the
-   task `[~]` with an implemented-timestamp in its phase task list (or, in a pre-3.3.0 plan, in
-   the Master Progress Checklist — see the protocol's dual-format detection) and bump the Progress
-   counter / Last Updated stamp as soon as implementation finishes (crash-safe), promote it to
-   `[x]` only after its verification passes. A task never shows `[x]` with a failing verify.
+2. **🚨 Immediately update `99-execution-plan.md`** — completion marks are **two-stage**: as soon
+   as implementation finishes (crash-safe), run
+   `python3 "${CODEOPS_PLUGIN_ROOT}/scripts/codeops_plan.py" mark --plan <plan-dir> --task <id> --state implemented`;
+   promote with `--state done` only after its verification passes. One `mark` call sets the
+   checkbox and timestamped status suffix, refreshes the Progress header and Last Updated stamp,
+   and prints the progress bar — no separate `date`, hand edit, or progress-bar step. A task never
+   shows `[x]` with a failing verify. (A pre-3.3.0 plan whose Master Progress Checklist is the
+   source of truth keeps the hand-edit procedure; see the protocol's dual-format detection.)
 
    - **Report progress** — when the `codeops_progress` tool is available — at the transition
-     points in [execution-protocol.md](execution-protocol.md) §Progress Reporting; a failed or
-     missing report never blocks any step.
+     points in [execution-protocol.md](execution-protocol.md) §Progress Reporting, issued in the
+     same step as the `mark` call (parallel tool calls); a failed or missing report never blocks
+     any step.
 
 3. **Verify** — run the task command: the plan's `**Task verify**` line, or the map's `task`
    gate with `--baseline <phase-tree>` and `--include <spec-file>` for the plan's declared spec
@@ -182,11 +186,10 @@ For each task, in order:
    (from AGENTS.md or detected conventions), output captured per the protocol's
    **Verify-output capture rule** (PASS one-liner; on failure
    the last 50 log lines + log path). A changed path outside the phase's expected modification
-   set, or a shared/config/test-infrastructure change, forces the full gate. Pass → promote `[~]`
-   → `[x]`; fail → fix and re-verify (mark stays `[~]`). Immediately after every `[x]` promotion,
-   run the protocol's read-only progress-bar command for the selected plan and show its exact
-   output in the next commentary update. Only `[x]` contributes to the displayed completion
-   count.
+   set, or a shared/config/test-infrastructure change, forces the full gate. Pass → `mark
+   --state done` (it prints the progress bar; show that exact line in the next commentary update);
+   fail → fix and re-verify (the task stays `[~]`). Only `[x]` contributes to the displayed
+   completion count.
 4. **Commit** per the active commit mode (see [commit-modes.md](commit-modes.md)) — the commit
    gate keys off `[x]`.
 5. **Techdocs check (after each phase):** if the phase introduced architectural changes and
@@ -271,7 +274,9 @@ before verify/commit/next): set the RD/task row to `Executing` (🔄) on start, 
 completion, and `Blocked` (⛔) with a nested `↳ DEF-n` sub-row when a blocking dependency is
 discovered. **Nested layout:** after each per-feature transition, **cascade** to the portfolio
 `codeops/00-roadmap.md` (re-roll that feature's row) before proceeding — per the roadmap skill's
-cascade mandate. If no roadmap exists, these hooks are inert.
+cascade mandate. Roadmap rows change only at these plan-level transitions and at phase
+boundaries — never per task (`mark` keeps the plan's own counters current). If no roadmap exists,
+these hooks are inert.
 
 ## Error handling
 
