@@ -1,8 +1,8 @@
 # Task T-08: Lean delivery — far fewer tokens, steps, and verification tasks per feature
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 12/37 tasks (32%)
-> **Last Updated**: 2026-11-26 07:07
+> **Progress**: 13/37 tasks (35%)
+> **Last Updated**: 2026-11-26 08:45
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -185,7 +185,7 @@ only counts and classes):
 - [x] 1.1.2 Write `scripts/codeops-plan-mark.spec.test.mjs` (≤ 9 cases): `mark` sets `[~]`/`[x]`/`[!]` with a system timestamp, updates Progress and Last Updated, prints the bar, touches only real task lines (never quoted example lines), is idempotent, rejects an unknown id; plus the protocol-wording replacements approved in 1.1.1 — confirm it fails ✅ (completed: 2026-11-26 07:05; red: 7/8 fail; ST-K7 passes early because the parser already rejects unknown arguments with the id in its error)
 - [x] 1.1.3 Implement `codeops_plan.py mark --plan <dir> --task <id> --state implemented|done|blocked [--note <text>]` ✅ (completed: 2026-11-26 07:06; ST-K1–K7 pass; parser specs and doctest pass)
 - [x] 1.1.4 exec-plan protocol and SKILL: one `mark` call per transition, with the progress-tool report in the same step, replaces the manual edit, `date`, and progress-bar steps; roadmap sync only at phase boundaries; README sidebar text updated ✅ (completed: 2026-11-26 07:07; SKILL loop, protocol update procedure and step loop, division of labor, plan-template rules block; README unchanged (the sidebar behaves as before); content specs 201/201)
-- [ ] 1.1.5 Arms S ×n and M ×1 (exec-plan) on the Phase 1 SHA; gate: ≥ 70% of the 0.1.6 bookkeeping share removed (≤ 9% S, ≤ 12% M), acceptance tests pass; total primary steps reported; record; end-of-phase review
+- [x] 1.1.5 Arms S ×n and M ×1 (exec-plan) on the Phase 1 SHA; gate: ≥ 70% of the 0.1.6 bookkeeping share removed (≤ 9% S, ≤ 12% M), acceptance tests pass; total primary steps reported; record; end-of-phase review ✅ (completed: 2026-11-26 08:45; gate missed (bookkeeping ~halved: S 29→16%, M 41→22%); accepted by the user; review pending)
 
 **Verify**: `npm run verify`
 
@@ -290,6 +290,24 @@ make-plan / preflight session.
 | Spec cases / decisions | 5 / 38 | 4 / 43 | — |
 | Assumptions logged | 18 | 28 | 2–3 |
 | Cost (planning + execution) | $1.37 + $0.41 = $1.77 | $1.67 + $0.34 = $2.01 | $0.11–0.17 |
+
+### Phase 1 result — lever B (ref `5691016`, 2026-11-26)
+
+Paired with the baseline (S on the same mini-plan; M3/M4 re-executing the exact baseline M3/M4
+plans). All five arms valid; acceptance unchanged (S 36/36 each, M 8/8 each).
+
+| Exec-plan arm | Bookkeeping share, baseline → Phase 1 | Primary steps | Cached tokens |
+|---|---|---|---|
+| S (median of 3) | 29% → 16% | 69 → 62 | 8.9M → 8.1M |
+| M3 (paired) | 38% → 22% | 174 → 151 | 38.0M → 39.3M |
+| M4 (paired) | 43% → 23% | 151 → 77 | 34.7M → 19.0M |
+
+**Gate missed; accepted by the user (2026-11-26).** Bookkeeping roughly halved (≈ 45% removed) but
+did not reach ≤ 9% (S) / ≤ 12% (M): the remaining calls are mostly the two `mark` calls each task
+needs (counted as bookkeeping by design), plus hand-written phase-header lines, `date` calls for
+them, and roadmap row edits. Further cuts (phase-header and roadmap writes through one call,
+dropping the intermediate `[~]` mark) are deferred; planning, ~80% of a feature's tokens, is the
+larger lever.
 
 **Static baselines (0.1.8).** Original plans: H 15 docs / 254 KB / 86 tasks / 46% verification;
 M 10 / 119 KB / 14 / 57%; S 1 / 1.8 KB / 6 / 33%. Instruction footprint at the baseline ref
