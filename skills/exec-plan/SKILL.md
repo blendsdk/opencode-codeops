@@ -100,9 +100,9 @@ Determine the layout via **[../../_shared/layout-convention.md](../../_shared/la
 
 | Flag | Behavior |
 |------|----------|
-| *(none)* / `--ask-commit` | **Default.** After each verified task, ask the user whether to commit. |
+| *(none)* / `--ask-commit` | **Default.** After each verified task, ask the user whether to commit (a dispatched phase commits once, after the phase). |
 | `--no-commit` | Never commit, never ask. Pure implementation. |
-| `--auto-commit` | Automatically commit + push (via the `git-commit` skill in push mode) after each verified task. |
+| `--auto-commit` | Automatically commit + push (via the `git-commit` skill in push mode) after each verified task (a dispatched phase: once, after the phase). |
 
 Full prompt wording, end-of-plan reminders, and commit-message format live in
 [commit-modes.md](commit-modes.md) — read it before the first commit decision.

@@ -15,9 +15,14 @@ Commit using the `git-commit` skill (commit only) or the `git-commit` skill in p
 
 | Mode | Flag | Behavior |
 |------|------|----------|
-| **Ask (default)** | *(no flag)* or `--ask-commit` | After each verified task, ask the user whether/how to commit. |
+| **Ask (default)** | *(no flag)* or `--ask-commit` | After each verified task (a dispatched phase: after the phase), ask the user whether/how to commit. |
 | **No-commit** | `--no-commit` | Never commit, never ask. Pure implementation. The user handles git. |
-| **Auto-commit** | `--auto-commit` | Automatically commit + push via the `git-commit` skill in push mode after each verified task. No prompts. |
+| **Auto-commit** | `--auto-commit` | Automatically commit + push via the `git-commit` skill in push mode after each verified task (a dispatched phase: after the phase). No prompts. |
+
+**Dispatched phases commit once.** A phase that runs in an executor (§Execution mode in
+execution-protocol.md) lands all its task diffs together, so it commits once — after every task is
+`[x]` and the phase gate passes — with a message that lists the task ids. Per-task commits apply to
+inline phases.
 
 The commit step is only triggered when ALL of these are true:
 

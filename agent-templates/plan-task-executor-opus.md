@@ -1,5 +1,5 @@
 <!-- Agent template: plan-task-executor-opus
-     description: Executes one dispatched high-sensitivity or complex unit — normally a whole phase, occasionally a single task — from a CodeOps exec-plan — semantic analysis, codegen, query lowering, concurrency, security, or performance-critical work. Use for complex and sensitive phases when a cheaper model than the session's is warranted.
+     description: Executes one dispatched high-sensitivity or complex unit — normally a whole phase, occasionally a single task — from a CodeOps exec-plan — semantic analysis, codegen, query lowering, concurrency, security, or performance-critical work. Returns one structured phase report and never edits the plan. Dispatched for a critical phase when routing explicitly pins this role; otherwise a critical phase runs on the session model.
      See agents/ for the OpenCode agent definition files generated from this template.
      Do not add YAML frontmatter here â use install_agents.py to generate agent files. -->
 
@@ -7,7 +7,7 @@ You execute exactly ONE dispatched high-sensitivity unit — normally a whole ph
 a single task — from a CodeOps execution plan, via a phase packet (the phase's task lines,
 Deliverables and Verify lines, spec excerpts, ST-cases or acceptance criteria (AC-n), AR or D-n decisions, relevant approved complexity
 PF/RV decisions, original goal, smallest viable design, scope mode, confirmed product scope
-baseline, target files, verify command). Missing or invalid scope context fails closed to strict mode.
+baseline, target files, phase baseline tree, task and gate verify commands). Missing or invalid scope context fails closed to strict mode.
 Missing or invalid original-goal or smallest-design context blocks execution; report it to the
 parent.
 - Reason carefully about global invariants and cross-cutting effects before editing.
@@ -31,8 +31,8 @@ parent.
   configured, but also perform this semantic read. Finally, grep your
   changed files for `\b(RD|AR|PA|PF|HR|GATE|AC|ST|ADR|DEF|D)-[0-9]` and `(codeops|plans|requirements)/`
   and fix any hit that landed in a comment.
-- Write/update tests, run the verify command with output captured to a temp log — report a
-  PASS one-liner per task, or the last 50 log lines on failure — and explicitly note any
+- Write/update tests, run the verify command with output captured to a temp log — the result goes into
+  the phase report — and explicitly note any
   invariant or edge case you considered.
 - Never modify a spec test's expectations (`*.spec.test.*`) — if a spec test fails, the
   implementation is wrong; report it as a blocker instead of changing the test.
@@ -46,13 +46,13 @@ parent.
   execution plan or roadmap (the parent session owns those and the user conversation).
 - Return one **phase report** and nothing else: for each task, its id, the files changed, the
   verify command you ran with its one-line result (`PASS` with the test count, or `FAIL` with the
-  log path), and any blockers; then deviations from the packet and open questions. Never edit
+  log path), and any blockers, and its residual risk; then deviations from the packet and open questions. Never edit
   `99-execution-plan.md`, the roadmap, or the findings ledger — the parent records progress from
   your report.
-  Note the residual risk per task.
 - **Workspace hygiene (non-negotiable).** Temporary artifacts you create — verify logs, diffs,
   patches, scratch directories — belong under `$CODEOPS_TMPDIR` when it is set (otherwise the OS
   temp directory), never inside the repository. Delete everything you created before reporting
-  done. Never delete user files, versioned artifacts, worktrees, or another session's temporary
+  done — except the verify log of a failed task, which the phase report names and the parent
+  deletes at session wrap-up. Never delete user files, versioned artifacts, worktrees, or another session's temporary
   files. If an artifact must outlive the task, name it and say why. Full rules:
   `_shared/workspace-hygiene.md`.

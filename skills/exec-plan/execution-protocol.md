@@ -15,7 +15,12 @@ session summary template, and error handling.
 4. Determine the starting point: a `[~]` task is resumed FIRST — re-read its partial-completion
    note, re-run verification, then promote it to `[x]` or continue fixing. Otherwise start at the
    first `[ ]` task.
-5. **Resume spot-check:** before building on prior work, confirm the most recent `[x]` task's
+5. **Dispatched-phase resume:** a dispatched phase records no marks until its report returns, so a
+   phase whose `Phase baseline tree` is recorded, whose tasks show no marks, and whose snapshot
+   diff against that tree is not empty was interrupted mid-run. Reconcile before re-dispatching:
+   show the user the changed files and ask whether to keep the partial diff (pass it to the new
+   executor as the starting state) or discard it.
+6. **Resume spot-check:** before building on prior work, confirm the most recent `[x]` task's
    named files actually exist (branch switches and reverts happen). If they don't, flag the drift
    to the user before continuing.
 
@@ -88,7 +93,9 @@ profile the session writes the spec tests itself; specification-first ordering i
 either way.
 
 Task completion is **two-stage**: `[~]` = implemented (crash-safe progress mark), `[x]` = verified
-complete. For each task, in order:
+complete. The per-task loop below is how an **inline** phase runs. A **dispatched** phase (§Execution
+mode) runs it inside the executor; the parent records every mark from the phase report and resumes
+an interrupted phase by the dispatched-phase rule in Step 1. For each task, in order:
 
 1. Run the **minimum-sufficient checkpoint** before editing. Compare the intended work with the
    original goal, established project patterns, relevant approved complexity AR/PF/RV decisions (a
@@ -130,7 +137,9 @@ complete. For each task, in order:
    - **FAIL** → the mark STAYS `[~]`. Fix the implementation and re-verify; promote only on pass.
      A task is never `[x]` with a failing verify.
 
-   **Documentation-standard self-check (NON-NEGOTIABLE, before every `[x]`).** Read the changed
+   **Documentation-standard self-check (NON-NEGOTIABLE, before every `[x]`).** In a dispatched
+   phase, the executor's documentation gate plus the parent's spot-check of the reported changed
+   files (the plan-reference grep below) satisfies this check. Read the changed
    code as a junior developer and confirm:
 
    - every public, exported, or external-facing class, interface, method, function, property, type,
@@ -233,7 +242,8 @@ whole-task diff. Activation rules, packets, supersession, and caps are defined i
      every finding it lists as not a finding, with a one-line note each, and adjust test-gap
      severities.
    - **Refute.** If any 🔴 CRITICAL / 🟠 MAJOR finding remains — of any prefix, at every tier —
-     dispatch one refute pass per phase: a fresh correctness reviewer in `Mode: refute` with the
+     dispatch one refute pass per review round, so at most one per phase — the completion review
+     sends a single pass for its cumulative diff: a fresh correctness reviewer in `Mode: refute` with the
      packet from `_shared/quality-profile.md`, on a different model than the finding reviewers when
      routing offers one. Each finding comes back `Confirmed`, `Downgraded → <severity>`, or
      `Refuted`. If the refute dispatch fails, or a finding gets no row, that finding counts as
@@ -363,9 +373,11 @@ summary per phase; the edits and tool output of a phase live in a fresh context 
 
 1. **Dispatch every phase of three or more tasks** to a fresh executor with the phase packet below
    — at both tiers. A `standard` phase runs on the `executor` role; a `critical` phase runs on the
-   session model (the `demanding-executor` role when routing provides one, otherwise the inherited
-   model). Routing policy may pick a role's model or reasoning level; it never keeps a phase of
-   three or more tasks inline.
+   session model, unless routing explicitly pins the `demanding-executor` role, whose pin then
+   wins. Routing picks a role's model and reasoning level; it never keeps a phase of three or more
+   tasks inline. When the phase has `[spec-author]` tasks, the parent dispatches the spec-test
+   author first and confirms the red state from its report, then dispatches the rest of the
+   phase.
 2. **Run a phase of fewer than three tasks inline** (§Inline phases).
 3. **Parallelize only independent work.** Read-heavy reconnaissance and independent reviews are
    preferred candidates. Parallel writes require disjoint ownership and an explicit merge plan.
@@ -422,7 +434,8 @@ commentary, for example `Dispatch: executor — reasoning: medium (phase suggest
 `— reasoning: high (routing default)`, or `— inherited`. Reporting is observational; it never
 gates a dispatch.
 
-**Inline phases.** When a phase runs inline (the default):
+**Inline phases.** When a phase runs inline (fewer than three tasks, or the host-without-subagents
+fallback):
 
 1. Print `Suggested reasoning: <level> — <reason>` before the phase's first task when the phase
    header carries the line.
@@ -449,8 +462,8 @@ the shared policy. The parent re-dispatches with the enriched packet. An executo
 user directly, widens delegated authority, or guesses.
 
 **Missing-executor guard.** If a named role is unavailable, spawn a generic subagent with the
-complete packet or run the phase inline and report why. Dispatch is an optimization — the
-protocol's guarantees hold either way.
+complete packet and report it. Run a phase of three or more tasks inline only when the host offers
+no subagents at all, and report that too. The protocol's guarantees hold either way.
 
 ---
 

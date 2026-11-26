@@ -43,10 +43,13 @@ Then classify each planned phase:
 
 | Risk | Meaning | Minimum routing |
 |---|---|---|
-| Critical | A defect can corrupt money/data, break security/isolation, or establish incompatible semantics/contracts | demanding executor where useful plus at least two independent relevant reviewers |
+| Critical | A defect can corrupt money/data, break security/isolation, or establish incompatible semantics/contracts | the session model, or a pinned demanding executor, plus at least two independent relevant reviewers |
 | High | Cross-cutting, difficult to reverse, concurrency-sensitive, migration-heavy, or public-contract work | demanding reasoning plus one independent reviewer |
-| Standard | Normal feature work with bounded impact | inline or balanced executor plus one review pass |
-| Mechanical | Fully specified, locally reversible transformation | fast executor or inline; deterministic verification still required |
+| Standard | Normal feature work with bounded impact | balanced executor plus one review pass |
+| Mechanical | Fully specified, locally reversible transformation | fast executor; deterministic verification still required |
+
+Routing chooses each role's model and reasoning level. Whether a phase runs inline is not a routing
+choice: exec-plan dispatches every phase of three or more tasks.
 
 ## Propose before writing
 
@@ -114,8 +117,9 @@ For every dispatch, send a bounded packet containing scope, authoritative excerp
 
 When a requested role is unavailable:
 
-1. use a generic subagent with the complete role packet when isolation or independence matters;
-2. otherwise run inline;
+1. use a generic subagent with the complete role packet;
+2. run inline only when the host offers no subagents (or for an exec-plan phase of fewer than three
+   tasks);
 3. report the fallback; and
 4. preserve every gate and required reviewer count.
 
