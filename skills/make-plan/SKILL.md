@@ -17,8 +17,8 @@ Load documents when a step needs them, not up front. A `standard`-tier run reads
 
 - this file; `templates.md` §Standard single-document plan, §Reference, don't restate, and the
   `99-execution-plan.md` template's execution-rules block and phase-header lines;
-- `quality-checklist.md` — its Granularity, Specification-First Testing, Zero-Ambiguity, and
-  Execution Plan Completeness blocks;
+- `quality-checklist.md` — its Granularity, Specification-First Testing, Security-First,
+  Zero-Ambiguity, and Execution Plan Completeness blocks;
 - `_shared/zero-ambiguity-gate.md` (the gate and its owner table), `_shared/spec-first-ordering.md`
   §Verification tiers and §Enforcement, `_shared/layout-convention.md` for paths,
   `_shared/reasoning-effort.md` §Plan suggestion derivation, `_shared/specialist-agents.md` for the
@@ -514,9 +514,16 @@ Adapt component documents to the project type (Web App, API, Library, CLI, UI Co
 
 ## Phase 3 — Quality Checklist
 
-Before finalizing, run the quality checklist in **[quality-checklist.md](quality-checklist.md)** — the
-full list at `critical`; at `standard`, its Granularity, Specification-First Testing,
-Zero-Ambiguity, and Execution Plan Completeness blocks (Completeness, Granularity, Dependencies, Testing, Specification-First Testing, No Dead Code, Security-First, Zero-Ambiguity, Execution Plan Completeness, Format). The Specification-First, Security-First, Zero-Ambiguity, and Execution-Plan-Completeness blocks are NON-NEGOTIABLE.
+Before finalizing, run the quality checklist in **[quality-checklist.md](quality-checklist.md)**: at
+`critical`, the full list (Completeness, Granularity, Dependencies, Testing, Specification-First
+Testing, No Dead Code, Security-First, Zero-Ambiguity, Execution Plan Completeness, Format); at
+`standard`, its Granularity, Specification-First Testing, Security-First, Zero-Ambiguity, and
+Execution Plan Completeness blocks. The Specification-First, Security-First, Zero-Ambiguity, and
+Execution-Plan-Completeness blocks are NON-NEGOTIABLE at both tiers. At `standard`, read the
+blocks' multi-document terms as their single-document equivalents: the Ambiguity Register is the
+`## Decisions` table, `AR-n` is `D-n`, `ST-n` and `07-testing-strategy.md` are the `AC-n` rows of
+`## Acceptance criteria`, the `00-index.md` tier line is the plan header's, and "under
+Implementation Phases" is under `## Tasks`.
 
 ---
 

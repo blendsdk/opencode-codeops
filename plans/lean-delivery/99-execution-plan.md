@@ -223,6 +223,7 @@ only counts and classes):
 
 ### Phase 4 — Lever F: instruction diet
 
+> **Review**: reviewed 2026-11-26 13:08 (review + one re-review; findings closed)
 > **Phase baseline tree**: 53083cbe72b02dd6365e08536b04caad74296778
 
 - [x] 4.1.1 List every content spec assertion that pins text the diet moves; get the user's one-batch approval (D-8) ✅ (completed: 2026-11-26 12:22; light trim (user's choice): no text moves, so no assertion is superseded)

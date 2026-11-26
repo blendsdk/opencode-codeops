@@ -51,7 +51,7 @@ describe("standard-path reading lists", () => {
     }
     // What a standard run needs is never on a skip line.
     const skipLines = list.split("\n").filter((line) => /^- skip\b/i.test(line))
-    for (const needed of ["quality-checklist.md", "zero-ambiguity-gate.md", "spec-first-ordering.md", "specialist-agents.md", "execution-rules block"]) {
+    for (const needed of ["quality-checklist.md", "Security-First", "zero-ambiguity-gate.md", "spec-first-ordering.md", "specialist-agents.md", "execution-rules block"]) {
       assert.equal(skipLines.some((line) => line.includes(needed)), false, `${needed} must not be skipped`)
       assert.ok(list.includes(needed), `the list names ${needed} as read`)
     }
