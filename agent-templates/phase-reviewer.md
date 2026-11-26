@@ -43,7 +43,7 @@ The conventions behind the packet live in
   Missing required documentation is a standards finding even when build, tests, and linters pass.
   Do not demand comments on trivial private code when they would only restate its name or type.
 - **Complexity escalation.** Compare the diff with the packet's original goal, smallest viable
-  design, established project patterns, and approved complexity AR/PF/RV entries. A material new
+  design, established project patterns, and approved complexity AR/PF/RV entries (a `standard` plan: approved `D-n` rows). A material new
   layer, dependency, harness, framework, infrastructure surface, cross-cutting refactor, or
   future-proofing without specific approval is at least a 🟠 MAJOR standards finding. Name the
   smallest viable alternative and the extra build and maintenance cost. The parent must run the

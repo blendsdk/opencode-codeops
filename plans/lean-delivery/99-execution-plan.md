@@ -1,8 +1,8 @@
 # Task T-08: Lean delivery — far fewer tokens, steps, and verification tasks per feature
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 21/37 tasks (57%)
-> **Last Updated**: 2026-11-26 10:02
+> **Progress**: 22/37 tasks (59%)
+> **Last Updated**: 2026-11-26 11:03
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -192,6 +192,7 @@ only counts and classes):
 
 ### Phase 2 — Levers C+D: one-document standard plan, tests equal acceptance criteria
 
+> **Review**: reviewed 2026-11-26 11:03 (specialist review + one re-review; findings closed)
 > **Phase baseline tree**: d51fbb14e145e8e6965e55319f4f5ec9121f93f4
 
 - [x] 2.1.1 List the existing spec assertions Phase 2 supersedes (e.g. `right-sized-verification-content.spec.test.mjs` ST-15 "report-only"/"1.5:1"/"never block"; `plan-coverage-content.spec.test.mjs` coverage hunt by default for full plans) and get the user's one-batch approval (D-8) ✅ (completed: 2026-11-26 08:52; two superseded, approved: coverage hunt default -> critical only; balance report-only -> blocks above 1:1 at standard)
@@ -207,7 +208,7 @@ only counts and classes):
 
 ### Phase 3 — Levers A+E: phase-scoped execution, one review round
 
-- [ ] 3.1.1 List the existing spec assertions Phase 3 supersedes (e.g. `right-sized-verification-content.spec.test.mjs` ST-7 "150 … product lines") and get the user's one-batch approval (D-8)
+- [x] 3.1.1 List the existing spec assertions Phase 3 supersedes (e.g. `right-sized-verification-content.spec.test.mjs` ST-7 "150 … product lines") and get the user's one-batch approval (D-8) ✅ (completed: 2026-11-26 11:03; one superseded, approved: the 150-product-line review trigger (ST-7); 'at most one refute per phase' stays true)
 - [ ] 3.1.2 Write `scripts/phase-dispatch-content.spec.test.mjs` (≤ 6 cases): per-phase executor dispatch above the threshold at both tiers, the compact packet, the structured report, parent-only marks and balance, `critical` phases on the session model, standard end review round — confirm it fails
 - [ ] 3.1.3 Measure M's post-Phase-2 phase sizes (2.1.8 plans) and set the dispatch threshold so M's feature phases dispatch
 - [ ] 3.1.4 exec-plan: dispatch each phase at or above the threshold to a fresh executor with the phase packet and a structured report (files changed, verify result, blockers); the parent keeps summaries, calls `mark`, and computes the balance

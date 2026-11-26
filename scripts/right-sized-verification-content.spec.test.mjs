@@ -201,7 +201,8 @@ it("ST-6 — the config schema accepts the verification tier setting", () => {
 
 it("ST-7 — the quality profile states the standard review trigger and that tiers change timing only", () => {
   const profile = prose(read(PROFILE))
-  assert.match(profile, /150.{0,40}product lines/i)
+  // The standard review trigger (one end-of-plan round, risk-tagged phases only) is pinned by
+  // phase-dispatch-content.spec.test.mjs; it superseded the 150-product-line trigger.
   assert.match(profile, /risk[- ]tag/i)
   assertTokens(profile, ["carried forward", "completion review"], PROFILE)
   assert.match(profile, /\bwhen\b.{0,100}\b(not|never)\s+whether/i)

@@ -91,7 +91,8 @@ Task completion is **two-stage**: `[~]` = implemented (crash-safe progress mark)
 complete. For each task, in order:
 
 1. Run the **minimum-sufficient checkpoint** before editing. Compare the intended work with the
-   original goal, established project patterns, relevant approved complexity AR/PF/RV decisions,
+   original goal, established project patterns, relevant approved complexity AR/PF/RV decisions (a
+   `standard` plan: the approved `D-n` rows),
    and the smallest viable implementation. If it triggers the Complexity Escalation Gate in
    `_shared/zero-ambiguity-gate.md`, mark the task `[!]`. For a T-NN mini-plan, preserve the current
    diff without marking it verified and switch to the full standalone-plan path before dispatching
