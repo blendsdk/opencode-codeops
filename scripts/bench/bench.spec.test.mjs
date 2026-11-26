@@ -115,6 +115,10 @@ function buildFixture(path) {
       prompt: "<!-- Agent template: phase-reviewer -->\nSECRET-PROMPT-EPSILON",
     }),
     toolItem("codeops_progress", { plan: "f", activity: "implementing" }),
+    toolItem("subagent", {
+      agent: "general", description: "second look",
+      prompt: "You review exactly ONE completed phase of work, via a review packet.",
+    }),
   ]))
   message.run("c1", "C1", "assistant", 1, 14, assistant(10, 1, 0, 100, 0))
   message.run("g1", "G1", "assistant", 1, 15, assistant(20, 2, 0, 200, 3))
@@ -152,6 +156,10 @@ function buildFixture(path) {
   part.run("m2", "R", 4, "tool", 12, tool("shell", {
     command: "sed -i 's/SECRET-OLD-ZETA/y/' plans/f/99-execution-plan.md",
   }))
+  part.run("m2", "R", 6, "tool", 12, tool("shell", { command: "grep -rn x plans/f 2>/dev/null > /tmp/out.txt" }))
+  part.run("m2", "R", 7, "tool", 12, tool("shell", { command: "perl -pi -e 's/a/b/' plans/f/99-execution-plan.md" }))
+  part.run("m2", "R", 8, "tool", 12, tool("shell", { command: "TZ=UTC date +%F" }))
+  part.run("m2", "R", 9, "tool", 12, tool("shell", { command: 'rg "Updated|date" plans/f' }))
   part.run("m2", "R", 5, "tool", 12, tool("subagent", {
     agent: "general", description: "refute",
     prompt: "<!-- Agent template: phase-reviewer -->\nMode: refute\nRV-001",
@@ -223,10 +231,10 @@ describe("bench sessions", () => {
 
   it("ST-B5 — counts bookkeeping: artifact edits and scripted writes, date, progress bar, mark, progress tool", () => {
     const { primary } = report()
-    assert.equal(primary.tool_calls, 16)
-    // artifact edit, date, progress bar, sed -i on a plan, multi-line mark, codeops_progress;
-    // `grep -n date` is not a timestamp
-    assert.equal(primary.bookkeeping_calls, 6)
+    assert.equal(primary.tool_calls, 21)
+    // artifact edit, date, TZ=… date, progress bar, sed -i and perl -pi on a plan, multi-line mark,
+    // codeops_progress; not: `grep -n date`, `rg "…|date"`, a read with a /dev/null or /tmp redirect
+    assert.equal(primary.bookkeeping_calls, 8)
   })
 
   it("ST-B6 — never prints message, prompt, command, or file text", () => {
@@ -244,10 +252,11 @@ describe("bench sessions", () => {
 
   it("ST-B7 — classifies dispatches by the template their prompt carries, never by description", () => {
     const { primary } = report()
-    assert.deepEqual(primary.dispatches, { review: 1, refute: 1, audit: 1, executor: 1, other: 1 })
+    // the second review pastes the template body without its header comment
+    assert.deepEqual(primary.dispatches, { review: 2, refute: 1, audit: 1, executor: 1, other: 1 })
     assert.equal(primary.review_rounds, 1)
     assert.equal(primary.refute_rounds, 1)
-    assert.equal(primary.reviewer_dispatches, 1)
+    assert.equal(primary.reviewer_dispatches, 2)
   })
 })
 

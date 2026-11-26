@@ -104,4 +104,5 @@ def scrub_credentials(db_path: Path) -> None:
     db.execute("DELETE FROM credential")
     db.commit()
     db.execute("VACUUM")
+    db.execute("PRAGMA wal_checkpoint(TRUNCATE)")  # old pages must not survive in the WAL
     db.close()

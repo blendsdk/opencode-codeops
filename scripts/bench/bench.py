@@ -39,18 +39,37 @@ TEST_PATH_RE = re.compile(
     r"(^|/)(test|tests|__tests__|spec|fixtures)/|\.test\.|\.spec\.|_test\.|_spec\.|Test\.|(^|/)test_"
 )
 PATCH_FILE_RE = re.compile(r"^\*\*\* (?:Update|Add|Delete) File: (.+)$", re.MULTILINE)
-#: `date` in command position: at the start, after a separator, or inside `$(` / backticks.
-DATE_RE = re.compile(r"(?:^|[;&|]\s*|\$\(\s*|`\s*)date\b", re.MULTILINE)
-PLAN_BOOKKEEPING_RE = re.compile(r"codeops_plan\.py\b.*?(--progress-bar|\smark\b)", re.DOTALL)
-#: A shell command that writes a file (in-place edit, redirect, tee, scripted write).
-SHELL_WRITE_RE = re.compile(
-    r"\b(?:sed|perl)\s+(?:-\w+\s+)*-i|>>?\s*[\"']?[\w./-]+|\btee\b|write_text\(|open\([^)]*['\"][wa]['\"]"
+#: `date` in command position (start, after a separator, `(`, `$(`, or a backtick), optionally
+#: after environment assignments; applied after quoted text is removed.
+DATE_RE = re.compile(r"(?:^|[;&|(]\s*|\$\(\s*|`\s*)(?:\w+=\S*\s+)*date\b", re.MULTILINE)
+#: A `codeops_plan.py --progress-bar` or `mark` call within one command (line continuations allowed).
+PLAN_BOOKKEEPING_RE = re.compile(r"codeops_plan\.py\b(?:[^\n;&|]|\\\n)*?(?:--progress-bar|\smark\b)")
+#: Write targets in a shell command: redirects, tee operands, and scripted Python writes.
+REDIRECT_TARGET_RE = re.compile(r"(?<![<>])>>?\s*[\"']?([^\s\"';|&<>]+)")
+TEE_TARGET_RE = re.compile(r"\btee\b(?:\s+-\w+)*\s+[\"']?([^\s\"';|&]+)")
+PY_WRITE_TARGET_RE = re.compile(
+    r"Path\(\s*[\"']([^\"']+)[\"']\s*\)\.write_(?:text|bytes)|open\(\s*[\"']([^\"']+)[\"']\s*,\s*[\"'][wax]"
 )
+#: An in-place editor (`sed -i`, `perl -pi`, combined flags allowed) within one command segment.
+IN_PLACE_RE = re.compile(r"\b(?:sed|perl)\b[^;&|\n]*?\s-[a-zA-Z]*i[a-zA-Z]*\b[^;&|\n]*")
 #: An artifact path inside a shell command (after a space, quote, slash, or `=`).
 ARTIFACT_IN_COMMAND_RE = re.compile(r"(?:^|[\s/'\"=])(?:plans|requirements|codeops)/")
 PROGRESS_TOOLS = {"codeops_progress"}
 DISPATCH_TOOLS = {"subagent", "task"}
 TEMPLATE_RE = re.compile(r"Agent template:\s*([\w-]+)|project domain specialist (reviewer|executor)")
+#: The first body sentence of each classified template, for prompts that paste the body without
+#: its header comment.
+TEMPLATE_OPENINGS = {
+    "You review exactly ONE completed phase of work": "phase-reviewer",
+    "You security-audit exactly ONE completed phase of work": "security-auditor",
+    "You performance-review exactly ONE completed phase of work": "perf-auditor",
+    "Audit exactly the supplied change packet. Establish shared state": "concurrency-auditor",
+    "Audit exactly the supplied change packet. Treat monetary": "financial-integrity-auditor",
+    "Review exactly the supplied semantic specification": "semantics-reviewer",
+    "You audit exactly ONE artifact in exactly ONE mode": "preflight-auditor",
+    "You execute exactly ONE dispatched high-sensitivity unit": "plan-task-executor-opus",
+    "You execute exactly ONE dispatched unit": "plan-task-executor",
+}
 REFUTE_RE = re.compile(r"^Mode:\s*refute\b", re.MULTILINE)
 REVIEW_ROLES = {
     "phase-reviewer", "correctness-reviewer", "security-auditor", "perf-auditor",
@@ -187,11 +206,22 @@ def is_bookkeeping_shell(command: str) -> bool:
     Bookkeeping is a timestamp (`date` in command position), a plan-progress call
     (`codeops_plan.py --progress-bar` or `mark`, also across line continuations), or a scripted
     write to a CodeOps artifact (`sed -i`, redirects, `tee`, or a scripted file write that names
-    a `plans/`, `requirements/`, or `codeops/` path).
+    a `plans/`, `requirements/`, or `codeops/` path as its target).
     """
-    if DATE_RE.search(command) or PLAN_BOOKKEEPING_RE.search(command):
+    if DATE_RE.search(unquoted(command)) or PLAN_BOOKKEEPING_RE.search(command):
         return True
-    return bool(ARTIFACT_IN_COMMAND_RE.search(command) and SHELL_WRITE_RE.search(command))
+    targets = [m.group(1) for m in REDIRECT_TARGET_RE.finditer(command)]
+    targets += [m.group(1) for m in TEE_TARGET_RE.finditer(command)]
+    targets += [m.group(1) or m.group(2) for m in PY_WRITE_TARGET_RE.finditer(command)]
+    if any(ARTIFACT_IN_COMMAND_RE.search(" " + target) for target in targets if target != "/dev/null"):
+        return True
+    return any(ARTIFACT_IN_COMMAND_RE.search(segment) for segment in IN_PLACE_RE.findall(command))
+
+
+def unquoted(command: str) -> str:
+    """Drop quoted text from a command, keeping command substitutions inside double quotes."""
+    command = re.sub(r"'[^']*'", "''", command)
+    return re.sub(r'"([^"]*)"', lambda m: " ".join(re.findall(r"\$\([^)]*\)", m.group(1))), command)
 
 
 def dispatch_class(inp: dict) -> str:
@@ -202,8 +232,11 @@ def dispatch_class(inp: dict) -> str:
     """
     prompt = str(inp.get("prompt") or "")
     match = TEMPLATE_RE.search(prompt)
-    role = (match.group(1) or f"domain-specialist-{match.group(2)}") if match else str(
-        inp.get("agent") or inp.get("subagent_type") or "")
+    if match:
+        role = match.group(1) or f"domain-specialist-{match.group(2)}"
+    else:
+        role = next((name for opening, name in TEMPLATE_OPENINGS.items() if opening in prompt),
+                    str(inp.get("agent") or inp.get("subagent_type") or ""))
     if role in REVIEW_ROLES:
         return "refute" if REFUTE_RE.search(prompt) else "review"
     if role in AUDIT_ROLES:

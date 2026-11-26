@@ -35,8 +35,8 @@ python3 scripts/bench/bench.py instructions --ref <checkout> [--json]
 | steps | assistant messages of the named (primary) session only |
 | ctx per step | input + cache.read + cache.write of one assistant message; median and p90 (nearest rank) for the primary session and for the whole tree |
 | edits | primary `edit`/`write`/`patch` targets, classed as `artifacts` (`plans/`, `requirements/`, `codeops/`), `tests` (test naming or test folders), `product`, or `other` (outside the repository) |
-| bookkeeping calls | primary edits that touch an artifact; shell calls that run `date` in command position, call `codeops_plan.py` with `--progress-bar` or `mark` (also across line continuations), or write an artifact path (`sed -i`, redirects, `tee`, scripted writes); and `codeops_progress` tool calls |
-| dispatches | each subagent dispatch classed by the agent template its prompt carries (the named role as fallback; never the description): `review`, `refute` (a review template whose packet starts `Mode: refute`), `audit` (preflight), `executor`, `other`; review rounds and refute rounds = primary steps with at least one such dispatch |
+| bookkeeping calls | primary edits that touch an artifact; shell calls that run `date` in command position (quoted text ignored, env prefixes allowed), call `codeops_plan.py` with `--progress-bar` or `mark` within one command (line continuations allowed), or write an artifact as their target (redirect, `tee`, `sed -i`/`perl -pi`, scripted Python writes; `/dev/null` excluded); and `codeops_progress` tool calls |
+| dispatches | each subagent dispatch classed by the agent template its prompt carries — its header comment or its first body sentence; the named role as fallback; never the description: `review`, `refute` (a review template whose packet starts `Mode: refute`), `audit` (preflight), `executor`, `other`; review rounds and refute rounds = primary steps with at least one such dispatch |
 | verification tasks | numbered plan tasks that run or check (run, verify, review, audit, red, green, gate, confirm, check, smoke, test, full verification) or whose first clause (parenthetical asides removed) produces tests, spec cases, a test file, or fixtures — not documentation *about* them |
 | instruction tokens | characters / 4 of SKILL.md plus linked Markdown, two levels deep; a link is conditional when its line names a flag, tier, or condition |
 
@@ -92,6 +92,12 @@ go to `~/.local/state/codeops-bench/`; inputs live in `/tmp/bench-lean/`.
    copied over the arm's own plus the subject's `npm run verify`, both run inside the sandbox with
    no network; an automatic audit flags every tool input that names a `/home` path other than the
    sandbox home or a harness path (refs, compiled tools, packets, other arms) outside the arm's own
-   ref, packet, and workspace; the main checkout's `git status` unchanged.
+   ref, packet, and workspace, apart from known-benign probes (listing the sandbox's own visible
+   directories, the scanned-clean compiled tools, the opencode binary, the masked nvm folder); a
+   scope check (the subject's out-of-scope paths in the diff, out-of-scope requirements in the
+   plan's task lines); and the main checkout's `git status` unchanged. An arm is `valid` only if
+   the audit, scope check, and checkout check all pass. Credentials are wiped on every exit path.
+   `harness/remeasure.py` re-applies the current kit and checks to stored arms without rerunning
+   them.
 7. **Repeat.** Baselines run more than once; the decision band is max(10%, observed spread); a pass
    inside the band gets one confirming re-run; report medians.

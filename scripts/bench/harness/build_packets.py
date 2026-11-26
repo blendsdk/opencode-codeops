@@ -8,9 +8,11 @@ from this repository's history; hand-written parts live next to this script in p
 Subjects:
 - S: reasoning-effort trace helper (mini-plan T-03.1..T-03.3), base 80f4e18^, acceptance = its
   spec files at 80f4e18.
-- M: live-task-sidebar slice 1 (TUI/RPC foundation), base d168332^, inputs = 01-requirements and
-  the ambiguity register at d168332 plus the interface sheet, acceptance = the tui-foundation spec
-  at 6ac519d. Slice 0 is excluded: it fixes CodeOps's own plan parser, which every ref ships.
+- M: live-task-sidebar slice 1 (TUI/RPC foundation), base d168332^, inputs = the slice-1 cut of
+  01-requirements (packets/M/), the ambiguity register at d168332, and the interface sheet;
+  acceptance = the tui-foundation spec at 6ac519d. Slice 0 is excluded: it fixes CodeOps's own plan
+  parser, which every ref ships. The requirements carry no slice-0 or live-smoke requirement, so
+  an arm has nothing to plan for them; run_arm.py invalidates an arm that touches them anyway.
 
 Usage: python3 -I build_packets.py
 """
@@ -24,8 +26,8 @@ STORE = Path.home() / ".local/state/codeops-bench"
 
 SOURCES = {
     "M": {
-        "packet": {"01-requirements.md": "d168332:plans/live-task-sidebar/01-requirements.md",
-                   "00-ambiguity-register.md": "d168332:plans/live-task-sidebar/00-ambiguity-register.md"},
+        # 01-requirements.md is hand-cut to slice 1 (packets/M/); the register stays a lookup.
+        "packet": {"00-ambiguity-register.md": "d168332:plans/live-task-sidebar/00-ambiguity-register.md"},
         "accept": {"plugin/tui-foundation.spec.test.mjs": "6ac519d:plugin/tui-foundation.spec.test.mjs"},
     },
     "S": {

@@ -22,9 +22,12 @@ TIMEOUT = {"make-plan": 5400, "preflight": 5400, "exec-plan": 10800}
 SUBJECTS = {
     "M": {"base": "d168332^", "slug": "live-task-sidebar",
           # Slice 1 only: slice 0 fixes CodeOps's own plan parser, which every ref ships and runs.
-          "accept": ["plugin/tui-foundation.spec.test.mjs"]},
+          "accept": ["plugin/tui-foundation.spec.test.mjs"],
+          "forbidden_paths": re.compile(r"^scripts/codeops_plan[\w-]*\.(?:py|[\w.]*mjs)$|^scripts/codeops-plan"),
+          "forbidden_scope": re.compile(r"\bFR-(?:[1-5]|10|12)\b|\blive[- ]smoke\b", re.IGNORECASE)},
     "S": {"base": "80f4e18^", "slug": "reasoning-effort-trace",
-          "accept": ["bin/reasoning-effort.spec.test.mjs", "scripts/reasoning-effort-content.spec.test.mjs"]},
+          "accept": ["bin/reasoning-effort.spec.test.mjs", "scripts/reasoning-effort-content.spec.test.mjs"],
+          "forbidden_paths": None, "forbidden_scope": None},
 }
 
 HEADER = """You are running one CodeOps benchmark arm. Work autonomously to completion; nobody will answer.
@@ -108,7 +111,41 @@ def audit(db_path, root, allowed):
     return sorted(bad)
 
 
+def task_text(execution_plan):
+    """The plan's numbered task lines only: notes and registers may name out-of-scope items."""
+    sys.path.insert(0, str(REPO / "scripts/bench"))
+    import bench
+    return "\n".join(bench.plan_tasks(execution_plan.read_text(errors="replace"))) if execution_plan.exists() else ""
+
+
+def audit_verdict(paths, work):
+    """Split flagged paths into known-benign probes and violations.
+
+    Benign: listing the sandbox's own visible directories (the harness root, `arms/`, `packets/`),
+    the compiled tools (scanned clean of subject answers at build time), the opencode binary and
+    its directory, and the masked nvm CodeOps folder. Anything else is a violation.
+    """
+    benign_exact = {str(W), str(W) + "/", f"{W}/arms", f"{W}/arms/", f"{W}/packets", f"{W}/packets/",
+                    "/home/gevik", "/home/gevik/"}
+    benign_prefix = (f"{W}/tools-", "/home/gevik/.opencode", "/home/gevik/.nvm/")
+    violations = [p for p in paths if p.rstrip("*") not in benign_exact and not p.startswith(benign_prefix)]
+    return {"benign": len(paths) - len(violations), "violations": violations}
+
+
+#: Arm databases holding a credential; scrubbed on every exit path.
+SEEDED = []
+
+
 def main():
+    """Run one arm; credentials are wiped however the arm ends."""
+    try:
+        run()
+    finally:
+        for db_path in SEEDED:
+            sandbox.scrub_credentials(db_path)
+
+
+def run():
     ap = argparse.ArgumentParser()
     ap.add_argument("subject", choices=["M", "S"])
     ap.add_argument("n")
@@ -163,6 +200,7 @@ def main():
     tools = ref.with_name(ref.name.replace("ref-", "tools-", 1))
     data_dir, config_dir = arm / "data", arm / "config"
     db_path = sandbox.seed_data(data_dir)
+    SEEDED.append(db_path)
     sandbox.write_config(config_dir, ref)
     allowed = (str(ref), str(p), str(work), sandbox.ARM_HOME)
     # Network: model API only (CONNECT allow-list) plus an npm mirror that refuses CodeOps itself.
@@ -177,6 +215,7 @@ def main():
     ]
     time.sleep(1)
 
+    session_records = []
     for wf in wfs:
         title = f"bench-{a.subject}-{wf}-{a.ref}-{a.n}"
         prompt = HEADER.format(ref=ref, wf=wf, assumptions=assumptions, subj=subj) + \
@@ -201,12 +240,23 @@ def main():
                "secs": secs, "done": done[-1] if done else None, "metrics": metrics, "model": MODEL,
                "pin_tier": a.pin_tier, "sandbox": True, "out_of_scope": audit(db_path, sid, allowed) if sid else None,
                "time": time.strftime("%Y-%m-%d %H:%M")}
+        session_records.append(rec)
         with (STORE / "results.jsonl").open("a") as f:
             f.write(json.dumps(rec) + "\n")
 
     for proc in proxies:
         proc.terminate()
     net_text = net_log.read_text() if net_log.exists() else ""
+
+    # Scope: an arm that changes out-of-scope code or plans out-of-scope requirements is invalid.
+    sh(["git", "add", "-A", "--intent-to-add"], cwd=subj)
+    changed = sh(["git", "diff", "--name-only", "HEAD"], cwd=subj)[1].split()
+    plan_text = task_text(subj / "plans" / s["slug"] / "99-execution-plan.md")
+    scope_violations = []
+    if s["forbidden_paths"]:
+        scope_violations += [f for f in changed if s["forbidden_paths"].search(f)]
+    if s["forbidden_scope"]:
+        scope_violations += sorted(set(s["forbidden_scope"].findall(plan_text)))
 
     # Acceptance: the subject's original spec tests, copied over the arm's files.
     for rel in s["accept"]:
@@ -229,7 +279,6 @@ def main():
     main_after = sh(["git", "-C", str(REPO), "status", "--porcelain"])[1]
     plans = sh(["python3", "-I", str(REPO / "scripts/bench/bench.py"), "plans", "--json",
                 str(subj / "plans" / s["slug"])])[1]
-    sh(["git", "add", "-A", "--intent-to-add"], cwd=subj)  # throwaway worktree: make new files visible to diff
     diffstat = sh(["git", "diff", "--shortstat", "HEAD"], cwd=subj)[1].strip()
     untracked = sh(["git", "ls-files", "--others", "--exclude-standard"], cwd=subj)[1].split()
     summary = {"subject": a.subject, "n": a.n, "ref": a.ref, "workflow": "acceptance",
@@ -238,7 +287,11 @@ def main():
                "main_unchanged": main_before == main_after, "diffstat": diffstat, "untracked": len(untracked),
                "plan": (json.loads(plans)[0] if plans.strip().startswith("[") else None),
                "net_denied": sorted(set(re.findall(r"(?:DENY|REGISTRY DENY) (\S+)", net_text))),
+               "scope_violations": scope_violations,
+               "audit": audit_verdict(sorted({x for r in session_records for x in (r["out_of_scope"] or [])}), work),
                "time": time.strftime("%Y-%m-%d %H:%M")}
+    summary["valid"] = not summary["scope_violations"] and not summary["audit"]["violations"] \
+        and summary["main_unchanged"]
     with (STORE / "results.jsonl").open("a") as f:
         f.write(json.dumps(summary) + "\n")
     # Keep the plan folder and a diff for inspection, then drop the worktree.
@@ -246,7 +299,6 @@ def main():
         shutil.copytree(subj / "plans" / s["slug"], arm / "plan", dirs_exist_ok=True)
     (arm / "subject.diff").write_text(sh(["git", "diff", "HEAD"], cwd=subj)[1])
     shutil.copy(assumptions, arm / "assumptions.md")
-    sandbox.scrub_credentials(db_path)
     shutil.rmtree(work, ignore_errors=True)
     note("done " + json.dumps(summary))
     print(json.dumps(summary))
