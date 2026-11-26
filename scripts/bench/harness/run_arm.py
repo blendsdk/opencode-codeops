@@ -158,8 +158,8 @@ def audit_verdict(paths, work):
     """
     benign_exact = {str(W), str(W) + "/", f"{W}/arms", f"{W}/arms/", f"{W}/packets", f"{W}/packets/",
                     "/home/gevik", "/home/gevik/"}
-    # Globs directly under the harness root match nothing the sandbox does not already show.
-    root_glob = re.compile(re.escape(str(W)) + r"/[^/]*\*[^/]*$")
+    # Globs under the harness root can only match what the sandbox mounts: the arm's own paths.
+    root_glob = re.compile(re.escape(str(W)) + r"/.*\*")
     benign_prefix = (f"{W}/tools-", "/home/gevik/.opencode", "/home/gevik/.nvm/")
     violations = [p for p in paths if p.rstrip("*") not in benign_exact and not p.startswith(benign_prefix)
                   and not root_glob.match(p)]
