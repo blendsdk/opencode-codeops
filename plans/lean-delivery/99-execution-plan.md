@@ -1,8 +1,8 @@
 # Task T-08: Lean delivery — far fewer tokens, steps, and verification tasks per feature
 
 > **Type**: Task (lightweight) · **CodeOps Artifact Schema**: 1
-> **Progress**: 33/37 tasks (89%)
-> **Last Updated**: 2026-11-26 13:07
+> **Progress**: 34/37 tasks (92%)
+> **Last Updated**: 2026-11-26 13:25
 > **Reasoning**: high — changes the core planning and execution protocols; every phase is measured
 > **Plan form**: single document by user decision (this plan practises lever C before lever C exists)
 > **Release**: MAJOR (3.0.0) — commits that change a skill contract carry a `BREAKING CHANGE:` footer (D-12)
@@ -236,7 +236,7 @@ only counts and classes):
 
 ### Phase 5 — Real-world validation and closeout
 
-- [ ] 5.1.1 Hand the user the MAJOR release step (`node scripts/release.mjs release --type auto --tag <dist-tag>`) and the update step (`npx opencode-codeops update`); proceed after the user releases and updates or explicitly defers
+- [x] 5.1.1 Hand the user the MAJOR release step (`node scripts/release.mjs release --type auto --tag <dist-tag>`) and the update step (`npx opencode-codeops update`); proceed after the user releases and updates or explicitly defers ✅ (completed: 2026-11-26 13:25; 3.0.0 published by the Release workflow (run 45818965860, provenance signed); version guard fixed to ignore the layout schema version)
 - [ ] 5.1.2 Next real standard feature in one of the user's projects: `bench.py sessions` and compare with that project's historical make-plan, preflight, and exec-plan medians
 - [ ] 5.1.3 A second real feature in another project, same measurements
 - [ ] 5.1.4 Final before/after report in §Results against the Objective targets; update issue #4 (Wave 2) from the results; roadmap row T-08 to Done
