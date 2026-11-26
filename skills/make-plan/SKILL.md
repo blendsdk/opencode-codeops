@@ -15,15 +15,19 @@ Create a detailed, multi-document implementation plan for a software feature or 
 
 Load documents when a step needs them, not up front. A `standard`-tier run reads:
 
-- this file and `templates.md` §Standard single-document plan (only that section);
-- `_shared/zero-ambiguity-gate.md` (the gate and its owner table), the tier table in
-  `_shared/spec-first-ordering.md`, `_shared/layout-convention.md` for paths, and
-  `_shared/reasoning-effort.md` §Plan suggestion derivation.
+- this file; `templates.md` §Standard single-document plan, §Reference, don't restate, and the
+  `99-execution-plan.md` template's execution-rules block and phase-header lines;
+- `quality-checklist.md` — its Granularity, Specification-First Testing, Zero-Ambiguity, and
+  Execution Plan Completeness blocks;
+- `_shared/zero-ambiguity-gate.md` (the gate and its owner table), `_shared/spec-first-ordering.md`
+  §Verification tiers and §Enforcement, `_shared/layout-convention.md` for paths,
+  `_shared/reasoning-effort.md` §Plan suggestion derivation, `_shared/specialist-agents.md` for the
+  specialist-gap check, and `references/domains/selection.md` for lens selection.
 
 It skips the `critical`-path material:
 
 - skip `_shared/coverage-hunt.md` (the hunt runs only at critical);
-- skip the 00–07 templates and `quality-checklist.md` (critical only).
+- skip the `00-index.md`, `01`–`07` document templates (critical only).
 
 Option policies stay unread without their flag:
 
@@ -510,7 +514,9 @@ Adapt component documents to the project type (Web App, API, Library, CLI, UI Co
 
 ## Phase 3 — Quality Checklist
 
-Before finalizing, run the full quality checklist in **[quality-checklist.md](quality-checklist.md)** (Completeness, Granularity, Dependencies, Testing, Specification-First Testing, No Dead Code, Security-First, Zero-Ambiguity, Execution Plan Completeness, Format). The Specification-First, Security-First, Zero-Ambiguity, and Execution-Plan-Completeness blocks are NON-NEGOTIABLE.
+Before finalizing, run the quality checklist in **[quality-checklist.md](quality-checklist.md)** — the
+full list at `critical`; at `standard`, its Granularity, Specification-First Testing,
+Zero-Ambiguity, and Execution Plan Completeness blocks (Completeness, Granularity, Dependencies, Testing, Specification-First Testing, No Dead Code, Security-First, Zero-Ambiguity, Execution Plan Completeness, Format). The Specification-First, Security-First, Zero-Ambiguity, and Execution-Plan-Completeness blocks are NON-NEGOTIABLE.
 
 ---
 

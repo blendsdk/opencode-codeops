@@ -46,8 +46,14 @@ describe("standard-path reading lists", () => {
     const list = section(read("skills/make-plan/SKILL.md"), "## What a standard run reads")
     assert.notEqual(list, "", "make-plan must carry the standard reading list")
     assert.match(list, /templates\.md.{0,80}Standard single-document plan/)
-    for (const skipped of ["coverage-hunt.md", "quality-checklist.md", "auto-design.md", "scope-expansion-control.md"]) {
-      assert.match(list, new RegExp(`(?:skip|not|only when)[^\\n]*${skipped.replace(".", "\\.")}|${skipped.replace(".", "\\.")}[^\\n]*(?:only when|skip)`, "i"), `the list names ${skipped} as skipped or conditional`)
+    for (const skipped of ["coverage-hunt.md", "auto-design.md", "scope-expansion-control.md"]) {
+      assert.match(list, new RegExp(`(?:\\bskip\\b|\\bnot\\b|only when)[^\\n]*${skipped.replace(".", "\\.")}|${skipped.replace(".", "\\.")}[^\\n]*(?:only when|\\bskip\\b)`, "i"), `the list names ${skipped} as skipped or conditional`)
+    }
+    // What a standard run needs is never on a skip line.
+    const skipLines = list.split("\n").filter((line) => /^- skip\b/i.test(line))
+    for (const needed of ["quality-checklist.md", "zero-ambiguity-gate.md", "spec-first-ordering.md", "specialist-agents.md", "execution-rules block"]) {
+      assert.equal(skipLines.some((line) => line.includes(needed)), false, `${needed} must not be skipped`)
+      assert.ok(list.includes(needed), `the list names ${needed} as read`)
     }
   })
 
@@ -57,6 +63,13 @@ describe("standard-path reading lists", () => {
     assert.match(list, /execution-protocol\.md/)
     for (const optional of ["auto-design.md", "scope-expansion-control.md", "reasoning-effort.md"]) {
       assert.match(list, new RegExp(`${optional.replace(".", "\\.")}[^\\n]*only when`, "i"), `${optional} is read only with its flag`)
+    }
+    // The option links in the body carry the same condition on their own line.
+    for (const skill of ["skills/exec-plan/SKILL.md", "skills/make-plan/SKILL.md"]) {
+      const body = read(skill)
+      for (const option of ["auto-design.md", "scope-expansion-control.md"]) {
+        assert.match(body, new RegExp(`only when the token is present\\) read and apply \\[[^\\]]*${option.replace(".", "\\.")}`), `${skill}: ${option} link is flag-gated`)
+      }
     }
   })
 })
