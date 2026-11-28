@@ -2,13 +2,15 @@
 
 All notable changes to CodeOps are recorded here.
 
-## Unreleased
+## 3.1.0 — 2026-11-28
 
 ### Features
 
-- `/enhance <prompt>`: improves a question or research prompt before running it — brief repo and
-  web grounding, the questions that would change the direction, a shown improved prompt, then the
-  run; `--ask` waits for approval first.
+- enhance: add the /enhance command to improve a question or research prompt before running it
+
+### Documentation
+
+- lean-delivery: record the 3.0.0 release
 
 ## 3.0.0 — 2026-11-26
 
