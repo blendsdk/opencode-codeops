@@ -27,6 +27,12 @@ Turn an idea or existing system into ambiguity-free requirements, grounded speci
 | `git-commit` | Guarded commit — verify, stage deliberately, Conventional Commit message |
 | `outcome-review` | Review local opt-in outcome metrics (requires `metrics.enabled: true`) |
 
+## Commands
+
+| Command | Purpose |
+|---|---|
+| `/enhance [--ask] <prompt>` | Improve a question or research prompt — asks what matters, shows the improved prompt, then runs it ([details](#improve-a-prompt-before-running-it-enhance)) |
+
 ## Test-impact selection (opt-in)
 
 Large suites do not have to run in full for every small change. CodeOps can use
@@ -219,8 +225,25 @@ you should be asking. Before answering, the agent:
    switching.
 4. **Runs it.** `/enhance --ask <prompt>` waits for your go-ahead first.
 
-The plugin registers the command, so it is available wherever CodeOps is installed; on an
-OpenCode build without plugin commands, `/enhance` is simply absent.
+For example:
+
+```text
+/enhance which local vector database should I use for a small RAG prototype
+```
+
+Instead of answering right away, the agent asks about your language, whether the database should
+run embedded or as a server, the features you need beyond similarity search, what the prototype
+must prove, and what is already in use or ruled out — then shows the improved prompt and answers
+that.
+
+Only a leading `--ask` is the option; `--ask` anywhere else is part of your prompt. Files you
+attach in the composer stay attached. `/enhance` with no prompt replies with its usage line.
+
+The plugin registers the command, so it is available wherever CodeOps is installed (from 3.1.0;
+run `npx opencode-codeops update`); on an OpenCode build without plugin commands, `/enhance` is
+simply absent. If two CodeOps versions are configured at once — for example a global install and
+a local checkout — only one plugin instance loads, so `/enhance` appears only when that instance
+is 3.1.0 or later.
 
 ## Live task progress in the sidebar
 
