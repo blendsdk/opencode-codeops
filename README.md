@@ -202,6 +202,26 @@ accumulate scratch data. Because OpenCode 2 does not expose a session id to shel
 sessions served by one instance share this directory, and no session's scratch is deleted while
 others may still use it. The full protocol is in `_shared/workspace-hygiene.md`.
 
+## Improve a prompt before running it: `/enhance`
+
+Type `/enhance <prompt>` when you have a question or research task but are not sure what else
+you should be asking. Before answering, the agent:
+
+1. **Looks around briefly** — reads `AGENTS.md` and any file you name, and runs 1–3 quick web
+   searches when the topic needs current facts.
+2. **Asks what matters** — every question whose answer would change the direction, as multiple
+   choice in one batch, with at most one follow-up batch. It skips this when nothing important is
+   unclear. It is a quick check, not a requirements interview: no files, no decision records.
+3. **Shows the improved prompt** — the real goal, context, considerations you did not mention,
+   related questions you will also want answered, what a good answer looks like, and its
+   assumptions. It keeps your goal and adds angles, never extra work. When `deep-research`,
+   `grill-me`, `make-plan`, or `make-requirements` fits better, it says so in one line without
+   switching.
+4. **Runs it.** `/enhance --ask <prompt>` waits for your go-ahead first.
+
+The plugin registers the command, so it is available wherever CodeOps is installed; on an
+OpenCode build without plugin commands, `/enhance` is simply absent.
+
 ## Live task progress in the sidebar
 
 While an `exec-plan` run is active, the sidebar shows the current run — plan, phase, task,

@@ -20,6 +20,7 @@ import {
   registerDiscoveryTools,
 } from "../bin/lib/discovery-tools.mjs"
 import { resolveDataDir } from "../bin/lib/discovery-store.mjs"
+import { registerEnhanceCommand } from "../bin/lib/enhance-command.mjs"
 import {
   appendEffortTrace,
   applyEffort,
@@ -516,6 +517,20 @@ export default Plugin.define({
       }
     } catch {
       warnContentFree("Could not register the codeops progress tool.")
+    }
+
+    // ---------------------------------------------------------------------
+    // /enhance: improve a question or research prompt, then run it. The
+    // command registers behind feature-detection; a host without the command
+    // API simply has no /enhance.
+    // ---------------------------------------------------------------------
+    try {
+      const registered = await registerEnhanceCommand(ctx)
+      if (!registered) {
+        warnContentFree("The /enhance command is unavailable in this OpenCode build.")
+      }
+    } catch {
+      warnContentFree("Could not register the /enhance command.")
     }
 
     // ---------------------------------------------------------------------

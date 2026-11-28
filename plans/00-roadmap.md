@@ -25,6 +25,7 @@
 | T-06 | Fix agent frontmatter layout so mode/hidden/permissions apply (issue #2) | — | [fix-agent-frontmatter](fix-agent-frontmatter/99-execution-plan.md) | Done | ✅ | 2026-10-09 | — |
 | T-07 | Specialist awareness: visible checks, proposal split, analyze-project coverage | — | [specialist-awareness](specialist-awareness/99-execution-plan.md) | Done | ✅ | 2026-10-09 | — |
 | T-08 | Lean delivery: far fewer tokens, steps, and verification tasks per standard feature (measured per lever) | — | [lean-delivery](lean-delivery/99-execution-plan.md) | Executing | 🔄 | 2026-11-25 12:10 | REQ-RIGHT-SIZED-VERIFICATION |
+| T-09 | The /enhance command: improve a question or research prompt, then run it | — | [enhance-command](enhance-command/99-execution-plan.md) | Done | ✅ | 2026-11-28 12:17 | — |
 | REQ-ANALYZE-AGENTS | Active specialist discovery: the analyze-agents skill with durable evidence | — | [analyze-agents](analyze-agents/00-index.md) | Done | ✅ | 2026-10-09 | T-07 |
 | REQ-LIVE-TASK-SIDEBAR | Live CodeOps task progress in the sidebar — foundation slices 0–1 (counting fix + TUI spike) | — | [live-task-sidebar](live-task-sidebar/00-index.md) | Done | ✅ | 2026-10-10 | — |
 | REQ-LIVE-TASK-PROGRESS | Live CodeOps task progress in the sidebar — the full feature (slice 2: progress tool, live state, sidebar view, exec-plan reporting) | — | [live-task-progress](live-task-progress/00-index.md) | Done | ✅ | 2026-10-10 20:39 | — |

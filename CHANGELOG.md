@@ -2,6 +2,14 @@
 
 All notable changes to CodeOps are recorded here.
 
+## Unreleased
+
+### Features
+
+- `/enhance <prompt>`: improves a question or research prompt before running it — brief repo and
+  web grounding, the questions that would change the direction, a shown improved prompt, then the
+  run; `--ask` waits for approval first.
+
 ## 3.0.0 — 2026-11-26
 
 ### Breaking Changes
